@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.01.13**
+* privatepirate: Fixed HDR Settings UI
+
 **2024.12.11**
 * Fix of "Fail to detach scope from some weapons" (https://github.com/themrdemonized/xray-monolith/issues/114)
 
