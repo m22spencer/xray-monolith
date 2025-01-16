@@ -195,7 +195,7 @@ enum EBoneCallbackParam
 
 struct hud_item_measures
 {
-	enum { e_fire_point=(1 << 0), e_fire_point2=(1 << 1), e_shell_point=(1 << 2), e_16x9_mode_now=(1 << 3) };
+	enum { e_fire_point=(1 << 0), e_fire_point2=(1 << 1), e_shell_point=(1 << 2), e_16x9_mode_now=(1 << 3), e_fire_point_silencer=(1 << 4) };
 
 	Flags8 m_prop_flags;
 
@@ -207,6 +207,8 @@ struct hud_item_measures
 	Fvector m_fire_point_offset;
 	u16 m_fire_bone2;
 	Fvector m_fire_point2_offset;
+	u16 m_fire_bone_silencer;
+	Fvector m_fire_point_silencer;
 	Fvector m_fire_direction;
 	u16 m_shell_bone;
 	Fvector m_shell_point_offset;

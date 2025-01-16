@@ -7,6 +7,7 @@ struct firedeps
 	Fvector vLastFP2; //fire point2
 	Fvector vLastFD; //fire direction
 	Fvector vLastSP; //shell point	
+	Fvector vLastFPSilencer;
 
 	firedeps()
 	{
@@ -15,5 +16,6 @@ struct firedeps
 		vLastFP2.set(0, 0, 0);
 		vLastFD.set(0, 0, 0);
 		vLastSP.set(0, 0, 0);
+		vLastFPSilencer.set(0, 0, 0);
 	}
 };

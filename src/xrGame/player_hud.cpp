@@ -205,6 +205,11 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		m_item_transform.transform_tiny(fd.vLastSP);
 		VERIFY(_valid(fd.vLastSP));
 	}
+
+	Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
+	fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
+	m_item_transform.transform_tiny(fd.vLastFPSilencer);
+	VERIFY(_valid(fd.vLastFPSilencer));
 }
 
 bool attachable_hud_item::need_renderable()
@@ -270,6 +275,12 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 	}
 	else
 		m_fire_point2_offset.set(0, 0, 0);
+
+	// demonized: fire point for silencer
+	m_prop_flags.set(e_fire_point_silencer, pSettings->line_exist(sect_name, "fire_bone_silencer"));
+	bone_name = READ_IF_EXISTS(pSettings, r_string, sect_name, "fire_bone_silencer", READ_IF_EXISTS(pSettings, r_string, sect_name, "fire_bone", "wpn_body"));
+	m_fire_bone_silencer = K->LL_BoneID(bone_name);
+	m_fire_point_silencer.set(pSettings->line_exist(sect_name, "fire_point_silencer") ? pSettings->r_fvector3(sect_name, "fire_point_silencer") : m_fire_point_offset);
 
 	m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
 	if (m_prop_flags.test(e_shell_point))
