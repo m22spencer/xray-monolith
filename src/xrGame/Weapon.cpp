@@ -264,10 +264,12 @@ void CWeapon::UpdateFireDependencies_internal()
 			Fvector& fp = vLoadedFirePoint;
 			Fvector& fp2 = vLoadedFirePoint2;
 			Fvector& sp = vLoadedShellPoint;
+			Fvector& fps = vLoadedFirePointSilencer;
 
 			parent.transform_tiny(m_current_firedeps.vLastFP, fp);
 			parent.transform_tiny(m_current_firedeps.vLastFP2, fp2);
 			parent.transform_tiny(m_current_firedeps.vLastSP, sp);
+			parent.transform_tiny(m_current_firedeps.vLastFPSilencer, fps);
 
 			m_current_firedeps.vLastFD.set(0.f, 0.f, 1.f);
 			parent.transform_dir(m_current_firedeps.vLastFD);
@@ -657,6 +659,11 @@ void CWeapon::Load(LPCSTR section)
 		vLoadedFirePoint2 = pSettings->r_fvector3(section, "fire_point2");
 	else
 		vLoadedFirePoint2 = vLoadedFirePoint;
+
+	if (pSettings->line_exist(section, "fire_point_silencer"))
+		vLoadedFirePointSilencer = pSettings->r_fvector3(section, "fire_point_silencer");
+	else
+		vLoadedFirePointSilencer = vLoadedFirePoint;
 
 	// hands
 	eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));

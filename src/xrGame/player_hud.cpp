@@ -209,6 +209,7 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 	Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
 	fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
 	m_item_transform.transform_tiny(fd.vLastFPSilencer);
+	fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
 	VERIFY(_valid(fd.vLastFPSilencer));
 }
 

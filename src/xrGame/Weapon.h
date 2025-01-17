@@ -507,6 +507,7 @@ public:
 	//çàãðóæàåìûå ïàðàìåòðû
 	Fvector vLoadedFirePoint;
 	Fvector vLoadedFirePoint2;
+	Fvector vLoadedFirePointSilencer;
 	bool m_bCanBeLowered;
 
 private:
