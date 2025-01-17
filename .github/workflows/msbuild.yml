@@ -48,7 +48,7 @@ jobs:
         rename-item -path gamedata.db0 -newname ${{env.PACK_GAMEDATA_NAME}}
         
     - name: Upload gamedata
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.6.0
       with:
         # Artifact name
         name: ${{env.PACK_GAMEDATA_NAME}}
@@ -130,7 +130,7 @@ jobs:
       run: msbuild /p:Configuration=${{matrix.buildconf}} ${{env.SOLUTION_FILE_PATH}}
 
     - name: Upload Exe
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.6.0
       with:
         # Artifact name
         name: ${{matrix.buildconf}}_exe
@@ -153,7 +153,7 @@ jobs:
         compress-archive -DestinationPath "STALKER-Anomaly-modded-exes_${{matrix.buildconf}}_pdb.zip" -Path "./*.pdb"
 
     - name: Upload PDB
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.6.0
       with:
         # Artifact name
         name: ${{matrix.buildconf}}_pdb
