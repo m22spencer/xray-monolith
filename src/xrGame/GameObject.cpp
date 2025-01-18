@@ -952,8 +952,11 @@ u32 CGameObject::ef_detector_type() const
 void CGameObject::net_Relcase(CObject* O)
 {
 	inherited::net_Relcase(O);
+	// demonized: Causes more allocations for lua gc. Pretty much all scripts never use this and should never.
+	/*
 	if (!g_dedicated_server)
 		CScriptBinder::net_Relcase(O);
+	*/
 }
 
 CGameObject::CScriptCallbackExVoid& CGameObject::callback(GameObject::ECallbackType type) const
