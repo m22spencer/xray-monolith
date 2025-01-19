@@ -184,7 +184,10 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
-**2025.01.18**
+**2025.01.19**
+* TIHan: Stutter improvement, disable running 'net_Relcase' on scripts (https://github.com/themrdemonized/xray-monolith/pull/122)
+
+**2025.01.17**
 * Possibility to set `fire_point_silencer` for weapons. Adjust fire point when silencer is attached, defaults to the value of fire_point. Supports both HUD and world models
 
 **2025.01.13**
