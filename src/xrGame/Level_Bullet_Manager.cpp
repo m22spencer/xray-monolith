@@ -43,7 +43,7 @@ SBullet::~SBullet()
 {
 }
 
-BOOL g_allow_silencer_hide_tracer = 1;
+BOOL g_allow_silencer_hide_tracer = 0;
 u32 SBullet::bulletCount = 0;
 
 void SBullet::Init(const Fvector& position,
