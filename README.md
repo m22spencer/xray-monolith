@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.01.22**
+* `allow_silencer_hide_tracer` cvar is 0 by default
+
 **2025.01.19**
 * TIHan: Stutter improvement, disable running 'net_Relcase' on scripts (https://github.com/themrdemonized/xray-monolith/pull/122)
 
