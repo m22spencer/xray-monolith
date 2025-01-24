@@ -133,7 +133,7 @@ void CUIMotionIcon::Update()
 
 float CUIMotionIcon::GetLuminosity()
 {
-	return m_luminosity;
+	return m_luminosity_progress.m_stage;
 }
 
 void SetActorVisibility(u16 who_id, float value)

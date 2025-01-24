@@ -16,10 +16,12 @@ public:
 
 	virtual void Draw();
 
+public:
+	float m_stage;
+
 protected:
 	bool m_bClockwise;
 	u32 m_sectorCount;
-	float m_stage;
 	bool m_bText;
 	bool m_blend;
 
