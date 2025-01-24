@@ -131,6 +131,11 @@ void CUIMotionIcon::Update()
 	}
 }
 
+float CUIMotionIcon::GetLuminosity()
+{
+	return m_luminosity;
+}
+
 void SetActorVisibility(u16 who_id, float value)
 {
 	if (!IsGameTypeSingle())
@@ -138,6 +143,19 @@ void SetActorVisibility(u16 who_id, float value)
 
 	if (g_pMotionIcon && g_pMotionIcon->IsShown())
 		g_pMotionIcon->SetActorVisibility(who_id, value);
+}
+
+float GetActorLuminosity()
+{
+	if (!IsGameTypeSingle())
+		return 0.f;
+
+	if (g_pMotionIcon) {
+		float lum = g_pMotionIcon->GetLuminosity();
+		clamp(lum, 0.f, 1.f);
+		return lum;
+	}
+	return 0.f;
 }
 
 void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)

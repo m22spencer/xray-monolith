@@ -32,6 +32,9 @@ private:
 	float cur_pos;
 
 public:
+	float GetLuminosity();
+
+public:
 	virtual ~CUIMotionIcon();
 	CUIMotionIcon();
 	virtual void Update();

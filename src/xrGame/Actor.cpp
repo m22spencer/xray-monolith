@@ -2728,3 +2728,10 @@ void CActor::removeFPCam()
 		m_FPCam = NULL;
 	}
 }
+
+float GetActorLuminosity();
+float CActor::GetUILuminosity()
+{
+
+	return GetActorLuminosity();
+}

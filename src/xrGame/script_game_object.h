@@ -1072,6 +1072,9 @@ public:
 
 	float Weight() const;
 
+	// demonized: get luminosity as displayed in ui
+	float GetActorUILuminosity();
+
 	float GetActorJumpSpeed() const;
 	void SetActorJumpSpeed(float jump_speed);
 	float GetActorSprintKoef() const;

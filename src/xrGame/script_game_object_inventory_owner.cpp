@@ -2455,6 +2455,19 @@ void CScriptGameObject::SetWeight(float w)
 	inventory_item->SetWeight(w);
 }
 
+// demonized: get luminosity as displayed in ui
+float CScriptGameObject::GetActorUILuminosity()
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if (!pActor)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
+			"CScriptGameObject::GetActorLuminosity, object is not actor");
+		return 0.f;
+	}
+	return pActor->GetUILuminosity();
+}
+
 float CScriptGameObject::GetActorJumpSpeed() const
 {
 	CActor* pActor = smart_cast<CActor*>(&object());

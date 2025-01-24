@@ -573,6 +573,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("update_weight", &CScriptGameObject::UpdateWeight)
 		.def("get_total_weight_force_update", &CScriptGameObject::GetTotalWeightForceUpdate)
 
+		// demonized: get luminosity as displayed in ui
+		.def("get_actor_ui_luminosity", &CScriptGameObject::GetActorUILuminosity)
+
 		.def("weight", &CScriptGameObject::Weight)
 
 		.def("get_actor_jump_speed", &CScriptGameObject::GetActorJumpSpeed)

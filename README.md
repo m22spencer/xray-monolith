@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.01.25**
+* `db.actor:get_actor_ui_luminosity()` to get luminosity as displayed on the HUD from 0 to 1
+
 **2025.01.22**
 * `allow_silencer_hide_tracer` cvar is 0 by default
 

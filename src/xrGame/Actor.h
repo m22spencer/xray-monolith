@@ -93,6 +93,8 @@ public:
 public:
 	virtual BOOL AlwaysTheCrow() { return TRUE; }
 
+	virtual float GetUILuminosity();
+
 	virtual CAttachmentOwner* cast_attachment_owner() { return this; }
 	virtual CInventoryOwner* cast_inventory_owner() { return this; }
 	virtual CActor* cast_actor() { return this; }
