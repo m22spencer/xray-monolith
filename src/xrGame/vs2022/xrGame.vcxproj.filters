@@ -4123,6 +4123,7 @@
     <ClInclude Include="..\new_sds.h" />
     <ClInclude Include="..\NewZoomFlag.h" />
     <ClInclude Include="..\LevelDebugScript.h" />
+    <ClInclude Include="..\WeaponSSRS.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp" />
@@ -5351,6 +5352,8 @@
     <ClCompile Include="..\ZudaArtifact.cpp" />
     <ClCompile Include="..\WeaponMagazineExtended.cpp" />
     <ClCompile Include="..\LevelDebugScript.cpp" />
+    <ClCompile Include="..\WeaponSSRS.cpp" />
+    <ClCompile Include="..\WeaponSSRS_script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\ai\monsters\chimera\chimera_attack_state.h" />
@@ -5358,5 +5361,8 @@
     <CustomBuild Include="..\Explosive.h" />
     <CustomBuild Include="..\graph_abstract.h" />
     <CustomBuild Include="..\graph_abstract_inline.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

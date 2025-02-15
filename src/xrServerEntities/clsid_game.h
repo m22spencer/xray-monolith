@@ -93,6 +93,7 @@
 #define CLSID_OBJECT_W_KNIFE		MK_CLSID('W','_','K','N','I','F','E',' ')
 #define CLSID_OBJECT_W_BM16			MK_CLSID('W','_','B','M','1','6',' ',' ')
 #define CLSID_OBJECT_W_RG6			MK_CLSID('W','_','R','G','6',' ',' ',' ')
+#define CLSID_OBJECT_W_SSRS			MK_CLSID('W','_','S','S','R','S',' ',' ')
 
 #define	CLSID_OBJECT_W_STATMGUN		MK_CLSID('W','_','S','T','M','G','U','N')
 // Weapons Ammo
