@@ -427,6 +427,9 @@ void CObjectFactory::register_classes()
 	ADD(smart_cover::object, CSE_SmartCover, TEXT2CLSID("SMRTCOVR"), "smart_cover");
 #endif // #ifndef NO_SINGLE
 
+// demonized: Custom classes go there
+	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, CLSID_OBJECT_W_SSRS, "wpn_ssrs");
+
 #ifndef NO_XR_GAME
 	// hack, for dedicated server only
 	// because we do not have scripts
@@ -464,9 +467,8 @@ void CObjectFactory::register_classes()
 	ADD(CAmebaZone, CSE_ALifeZoneVisual, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
 	ADD(CNoGravityZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_NGRAV"), "zone_nograv_s");
 	ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
-#endif // NO_XR_GAME
 
-// demonized: Custom classes go there
-	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, CLSID_OBJECT_W_SSRS, "wpn_ssrs");
-	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("WP_SSRS"), "wpn_ssrs_s");
+	// demonized: custom classes go there
+	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("_WP_SSRS"), "wpn_ssrs_s");
+#endif // NO_XR_GAME
 }
