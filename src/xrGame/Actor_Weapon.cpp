@@ -126,7 +126,7 @@ void CActor::g_fireParams(const CHudItem* pHudItem, Fvector& fire_pos, Fvector& 
 			dir.setHP(-angle_normalize_signed(old_torso_yaw), pitch > 0.f ? ((pWeapon->GetState() == CWeapon::eFire || cam_freelook == eflDisabling) ? pitch : pitch * .6f) : pitch * .8f);
 			fire_dir = dir;
 		}
-		else if ((psActorFlags.test(AF_FIREPOS)) /* && (pWeapon->GetZRotatingFactor() != 1.f /*|| dist < 1.f)*/)
+		else if (((psActorFlags.test(AF_FIREPOS) || (mstate_real & mcAnyMove)) && (pWeapon->GetZRotatingFactor() != 1.f /*|| dist < 1.f*/)) || psActorFlags.test(AF_FIREPOS_ZOOM))
 		{
 			//correct barrel direction
 			fire_dir = fire_mat.k; //pWeapon->get_lastFD() doesn't seem to work, returns (0,0,1) for all weapons except pistols/shotguns
