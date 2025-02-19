@@ -218,6 +218,9 @@
 	<string id="ui_mm_modded_exes_gameplay_smooth_ads_transition">
 		<text>Плавно применить PDM значения (smooth_ads_transition)</text>
 	</string>
+	<string id="ui_mm_modded_exes_gameplay_g_firepos_zoom">
+		<text>Пули вылетают из ствола во время прицеливания (g_firepos_zoom)</text>
+	</string>
 
 	<!-- HDR10 -->
 	<string id="ui_mm_modded_exes_hdr10_enabled">

@@ -222,6 +222,9 @@
 	<string id="ui_mm_modded_exes_gameplay_smooth_ads_transition">
 		<text>Smoothly apply the ADS accuracy bonus (smooth_ads_transition)</text>
 	</string>
+	<string id="ui_mm_modded_exes_gameplay_g_firepos_zoom">
+		<text>Enable bullets firing from gun barrel while aiming (g_firepos_zoom)</text>
+	</string>
 
 
 	<!-- HDR10 -->

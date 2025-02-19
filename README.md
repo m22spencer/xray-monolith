@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.02.19**
+* VodoXleb: `g_firepos_zoom` to enable bullets firing from gun barrel while aiming (https://github.com/themrdemonized/xray-monolith/pull/129)
+
 **2025.02.07**
 * GAMEMTL_SUBITEM_COUNT increased 10 -> 20
 

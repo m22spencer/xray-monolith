@@ -567,6 +567,13 @@ function init_opt_base()
 						content = {function() return {{"1", "ON"}, {"0", "OFF"}} end},
 						cmd = "smooth_ads_transition",
 					},
+					{
+						id = "g_firepos_zoom",
+						type = "check",
+						val = 1,
+						def = true,
+						cmd = "g_firepos_zoom",
+					},
 				}
 			},
 
