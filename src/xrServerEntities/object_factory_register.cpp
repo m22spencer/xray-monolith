@@ -95,6 +95,7 @@
 #	include "weaponknife.h"
 #	include "weaponBM16.h"
 #	include "weaponRG6.h"
+#	include "weaponSSRS.h"
 #	include "WeaponStatMgun.h"
 
 #	include "scope.h"

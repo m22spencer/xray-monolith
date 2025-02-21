@@ -3,6 +3,7 @@
 #include "rocketlauncher.h"
 #include "WeaponMagazined.h"
 #include "script_export_space.h"
+#include "WeaponSSRS.h"
 
 class CWeaponSSRS : public CRocketLauncher,
                     public CWeaponMagazined

@@ -28,6 +28,7 @@
 #include "script_game_object.h"
 #include "player_hud.h"
 #include "HudSound.h"
+#include "WeaponSSRS.h"
 
 #include "ai/stalker/ai_stalker.h"
 
