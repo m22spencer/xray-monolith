@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.02.22**
+* Bence7661: Magazine fed grenade launcher class -> SSRS (allows modding in mag fed GLs) (https://github.com/themrdemonized/xray-monolith/pull/130)
+
 **2025.02.19**
 * VodoXleb: `g_firepos_zoom` to enable bullets firing from gun barrel while aiming (https://github.com/themrdemonized/xray-monolith/pull/129)
 
