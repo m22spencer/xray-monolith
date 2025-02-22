@@ -93,7 +93,6 @@
 #define CLSID_OBJECT_W_KNIFE		MK_CLSID('W','_','K','N','I','F','E',' ')
 #define CLSID_OBJECT_W_BM16			MK_CLSID('W','_','B','M','1','6',' ',' ')
 #define CLSID_OBJECT_W_RG6			MK_CLSID('W','_','R','G','6',' ',' ',' ')
-#define CLSID_OBJECT_W_SSRS			MK_CLSID('_','W','_','S','S','R','S',' ')
 
 #define	CLSID_OBJECT_W_STATMGUN		MK_CLSID('W','_','S','T','M','G','U','N')
 // Weapons Ammo
@@ -229,3 +228,6 @@
 #define CLSID_GAME_UI_CAPTURETHEARTEFACT	MK_CLSID('U','I','_','C','T','A',' ',' ')
 
 #define CLSID_ONLINE_OFFLINE_GROUP		MK_CLSID('O','N','_','O','F','F','_','G')
+
+// demonized: Custom classes
+#define CLSID_OBJECT_W_SSRS			MK_CLSID('_','W','_','S','S','R','S',' ')

@@ -325,7 +325,6 @@ void CObjectFactory::register_classes()
 	ADD(CWeaponKnife, CSE_ALifeItemWeapon, CLSID_OBJECT_W_KNIFE, "wpn_knife");
 	ADD(CWeaponBM16, CSE_ALifeItemWeaponShotGun, CLSID_OBJECT_W_BM16, "wpn_bm16");
 	ADD(CWeaponRG6, CSE_ALifeItemWeaponShotGun, CLSID_OBJECT_W_RG6, "wpn_rg6");
-	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, CLSID_OBJECT_W_SSRS, "_wp_ssrs");
 	//-----------------------------------------------------------------------------------------------------
 	ADD(CWeaponAmmo, CSE_ALifeItemAmmo, CLSID_OBJECT_AMMO, "wpn_ammo");
 	ADD(CWeaponAmmo, CSE_ALifeItemAmmo, CLSID_OBJECT_A_VOG25, "wpn_ammo_vog25");
@@ -428,6 +427,9 @@ void CObjectFactory::register_classes()
 	ADD(smart_cover::object, CSE_SmartCover, TEXT2CLSID("SMRTCOVR"), "smart_cover");
 #endif // #ifndef NO_SINGLE
 
+	// demonized: Custom classes
+	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, CLSID_OBJECT_W_SSRS, "wpn_ssrs");
+
 #ifndef NO_XR_GAME
 	// hack, for dedicated server only
 	// because we do not have scripts
@@ -451,7 +453,6 @@ void CObjectFactory::register_classes()
 	ADD(CWeaponKnife, CSE_ALifeItemWeapon, TEXT2CLSID("WP_KNIFE"), "wpn_knife_s");
 	ADD(CWeaponPM, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("WP_PM"), "wpn_pm_s");
 	ADD(CWeaponRG6, CSE_ALifeItemWeaponShotGun, TEXT2CLSID("WP_RG6"), "wpn_rg6_s");
-	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("_WP_SSRS"), "wpn_ssrs_s");
 	ADD(CWeaponRPG7, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("WP_RPG7"), "wpn_rpg7_s");
 	ADD(CWeaponShotgun, CSE_ALifeItemWeaponShotGun, TEXT2CLSID("WP_SHOTG"), "wpn_shotgun_s");
 	ADD(CWeaponSVU, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("WP_SVU"), "wpn_svu_s");
@@ -466,5 +467,8 @@ void CObjectFactory::register_classes()
 	ADD(CAmebaZone, CSE_ALifeZoneVisual, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
 	ADD(CNoGravityZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_NGRAV"), "zone_nograv_s");
 	ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
+
+	// demonized: Custom classes
+	ADD(CWeaponSSRS, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("_WP_SSRS"), "wpn_ssrs_s");
 #endif // NO_XR_GAME
 }
