@@ -1892,6 +1892,7 @@
     <ClInclude Include="..\WeaponRG6.h" />
     <ClInclude Include="..\WeaponRPG7.h" />
     <ClInclude Include="..\WeaponShotgun.h" />
+    <ClInclude Include="..\WeaponSSRS.h" />
     <ClInclude Include="..\WeaponStatMgun.h" />
     <ClInclude Include="..\HolderEntityObject.h" />
     <ClInclude Include="..\WeaponSVD.h" />
@@ -4147,6 +4148,17 @@
     <ClCompile Include="..\weaponshotgun_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\WeaponSSRS.cpp" />
+    <ClCompile Include="..\WeaponSSRS_script.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\WeaponStatMgun.cpp" />
     <ClCompile Include="..\HolderEntityObject.cpp" />
