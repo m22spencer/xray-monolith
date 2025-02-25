@@ -603,6 +603,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("set_actor_run_strafe_coef", &CScriptGameObject::SetActorRunStrafeCoef)
 		.def("get_actor_sprint_strafe_coef", &CScriptGameObject::GetActorSprintStrafeCoef)
 		.def("set_actor_sprint_strafe_coef", &CScriptGameObject::SetActorSprintStrafeCoef)
+		.def("get_actor_object_looking_at", &CScriptGameObject::GetActorObjectLookingAt)
+		.def("get_actor_person_looking_at", &CScriptGameObject::GetActorPersonLookingAt)
+		.def("get_actor_default_action_for_object", &CScriptGameObject::GetActorDefaultActionForObject)
 
 		// demonized: Adjust Lookout factor
 		.def("get_actor_lookout_coef", &CScriptGameObject::GetActorLookoutCoef)

@@ -184,6 +184,12 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.02.25**
+* New engine exports:
+  * db.actor:get_actor_object_looking_at() - get object actor is looking at and in interaction radius
+  * db.actor:get_actor_person_looking_at() - get inventory owner actor is looking at and in interaction radius
+  * db.actor:get_actor_default_action_for_object() - get the interaction action for the object actor is looking at
+
 **2025.02.22**
 * Bence7661: Magazine fed grenade launcher class -> SSRS (allows modding in mag fed GLs) (https://github.com/themrdemonized/xray-monolith/pull/130)
 

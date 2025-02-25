@@ -1103,6 +1103,10 @@ public:
 	float GetActorSprintStrafeCoef() const;
 	void SetActorSprintStrafeCoef(float val);
 
+	CScriptGameObject* GetActorObjectLookingAt();
+	CScriptGameObject* GetActorPersonLookingAt();
+	LPCSTR GetActorDefaultActionForObject();
+
 	void SetCharacterIcon(LPCSTR iconName);
 
 	// demonized: get talking npc

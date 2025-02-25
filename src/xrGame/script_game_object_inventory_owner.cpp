@@ -2763,5 +2763,53 @@ void CScriptGameObject::SetActorSprintStrafeCoef(float val)
 	pActor->m_fSprint_StrafeFactor = val;
 }
 
+CScriptGameObject* CScriptGameObject::GetActorObjectLookingAt()
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if (!pActor)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
+			"CActor : cannot access class member GetActorObjectLookingAt!");
+		return nullptr;
+	}
+	auto obj = pActor->ObjectWeLookingAt();
+	if (!obj) {
+		return nullptr;
+	}
+	return obj->lua_game_object();
+}
+
+CScriptGameObject* CScriptGameObject::GetActorPersonLookingAt()
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if (!pActor)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
+			"CActor : cannot access class member GetActorPersonLookingAt!");
+		return nullptr;
+	}
+	auto obj = pActor->PersonWeLookingAt();
+	if (!obj) {
+		return nullptr;
+	}
+	auto gobj = obj->cast_game_object();
+	if (!gobj) {
+		return nullptr;
+	}
+	return gobj->lua_game_object();
+}
+
+LPCSTR CScriptGameObject::GetActorDefaultActionForObject()
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if (!pActor)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
+			"CActor : cannot access class member GetDefaultActionForObject!");
+		return nullptr;
+	}
+	return pActor->GetDefaultActionForObject();
+}
+
 #endif
 //Alundaio: END
