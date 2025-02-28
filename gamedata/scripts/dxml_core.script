@@ -41,9 +41,9 @@ _G.UnregisterScriptCallback = function(name,func_or_userdata)
 	URSC(name, func_or_userdata)
 end
 
-function xmlDispatch(xml_file_name, xml_obj)
+function xmlDispatch(xml_file_name, xml_obj, flags)
 	for i, v in ipairs(xmlCallbacks) do
-		v(xml_file_name, xml_obj)
+		v(xml_file_name, xml_obj, flags)
 	end
 end
 
@@ -200,7 +200,6 @@ do
 end
 
 -- Cache parsed files
-local xml_string_cache_enabled = false
 local xml_string_debug_enabled = false
 local xml_string_cache = {}
 
@@ -963,7 +962,7 @@ _G.COnXmlRead = function(xml_file_name, xml_string)
 		return xml_string
 	end
 
-	if xml_string_cache_enabled and xml_string_cache[xml_file_name] then
+	if xml_string_cache[xml_file_name] then
 		if xml_string_debug_enabled then print_parser_msg(xml_file_name, "cache found, load cache") end
 		return xml_string_cache[xml_file_name]
 	end
@@ -975,6 +974,7 @@ _G.COnXmlRead = function(xml_file_name, xml_string)
 		print_parser_error(xml_file_name, "error parsing")
 		return xml_string
 	end
+
 	local xml_obj = try(xml_object, xml_file_name, xml_string, xml_table)
 	if not xml_obj then
 		print_parser_error(xml_file_name, "error creating xml_obj")
@@ -982,13 +982,17 @@ _G.COnXmlRead = function(xml_file_name, xml_string)
 	end
 	if xml_string_debug_enabled then print_parser_msg(xml_file_name, "parsed") end
 
-	xmlDispatch(xml_file_name, xml_obj)
+	-- Flags for DXML scripts to change
+	local flags = {
+		cache = false -- If true, the result will be cached and the callback will not be fired next time
+	}
+	xmlDispatch(xml_file_name, xml_obj, flags)
 	if xml_string_debug_enabled then print_parser_msg(xml_file_name, "callback") end
 
 	xml_string = parser:simple_xml(xml_table)
 
 	-- Cache parsed file
-	if xml_string_cache_enabled then
+	if flags.cache then
 		xml_string_cache[xml_file_name] = xml_string
 	end
 	return xml_string
@@ -1001,8 +1005,8 @@ function openXMLFile(xml_file_name)
 		local file_reader = getFS():r_open('$game_config$', path)
 		if file_reader then
 			local lua_s = ""
-			while not s:r_eof() do
-				lua_s = lua_s .. string.char(s:r_u8())
+			while not file_reader:r_eof() do
+				lua_s = lua_s .. string.char(file_reader:r_u8())
 			end
 			return lua_s
 		end
@@ -1028,6 +1032,6 @@ function openXMLFile(xml_file_name)
 		printf("error creating xml_obj for file %s", xml_file_name)
 		return
 	end
-	xmlDispatch(xml_file_name, xml_obj)
+	xmlDispatch(xml_file_name, xml_obj, {})
 	return xml_obj
 end
