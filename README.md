@@ -184,6 +184,12 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.02.28**
+* DXML:
+  * Added `flags` parameter to `on_xml_read` callback. Currently supported flags:
+    * cache - if `flags.cache = true` then the result of DXML will be cached and the callback will not be fired next time the XML file is processed by the engine
+  * Fixed typos in `dxml_core.openXMLFile` utility function
+
 **2025.02.25**
 * New engine exports:
   * db.actor:get_actor_object_looking_at() - get object actor is looking at and in interaction radius
