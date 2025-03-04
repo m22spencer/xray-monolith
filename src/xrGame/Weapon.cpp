@@ -433,10 +433,6 @@ void CWeapon::SwitchZoomType()
 	{
 		SetZoomTypeAndParams(0);
 	}
-	else if (m_zoomtype == 2)
-	{
-		SetZoomTypeAndParams(zoomTypeBeforeLauncher);
-	}
 
 	UpdateUIScope();
 }
@@ -3066,7 +3062,7 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
 		return 3;
 	else
 		return 1;
-}
+	}
 
 void CWeapon::render_hud_mode()
 {

@@ -212,7 +212,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
 {
 	m_bGrenadeMode = !m_bGrenadeMode;
 
-    SetZoomType(m_bGrenadeMode ? 2 : 0);
+    SetZoomType(m_bGrenadeMode ? 2 : zoomTypeBeforeLauncher);
 
 	UpdateUIScope();
 
