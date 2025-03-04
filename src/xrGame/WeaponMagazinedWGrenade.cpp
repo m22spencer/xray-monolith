@@ -28,6 +28,8 @@ CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade()
 {
 }
 
+BOOL g_aimmode_remember = 1;
+
 void CWeaponMagazinedWGrenade::Load(LPCSTR section)
 {
 	inherited::Load(section);
@@ -212,7 +214,14 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
 {
 	m_bGrenadeMode = !m_bGrenadeMode;
 
-    SetZoomType(m_bGrenadeMode ? 2 : zoomTypeBeforeLauncher);
+	u8 newzoomtype = 0;
+
+	if (g_aimmode_remember)
+	{
+		newzoomtype = zoomTypeBeforeLauncher;
+	}
+
+    SetZoomType(m_bGrenadeMode ? 2 : newzoomtype);
 
 	UpdateUIScope();
 

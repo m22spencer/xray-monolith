@@ -419,6 +419,14 @@ function init_opt_base()
 						step = 1,
 						cmd = "crash_save_count",
 					},
+					{
+						id = "aimmode_remember",
+						type = "list",
+						val = 1,
+						curr = {function() return get_console_cmd(0, "aimmode_remember") end},
+						content = {function() return {{"1", "ON"}, {"0", "OFF"}} end},
+						cmd = "aimmode_remember",
+					},
 				}
 			},
 

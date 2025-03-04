@@ -165,6 +165,9 @@
 	<string id="ui_mm_modded_exes_qol_crash_save_count">
 		<text>Crash Saves Count (crash_save_count)</text>
 	</string>
+  <string id="ui_mm_modded_exes_qol_aimmode_remember">
+    <text>Aimmode remember (aimmode_remember)</text>
+  </string>
 	
 	
 	<!-- Sounds -->
