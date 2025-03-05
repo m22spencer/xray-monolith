@@ -494,6 +494,8 @@ protected:
 	Fmatrix m_StrapOffset;
 	bool m_strapped_mode;
 	bool m_can_be_strapped;
+	bool isGrenadeLauncherActive = false;
+	u8 zoomTypeBeforeLauncher = 0;
 	float m_fSafeModeRotateTime;
 	SafemodeAnm m_safemode_anm[2];
 
@@ -530,7 +532,9 @@ protected:
 	virtual void UpdateFireDependencies_internal();
 	void UpdateUIScope();
 	void SwitchZoomType();
+	void ToggleGrenadeLauncher();
     void SetZoomType(u8 new_zoom_type);
+	void SetZoomTypeAndParams(u8 zoomType);
 	float GetHudFov();
 	virtual void UpdatePosition(const Fmatrix& transform); //.
 	virtual void UpdateXForm();

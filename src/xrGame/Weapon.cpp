@@ -104,7 +104,8 @@ CWeapon::CWeapon()
 
 	m_Offset.identity();
 	m_StrapOffset.identity();
-
+	isGrenadeLauncherActive = false;
+	
 	m_iAmmoCurrentTotal = 0;
 	m_BriefInfo_CalcFrame = 0;
 
@@ -404,7 +405,6 @@ void CWeapon::UpdateUIScope()
 			CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
 		}		
 	}
-
 	UpdateZoomParams();
 }
 
@@ -420,23 +420,51 @@ void CWeapon::SetUIScope(LPCSTR scope_texture)
 
 void CWeapon::SwitchZoomType()
 {
+	if (isGrenadeLauncherActive) // The IsGrenadeLauncherAttached() check is handled by ToggleGrenadeLauncher
+	{
+		ToggleGrenadeLauncher();
+	}
+
 	if (m_zoomtype == 0 && (m_altAimPos || g_player_hud->m_adjust_mode))
 	{
-        SetZoomType(1);
-        m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Alt || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom_alt", false);
+		SetZoomTypeAndParams(1);
 	}
-	else if (IsGrenadeLauncherAttached())
+	else if (m_zoomtype == 1)
 	{
-		SwitchState(eSwitch);
-		return;
-	}
-	else if (m_zoomtype != 0)
-	{
-        SetZoomType(0);
-        m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Primary || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
+		SetZoomTypeAndParams(0);
 	}
 
 	UpdateUIScope();
+}
+
+void CWeapon::ToggleGrenadeLauncher()
+{
+	if (!isGrenadeLauncherActive)
+	{
+		zoomTypeBeforeLauncher = m_zoomtype;
+	}
+
+	if (IsGrenadeLauncherAttached())
+	{
+		isGrenadeLauncherActive = !isGrenadeLauncherActive;
+		SwitchState(eSwitch);
+		return;
+	}
+}
+
+void CWeapon::SetZoomTypeAndParams(u8 zoomType)
+{
+	if (zoomType == 1)
+	{
+		SetZoomType(1);
+		m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Alt || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom_alt", false);
+	}
+
+	if (zoomType == 0)
+	{
+		SetZoomType(0);
+		m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Primary || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
+	}
 }
 
 void CWeapon::SetZoomType(u8 new_zoom_type)
@@ -1466,6 +1494,15 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 			}
 			return true;
 		}
+	case kCUSTOM16:
+		if (flags & CMD_START && !IsPending())
+		{
+			if (pActor && pActor->is_safemode())
+				pActor->set_safemode(false);
+			
+			ToggleGrenadeLauncher();
+		}
+		return true;
 	break;
 	}
 	return false;
@@ -1854,6 +1891,7 @@ void CWeapon::UpdateAddonsVisibility()
 		{
 			if (!pWeaponVisual->LL_GetBoneVisible(bone_id))
 				pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
+			isGrenadeLauncherActive = false;
 		}
 		else
 		{
@@ -3024,7 +3062,7 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
 		return 3;
 	else
 		return 1;
-}
+	}
 
 void CWeapon::render_hud_mode()
 {
