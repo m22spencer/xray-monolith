@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.06**
+* `actor_on_update_pickup` callback to check if there is an item possible to be picked up
+
 **2025.03.05**
 * Bence7661: Ability to separately set keybinds for UBGL (Under Barrel Grenade Launcher) and alternate aim switch (Canted, Laser, etc) (https://github.com/themrdemonized/xray-monolith/pull/134)
 

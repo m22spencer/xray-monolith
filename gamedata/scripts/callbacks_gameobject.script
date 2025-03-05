@@ -50,18 +50,15 @@ AddScriptCallback("pseudogiant_on_stomp")
 
 _G.CPseudoGigant__OnStartStompAnimation = function(victim, who)
 	SendScriptCallback("pseudogiant_on_start_stomp_animation", victim, who)
-	-- printf("pseudogiant_on_start_stomp_animation: %s, %s", victim:name(), who:name())
 end
 
 _G.CPseudoGigant__BeforeHitCallback = function(victim, who, shit, boneId)
 	local flags = { ret_value = true }
 	SendScriptCallback("pseudogiant_before_stomp", victim, who, shit, boneId, flags)
-	-- printf("pseudogiant_before_stomp: %s, %s, %s, %s", victim:name(), who:name(), shit.power, flags.ret_value)
 	return flags.ret_value
 end
 
 _G.CPseudoGigant__HitCallback = function(victim, who, shit, boneId)
-	-- printf("pseudogiant_on_stomp: %s, %s, %s", victim:name(), who:name(), shit.power)
 	SendScriptCallback("pseudogiant_on_stomp", victim, who, shit, boneId)
 end
 
@@ -106,8 +103,6 @@ end
 
 -- Weapons callbacks
 AddScriptCallback("actor_on_weapon_zoom_type_changed")
-
-
 _G.CWeapon_OnSwitchZoomType = function(obj, previous, current)
 	SendScriptCallback("actor_on_weapon_zoom_type_changed", obj, previous, current)
 end
@@ -149,6 +144,7 @@ end
 		printf("mousewheel %s", dir == 1 and "up" or "down")
 	end)
 ]] 
+
 AddScriptCallback("on_mouse_wheel")
 _G.COnMouseWheel = function(dir)
 	local d = dir > 0 and 1 or 0
@@ -202,6 +198,7 @@ map_table contains:
 	gvid - game vertex id by position on the hovered map
 
 --]]
+
 AddScriptCallback("on_map_right_click")
 _G.COnRightClickMap = function(property_ui, map_table)
 	pda.map_spot_property.id = map_table.object_id
@@ -244,7 +241,13 @@ end
 AddScriptCallback("explosive_item_on_explode")
 _G.CExplosiveItem__OnExplode = function(obj)
 	SendScriptCallback("explosive_item_on_explode", obj)
-	--printf("barrel exploded")
+end
+
+-- nearest item to pickup callback
+-- obj can be nil
+AddScriptCallback("actor_on_update_pickup")
+_G.CPickupModeUpdate_COD = function(obj)
+	SendScriptCallback("actor_on_update_pickup", obj)
 end
 
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius
@@ -265,7 +268,6 @@ function is_outside_damage_radius(zone, obj)
 	local damage_radius_sqr = damage_radius * damage_radius
 	local dist_sqr = zone:position():distance_to_sqr(obj:position())
 	local res = dist_sqr > damage_radius_sqr
-	-- printf("obj %s anomaly %s, dist_sqr %s, damage_radius_sqr %s, damaging %s", obj:name(), zone:name(), dist_sqr, damage_radius_sqr, res)
 	return res
 end
 
@@ -275,7 +277,6 @@ function anomaly_on_before_activate(zone, obj, flags)
 	and obj:alive()
 	and is_outside_damage_radius(zone, obj)
 	then
-		-- printf("obj %s in anomaly %s and is_outside_damage_radius", obj:name(), zone:name())
 		flags.ret_value = false
 	end
 end

@@ -239,6 +239,14 @@ void CActor::PickupModeUpdate_COD(pickup_result_t pickup_result)
 
 	CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
 
+	{
+		luabind::functor<void> func;
+		if (ai().script_engine().functor("_G.CPickupModeUpdate_COD", func))
+		{
+			func(pNearestItem && pNearestItem->cast_game_object() ? pNearestItem->cast_game_object()->lua_game_object() : nullptr);
+		}
+	}
+	
 	if (pNearestItem && m_bPickupMode)
 	{
 		//Tronex: ability to prevent item picking up if the export returns false
