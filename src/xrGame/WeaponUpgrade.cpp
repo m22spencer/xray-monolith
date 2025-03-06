@@ -251,6 +251,18 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
 
 			if (m_eScopeStatus == ALife::eAddonAttachable)
 			{
+				if (m_modular_attachments)
+				{
+					LPCSTR scope_group = pSettings->r_string(section, "modular_scope_group");
+					LPCSTR scopes = pSettings->r_string(scope_group, "scopes");
+
+					for (int i = 0, count = _GetItemCount(scopes); i < count; ++i)
+					{
+						string128 scope;
+						_GetItem(scopes, i, scope);
+						m_scopes.push_back(scope);
+					}
+				}
 				if (pSettings->line_exist(section, "scopes_sect"))
 				{
 					LPCSTR str = pSettings->r_string(section, "scopes_sect");

@@ -124,6 +124,54 @@ Fvector& attachable_hud_item::hands_offset_rot()
 	return m_measures.m_hands_offset[1][idx];
 }
 
+Fvector& attachable_hud_item::aim_offset_pos()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[0][8];
+		return g_player_hud->m_adjust_offset[0][1];
+	}
+	return m_measures.m_hands_offset[0][1];
+}
+
+Fvector& attachable_hud_item::aim_offset_rot()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[1][8];
+		return g_player_hud->m_adjust_offset[1][1];
+	}
+	return m_measures.m_hands_offset[1][1];
+}
+
+Fvector& attachable_hud_item::attach_base_offset_pos()
+{
+	if (g_player_hud->m_adjust_mode)
+		return g_player_hud->m_adjust_offset[0][6];
+	return m_measures.m_hands_offset[0][6];
+}
+
+Fvector& attachable_hud_item::attach_base_offset_rot()
+{
+	if (g_player_hud->m_adjust_mode)
+		return g_player_hud->m_adjust_offset[1][6];
+	return m_measures.m_hands_offset[1][6];
+}
+
+Fvector& attachable_hud_item::attach_mount_offset_pos()
+{
+	if (g_player_hud->m_adjust_mode)
+		return g_player_hud->m_adjust_offset[0][7];
+	return m_measures.m_hands_offset[0][7];
+}
+
+Fvector& attachable_hud_item::attach_mount_offset_rot()
+{
+	if (g_player_hud->m_adjust_mode)
+		return g_player_hud->m_adjust_offset[1][7];
+	return m_measures.m_hands_offset[1][7];
+}
+
 void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
 {
 	u16 bone_id;
@@ -154,8 +202,29 @@ void attachable_hud_item::update(bool bForce)
 	m_attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
 	m_attach_offset.translate_over(m_parent->m_adjust_mode ? m_parent->m_adjust_obj[0] : m_measures.m_item_attach[0]);
 
-	m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform, m_measures.m_bLeadGunLeftHand);
-	m_upd_firedeps_frame = Device.dwFrame;
+	if (m_attach_place_idx == SCOPE_ATTACH_IDX) {
+		m_item_transform.set(m_parent->attached_item(0)->m_item_transform);
+
+		Fmatrix hud_rotation;
+		hud_rotation.identity();
+		hud_rotation.rotateX(m_parent->attached_item(0)->attach_mount_offset_rot().x);
+
+		Fmatrix hud_rotation_y;
+		hud_rotation_y.identity();
+		hud_rotation_y.rotateY(m_parent->attached_item(0)->attach_mount_offset_rot().y);
+		hud_rotation.mulA_43(hud_rotation_y);
+
+		hud_rotation_y.identity();
+		hud_rotation_y.rotateZ(m_parent->attached_item(0)->attach_mount_offset_rot().z);
+		hud_rotation.mulA_43(hud_rotation_y);
+
+		hud_rotation.translate_over(m_parent->attached_item(0)->attach_mount_offset_pos());
+		m_item_transform.mulB_43(hud_rotation);
+	}
+	else {
+		m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform, m_measures.m_bLeadGunLeftHand);
+		m_upd_firedeps_frame = Device.dwFrame;
+	}
 
 	IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
 	if (ka)
@@ -414,6 +483,16 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 
 	//--#SM+# End--
 
+	strconcat(sizeof(val_name), val_name, "attach_base_hud_offset_pos", _prefix);
+	m_hands_offset[0][6] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, vZero);
+	strconcat(sizeof(val_name), val_name, "attach_base_hud_offset_rot", _prefix);
+	m_hands_offset[1][6] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, vZero);
+
+	strconcat(sizeof(val_name), val_name, "attach_mount_hud_offset_pos", _prefix);
+	m_hands_offset[0][7] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, vZero);
+	strconcat(sizeof(val_name), val_name, "attach_mount_hud_offset_rot", _prefix);
+	m_hands_offset[1][7] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, vZero);
+
 	m_fFreelookZOffset = READ_IF_EXISTS(pSettings, r_float, sect_name, "freelook_z_offset_mul", 0.f);
 	m_bLeadGunLeftHand = READ_IF_EXISTS(pSettings, r_bool, sect_name, "lh_lead_gun", false);
 }
@@ -503,6 +582,10 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 		m_model->CalculateBones_Invalidate();
 	}
 
+	if (m_attach_place_idx == SCOPE_ATTACH_IDX) {
+		return ret;
+	}
+
 	R_ASSERT2(m_parent_hud_item, "parent hud item is NULL");
 	CPhysicItem& parent_object = m_parent_hud_item->object();
 	//R_ASSERT2		(parent_object, "object has no parent actor");
@@ -536,6 +619,7 @@ player_hud::player_hud()
 	m_model_2 = nullptr;
 	m_attached_items[0] = nullptr;
 	m_attached_items[1] = nullptr;
+	m_attached_items[SCOPE_ATTACH_IDX] = nullptr;
 	m_attach_offset.identity();
 	m_attach_offset_2.identity();
 	m_transform.identity();
@@ -731,6 +815,9 @@ bool player_hud::render_item_ui_query()
 	if (m_attached_items[1])
 		res |= m_attached_items[1]->render_item_ui_query();
 
+	if (m_attached_items[SCOPE_ATTACH_IDX])
+		res |= m_attached_items[SCOPE_ATTACH_IDX]->render_item_ui_query();
+
 	return res;
 }
 
@@ -745,6 +832,9 @@ void player_hud::render_item_ui()
 
 	if (m_attached_items[1])
 		m_attached_items[1]->render_item_ui();
+
+	if (m_attached_items[SCOPE_ATTACH_IDX])
+		m_attached_items[SCOPE_ATTACH_IDX]->render_item_ui();
 
 	UIRender->CacheSetCullMode(IUIRender::cmCCW);
 	UI().m_currentPointType = bk;
@@ -767,6 +857,9 @@ void player_hud::render_hud()
 
 	if (m_attached_items[1])
 		m_attached_items[1]->render();
+
+	if (m_attached_items[SCOPE_ATTACH_IDX])
+		m_attached_items[SCOPE_ATTACH_IDX]->render();
 
 	if (script_anim_item_model)
 	{
@@ -927,13 +1020,16 @@ void player_hud::update(const Fmatrix& cam_trans)
 
 	if (m_attached_items[0])
 		m_attached_items[0]->m_parent_hud_item->UpdateHudAdditional(trans);
-		
+	
 	if (m_attached_items[1])
 	{
 		m_attached_items[1]->m_parent_hud_item->UpdateHudAdditional(trans_2);
 		if (wep && wep->IsZoomed())
 			trans_2.mulB_43(wep->m_shoot_shake_mat);
 	}
+
+	if (m_attached_items[SCOPE_ATTACH_IDX])
+		m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->UpdateHudAdditional(trans);
 	
 	if (m_attached_items[0] && !m_attached_items[1])
 		trans_2 = trans;
@@ -1093,6 +1189,9 @@ void player_hud::update(const Fmatrix& cam_trans)
 	if (m_attached_items[1])
 		m_attached_items[1]->update(true);
 
+	if (m_attached_items[SCOPE_ATTACH_IDX])
+		m_attached_items[SCOPE_ATTACH_IDX]->update(true);
+
 	if (script_anim_item_attached && script_anim_item_model)
 		update_script_item();
 
@@ -1134,16 +1233,21 @@ void player_hud::updateMovementLayerState()
 		if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->object().cast_weapon())
 			wep = m_attached_items[0]->m_parent_hud_item->object().cast_weapon();
 
-		if (wep && wep->IsZoomed())
+		if (wep && wep->IsZoomed()) {
 			state.bCrouch ? m_movement_layers[eAimCrouch]->Play() : m_movement_layers[eAimWalk]->Play();
-		else if (state.bCrouch)
+		}
+		else if (state.bCrouch) {
 			m_movement_layers[eCrouch]->Play();
-		else if (state.bSprint)
+		}
+		else if (state.bSprint) {
 			m_movement_layers[eSprint]->Play();
-		else if (!isActorAccelerated(pActor->MovingState(), false))
+		}
+		else if (!isActorAccelerated(pActor->MovingState(), false)) {
 			m_movement_layers[eWalk]->Play();
-		else
+		}
+		else {
 			m_movement_layers[eRun]->Play();
+		}
 	}
 }
 
@@ -1660,6 +1764,11 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 			if (m_attached_items[1]->m_parent_hud_item->GetState() == CHUDState::eIdle)
 				m_attached_items[1]->m_parent_hud_item->PlayAnimIdle();
 		}
+		if (m_attached_items[SCOPE_ATTACH_IDX])
+		{
+			if (m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->GetState() == CHUDState::eIdle)
+				m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->PlayAnimIdle();
+		}
 	}
 	else
 	{
@@ -1668,6 +1777,9 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 
 		if (m_attached_items[1])
 			m_attached_items[1]->m_parent_hud_item->OnMovementChanged(cmd);
+
+		if (m_attached_items[SCOPE_ATTACH_IDX])
+			m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->OnMovementChanged(cmd);
 	}
 
 	luabind::functor<void> func;

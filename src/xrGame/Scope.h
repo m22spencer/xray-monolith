@@ -6,6 +6,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
+#include "hud_item_object.h"
 #include "script_export_space.h"
 
 class CScope : public CInventoryItemObject

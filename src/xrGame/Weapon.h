@@ -88,7 +88,6 @@ public:
 	IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
 	IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.005f; }
 
-
 	// Up
 	// Magazine system & etc
 	xr_vector<shared_str> bullets_bones;
@@ -318,6 +317,9 @@ public:
 		{
 			return {};
 		}
+		if (m_modular_attachments) {
+			return m_scopes[m_cur_scope];
+		}
 		return pSettings->r_string(m_scopes[m_cur_scope], "scope_name");
 	}
 
@@ -509,6 +511,7 @@ public:
 	Fvector vLoadedFirePoint2;
 	Fvector vLoadedFirePointSilencer;
 	bool m_bCanBeLowered;
+	bool m_modular_attachments;
 
 private:
 	firedeps m_current_firedeps;

@@ -64,6 +64,11 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 
 CWeaponMagazined::~CWeaponMagazined()
 {
+	if (m_scopeItem) {
+		g_player_hud->detach_item(m_scopeItem);
+		xr_delete(m_scopeItem);
+	}
+
 	// sounds
 }
 
@@ -615,6 +620,24 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
 	case eHidden:
 		switch2_Hidden();
 		break;
+	}
+}
+
+void CWeaponMagazined::on_a_hud_attach()
+{
+	inherited::on_a_hud_attach();
+
+	if (m_scopeItem) {
+		g_player_hud->attach_item(m_scopeItem);
+	}
+}
+
+void CWeaponMagazined::on_b_hud_detach()
+{
+	inherited::on_b_hud_detach();
+
+	if (m_scopeItem) {
+		g_player_hud->detach_item(m_scopeItem);
 	}
 }
 
@@ -1250,8 +1273,13 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
 		SCOPES_VECTOR_IT it = m_scopes.begin();
 		for (; it != m_scopes.end(); it++)
 		{
-			if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
-				return true;
+			if (m_modular_attachments) {
+				if (*it == pIItem->object().cNameSect())
+					return true;
+			} else {
+				if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
+					return true;
+			}
 		}
 		return false;
 	}
@@ -1272,16 +1300,24 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
 bool CWeaponMagazined::CanDetach(const char* item_section_name)
 {
 	if (m_eScopeStatus == ALife::eAddonAttachable &&
-		0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)) /* &&
+		0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)
+		&& (!m_modular_attachments || m_scopes[m_cur_scope] == item_section_name)) /* &&
 																		   (m_scopes[cur_scope]->m_sScopeName	== item_section_name))*/
 	{
 		SCOPES_VECTOR_IT it = m_scopes.begin();
 		for (; it != m_scopes.end(); it++)
 		{
-			LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
-			if (!xr_strcmp(iter_scope_name, item_section_name))
-			{
-				return true;
+			if (m_modular_attachments) {
+				if (!xr_strcmp(*it, item_section_name))
+				{
+					return true;
+				}
+			} else {
+				LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
+				if (!xr_strcmp(iter_scope_name, item_section_name))
+				{
+					return true;
+				}
 			}
 		}
 		return false;
@@ -1314,10 +1350,23 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 		SCOPES_VECTOR_IT it = m_scopes.begin();
 		for (; it != m_scopes.end(); it++)
 		{
-			if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
-				m_cur_scope = u8(it - m_scopes.begin());
+			if (m_modular_attachments) {
+				if (*it == pIItem->object().cNameSect())
+					m_cur_scope = u8(it - m_scopes.begin());
+			} else {
+				if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
+					m_cur_scope = u8(it - m_scopes.begin());
+			}
 		}
 		m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
+		if (m_modular_attachments) {
+			LoadScopeKoeffs();
+			m_scopeItem = xr_new<CAnonHudItem>();
+			m_scopeItem->Load(pIItem->object().cNameSect().c_str());
+			if (HudItemData()) {
+				g_player_hud->attach_item(m_scopeItem);
+			}
+		}
 		result = true;
 	}
 	else if (pSilencer &&
@@ -1361,11 +1410,19 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
 	SCOPES_VECTOR_IT it = m_scopes.begin();
 	for (; it != m_scopes.end(); it++)
 	{
-		LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
-		if (!xr_strcmp(iter_scope_name, item_section_name))
-		{
-			m_cur_scope = NULL;
-			detached = true;
+		if (m_modular_attachments) {
+			if (!xr_strcmp(*it, item_section_name))
+			{
+				m_cur_scope = NULL;
+				detached = true;
+			}
+		} else {
+			LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
+			if (!xr_strcmp(iter_scope_name, item_section_name))
+			{
+				m_cur_scope = NULL;
+				detached = true;
+			}
 		}
 	}
 	return detached;
@@ -1382,6 +1439,11 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 			return true;
 		}
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
+
+		if (m_scopeItem) {
+			g_player_hud->detach_item(m_scopeItem);
+			xr_delete(m_scopeItem);
+		}
 
 		UpdateAddonsVisibility();
 		InitAddons();
@@ -1518,7 +1580,8 @@ void CWeaponMagazined::LoadSilencerKoeffs()
 
 void CWeaponMagazined::LoadScopeKoeffs()
 {
-	if (m_eScopeStatus == ALife::eAddonAttachable)
+	if (m_eScopeStatus == ALife::eAddonAttachable
+		&& (!m_modular_attachments || (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)))
 	{
 		LPCSTR sect = GetScopeName().c_str();
 		m_scope_koef.cam_dispersion = READ_IF_EXISTS(pSettings, r_float, sect, "cam_dispersion_k", 1.0f);
@@ -1623,6 +1686,9 @@ void CWeaponMagazined::PlayAnimAim()
 void CWeaponMagazined::PlayAnimIdle()
 {
 	if (GetState() != eIdle) return;
+	if (m_scopeItem) {
+		m_scopeItem->PlayAnimIdle();
+	}
 	if (IsZoomed())
 	{
 		PlayAnimAim();

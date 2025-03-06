@@ -685,10 +685,23 @@ void CWeapon::Load(LPCSTR section)
 	m_zoom_params.m_fZoomRotateTime = pSettings->r_float(section, "zoom_rotate_time");
 	m_fZoomRotateModifier = READ_IF_EXISTS(pSettings, r_float, section, "zoom_rotate_modifier", 1);
 	m_zoom_params.m_fBaseZoomFactor = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "scope_zoom_factor", 0);
+	m_modular_attachments = READ_IF_EXISTS(pSettings, r_bool, section, "modular_attachments", false);
 
 	if (m_eScopeStatus == ALife::eAddonAttachable)
 	{
-		if (pSettings->line_exist(section, "scopes_sect"))
+		if (m_modular_attachments)
+		{
+			LPCSTR scope_group = pSettings->r_string(section, "modular_scope_group");
+			LPCSTR scopes = pSettings->r_string(scope_group, "scopes");
+
+			for (int i = 0, count = _GetItemCount(scopes); i < count; ++i)
+			{
+				string128 scope;
+				_GetItem(scopes, i, scope);
+				m_scopes.push_back(scope);
+			}
+		}
+		else if (pSettings->line_exist(section, "scopes_sect"))
 		{
 			LPCSTR str = pSettings->r_string(section, "scopes_sect");
 			for (int i = 0, count = _GetItemCount(str); i < count; ++i)
@@ -1191,6 +1204,9 @@ bool CWeapon::NeedBlendAnm()
 		return true;
 
 	if (IsZoomed() && psDeviceFlags2.test(rsAimSway))
+		return true;
+
+	if (psDeviceFlags2.test(rsAimSway))
 		return true;
 
 	return inherited::NeedBlendAnm();
@@ -1745,6 +1761,8 @@ bool CWeapon::SilencerAttachable()
 #define WPN_SCOPE "wpn_scope"
 #define WPN_SILENCER "wpn_silencer"
 #define WPN_GRENADE_LAUNCHER "wpn_launcher"
+#define WPN_SCOPED_HIDE "wpn_scoped_hide"
+#define WPN_SCOPED_UNHIDE "wpn_scoped_unhide"
 
 void CWeapon::UpdateHUDAddonsVisibility()
 {
@@ -1754,20 +1772,32 @@ void CWeapon::UpdateHUDAddonsVisibility()
 	static shared_str wpn_scope = WPN_SCOPE;
 	static shared_str wpn_silencer = WPN_SILENCER;
 	static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+	static shared_str wpn_scoped_hide = WPN_SCOPED_HIDE;
+	static shared_str wpn_scoped_unhide = WPN_SCOPED_UNHIDE;
 
 	//.	return;
 
-	if (ScopeAttachable())
-	{
-		HudItemData()->set_bone_visible(wpn_scope, IsScopeAttached());
-	}
-
-	if (m_eScopeStatus == ALife::eAddonDisabled)
-	{
+	if (m_modular_attachments) {
 		HudItemData()->set_bone_visible(wpn_scope, FALSE, TRUE);
+		if (ScopeAttachable())
+		{
+			HudItemData()->set_bone_visible(wpn_scoped_hide, !IsScopeAttached(), TRUE);
+			HudItemData()->set_bone_visible(wpn_scoped_unhide, IsScopeAttached(), TRUE);
+		}
 	}
-	else if (m_eScopeStatus == ALife::eAddonPermanent)
-		HudItemData()->set_bone_visible(wpn_scope, TRUE, TRUE);
+	else {
+		if (ScopeAttachable())
+		{
+			HudItemData()->set_bone_visible(wpn_scope, IsScopeAttached());
+		}
+
+		if (m_eScopeStatus == ALife::eAddonDisabled)
+		{
+			HudItemData()->set_bone_visible(wpn_scope, FALSE, TRUE);
+		}
+		else if (m_eScopeStatus == ALife::eAddonPermanent)
+			HudItemData()->set_bone_visible(wpn_scope, TRUE, TRUE);
+	}
 
 	if (SilencerAttachable())
 	{
@@ -1807,7 +1837,7 @@ void CWeapon::UpdateAddonsVisibility()
 	pWeaponVisual->CalculateBones_Invalidate();
 
 	bone_id = pWeaponVisual->LL_BoneID(wpn_scope);
-	if (ScopeAttachable())
+    if (ScopeAttachable())
 	{
 		if (IsScopeAttached())
 		{
@@ -2286,6 +2316,7 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 		OnZoomOut();
 
 	attachable_hud_item* hi = HudItemData();
+	attachable_hud_item* si = g_player_hud->attached_item(SCOPE_ATTACH_IDX);
 	R_ASSERT(hi);
 
 	/*PP.RQ.O = 0;
@@ -2319,7 +2350,25 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 	{
 		Fvector curr_offs, curr_rot;
 
-		if (g_player_hud->m_adjust_mode)
+		if (idx == 1 && m_modular_attachments) {
+			if (si) {
+				curr_offs.set(hi->attach_base_offset_pos());
+				curr_rot.set(hi->attach_base_offset_rot());
+
+				curr_offs.sub(hi->attach_mount_offset_pos());
+				curr_rot.sub(hi->attach_mount_offset_rot());
+
+				curr_offs.add(si->aim_offset_pos());
+				curr_rot.add(si->aim_offset_rot());
+			} else {
+				curr_offs.set(hi->attach_base_offset_pos());
+				curr_rot.set(hi->attach_base_offset_rot());
+
+				curr_offs.add(hi->aim_offset_pos());
+				curr_rot.add(hi->aim_offset_rot());
+			}
+		}
+		else if (g_player_hud->m_adjust_mode)
 		{
 			if (idx == 0)
 			{
@@ -2344,7 +2393,7 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 				curr_rot = hi->m_measures.m_hands_offset[1][idx]; //rot,aim
 			}
 		}
-
+		
 		float factor;
 		
 		if (idx == 4 || last_idx == 4)
@@ -2362,7 +2411,7 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 		{
 			Fvector diff;
 			diff.set(curr_offs);
-			diff.sub(m_hud_offset[0]);
+		    diff.sub(m_hud_offset[0]);
 			diff.mul(factor * 2.5f);
 			m_hud_offset[0].add(diff);
 		}

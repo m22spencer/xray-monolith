@@ -881,6 +881,10 @@ attachable_hud_item* CHudItem::HudItemData()
 	if (hi && hi->m_parent_hud_item == this)
 		return hi;
 
+	hi = g_player_hud->attached_item(SCOPE_ATTACH_IDX);
+	if (hi && hi->m_parent_hud_item == this)
+		return hi;
+
 	return NULL;
 }
 
@@ -922,3 +926,11 @@ float CHudItem::GetHudFov()
 
 	return m_nearwall_last_hud_fov;
 }
+
+CAnonHudItem::CAnonHudItem() { }
+
+CAnonHudItem::~CAnonHudItem() { }
+
+void CAnonHudItem::UpdateXForm() { }
+
+void CAnonHudItem::on_renderable_Render() { }

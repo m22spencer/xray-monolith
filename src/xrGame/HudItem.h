@@ -157,7 +157,7 @@ public:
 
 	virtual void PlayAnimIdle();
 	virtual bool TryPlayAnimBore();
-	bool TryPlayAnimIdle();
+	virtual bool TryPlayAnimIdle();
 	virtual bool MovingAnimAllowedNow() { return true; }
 
 	virtual bool NeedBlendAnm();
@@ -254,4 +254,18 @@ public:
 	virtual CHudItem* cast_hud_item() { return this; }
 	virtual bool PlayAnimCrouchIdleMoving(); //AVO: new crouch idle animation
 	bool HudAnimationExist(LPCSTR anim_name);
+};
+
+class CAnonHudItem : public CHudItem
+{
+private:
+	typedef CHudItem inherited;
+public:
+	CAnonHudItem();
+	virtual ~CAnonHudItem();
+	virtual void UpdateXForm();
+	virtual void on_renderable_Render();
+	virtual bool TryPlayAnimIdle() { return false; }
+	virtual void UpdateHudAdditional(Fmatrix& trans) { }
+	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

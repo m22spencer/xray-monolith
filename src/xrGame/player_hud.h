@@ -5,6 +5,8 @@
 #include "../Include/xrRender/KinematicsAnimated.h"
 #include "actor_defs.h"
 
+#define SCOPE_ATTACH_IDX 2
+
 class player_hud;
 class CHudItem;
 class CMotionDef;
@@ -200,7 +202,7 @@ struct hud_item_measures
 	Flags8 m_prop_flags;
 
 	Fvector m_item_attach[2]; // pos,rot
-	Fvector m_hands_offset[2][6]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2 --#SM+#--
+	Fvector m_hands_offset[2][8]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount --#SM+#--
 	Fvector m_strafe_offset[4][2]; // pos,rot,data1,data2/ normal,aim-GL	 --#SM+#--
 
 	u16 m_fire_bone;
@@ -286,6 +288,14 @@ struct attachable_hud_item
 	Fvector& hands_offset_pos();
 	Fvector& hands_offset_rot();
 
+	Fvector& aim_offset_pos();
+	Fvector& aim_offset_rot();
+
+	Fvector& attach_base_offset_pos();
+	Fvector& attach_base_offset_rot();
+	Fvector& attach_mount_offset_pos();
+	Fvector& attach_mount_offset_rot();
+
 	//props
 	u32 m_upd_firedeps_frame;
 	void tune(Ivector values);
@@ -355,6 +365,7 @@ public:
 	{
 		m_attached_items[0] = NULL;
 		m_attached_items[1] = NULL;
+		m_attached_items[SCOPE_ATTACH_IDX] = NULL;
 	};
 
 	Fmatrix m_transform;
@@ -376,13 +387,13 @@ private:
 
 	shared_str m_sect_name;
 	xr_vector<u16> m_ancors;
-	attachable_hud_item* m_attached_items[2];
+	attachable_hud_item* m_attached_items[3];
 	xr_vector<attachable_hud_item*> m_pool;
 	static void _BCL FingerCallback(CBoneInstance* B);
 public:
 	IKinematicsAnimated* m_model;
 	IKinematicsAnimated* m_model_2;
-	Fvector m_adjust_offset[2][6]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2
+	Fvector m_adjust_offset[2][9]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount, aim for attach
 	Fvector m_adjust_obj[2]; // pos,rot; used for the item/weapon itself
 	Fvector m_adjust_ui_offset[2]; // pos,rot; used for custom device ui
 	Fvector m_adjust_firepoint_shell[2][2];

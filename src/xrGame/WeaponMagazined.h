@@ -5,6 +5,7 @@
 #include "ai_sounds.h"
 
 class ENGINE_API CMotionDef;
+class CAnonHudItem;
 
 //размер очереди считается бесконечность
 //заканчиваем стрельбу, только, если кончились патроны
@@ -36,6 +37,8 @@ protected:
 	// General
 	//кадр момента пересчета UpdateSounds
 	u32 dwUpdateSounds_Frame;
+
+	CAnonHudItem* m_scopeItem = NULL;
 protected:
 	virtual void OnMagazineEmpty();
 
@@ -48,6 +51,9 @@ protected:
 
 	virtual void switch2_StartAim();
 	virtual void switch2_EndAim();
+
+	virtual void on_a_hud_attach();
+	virtual void on_b_hud_detach();
 
 	virtual void OnShot();
 	virtual void PlaySoundShot();
