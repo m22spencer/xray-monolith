@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.07**
+* damoldavskiy: Modular Attachment System (https://github.com/themrdemonized/xray-monolith/pull/135)
+
 **2025.03.06**
 * `actor_on_update_pickup` callback to check if there is an item possible to be picked up
 

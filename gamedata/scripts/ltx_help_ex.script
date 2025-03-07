@@ -19,6 +19,7 @@
         silenced_tracers - Option to disable silencers hiding the tracer on a per weapon basis
         fire_point_silencer - Adjust fire point when silencer is attached, defaults to the value of fire_point. Supports both HUD and world models
         ai_rpm - Set RPM of weapon for AI (only for SSRS)
+        modular_attachments - enable modular attachments (https://github.com/themrdemonized/xray-monolith/pull/135)
 
     Grenades
         frags_ap - AP power for shrapnel
