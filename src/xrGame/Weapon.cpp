@@ -333,6 +333,9 @@ void CWeapon::UpdateZoomParams() {
 		} else if (ALife::eAddonPermanent != m_eScopeStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) && m_scopes.size())
 		{
 			m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(GetScopeName(), "scope_zoom_factor") / zoom_multiple;
+			if (m_modular_attachments) {
+				m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
+			}
 		} else
 		{
 			m_zoom_params.m_fScopeZoomFactor = m_zoom_params.m_fBaseZoomFactor / zoom_multiple;
@@ -365,7 +368,7 @@ void CWeapon::UpdateUIScope()
 	{
 		if (0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) && m_scopes.size())
 		{
-			if (!m_primary_scope_tex_name) {
+			if (!m_primary_scope_tex_name || m_modular_attachments) {
 				m_primary_scope_tex_name = pSettings->r_string(GetScopeName(), "scope_texture");
 			}
 			scope_tex_name = m_primary_scope_tex_name;
@@ -2348,7 +2351,7 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 
 	//============= Поворот ствола во время аима =============//
 	{
-		Fvector curr_offs, curr_rot;
+		Fvector curr_offs, curr_rot, aim_offs;
 
 		if (idx == 1 && m_modular_attachments) {
 			if (si) {
@@ -2358,7 +2361,9 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 				curr_offs.sub(hi->attach_mount_offset_pos());
 				curr_rot.sub(hi->attach_mount_offset_rot());
 
-				curr_offs.add(si->aim_offset_pos());
+				aim_offs.set(si->aim_offset_pos());
+				aim_offs.mul(hi->attach_scale());
+				curr_offs.add(aim_offs);
 				curr_rot.add(si->aim_offset_rot());
 			} else {
 				curr_offs.set(hi->attach_base_offset_pos());

@@ -627,8 +627,18 @@ void CWeaponMagazined::on_a_hud_attach()
 {
 	inherited::on_a_hud_attach();
 
-	if (m_scopeItem) {
-		g_player_hud->attach_item(m_scopeItem);
+	if (m_eScopeStatus == ALife::eAddonAttachable &&
+		0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)
+		&& m_modular_attachments)
+	{
+		if (!m_scopeItem) {
+			m_scopeItem = xr_new<CAnonHudItem>();
+			m_scopeItem->Load(m_scopes[m_cur_scope].c_str());
+		}
+		if (HudItemData()) {
+			g_player_hud->attach_item(m_scopeItem);
+			m_scopeItem->PlayAnimIdle();
+		}
 	}
 }
 
@@ -1365,6 +1375,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 			m_scopeItem->Load(pIItem->object().cNameSect().c_str());
 			if (HudItemData()) {
 				g_player_hud->attach_item(m_scopeItem);
+				m_scopeItem->PlayAnimIdle();
 			}
 		}
 		result = true;

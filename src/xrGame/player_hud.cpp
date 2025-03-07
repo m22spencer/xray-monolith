@@ -172,6 +172,13 @@ Fvector& attachable_hud_item::attach_mount_offset_rot()
 	return m_measures.m_hands_offset[1][7];
 }
 
+float attachable_hud_item::attach_scale()
+{
+	if (g_player_hud->m_adjust_mode)
+		return g_player_hud->m_adjust_scale;
+	return m_measures.m_attach_scale;
+}
+
 void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
 {
 	u16 bone_id;
@@ -495,6 +502,8 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 
 	m_fFreelookZOffset = READ_IF_EXISTS(pSettings, r_float, sect_name, "freelook_z_offset_mul", 0.f);
 	m_bLeadGunLeftHand = READ_IF_EXISTS(pSettings, r_bool, sect_name, "lh_lead_gun", false);
+
+	m_attach_scale = READ_IF_EXISTS(pSettings, r_float, sect_name, "attach_scale", 1);
 }
 
 attachable_hud_item::~attachable_hud_item()
@@ -550,7 +559,10 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 	if (speed == 1.f)
 		speed = anm->m_anim_speed != 0 ? anm->m_anim_speed : 1.f;
 
-	u32 ret = g_player_hud->anim_play(m_attach_place_idx, M.mid, bMixIn, md, speed);
+	u32 ret = 0;
+	if (m_attach_place_idx != SCOPE_ATTACH_IDX) {
+		ret = g_player_hud->anim_play(m_attach_place_idx, M.mid, bMixIn, md, speed);
+	}
 
 	if (m_model->dcast_PKinematicsAnimated())
 	{
@@ -574,6 +586,10 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 		CBoneInstance& root_binst = m_model->LL_GetBoneInstance(root_id);
 		root_binst.set_callback_overwrite(TRUE);
 		root_binst.mTransform.identity();
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX) {
+			float s = m_parent->attached_item(0)->attach_scale();
+			root_binst.mTransform.scale(s, s, s);
+		}
 
 		u16 pc = ka->partitions().count();
 		for (u16 pid = 0; pid < pc; ++pid)
