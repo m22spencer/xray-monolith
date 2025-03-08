@@ -250,6 +250,7 @@ struct hud_item_measures
 
 	float m_fFreelookZOffset;
 	bool m_bLeadGunLeftHand;
+	float m_attach_scale;
 };
 
 struct attachable_hud_item
@@ -295,6 +296,7 @@ struct attachable_hud_item
 	Fvector& attach_base_offset_rot();
 	Fvector& attach_mount_offset_pos();
 	Fvector& attach_mount_offset_rot();
+	float attach_scale();
 
 	//props
 	u32 m_upd_firedeps_frame;
@@ -400,6 +402,7 @@ public:
 	xr_map<EBoneCallbackParam, BoneCallbackParams*> m_bone_callback_params; // bonename,params
 	int m_edit_attachment;
 	float m_adjust_zoom_factor[3];
+	float m_adjust_scale;
 	bool m_adjust_mode;
 	u16 m_edit_bone;
 
