@@ -20,6 +20,14 @@
         fire_point_silencer - Adjust fire point when silencer is attached, defaults to the value of fire_point. Supports both HUD and world models
         ai_rpm - Set RPM of weapon for AI (only for SSRS)
         modular_attachments - enable modular attachments (https://github.com/themrdemonized/xray-monolith/pull/135)
+        modular_scope_group - section which is used to define available scopes (modular attachments)
+        inv_scope_x - ui x offset for weapon scope mount (modular attachments)
+        inv_scope_y - ui y offset for weapon scope mount (modular attachments)
+        attach_base_hud_offset_pos - base aim offset (modular attachments)
+        attach_base_hud_offset_rot - base aim rotation (modular attachments)
+        attach_mount_hud_offset_pos - scope mount offset (modular_attachments)
+        attach_mount_hud_offset_rot - scope mount rotation (modular_attachments)
+        attach_scale - scale modifier for all attachments (modular_attachments)
 
     Grenades
         frags_ap - AP power for shrapnel
