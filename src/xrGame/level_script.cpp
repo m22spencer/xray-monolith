@@ -1441,6 +1441,8 @@ void hud_adj_value(LPCSTR name, float val)
 		g_player_hud->m_adjust_zoom_factor[1] = val;
 	else if (0 == xr_strcmp(name, "scope_zoom_factor_alt"))
 		g_player_hud->m_adjust_zoom_factor[2] = val;
+	else if (0 == xr_strcmp(name, "attach_scale"))
+		g_player_hud->m_adjust_scale = val;
 }
 
 void hud_adj_state(bool state)
