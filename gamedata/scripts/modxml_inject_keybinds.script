@@ -39,5 +39,28 @@ function RegisterUBGLKeybindSeparationInjector()
 
 			xml_obj:insertFromXMLString(new_node)
 		end
+
+		if xml_file_name == [[text\rus\ui_st_keybinding.xml]] then
+			local string_nodes = xml_obj:query("string[id=kb_func] > text")
+
+			if string_nodes[1] then
+				local string_node = string_nodes[1]
+				local target_text = xml_obj:getText(string_node)
+				if target_text then
+
+					local text_overwrite = "Альтернативное прицеливание"
+					xml_obj:setText(string_node, text_overwrite)
+				end
+			end
+
+			local new_node = 
+			[[
+            <string id="kb_switch_ubgl">
+            <text>Подствольник</text>
+            </string>
+			]]
+
+			xml_obj:insertFromXMLString(new_node)
+		end
     end)
 end
