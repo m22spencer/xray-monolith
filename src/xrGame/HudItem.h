@@ -181,6 +181,7 @@ public:
 	IC void RenderHud(BOOL B) { m_huditem_flags.set(fl_renderhud, B); }
 	IC BOOL RenderHud() { return m_huditem_flags.test(fl_renderhud); }
 	attachable_hud_item* HudItemData();
+	bool IsAttachedToHUD();
 	virtual bool ParentIsActor();
 	virtual float GetHudFov();
 	virtual void on_outfit_changed();

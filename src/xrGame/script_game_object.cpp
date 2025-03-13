@@ -53,10 +53,17 @@ class CScriptBinderObject;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-Fvector CScriptGameObject::Center()
+Fvector CScriptGameObject::Center(bool bHud)
 {
+	if (bHud)
+	{
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			return itm->HudItemData()->m_model->dcast_RenderVisual()->getVisData().sphere.P;
+	}
+
 	Fvector c;
-	m_game_object->Center(c);
+	object().Center(c);
 	return c;
 }
 
@@ -348,7 +355,7 @@ u16 CScriptGameObject::bone_id(LPCSTR bone_name, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 			k = itm->HudItemData()->m_model;
 		else if (act)
 			k = g_player_hud->m_model->dcast_PKinematics();
@@ -376,7 +383,7 @@ Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 		{
 			k = itm->HudItemData()->m_model;
 			xform = &itm->HudItemData()->m_item_transform;
@@ -418,7 +425,7 @@ Fvector CScriptGameObject::bone_direction(u16 bone_id, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 		{
 			k = itm->HudItemData()->m_model;
 			xform = &itm->HudItemData()->m_item_transform;
@@ -459,7 +466,7 @@ u16 CScriptGameObject::bone_parent(u16 bone_id, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 			k = itm->HudItemData()->m_model;
 		else if (act)
 			k = g_player_hud->m_model->dcast_PKinematics();
@@ -484,7 +491,7 @@ LPCSTR CScriptGameObject::bone_name(u16 bone_id, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 			k = itm->HudItemData()->m_model;
 		else if (act)
 			k = g_player_hud->m_model->dcast_PKinematics();
@@ -507,7 +514,7 @@ void CScriptGameObject::set_bone_visible(u16 bone_id, bool bVisibility, bool bRe
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 			k = itm->HudItemData()->m_model;
 		else if (act)
 			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();
@@ -532,7 +539,7 @@ bool CScriptGameObject::is_bone_visible(u16 bone_id, bool bHud)
 	{
 		CActor* act = smart_cast<CActor*>(&object());
 		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm && itm->HudItemData())
+		if (itm)
 			k = itm->HudItemData()->m_model;
 		else if (act)
 			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();

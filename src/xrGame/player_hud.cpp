@@ -912,7 +912,7 @@ u32 player_hud::motion_length_script(LPCSTR section, LPCSTR anm_name, float spee
 
 u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md)
 {
-	attachable_hud_item* pi = create_hud_item(hud_name);
+	attachable_hud_item* pi = get_hud_item(hud_name);
 	player_hud_motion* pm = pi->m_hand_motions.find_motion(anim_name);
 	if (!pm || !pm->m_animations.size())
 		return 100; // ms TEMPORARY
@@ -1557,7 +1557,7 @@ void player_hud::remove_from_model_pool(LPCSTR sect)
 }
 
 shared_str current_player_hud_sect;
-attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
+attachable_hud_item* player_hud::get_hud_item(const shared_str& sect)
 {
 	current_player_hud_sect = sect;
 	xr_vector<attachable_hud_item*>::iterator it = m_pool.begin();
@@ -1588,7 +1588,7 @@ bool player_hud::allow_activation(CHudItem* item)
 
 void player_hud::attach_item(CHudItem* item)
 {
-	attachable_hud_item* pi = create_hud_item(item->HudSection());
+	attachable_hud_item* pi = get_hud_item(item->HudSection());
 	int item_idx = pi->m_attach_place_idx;
 
 	if (m_attached_items[item_idx] != pi)
@@ -1726,7 +1726,7 @@ void player_hud::detach_item_idx(u16 idx)
 
 void player_hud::detach_item(CHudItem* item)
 {
-	if (NULL == item->HudItemData()) return;
+	if (!item->IsAttachedToHUD()) return;
 	u16 item_idx = item->HudItemData()->m_attach_place_idx;
 
 	if (m_attached_items[item_idx] == item->HudItemData())

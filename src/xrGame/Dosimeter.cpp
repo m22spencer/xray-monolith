@@ -16,7 +16,6 @@ CUIDosimeter& CDosimeter::ui()
 
 void CDosimeter::render_item_3d_ui()
 {
-	R_ASSERT(HudItemData());
 	ui().Draw();
 
 	//	Restore cull mode

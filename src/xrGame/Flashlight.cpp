@@ -121,7 +121,7 @@ void CFlashlight::UpdateCL()
 	if (!IsWorking())
 		return;
 
-	if (!HudItemData())
+	if (!IsAttachedToHUD())
 	{
 		TurnDeviceInternal(false);
 		return;

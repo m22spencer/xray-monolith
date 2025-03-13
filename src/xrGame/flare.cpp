@@ -35,10 +35,7 @@ void CFlare::ActivateFlare()
 
 bool CFlare::IsFlareActive()
 {
-	if (NULL == HudItemData()) return false;
-
-	VERIFY(g_player_hud->attached_item(HudItemData()->m_attach_place_idx)==HudItemData());
-
+	if (!IsAttachedToHUD()) return false;
 	return (GetState() == eFlareIdle);
 }
 
@@ -179,7 +176,7 @@ void CFlare::UpdateCL()
 
 void CFlare::FirePoint(Fvector& _fp)
 {
-	if (HudItemData())
+	if (IsAttachedToHUD())
 	{
 		firedeps _current_firedeps;
 		HudItemData()->setup_firedeps(_current_firedeps);
@@ -197,7 +194,7 @@ void CFlare::FirePoint(Fvector& _fp)
 
 void CFlare::ParticlesMatrix(Fmatrix& _pm)
 {
-	if (HudItemData())
+	if (IsAttachedToHUD())
 	{
 		firedeps _current_firedeps;
 		HudItemData()->setup_firedeps(_current_firedeps);

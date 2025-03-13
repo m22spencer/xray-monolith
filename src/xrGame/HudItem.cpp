@@ -176,7 +176,7 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
 
 		if (TryPlayAnimBore())
 		{
-			if (HudItemData())
+			if (IsAttachedToHUD())
 			{
 				Fvector P = HudItemData()->m_item_transform.c;
 				m_sounds.PlaySound("sndBore", P, object().H_Root(), !!GetHUDmode(), false, m_started_rnd_anim_idx);
@@ -187,7 +187,7 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
 
 		break;
 	case eHidden:
-		if (HudItemData())
+		if (IsAttachedToHUD())
 			g_player_hud->detach_item(this);
 		break;
 	}
@@ -263,7 +263,6 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans)
 		return;
 
 	attachable_hud_item* hi = HudItemData();
-	R_ASSERT(hi);
 
 	if (!g_player_hud->inertion_allowed())
 		return;
@@ -544,12 +543,12 @@ void CHudItem::OnH_B_Independent(bool just_before_destroy)
 
 	// next code was commented
 	/*
-	if(HudItemData() && !just_before_destroy)
+	if(IsAttachedToHUD() && !just_before_destroy)
 	{
 	object().XFORM().set( HudItemData()->m_item_transform );
 	}
 
-	if (HudItemData())
+	if (IsAttachedToHUD())
 	{
 	g_player_hud->detach_item(this);
 	Msg("---Detaching hud item [%s][%d]", this->HudSection().c_str(), this->object().ID());
@@ -559,7 +558,7 @@ void CHudItem::OnH_B_Independent(bool just_before_destroy)
 
 void CHudItem::OnH_A_Independent()
 {
-	if (HudItemData())
+	if (IsAttachedToHUD())
 		g_player_hud->detach_item(this);
 	StopCurrentAnimWithoutCallback();
 }
@@ -627,7 +626,7 @@ extern float g_end_modif;
 
 u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, float speed, float end, bool bMixIn2)
 {
-	if (HudItemData())
+	if (IsAttachedToHUD())
 	{
 		luabind::functor<luabind::object> funct;
 		if (ai().script_engine().functor("_G.CHudItem__PlayHUDMotion", funct))
@@ -679,7 +678,7 @@ u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, f
 
 		float end_modifier = 0.f;
 
-		if (HudItemData())
+		if (IsAttachedToHUD())
 		{
 			player_hud_motion* anm = HudItemData()->find_motion(M);
 			end_modifier = anm->m_anim_end;
@@ -706,13 +705,13 @@ u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn, flo
 	if (bDebug && item().m_pInventory)
 	{
 		Msg("-[%s] as[%d] [%d]anim_play [%s][%d]",
-		    HudItemData() ? "HUD" : "Simulating",
+			IsAttachedToHUD() ? "HUD" : "Simulating",
 		    item().m_pInventory->GetActiveSlot(),
 		    item().object_id(),
 		    motion_name.c_str(),
 		    Device.dwFrame);
 	}
-	if (HudItemData())
+	if (IsAttachedToHUD())
 	{
 		return HudItemData()->anim_play(motion_name, bMixIn, m_current_motion_def, m_started_rnd_anim_idx, speed, bMixIn2);
 	}
@@ -737,7 +736,7 @@ BOOL CHudItem::GetHUDmode()
 	if (object().H_Parent())
 	{
 		CActor* A = smart_cast<CActor*>(object().H_Parent());
-		return (A && A->HUDview() && HudItemData());
+		return (A && A->HUDview() && IsAttachedToHUD());
 	}
 	else
 		return FALSE;
@@ -796,7 +795,7 @@ bool CHudItem::TryPlayAnimIdle()
 //AVO: check if animation exists
 bool CHudItem::HudAnimationExist(LPCSTR anim_name)
 {
-	if (HudItemData()) // First person
+	if (IsAttachedToHUD()) // First person
 	{
 		string256 anim_name_r;
 		bool is_16x9 = UI().is_widescreen();
@@ -869,7 +868,7 @@ void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 
 attachable_hud_item* CHudItem::HudItemData()
 {
-	attachable_hud_item* hi = NULL;
+	attachable_hud_item* hi = nullptr;
 	if (!g_player_hud)
 		return hi;
 
@@ -885,7 +884,28 @@ attachable_hud_item* CHudItem::HudItemData()
 	if (hi && hi->m_parent_hud_item == this)
 		return hi;
 
-	return NULL;
+	hi = g_player_hud->get_hud_item(HudSection());
+	R_ASSERT(hi);
+
+	return hi;
+}
+
+bool CHudItem::IsAttachedToHUD()
+{
+	if (!g_player_hud)
+		return false;
+
+	attachable_hud_item* hi = nullptr;
+	
+	hi = g_player_hud->attached_item(0);
+	if (hi && hi->m_parent_hud_item == this)
+		return true;
+
+	hi = g_player_hud->attached_item(1);
+	if (hi && hi->m_parent_hud_item == this)
+		return true;
+
+	return false;
 }
 
 bool CHudItem::ParentIsActor()

@@ -114,7 +114,7 @@ void CActor::g_fireParams(const CHudItem* pHudItem, Fvector& fire_pos, Fvector& 
 		XFORM().transform_dir(offset, pMissile->throw_point_offset());
 		fire_pos.add(offset);
 	}
-	else if (pWeapon && pWeapon->HudItemData() && !smart_cast<CWeaponKnife*>(pWeapon))
+	else if (pWeapon && pWeapon->IsAttachedToHUD() && !smart_cast<CWeaponKnife*>(pWeapon))
 	{
 		const Fmatrix& fire_mat = pWeapon->get_ParticlesXFORM();
 		//collide::rq_result& RQ = pWeapon->GetRQ();

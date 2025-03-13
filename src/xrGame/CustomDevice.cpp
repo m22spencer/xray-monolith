@@ -342,7 +342,7 @@ void CCustomDevice::UpdateVisibility()
 
 	//check visibility
 	attachable_hud_item* i0 = g_player_hud->attached_item(0);
-	if (i0 && HudItemData())
+	if (i0 && IsAttachedToHUD())
 	{
 		if (bClimb)
 		{
@@ -400,7 +400,7 @@ void CCustomDevice::UpdateVisibility()
 	{
 		if (bClimb)
 		{
-			if (HudItemData())
+			if (IsAttachedToHUD())
 			{
 				if (GetState() != eHiding)
 					HideDevice(true);
@@ -481,7 +481,6 @@ void CCustomDevice::UpdateHudAdditional(Fmatrix& trans)
 		return;
 
 	attachable_hud_item* hi = HudItemData();
-	R_ASSERT(hi);
 
 	Fvector curr_offs, curr_rot;
 	// DaimeneX: Applying hud_base_offset to devices
@@ -871,6 +870,5 @@ bool CCustomDevice::render_item_3d_ui_query()
 
 void CCustomDevice::render_item_3d_ui()
 {
-	R_ASSERT(HudItemData());
 	inherited::render_item_3d_ui();
 }

@@ -102,7 +102,7 @@ CUIArtefactDetectorSimple::~CUIArtefactDetectorSimple()
 
 void CUIArtefactDetectorSimple::Flash(bool bOn, float fRelPower)
 {
-	if (!m_parent->HudItemData()) return;
+	if (!m_parent->IsAttachedToHUD()) return;
 	if (m_flash_bone == BI_NONE) return;
 
 	IKinematics* K = m_parent->HudItemData()->m_model;
@@ -157,7 +157,7 @@ void CUIArtefactDetectorSimple::update()
 {
 	inherited::update();
 
-	if (m_parent->HudItemData())
+	if (m_parent->IsAttachedToHUD())
 	{
 		if (m_flash_bone == BI_NONE)
 			setup_internals();

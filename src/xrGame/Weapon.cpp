@@ -3130,7 +3130,7 @@ bool CWeapon::MovingAnimAllowedNow()
 
 bool CWeapon::IsHudModeNow()
 {
-	return (HudItemData() != NULL);
+	return (IsAttachedToHUD() != NULL);
 }
 
 float CWeapon::GetMinScopeZoomFactor() const

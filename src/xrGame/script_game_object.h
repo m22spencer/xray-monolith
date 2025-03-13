@@ -175,7 +175,7 @@ public:
 	int clsid() const;
 	void play_cycle(LPCSTR anim, bool mix_in);
 	void play_cycle(LPCSTR anim);
-	Fvector Center();
+	Fvector Center(bool bHud = false);
 	_DECLARE_FUNCTION10(Position, Fvector);
 	_DECLARE_FUNCTION10(Direction, Fvector);
 	_DECLARE_FUNCTION10(Mass, float);
