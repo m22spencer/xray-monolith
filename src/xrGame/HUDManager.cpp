@@ -200,9 +200,8 @@ bool need_render_hud()
 
 void CHUDManager::Render_Last()
 {
-	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))return;
 	if (0 == pUIGame) return;
-
+	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))return;
 	if (!need_render_hud()) return;
 
 	CObject* O = g_pGameLevel->CurrentViewEntity();
@@ -212,30 +211,6 @@ void CHUDManager::Render_Last()
 	O->OnHUDDraw(this);
 	::Render->set_HUD(FALSE);
 }
-
-//Swartz: actor shadow
-void CHUDManager::Render_Actor_Shadow() // added by KD
-{
-	if (0 == pUIGame) return;
-	CObject* O = g_pGameLevel->CurrentViewEntity();
-	if (0 == O) return;
-	CActor* A = smart_cast<CActor*>(O);
-	if (!A) return;
-	if (A->active_cam() != eacFirstEye) return; // KD: we need to render actor shadow only in first eye cam mode because
-	// in other modes actor model already in scene graph and renders well
-
-	//Alun: Due to glitchy shadows this is forced
-	CFlashlight* flashlight = smart_cast<CFlashlight*>(A->inventory().ItemFromSlot(DETECTOR_SLOT));
-	if (flashlight && flashlight->torch_active())
-		return;
-
-	::Render->set_Object(O->H_Root());
-	O->renderable_Render();
-}
-
-//-Swartz
-
-#include "player_hud.h"
 
 bool CHUDManager::RenderActiveItemUIQuery()
 {

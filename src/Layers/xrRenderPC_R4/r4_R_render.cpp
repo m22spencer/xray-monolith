@@ -516,9 +516,7 @@ void CRender::Render()
 
 			if (!Device.m_SecondViewport.IsSVPFrame())
 			{
-				Fmatrix m_invview;
-				m_invview.invert(Device.mView);
-				Target->Matrix_previous.mul(mm_saved_viewproj, m_invview);
+				Target->Matrix_previous.mul(mm_saved_viewproj, Device.mInvView);
 				Target->Matrix_current.set(Device.mProject);
 				mm_saved_viewproj.set(Device.mFullTransform);
 			}

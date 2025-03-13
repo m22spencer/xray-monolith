@@ -1812,7 +1812,7 @@ void CActor::shedule_Update(u32 DT)
 
 	//åñëè â ðåæèìå HUD, òî ñàìà ìîäåëü àêòåðà íå ðèñóåòñÿ
 	if (!character_physics_support()->IsRemoved())
-		setVisible(!HUDview());
+		setVisible(TRUE);
 
 	//÷òî àêòåð âèäèò ïåðåä ñîáîé
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
@@ -1897,29 +1897,47 @@ void CActor::shedule_Update(u32 DT)
 	Check_for_AutoPickUp();
 };
 
+extern Flags32 ps_actor_shadow_flags;
+
+bool CActor::AllowActorShadow()
+{
+	if (!ps_actor_shadow_flags.test(1)) return false;
+	if (::Render->get_generation() != ::Render->GENERATION_R2) return false;
+
+	CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
+	if (flashlight && flashlight->torch_active())
+		return false;
+
+	return true;
+}
+
+#include "debug_renderer.h"
 void CActor::renderable_Render()
 {
 	VERIFY(_valid(XFORM()));
-	inherited::renderable_Render();
+	
+	if (cam_active == eacFirstEye)
+	{
+		if (::Render->active_phase() == 0) // can render first person body here
+		{
+			//if (fpBody) 
+			//	inherited::renderable_Render();
+		}
+		else if (AllowActorShadow()) // render actor shadow
+		{
+			inherited::renderable_Render();
+			if ((IsFocused() || (!(IsFocused() && ((!m_holder) ||
+				(m_holder && m_holder->allowWeapon() && m_holder->HUDView()))))))
+				CInventoryOwner::renderable_Render();
+		}
+	}
 
-	//Alun: Due to glitchy shadows this is forced
-	CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
-	if (flashlight && flashlight->torch_active())
-		return;
-
-	//if(1/*!HUDview()*/) //Swartz: replaced by block below for actor shadow
-	if ((cam_active == eacFirstEye && // first eye cam
-			::Render->get_generation() == ::Render->GENERATION_R2 && // R2
-			::Render->active_phase() == 1) // shadow map rendering on R2	
-		||
-		!(IsFocused() &&
-			(cam_active == eacFirstEye) &&
-			((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
-	)
-		//{
+// Third Person Body and Weapon/Item
+	else
+	{
+		inherited::renderable_Render();
 		CInventoryOwner::renderable_Render();
-	//}
-	//VERIFY(_valid(XFORM()));
+	}
 }
 
 BOOL CActor::renderable_ShadowGenerate()
