@@ -1458,6 +1458,10 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		UpdateAddonsVisibility();
 		InitAddons();
 
+		if (m_modular_attachments && m_zoomtype == 1) {
+			SetZoomTypeAndParams(0);
+		}
+
 		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
 	}
 	else if (m_eSilencerStatus == ALife::eAddonAttachable &&
@@ -1505,6 +1509,7 @@ void CWeaponMagazined::InitAddons()
 			m_zoom_params.m_sUseZoomPostprocess = READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
 			m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", FALSE);
 			m_zoom_params.m_sUseBinocularVision = READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
+			m_zoom_params.m_fZoomStepCount = READ_IF_EXISTS(pSettings, r_float, GetScopeName(), "zoom_step_count", 0);
 			m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
 			if (m_UIScope)
 			{

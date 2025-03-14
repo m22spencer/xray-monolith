@@ -503,6 +503,7 @@ protected:
 
 	Fmatrix m_Offset;
 	Fvector m_hud_offset[2];
+	Fvector m_hud_aim_rot;
 	// 0-èñïîëüçóåòñÿ áåç ó÷àñòèÿ ðóê, 1-îäíà ðóêà, 2-äâå ðóêè
 	EHandDependence eHandDependence;
 	bool m_bIsSingleHanded;
@@ -541,6 +542,7 @@ protected:
 	float GetHudFov();
 	virtual void UpdatePosition(const Fmatrix& transform); //.
 	virtual void UpdateXForm();
+	void InterpolateOffset(Fvector& current, const Fvector& target, const float factor) const;
 	virtual void UpdateHudAdditional(Fmatrix& trans);
 	IC void UpdateFireDependencies()
 	{
