@@ -292,6 +292,9 @@ struct attachable_hud_item
 	Fvector& aim_offset_pos();
 	Fvector& aim_offset_rot();
 
+	Fvector& alt_aim_offset_pos();
+	Fvector& alt_aim_offset_rot();
+
 	Fvector& attach_base_offset_pos();
 	Fvector& attach_base_offset_rot();
 	Fvector& attach_mount_offset_pos();
@@ -386,7 +389,6 @@ public:
 private:
 	const Fvector& attach_rot(u8 part) const;
 	const Fvector& attach_pos(u8 part) const;
-
 	shared_str m_sect_name;
 	xr_vector<u16> m_ancors;
 	attachable_hud_item* m_attached_items[3];
@@ -395,7 +397,7 @@ private:
 public:
 	IKinematicsAnimated* m_model;
 	IKinematicsAnimated* m_model_2;
-	Fvector m_adjust_offset[2][9]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount, aim for attach
+	Fvector m_adjust_offset[2][10]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount, aim for attach, alt aim for attach
 	Fvector m_adjust_obj[2]; // pos,rot; used for the item/weapon itself
 	Fvector m_adjust_ui_offset[2]; // pos,rot; used for custom device ui
 	Fvector m_adjust_firepoint_shell[2][2];
