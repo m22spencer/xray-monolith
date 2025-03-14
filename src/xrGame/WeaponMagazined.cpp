@@ -634,7 +634,7 @@ void CWeaponMagazined::on_a_hud_attach()
 			m_scopeItem = xr_new<CAnonHudItem>();
 			m_scopeItem->Load(m_scopes[m_cur_scope].c_str());
 		}
-		if (HudItemData()) {
+		if (g_player_hud->attached_item(0) && g_player_hud->attached_item(0)->m_parent_hud_item == this) {
 			g_player_hud->attach_item(m_scopeItem);
 			m_scopeItem->PlayAnimIdle();
 		}
@@ -1372,7 +1372,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 			LoadScopeKoeffs();
 			m_scopeItem = xr_new<CAnonHudItem>();
 			m_scopeItem->Load(pIItem->object().cNameSect().c_str());
-			if (HudItemData()) {
+			if (g_player_hud->attached_item(0) && g_player_hud->attached_item(0)->m_parent_hud_item == this) {
 				g_player_hud->attach_item(m_scopeItem);
 				m_scopeItem->PlayAnimIdle();
 			}
