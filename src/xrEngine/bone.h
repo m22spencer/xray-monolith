@@ -28,6 +28,7 @@ class ENGINE_API CBoneInstance
 public:
 	// data
 	Fmatrix mTransform; // final x-form matrix (local to model)
+	Fmatrix mTransformHidden; // hidden x-form matrix (local to model)
 	Fmatrix mRenderTransform; // final x-form matrix (model_base -> bone -> model)
 	Fmatrix mRenderTransform_prev; // Prev x-form matrix
 	Fmatrix mRenderTransform_temp; // Temp var
@@ -596,6 +597,7 @@ enum EBoneCallbackType
 IC void CBoneInstance::construct()
 {
 	mTransform.identity();
+	mTransformHidden.identity();
 	mRenderTransform.identity();
 	Callback = nullptr;
 	Callback_Param = nullptr;

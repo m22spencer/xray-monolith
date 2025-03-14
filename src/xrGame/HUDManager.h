@@ -23,7 +23,6 @@ public:
 
 	virtual void Render_First();
 	virtual void Render_Last();
-	virtual void Render_Actor_Shadow(); //Swartz: actor shadow
 	virtual void OnFrame();
 
 	virtual void RenderUI();
@@ -58,13 +57,17 @@ public:
 	virtual void OnConnected();
 
 	virtual void RenderActiveItemUI();
+	virtual void RenderCamAttachedUI();
 	virtual bool RenderActiveItemUIQuery();
+	virtual bool RenderCamAttachedUIQuery();
 
 	//Lain: added
 	void SetRenderable(bool renderable)
 	{
 		psHUD_Flags.set(HUD_DRAW_RT2, renderable);
 	}
+
+	void Render_R1_Attachment_UI();
 };
 
 IC CHUDManager& HUD()

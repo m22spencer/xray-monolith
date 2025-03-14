@@ -692,6 +692,24 @@ public:
 			up.z = -dir.y * right.x;
 		}
 	}
+
+	IC static void hud_to_world(Self& pos)
+	{
+		Device.mView.transform_tiny(pos);
+		Device.mProjectHud.transform_tiny(pos);
+
+		Device.mInvProject.transform_tiny(pos);
+		Device.mInvView.transform_tiny(pos);
+	}
+
+	IC static void hud_to_world_dir(Self& dir)
+	{
+		Device.mView.transform_dir(dir);
+		Device.mProjectHud.transform_dir(dir);
+
+		Device.mInvProject.transform_dir(dir);
+		Device.mInvView.transform_dir(dir);
+	}
 };
 
 typedef _vector3<float> Fvector;

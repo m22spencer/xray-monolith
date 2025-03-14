@@ -333,6 +333,7 @@ void CRenderDevice::on_idle()
 
 	// Matrices
 	mFullTransform.mul(mProject, mView);
+	mFullTransformHud.mul(mProjectHud, mView);
 	m_pRender->SetCacheXform(mView, mProject);
 	//RCache.set_xform_view ( mView );
 	//RCache.set_xform_project ( mProject );

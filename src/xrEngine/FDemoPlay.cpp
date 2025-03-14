@@ -309,11 +309,9 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 			spline1(t, &(v[0]), (Fvector*)&(Device.mView.m[i][0]));
 		}
 
-		Fmatrix mInvCamera;
-		mInvCamera.invert(Device.mView);
-		info.n.set(mInvCamera._21, mInvCamera._22, mInvCamera._23);
-		info.d.set(mInvCamera._31, mInvCamera._32, mInvCamera._33);
-		info.p.set(mInvCamera._41, mInvCamera._42, mInvCamera._43);
+		info.n.set(Device.mInvView._21, Device.mInvView._22, Device.mInvView._23);
+		info.d.set(Device.mInvView._31, Device.mInvView._32, Device.mInvView._33);
+		info.p.set(Device.mInvView._41, Device.mInvView._42, Device.mInvView._43);
 
 		fLifeTime -= Device.fTimeDelta;
 	}

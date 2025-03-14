@@ -9,6 +9,8 @@
 #include "../xrEngine/IGame_Persistent.h"
 #include "inventory_item.h"
 #include "weapon.h"
+#include "script_attachment_manager.h"
+#include "../xrEngine/CameraBase.h"
 
 player_hud* g_player_hud = NULL;
 Fvector _ancor_pos;
@@ -300,6 +302,17 @@ void attachable_hud_item::render()
 	::Render->add_Visual(m_model->dcast_RenderVisual());
 
 	m_parent_hud_item->render_hud_mode();
+
+	if (m_parent_hud_item->object().GetAttachments()->size())
+	{
+		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
+		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
+		for (; it != it_e; ++it)
+		{
+			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
+				(*it).second->Render(m_model, &m_item_transform, true);
+		}
+	}
 }
 
 bool attachable_hud_item::render_item_ui_query()
@@ -310,6 +323,14 @@ bool attachable_hud_item::render_item_ui_query()
 void attachable_hud_item::render_item_ui()
 {
 	m_parent_hud_item->render_item_3d_ui();
+
+	xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
+	xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
+	for (; it != it_e; ++it)
+	{
+		if ((*it).second->GetFFlags().test(eSA_RenderHUD))
+			(*it).second->RenderUI(true);
+	}
 }
 
 void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
@@ -852,6 +873,15 @@ void player_hud::render_item_ui()
 	if (m_attached_items[SCOPE_ATTACH_IDX])
 		m_attached_items[SCOPE_ATTACH_IDX]->render_item_ui();
 
+	if (g_actor->GetAttachments()->size())
+	{
+		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
+		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
+		for (; it != it_e; ++it)
+			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
+				(*it).second->RenderUI(true);
+	}
+
 	UIRender->CacheSetCullMode(IUIRender::cmCCW);
 	UI().m_currentPointType = bk;
 }
@@ -881,6 +911,27 @@ void player_hud::render_hud()
 	{
 		::Render->set_Transform(&m_item_pos);
 		::Render->add_Visual(script_anim_item_model->dcast_RenderVisual());
+	}
+
+	if (g_actor->GetAttachments()->size())
+	{
+		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
+		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
+		for (; it != it_e; ++it)
+		{
+			script_attachment* att = (*it).second;
+
+			if (att->GetFFlags().test(eSA_RenderHUD))
+			{
+				// Left arm
+				if (att->GetParentBone() < 21)
+					att->Render(m_model_2->dcast_PKinematics(), &m_transform_2, true);
+
+				// Right arm
+				else
+					att->Render(m_model->dcast_PKinematics(), &m_transform, true);
+			}
+		}
 	}
 }
 
@@ -912,7 +963,7 @@ u32 player_hud::motion_length_script(LPCSTR section, LPCSTR anm_name, float spee
 
 u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md)
 {
-	attachable_hud_item* pi = create_hud_item(hud_name);
+	attachable_hud_item* pi = get_hud_item(hud_name);
 	player_hud_motion* pm = pi->m_hand_motions.find_motion(anim_name);
 	if (!pm || !pm->m_animations.size())
 		return 100; // ms TEMPORARY
@@ -1557,7 +1608,7 @@ void player_hud::remove_from_model_pool(LPCSTR sect)
 }
 
 shared_str current_player_hud_sect;
-attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
+attachable_hud_item* player_hud::get_hud_item(const shared_str& sect)
 {
 	current_player_hud_sect = sect;
 	xr_vector<attachable_hud_item*>::iterator it = m_pool.begin();
@@ -1588,7 +1639,7 @@ bool player_hud::allow_activation(CHudItem* item)
 
 void player_hud::attach_item(CHudItem* item)
 {
-	attachable_hud_item* pi = create_hud_item(item->HudSection());
+	attachable_hud_item* pi = get_hud_item(item->HudSection());
 	int item_idx = pi->m_attach_place_idx;
 
 	if (m_attached_items[item_idx] != pi)
@@ -1726,7 +1777,7 @@ void player_hud::detach_item_idx(u16 idx)
 
 void player_hud::detach_item(CHudItem* item)
 {
-	if (NULL == item->HudItemData()) return;
+	if (!item->IsAttachedToHUD()) return;
 	u16 item_idx = item->HudItemData()->m_attach_place_idx;
 
 	if (m_attached_items[item_idx] == item->HudItemData())

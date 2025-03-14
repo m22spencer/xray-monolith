@@ -23,6 +23,7 @@ public:
 	IRenderable* val_pObject;
 	Fmatrix* val_pTransform;
 	BOOL val_bHUD;
+	BOOL val_bCamAttached;
 	BOOL val_bInvisible;
 	BOOL val_bRecordMP; // record nearest for multi-pass
 	R_feedback* val_feedback; // feedback for geometry being rendered
@@ -40,21 +41,25 @@ public:
 	R_dsgraph::mapMatrixPasses_T mapMatrixPasses [2];
 	R_dsgraph::mapSorted_T mapSorted;
 	R_dsgraph::mapHUD_T mapHUD;
+	R_dsgraph::mapHUD_T mapCamAttached;
 	R_dsgraph::mapLOD_T mapLOD;
 	R_dsgraph::mapSorted_T mapDistort;
 	R_dsgraph::mapHUD_T mapHUDSorted;
+	R_dsgraph::mapHUD_T mapCamAttachedSorted;
 #if defined(USE_DX11)
 	R_dsgraph::mapScopeHUD_T mapScopeHUD;	//  Redotix99: for 3D Shader Based Scopes
 	R_dsgraph::mapScopeHUD_T mapScopeHUDSorted;
 #endif
 	R_dsgraph::mapLandscape_T mapLandscape;
 	R_dsgraph::HUDMask_T HUDMask;
+	R_dsgraph::HUDMask_T HUDMaskCamAttached;
 	R_dsgraph::mapWater_T mapWater;
 
 #if RENDER!=R_R1
 	R_dsgraph::mapSorted_T										mapWmark;			// sorted
 	R_dsgraph::mapSorted_T										mapEmissive;
 	R_dsgraph::mapSorted_T										mapHUDEmissive;
+	R_dsgraph::mapSorted_T										mapCamAttachedEmissive;
 #endif
 
 	// Runtime structures 
@@ -98,6 +103,8 @@ public:
 
 	virtual void set_HUD(BOOL V) { val_bHUD = V; }
 	virtual BOOL get_HUD() { return val_bHUD; }
+	virtual void set_CamAttached(BOOL V) { val_bCamAttached = V; }
+	virtual BOOL get_CamAttached() { return val_bCamAttached; }
 	virtual void set_Invisible(BOOL V) { val_bInvisible = V; }
 
 	void set_Feedback(R_feedback* V, u32 id)
@@ -125,6 +132,7 @@ public:
 		val_pObject = NULL;
 		val_pTransform = NULL;
 		val_bHUD = FALSE;
+		val_bCamAttached = FALSE;
 		val_bInvisible = FALSE;
 		val_bRecordMP = FALSE;
 		val_feedback = 0;
@@ -172,17 +180,21 @@ public:
 		}
 		mapSorted.destroy();
 		mapHUD.destroy();
+		mapCamAttached.destroy();
 		mapLOD.destroy();
 		mapDistort.destroy();
 		mapHUDSorted.destroy();
+		mapCamAttachedSorted.destroy();
 		mapLandscape.destroy();
 		HUDMask.destroy();
+		HUDMaskCamAttached.destroy();
 		mapWater.destroy();
 
 #if RENDER!=R_R1
-		mapWmark.destroy		();
-		mapEmissive.destroy		();
-        mapHUDEmissive.destroy  ();
+		mapWmark.destroy();
+		mapEmissive.destroy();
+		mapHUDEmissive.destroy();
+		mapCamAttachedEmissive.destroy();
 #endif
 	}
 
@@ -199,6 +211,7 @@ public:
 	void r_dsgraph_render_graph(u32 _priority, bool _clear = true);
 	void r_dsgraph_render_hud(bool NoPS = false);
 	void r_dsgraph_render_hud_ui();
+	void r_dsgraph_render_cam_ui();
 	void r_dsgraph_render_lods(bool _setup_zb, bool _clear);
 	void r_dsgraph_render_sorted();
 #if defined(USE_DX11)

@@ -28,7 +28,6 @@
 #include "WeaponRG6.h"
 
 extern ENGINE_API bool g_dedicated_server;
-ENGINE_API extern float psHUD_FOV;
 ENGINE_API extern float psHUD_FOV_def;
 
 CUIXml* pWpnScopeXml = NULL;

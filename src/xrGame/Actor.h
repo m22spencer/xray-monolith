@@ -107,6 +107,7 @@ public:
 public:
 
 	virtual void Load(LPCSTR section);
+	virtual void RenderCamAttached();
 
 	virtual void shedule_Update(u32 T);
 	virtual void UpdateCL();
@@ -116,6 +117,7 @@ public:
 	// Render
 	virtual void renderable_Render();
 	virtual BOOL renderable_ShadowGenerate();
+	virtual bool AllowActorShadow();
 	virtual void feel_sound_new(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position,
 	                            float power);
 	virtual Feel::Sound* dcast_FeelSound() { return this; }

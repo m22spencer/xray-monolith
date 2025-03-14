@@ -84,7 +84,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time, BOOL return_ctrl_inp
 	{
 		g_position.set_position = false;
 		IR_Capture(); // capture input
-		m_Camera.invert(Device.mView);
+		m_Camera = Device.mInvView;
 		m_fCameraBoundary = 100.f;
 
 		// parse yaw

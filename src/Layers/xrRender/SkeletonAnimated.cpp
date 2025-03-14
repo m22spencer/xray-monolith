@@ -929,7 +929,7 @@ void CKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 cha
 }
 
 // calculate single bone with key blending 
-void CKinematicsAnimated::LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* parent, const SKeyTable& keys)
+void CKinematicsAnimated::LL_BoneMatrixBuild(u16 bone_id, CBoneInstance& bi, const Fmatrix* parent, const SKeyTable& keys)
 {
 	// Blend them together
 	CKey channel_keys[MAX_CHANNELS];
@@ -952,7 +952,18 @@ void CKinematicsAnimated::LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* p
 
 	Fmatrix RES;
 	RES.mk_xform(Result.Q, Result.T);
-	bi.mTransform.mul_43(*parent, RES);
+	
+	if (LL_GetBoneVisible(bone_id))
+	{
+		bi.mTransform.mul_43(*parent, RES);
+		bi.mTransformHidden.set(bi.mTransform);
+	}
+	else
+	{
+		bi.mTransform.c = (*parent).c;
+		bi.mTransformHidden.mul_43(*parent, RES);
+	}
+
 #ifdef DEBUG
 #ifndef _EDITOR
 		if(!check_scale(RES))
@@ -984,7 +995,7 @@ void CKinematicsAnimated::BuildBoneMatrix(const CBoneData* bd, CBoneInstance& bi
 	SKeyTable keys;
 	LL_BuldBoneMatrixDequatize(bd, channel_mask, keys);
 
-	LL_BoneMatrixBuild(bi, parent, keys);
+	LL_BoneMatrixBuild(bd->GetSelfID(), bi, parent, keys);
 
 	/*
 	if(bi.mTransform.c.y>10000)

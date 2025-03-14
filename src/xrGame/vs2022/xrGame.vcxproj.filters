@@ -4124,6 +4124,9 @@
     <ClInclude Include="..\NewZoomFlag.h" />
     <ClInclude Include="..\LevelDebugScript.h" />
     <ClInclude Include="..\WeaponSSRS.h" />
+    <ClInclude Include="..\script_attachment_manager.h">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp" />
@@ -5354,6 +5357,12 @@
     <ClCompile Include="..\LevelDebugScript.cpp" />
     <ClCompile Include="..\WeaponSSRS.cpp" />
     <ClCompile Include="..\WeaponSSRS_script.cpp" />
+    <ClCompile Include="..\script_attachment_manager.cpp">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\script_attachment_script.cpp">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\ai\monsters\chimera\chimera_attack_state.h" />

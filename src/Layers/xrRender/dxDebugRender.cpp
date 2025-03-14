@@ -5,8 +5,6 @@
 
 dxDebugRender DebugRenderImpl;
 
-extern float psHUD_FOV;
-
 void dxDebugRender::Render()
 {
 	RCache.set_xform_world(Fidentity);
@@ -14,17 +12,9 @@ void dxDebugRender::Render()
 	if (!m_line_vertices_hud.empty())
 	{
 		// Change projection
-		Fmatrix Pold = Device.mProject;
 		Fmatrix FTold = Device.mFullTransform;
-		Fmatrix FVold = Device.mView;
-		Device.mView.build_camera_dir(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
-		Device.mProject.build_projection(
-			deg2rad(psHUD_FOV * 83.f),
-			Device.fASPECT, R_VIEWPORT_NEAR,
-			g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-		Device.mFullTransform.mul(Device.mProject, Device.mView);
-		RCache.set_xform_project(Device.mProject);
+		Device.mFullTransform = Device.mFullTransformHud;
+		RCache.set_xform_project(Device.mProjectHud);
 
 		// Rendering
 		::Render->rmNear();
@@ -48,9 +38,7 @@ void dxDebugRender::Render()
 		::Render->rmNormal();
 
 		// Restore projection
-		Device.mProject = Pold;
 		Device.mFullTransform = FTold;
-		Device.mView = FVold;
 		RCache.set_xform_project(Device.mProject);
 	}
 

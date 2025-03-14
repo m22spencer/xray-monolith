@@ -108,6 +108,7 @@ class CScriptGameObject;
 class CZoneCampfire;
 class CPhysicObject;
 class CArtefact;
+class script_attachment;
 
 #ifdef DEBUG
     template <typename _object_type>
@@ -175,7 +176,7 @@ public:
 	int clsid() const;
 	void play_cycle(LPCSTR anim, bool mix_in);
 	void play_cycle(LPCSTR anim);
-	Fvector Center();
+	Fvector Center(bool bHud = false);
 	_DECLARE_FUNCTION10(Position, Fvector);
 	_DECLARE_FUNCTION10(Direction, Fvector);
 	_DECLARE_FUNCTION10(Mass, float);
@@ -1117,6 +1118,10 @@ public:
 	void set_scope_ui(LPCSTR scope_texture);
 #endif
 	//-Alundaio
+
+	script_attachment* AddAttachment(u16 slot, LPCSTR model_name);
+	script_attachment* GetAttachment(u16 slot);
+	void RemoveAttachment(u16 slot);
 
 	doors::door* m_door;
 

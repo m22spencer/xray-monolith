@@ -20,6 +20,8 @@
 #include "Flashlight.h"
 #include "Inventory.h"
 #include "map_manager.h"
+#include "player_hud.h"
+#include "script_attachment_manager.h"
 
 extern CUIGameCustom* CurrentGameUI()
 {
@@ -165,9 +167,6 @@ void CHUDManager::OnFrame()
 }
 
 //--------------------------------------------------------------------
-
-ENGINE_API extern float psHUD_FOV;
-
 void CHUDManager::Render_First()
 {
 	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))return;
@@ -203,9 +202,9 @@ bool need_render_hud()
 
 void CHUDManager::Render_Last()
 {
-	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))return;
 	if (0 == pUIGame) return;
-
+	if (g_actor) g_actor->RenderCamAttached();
+	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))return;
 	if (!need_render_hud()) return;
 
 	CObject* O = g_pGameLevel->CurrentViewEntity();
@@ -216,29 +215,14 @@ void CHUDManager::Render_Last()
 	::Render->set_HUD(FALSE);
 }
 
-//Swartz: actor shadow
-void CHUDManager::Render_Actor_Shadow() // added by KD
+void CHUDManager::Render_R1_Attachment_UI()
 {
-	if (0 == pUIGame) return;
-	CObject* O = g_pGameLevel->CurrentViewEntity();
-	if (0 == O) return;
-	CActor* A = smart_cast<CActor*>(O);
-	if (!A) return;
-	if (A->active_cam() != eacFirstEye) return; // KD: we need to render actor shadow only in first eye cam mode because
-	// in other modes actor model already in scene graph and renders well
+	for (auto att : g_pGamePersistent->AttachmentUIsToRender)
+		att->RenderUI();
 
-	//Alun: Due to glitchy shadows this is forced
-	CFlashlight* flashlight = smart_cast<CFlashlight*>(A->inventory().ItemFromSlot(DETECTOR_SLOT));
-	if (flashlight && flashlight->torch_active())
-		return;
-
-	::Render->set_Object(O->H_Root());
-	O->renderable_Render();
+	g_pGamePersistent->AttachmentUIsToRender.clear_not_free();
 }
 
-//-Swartz
-
-#include "player_hud.h"
 
 bool CHUDManager::RenderActiveItemUIQuery()
 {
@@ -252,12 +236,39 @@ bool CHUDManager::RenderActiveItemUIQuery()
 	return (g_player_hud && g_player_hud->render_item_ui_query());
 }
 
+bool CHUDManager::RenderCamAttachedUIQuery()
+{
+	if (!g_actor) return false;
+
+	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
+	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
+	for (; it != it_e; ++it)
+	{
+		script_attachment* att = (*it).second;
+		if (att->GetFFlags().test(eSA_CamAttached))
+			return true;
+	}
+	return false;
+}
+
 void CHUDManager::RenderActiveItemUI()
 {
 	if (!psHUD_Flags.is(HUD_DRAW_RT2))
 		return;
 
 	g_player_hud->render_item_ui();
+}
+
+void CHUDManager::RenderCamAttachedUI()
+{
+	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
+	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
+	for (; it != it_e; ++it)
+	{
+		script_attachment* att = (*it).second;
+		if (att->GetFFlags().test(eSA_CamAttached))
+			att->RenderUI(false);
+	}
 }
 
 extern ENGINE_API BOOL bShowPauseString;

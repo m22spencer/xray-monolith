@@ -2,7 +2,6 @@
 #include "script_export_space.h"
 #include "script_light_inline.h"
 
-typedef class_exporter<ScriptLight> CScriptLight;
-add_to_type_list(CScriptLight)
+add_to_type_list(ScriptLight)
 #undef script_type_list
-#define script_type_list save_type_list(CScriptLight)
+#define script_type_list save_type_list(ScriptLight)

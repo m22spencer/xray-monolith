@@ -1580,8 +1580,6 @@ void AddBullet(luabind::object t)
 	}
 }
 
-extern ENGINE_API float psHUD_FOV;
-
 const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
 {
 	Fmatrix world, res;
@@ -1589,17 +1587,7 @@ const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = fa
 	world.c = pos;
 
 	if (hud)
-	{
-		Fmatrix FP, FT, FV;
-		FV.build_camera_dir(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
-		FP.build_projection(
-			deg2rad(psHUD_FOV * 83.f),
-			Device.fASPECT, R_VIEWPORT_NEAR,
-			g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-		FT.mul(FP, FV);
-		res.mul(FT, world);
-	}
+		res.mul(Device.mFullTransformHud, world);
 	else
 		res.mul(Device.mFullTransform, world);
 	

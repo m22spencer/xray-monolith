@@ -70,7 +70,9 @@ public:
 
 	Fmatrix mView;
 	Fmatrix mProject;
+	Fmatrix mProjectHud;
 	Fmatrix mFullTransform;
+	Fmatrix mFullTransformHud;
 
 	// Copies of corresponding members. Used for synchronization.
 	Fvector vCameraPosition_saved;
@@ -228,6 +230,9 @@ public:
 	//Fmatrix mProject;
 	//Fmatrix mFullTransform;
 
+	Fmatrix mInvView;
+	Fmatrix mInvProject;
+	Fmatrix mInvProjectHud;
 	Fmatrix mInvFullTransform;
 
 	CSecondVPParams m_SecondViewport;	//--#SM+#-- +SecondVP+

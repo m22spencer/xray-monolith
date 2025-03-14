@@ -513,16 +513,21 @@ void CKinematics::LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive)
 	visimask.set(mask, val);
 	if (!visimask.is(mask))
 	{
+		bone_instances[bone_id].mTransformHidden = bone_instances[bone_id].mTransform;
 		bone_instances[bone_id].mTransform.scale(0.f, 0.f, 0.f);
-		if (LL_GetData(bone_id).GetParentID() < LL_BoneCount() && LL_GetData(bone_id).GetParentID() != BI_NONE)
-			bone_instances[bone_id].mTransform.c = LL_GetBoneInstance(LL_GetData(bone_id).GetParentID()).mTransform.c;
+		u16 parent_id = LL_GetData(bone_id).GetParentID();
+		if (parent_id < LL_BoneCount() && parent_id != BI_NONE)
+			bone_instances[bone_id].mTransform.c = LL_GetBoneInstance(parent_id).mTransform.c;
+
+		bone_instances[bone_id].mRenderTransform.mul_43(bone_instances[bone_id].mTransform,
+			(*bones)[bone_id]->m2b_transform);
 	}
 	else
 	{
+		bone_instances[bone_id].mTransform = bone_instances[bone_id].mTransformHidden;
 		CalculateBones_Invalidate();
 	}
-	bone_instances[bone_id].mRenderTransform.mul_43(bone_instances[bone_id].mTransform,
-	                                                (*bones)[bone_id]->m2b_transform);
+
 	if (bRecursive)
 	{
 		for (xr_vector<CBoneData*>::iterator C = (*bones)[bone_id]->children.begin(); C != (*bones)[bone_id]
@@ -535,19 +540,24 @@ void CKinematics::LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive)
 void CKinematics::LL_SetBonesVisible(u64 mask)
 {
 	visimask.assign(0);
-	for (u32 b = 0; b < bones->size(); b++)
+	for (u32 bone_id = 0; bone_id < bones->size(); bone_id++)
 	{
-		u64 bm = u64(1) << b;
+		u64 bm = u64(1) << bone_id;
 		if (mask & bm)
 		{
 			visimask.set(bm,TRUE);
 		}
 		else
 		{
-			Fmatrix& A = bone_instances[b].mTransform;
-			Fmatrix& B = bone_instances[b].mRenderTransform;
-			A.scale(0.f, 0.f, 0.f);
-			B.mul_43(A, (*bones)[b]->m2b_transform);
+			bone_instances[bone_id].mTransformHidden = bone_instances[bone_id].mTransform;
+			bone_instances[bone_id].mTransform.scale(0.f, 0.f, 0.f);
+
+			u16 parent_id = LL_GetData(bone_id).GetParentID();
+			if (parent_id < LL_BoneCount() && parent_id != BI_NONE)
+				bone_instances[bone_id].mTransform.c = LL_GetBoneInstance(parent_id).mTransform.c;
+
+			bone_instances[bone_id].mRenderTransform.mul_43(bone_instances[bone_id].mTransform,
+				(*bones)[bone_id]->m2b_transform);
 		}
 	}
 	CalculateBones_Invalidate();

@@ -64,7 +64,6 @@ void CEliteDetector::UpdateAf()
 
 void CEliteDetector::render_item_3d_ui()
 {
-	R_ASSERT(HudItemData());
 	ui().Draw();
 
 	//	Restore cull mode

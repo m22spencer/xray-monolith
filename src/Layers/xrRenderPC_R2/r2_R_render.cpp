@@ -147,6 +147,8 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 			g_hud->Render_Last(); // HUD
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
+			if (g_hud->RenderCamAttachedUIQuery())
+				r_dsgraph_render_cam_ui();
 		}
 	}
 	else
@@ -157,6 +159,8 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 			g_hud->Render_Last(); // HUD
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
+			if (g_hud->RenderCamAttachedUIQuery())
+				r_dsgraph_render_cam_ui();
 		}
 	}
 }

@@ -44,6 +44,7 @@ class CBlend;
 class ai_obstacle;
 class CFlashlight;
 class IKinematics;
+class script_attachment;
 
 template <typename _return_type>
 class CScriptCallbackEx;
@@ -62,6 +63,7 @@ class CGameObject :
 protected:
 	//время удаления объекта
 	bool m_bObjectRemoved;
+	xr_map<u16, script_attachment*> m_script_attachments;
 public:
 	CGameObject();
 	virtual ~CGameObject();
@@ -125,6 +127,7 @@ public:
 	virtual bool shedule_Needed();
 
 	virtual void renderable_Render();
+	virtual void RenderAttachments();
 	virtual void OnEvent(NET_Packet& P, u16 type);
 
 	virtual void Hit(SHit* pHDS)
@@ -177,6 +180,11 @@ public:
 	virtual void reload(LPCSTR section);
 	///////////////////// network /////////////////////////////////////////
 	bool object_removed() const { return m_bObjectRemoved; };
+
+	virtual script_attachment* add_attachment(u16 slot, script_attachment* att);
+	virtual script_attachment* get_attachment(u16 slot);
+	virtual void remove_attachment(u16 slot, bool destroy = false);
+
 private:
 	bool m_bCrPr_Activated;
 	u32 m_dwCrPr_ActivationStep;
@@ -335,6 +343,7 @@ public:
 	virtual void on_matrix_change(const Fmatrix& previous);
 
 	void FootStepCallback(float power, bool b_play, bool b_on_ground, bool b_hud_view);
+	xr_map<u16, script_attachment*>* GetAttachments() { return &m_script_attachments; }
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)

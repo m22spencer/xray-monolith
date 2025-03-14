@@ -423,8 +423,6 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 	FillSprite(pv, T, R, pos, lt, rb, r1, r2, clr, sina, cosa);
 }
 
-extern ENGINE_API float psHUD_FOV;
-
 struct PRS_PARAMS
 {
 	FVF::LIT* pv;
@@ -596,17 +594,11 @@ void CParticleEffect::Render(float)
 			if (dwCount)
 			{
 #ifndef _EDITOR
-				Fmatrix Pold = Device.mProject;
 				Fmatrix FTold = Device.mFullTransform;
 				if (GetHudMode())
 				{
-					RDEVICE.mProject.build_projection(deg2rad(psHUD_FOV * 83.f),
-					                                  Device.fASPECT,
-					                                  R_VIEWPORT_NEAR,
-					                                  g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-					Device.mFullTransform.mul(Device.mProject, Device.mView);
-					RCache.set_xform_project(Device.mProject);
+					Device.mFullTransform = Device.mFullTransformHud;
+					RCache.set_xform_project(Device.mProjectHud);
 					RImplementation.rmNear();
 					ApplyTexgen(Device.mFullTransform);
 				}
@@ -624,7 +616,6 @@ void CParticleEffect::Render(float)
 				if (GetHudMode())
 				{
 					RImplementation.rmNormal();
-					Device.mProject = Pold;
 					Device.mFullTransform = FTold;
 					RCache.set_xform_project(Device.mProject);
 					ApplyTexgen(Device.mFullTransform);
@@ -687,7 +678,6 @@ IC void FillSprite	(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 	pv->set		(b.x+pos.x,b.y+pos.y,b.z+pos.z,	clr, rb.x,lt.y);	pv++;
 }
 
-extern ENGINE_API float		psHUD_FOV;
 void CParticleEffect::Render(float )
 {
 	u32			dwOffset,dwCount;
@@ -770,17 +760,11 @@ void CParticleEffect::Render(float )
 			if (dwCount)    
 			{
 #ifndef _EDITOR
-				Fmatrix Pold						= Device.mProject;
 				Fmatrix FTold						= Device.mFullTransform;
 				if(GetHudMode())
 				{
-					RDEVICE.mProject.build_projection(	deg2rad(psHUD_FOV*Device.fFOV), 
-														Device.fASPECT, 
-														VIEWPORT_NEAR, 
-														g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-					Device.mFullTransform.mul	(Device.mProject, Device.mView);
-					RCache.set_xform_project	(Device.mProject);
+					Device.mFullTransform = Device.mFullTransformHud;
+					RCache.set_xform_project(Device.mProjectHud);
 					RImplementation.rmNear		();
 					ApplyTexgen(Device.mFullTransform);
 				}
@@ -796,7 +780,6 @@ void CParticleEffect::Render(float )
 				if(GetHudMode())
 				{
 					RImplementation.rmNormal	();
-					Device.mProject				= Pold;
 					Device.mFullTransform		= FTold;
 					RCache.set_xform_project	(Device.mProject);
 					ApplyTexgen(Device.mFullTransform);

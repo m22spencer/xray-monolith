@@ -1439,6 +1439,7 @@
     <ClInclude Include="..\screenshots_writer.h" />
     <ClInclude Include="..\screenshot_manager.h" />
     <ClInclude Include="..\screenshot_server.h" />
+    <ClInclude Include="..\script_attachment_manager.h" />
     <ClInclude Include="..\script_light_inline.h" />
     <ClInclude Include="..\ScriptXMLInit.h" />
     <ClInclude Include="..\script_abstract_action.h" />
@@ -3307,6 +3308,11 @@
     </ClCompile>
     <ClCompile Include="..\script_animation_action.cpp" />
     <ClCompile Include="..\script_animation_action_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\script_attachment_manager.cpp" />
+    <ClCompile Include="..\script_attachment_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>

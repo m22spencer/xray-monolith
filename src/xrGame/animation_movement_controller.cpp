@@ -204,7 +204,7 @@ static void get_animation_root_position(Fmatrix& pos, IKinematics* K, IKinematic
 
 	CBoneInstance BI = K->LL_GetBoneInstance(0);
 
-	KA->LL_BoneMatrixBuild(BI, &Fidentity, keys);
+	KA->LL_BoneMatrixBuild(0, BI, &Fidentity, keys);
 	pos.set(BI.mTransform);
 	control_blend->blendAmount = sv_amount;
 }

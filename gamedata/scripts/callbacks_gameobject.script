@@ -153,6 +153,13 @@ _G.COnMouseWheel = function(dir)
 	return flags.ret_value
 end
 
+AddScriptCallback("on_before_mouse_move")
+level_input.on_mouse_move = function(x, y, disabled)
+	local flags = { ret_value = false }
+	SendScriptCallback("on_before_mouse_move", x, y, disabled, flags)
+	return flags.ret_value
+end
+
 -- Slot change callback
 -- new_obj and prev_obj can be nil
 AddScriptCallback("actor_on_changed_slot")

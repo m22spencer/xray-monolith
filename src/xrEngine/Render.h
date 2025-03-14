@@ -274,6 +274,8 @@ public:
 	virtual void set_Transform(Fmatrix* M) = 0;
 	virtual void set_HUD(BOOL V) = 0;
 	virtual BOOL get_HUD() = 0;
+	virtual void set_CamAttached(BOOL V) = 0;
+	virtual BOOL get_CamAttached() = 0;
 	virtual void set_Invisible(BOOL V) = 0;
 	virtual void flush() = 0;
 	virtual void set_Object(IRenderable* O) = 0;

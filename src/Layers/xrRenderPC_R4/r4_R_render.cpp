@@ -150,6 +150,8 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 			g_hud->Render_Last(); // HUD
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
+			if (g_hud->RenderCamAttachedUIQuery())
+				r_dsgraph_render_cam_ui();
 		}
 	}
 	else
@@ -160,6 +162,8 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 			g_hud->Render_Last(); // HUD
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
+			if (g_hud->RenderCamAttachedUIQuery())
+				r_dsgraph_render_cam_ui();
 		}
 	}
 }
@@ -516,9 +520,7 @@ void CRender::Render()
 
 			if (!Device.m_SecondViewport.IsSVPFrame())
 			{
-				Fmatrix m_invview;
-				m_invview.invert(Device.mView);
-				Target->Matrix_previous.mul(mm_saved_viewproj, m_invview);
+				Target->Matrix_previous.mul(mm_saved_viewproj, Device.mInvView);
 				Target->Matrix_current.set(Device.mProject);
 				mm_saved_viewproj.set(Device.mFullTransform);
 			}

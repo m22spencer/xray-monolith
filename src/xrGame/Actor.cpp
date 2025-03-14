@@ -88,6 +88,7 @@ using namespace luabind;
 //Rezy
 #include "xrEngine\x_ray.h"
 #include "ui/UIHudStatesWnd.h"
+#include "script_attachment_manager.h"
 
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
@@ -1812,7 +1813,7 @@ void CActor::shedule_Update(u32 DT)
 
 	//åñëè â ðåæèìå HUD, òî ñàìà ìîäåëü àêòåðà íå ðèñóåòñÿ
 	if (!character_physics_support()->IsRemoved())
-		setVisible(!HUDview());
+		setVisible(TRUE);
 
 	//÷òî àêòåð âèäèò ïåðåä ñîáîé
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
@@ -1896,31 +1897,77 @@ void CActor::shedule_Update(u32 DT)
 	m_pPhysics_support->in_shedule_Update(DT);
 	Check_for_AutoPickUp();
 };
-#include "debug_renderer.h"
 
+void CActor::RenderCamAttached()
+{
+	if (cam_active == eacFirstEye && ::Render->active_phase() == 0)
+	{
+		if (GetAttachments()->size())
+		{
+			::Render->set_HUD(TRUE);
+			::Render->set_CamAttached(TRUE);
+			::Render->set_Object(this);
+
+			Fmatrix cam = Fidentity;
+			Cameras().camera_Matrix(cam);
+
+			xr_map<u16, script_attachment*>::iterator it = GetAttachments()->begin();
+			xr_map<u16, script_attachment*>::iterator it_e = GetAttachments()->end();
+			for (; it != it_e; ++it)
+			{
+				script_attachment* att = (*it).second;
+
+				if (att->GetFFlags().test(eSA_CamAttached))
+					att->Render(nullptr, &cam, true);
+			}
+
+			::Render->set_CamAttached(FALSE);
+			::Render->set_HUD(FALSE);
+		}
+	}
+}
+
+extern Flags32 ps_actor_shadow_flags;
+
+bool CActor::AllowActorShadow()
+{
+	if (!ps_actor_shadow_flags.test(1)) return false;
+	if (::Render->get_generation() != ::Render->GENERATION_R2) return false;
+
+	CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
+	if (flashlight && flashlight->torch_active())
+		return false;
+
+	return true;
+}
+
+#include "debug_renderer.h"
 void CActor::renderable_Render()
 {
 	VERIFY(_valid(XFORM()));
-	inherited::renderable_Render();
+	
+	if (cam_active == eacFirstEye)
+	{
+		if (::Render->active_phase() == 0) // can render first person body here
+		{
+			//if (fpBody) 
+			//	inherited::renderable_Render();
+		}
+		else if (AllowActorShadow()) // render actor shadow
+		{
+			inherited::renderable_Render();
+			if ((IsFocused() || (!(IsFocused() && ((!m_holder) ||
+				(m_holder && m_holder->allowWeapon() && m_holder->HUDView()))))))
+				CInventoryOwner::renderable_Render();
+		}
+	}
 
-	//Alun: Due to glitchy shadows this is forced
-	CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
-	if (flashlight && flashlight->torch_active())
-		return;
-
-	//if(1/*!HUDview()*/) //Swartz: replaced by block below for actor shadow
-	if ((cam_active == eacFirstEye && // first eye cam
-			::Render->get_generation() == ::Render->GENERATION_R2 && // R2
-			::Render->active_phase() == 1) // shadow map rendering on R2	
-		||
-		!(IsFocused() &&
-			(cam_active == eacFirstEye) &&
-			((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
-	)
-		//{
+// Third Person Body and Weapon/Item
+	else
+	{
+		inherited::renderable_Render();
 		CInventoryOwner::renderable_Render();
-	//}
-	//VERIFY(_valid(XFORM()));
+	}
 }
 
 BOOL CActor::renderable_ShadowGenerate()
@@ -2011,10 +2058,9 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
 
 	UIRender->StartPrimitive(4, IUIRender::ptTriStrip, IUIRender::pttLIT);
 
-	CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
 	Fmatrix M;
-	smart_cast<IKinematics*>(Visual())->CalculateBones();
-	M.mul(XFORM(), BI.mTransform);
+	Visual()->dcast_PKinematics()->CalculateBones();
+	M.mul(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_head));
 
 	Fvector pos = M.c;
 	pos.add(dpos);
@@ -2063,10 +2109,10 @@ void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
 {
 	if (!g_Alive()) return;
 
-	CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
 	Fmatrix M;
+	Visual()->dcast_PKinematics()->CalculateBones();
 	smart_cast<IKinematics*>(Visual())->CalculateBones();
-	M.mul(XFORM(), BI.mTransform);
+	M.mul(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_head));
 	//------------------------------------------------
 	Fvector v0, v1;
 	v0.set(M.c);
@@ -2134,14 +2180,11 @@ void CActor::ForceTransform(const Fmatrix& m)
 		character_physics_support()->movement()->BlockDamageSet(u64(block_damage_time_seconds / fixed_step));
 }
 
-ENGINE_API extern float psHUD_FOV;
-
 float CActor::Radius() const
 {
 	float R = inherited::Radius();
 	CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
 	if (W) R += W->Radius();
-	//	if (HUDview()) R *= 1.f/psHUD_FOV;
 	return R;
 }
 

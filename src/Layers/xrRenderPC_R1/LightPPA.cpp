@@ -314,20 +314,52 @@ void CLightR_Manager::render_spot(u32 _priority)
 	//		??? grass ???l
 }
 
+IC void hud_light_apply(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos, xr_vector<light*>& source)
+{
+	for (u32 it = 0; it < source.size(); it++)
+	{
+		light* L = source[it];
+		if (!L->get_hud_mode()) continue;
+
+		saved_pos.emplace(L, mk_pair(L->position, L->direction));
+
+		Fvector::hud_to_world(L->position);
+		Fvector::hud_to_world_dir(L->direction);
+	}
+}
+
+IC void hud_light_restore(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos, xr_vector<light*>& source)
+{
+	for (const auto& saved : saved_pos)
+	{
+		light* L = saved.first;
+		if (!L->get_hud_mode()) continue;
+
+		L->position = saved.second.first;
+		L->direction = saved.second.second;
+	}
+}
+
 void CLightR_Manager::render(u32 _priority)
 {
+	xr_map<light*, std::pair<Fvector, Fvector>> saved_pos;
+
 	if (selected_spot.size())
 	{
+		hud_light_apply(saved_pos, selected_spot);
 		RImplementation.phase = CRender::PHASE_SPOT;
 		render_spot(_priority);
+		hud_light_restore(saved_pos, selected_spot);
 
 		if (_priority == 1)
 			selected_spot.clear();
 	}
 	if (selected_point.size())
 	{
+		hud_light_apply(saved_pos, selected_point);
 		RImplementation.phase = CRender::PHASE_POINT;
 		render_point(_priority);
+		hud_light_restore(saved_pos, selected_point);
 
 		if (_priority == 1)
 			selected_point.clear();

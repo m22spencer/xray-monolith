@@ -350,7 +350,7 @@ public:
 
 	void update_script_item();
 
-	attachable_hud_item* create_hud_item(const shared_str& sect);
+	attachable_hud_item* get_hud_item(const shared_str& sect);
 
 	void attach_item(CHudItem* item);
 	void re_sync_anim(u8 part);

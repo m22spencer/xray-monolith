@@ -123,12 +123,11 @@ void CUIArtefactDetectorAdv::SetValue(const float val1, const Fvector& val2)
 
 void CUIArtefactDetectorAdv::update()
 {
-	if (NULL == m_parent->HudItemData() || m_bid == u16(-1)) return;
+	if (!m_parent->IsAttachedToHUD() || m_bid == u16(-1)) return;
 	inherited::update();
 	attachable_hud_item* itm = m_parent->HudItemData();
-	R_ASSERT(itm);
 
-	BOOL b_visible = !fis_zero(m_target_dir.magnitude());
+	BOOL b_visible = !!!fis_zero(m_target_dir.magnitude());
 	if (b_visible != itm->m_model->LL_GetBoneVisible(m_bid))
 		itm->m_model->LL_SetBoneVisible(m_bid, b_visible, TRUE);
 
@@ -188,7 +187,6 @@ void CUIArtefactDetectorAdv::BoneCallback(CBoneInstance* B)
 void CUIArtefactDetectorAdv::SetBoneCallbacks()
 {
 	attachable_hud_item* itm = m_parent->HudItemData();
-	R_ASSERT(itm);
 	m_bid = itm->m_model->LL_BoneID("screen_bone");
 
 	CBoneInstance& bi = itm->m_model->LL_GetBoneInstance(m_bid);
@@ -201,7 +199,6 @@ void CUIArtefactDetectorAdv::SetBoneCallbacks()
 void CUIArtefactDetectorAdv::ResetBoneCallbacks()
 {
 	attachable_hud_item* itm = m_parent->HudItemData();
-	R_ASSERT(itm);
 	u16 bid = itm->m_model->LL_BoneID("screen_bone");
 
 	CBoneInstance& bi = itm->m_model->LL_GetBoneInstance(bid);

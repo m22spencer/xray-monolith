@@ -234,8 +234,8 @@ public:
 		return (u16)btwCount1(F);
 	}
 
-	ICF Fmatrix& _BCL LL_GetTransform(u16 bone_id) { return LL_GetBoneInstance(bone_id).mTransform; }
-	ICF const Fmatrix& _BCL LL_GetTransform(u16 bone_id) const { return LL_GetBoneInstance(bone_id).mTransform; }
+	ICF Fmatrix& _BCL LL_GetTransform(u16 bone_id) { return LL_GetBoneVisible(bone_id) ? LL_GetBoneInstance(bone_id).mTransform : LL_GetBoneInstance(bone_id).mTransformHidden; }
+	ICF const Fmatrix& _BCL LL_GetTransform(u16 bone_id) const { return LL_GetBoneVisible(bone_id) ? LL_GetBoneInstance(bone_id).mTransform : LL_GetBoneInstance(bone_id).mTransformHidden; }
 	ICF Fmatrix& LL_GetTransform_R(u16 bone_id) { return LL_GetBoneInstance(bone_id).mRenderTransform; }
 	// rendering only
 	Fobb& LL_GetBox(u16 bone_id)
@@ -259,6 +259,12 @@ public:
 	BOOL _BCL LL_GetBoneVisible(u16 bone_id)
 	{
 		VERIFY(bone_id<LL_BoneCount());
+		return visimask.is(u64(1) << bone_id);
+	}
+
+	const BOOL _BCL LL_GetBoneVisible(u16 bone_id) const
+	{
+		VERIFY(bone_id < LL_BoneCount());
 		return visimask.is(u64(1) << bone_id);
 	}
 

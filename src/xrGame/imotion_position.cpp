@@ -756,7 +756,7 @@ void imotion_position::rootbone_callback(CBoneInstance* BI)
 	{
 		key->Q.rotation(Fvector().set(0, 1, 0), im->angle);
 	}
-	KA->LL_BoneMatrixBuild(*BI, &Fidentity, keys);
+	KA->LL_BoneMatrixBuild(0, *BI, &Fidentity, keys);
 
 	R_ASSERT2(_valid(BI->mTransform), "imotion_position::rootbone_callback");
 }

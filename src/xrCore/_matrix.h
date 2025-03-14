@@ -915,6 +915,13 @@ public:
 		getXYZ(xyz.x, xyz.y, xyz.z);
 		xyz.mul(-1.f);
 	}
+
+	IC static void hud_to_world(Self& xform)
+	{
+		Fvector::hud_to_world(xform.c);
+		Fvector::hud_to_world_dir(xform.k);
+		Fvector::generate_orthonormal_basis_normalized(xform.k, xform.j, xform.i);
+	}
 };
 
 typedef _matrix<float> Fmatrix;

@@ -35,7 +35,9 @@ public:
 	IC const bool IsEnabled() const			{ return m_glow->get_active(); }
 	IC const float GetRange() const			{ return fRange; }
 	IC void SetPosition(Fvector pos)		{ m_glow->set_position(pos); }
+	IC void SetPosition(float x, float y, float z) { m_glow->set_position(Fvector{x,y,z}); }
 	IC void SetDirection(Fvector dir)		{ m_glow->set_direction(dir); }
+	IC void SetDirection(float x, float y, float z) { m_glow->set_direction(Fvector{ x,y,z }); }
 	IC const Fcolor GetColor() const		{ return color; }
 	IC const LPCSTR GetTexture() const		{ return texture; }
 	IC void SetBrightness(float val)		{ fBrightness = val; }
@@ -80,7 +82,7 @@ public:
 
 class ScriptLight
 {
-private:
+protected:
 	ref_light m_light;
 	CLAItem* m_light_anim;
 
@@ -127,7 +129,9 @@ public:
 	IC void SetLanim(LPCSTR name)						{ m_light_anim = LALib.FindItem(name); }
 	IC LPCSTR GetLanim() const							{ return m_light_anim != nullptr ? *m_light_anim->cName : nullptr; }
 	IC void SetPosition(Fvector pos)					{ m_light->set_position(pos); }
+	IC void SetPosition(float x, float y, float z)		{ m_light->set_position(Fvector{ x,y,z }); }
 	IC void SetDirection(Fvector dir)					{ m_light->set_rotation(dir, Fvector().set(1, 0, 0)); }
+	IC void SetDirection(float x, float y, float z)		{ m_light->set_rotation(Fvector{ x,y,z }, Fvector().set(1, 0, 0)); }
 	IC void SetDirection(Fvector dir, Fvector right)	{ m_light->set_rotation(dir, right); }
 	IC void SetCone(float angle)						{ m_light->set_cone(angle); }
 	IC void Enable(bool state)							{ m_light->set_active(state); }
@@ -217,5 +221,45 @@ public:
 			fclr.mul_rgb(fBrightness);
 			m_light->set_color(fclr);
 		}
+	}
+
+	DECLARE_SCRIPT_REGISTER_FUNCTION
+};
+
+// Modified script light class used for script attachments
+
+class AttachmentScriptLight : public ScriptLight
+{
+private:
+	Fmatrix m_offset;
+
+public:
+	AttachmentScriptLight()
+	{
+		m_offset = Fidentity;
+	}
+
+	virtual ~AttachmentScriptLight() {}
+
+	IC void SetPosition(Fvector pos) { m_offset.translate_over(pos); }
+	IC void SetPosition(float x, float y, float z) { m_offset.translate_over(x, y, z); }
+	IC void SetDirection(Fvector dir)
+	{
+		Fvector pos = m_offset.c;
+		m_offset.setHPB(dir.x, dir.y, dir.z);
+		m_offset.c = pos;
+	}
+	IC void SetDirection(float x, float y, float z)
+	{
+		Fvector pos = m_offset.c;
+		m_offset.setHPB(x, y, z);
+		m_offset.c = pos;
+	}
+	IC void SetDirection(Fvector dir, Fvector right) { SetDirection(dir); }
+	IC void SetXFORM(Fmatrix& mat)
+	{
+		mat.mulB_43(m_offset);
+		m_light->set_position(mat.c);
+		m_light->set_rotation(mat.k, mat.i);
 	}
 };

@@ -349,6 +349,7 @@ void light::export_(light_Package& package)
 					L->s_spot = s_spot;
 					L->s_point = s_point;
 					L->set_virtual_size(virtual_size); //Set virtual size
+					L->set_hud_mode(get_hud_mode());
 					L->omnipart_num = f;
 					L->omipart_parent = omnipart[0];
 					L->flags.bActive = true;

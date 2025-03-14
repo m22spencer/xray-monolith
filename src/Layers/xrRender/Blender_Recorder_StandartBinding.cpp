@@ -690,13 +690,10 @@ static class cl_actor_params : public R_constant_setup
 static class cl_inv_v : public R_constant_setup
 {
 	u32	marker;
-	Fmatrix	result;
 
 	virtual void setup(R_constant* C)
 	{
-		result.invert(Device.mView);
-
-		RCache.set_c(C, result);
+		RCache.set_c(C, Device.mInvView);
 	}
 } binder_inv_v;
 

@@ -486,11 +486,11 @@ void CActor::cam_Update(float dt, float fFOV)
 			CHudItem* pItem = smart_cast<CHudItem*>(inventory().ActiveItem());
 			CHudItem* pDevice = smart_cast<CHudItem*>(inventory().ItemFromSlot(DETECTOR_SLOT));
 
-			if (pItem && pItem->HudItemData() && pDevice && pDevice->HudItemData())
+			if (pItem && pItem->IsAttachedToHUD() && pDevice && pDevice->IsAttachedToHUD())
 				psHUD_FOV = fminf(pItem->GetHudFov(), pDevice->GetHudFov());
-			else if (pItem && pItem->HudItemData())
+			else if (pItem && pItem->IsAttachedToHUD())
 				psHUD_FOV = pItem->GetHudFov();
-			else if (pDevice && pDevice->HudItemData())
+			else if (pDevice && pDevice->IsAttachedToHUD())
 				psHUD_FOV = pDevice->GetHudFov();
 			else
 				psHUD_FOV = psHUD_FOV_def;

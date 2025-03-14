@@ -30,7 +30,6 @@ public:
 
 	virtual void Render_First() { ; }
 	virtual void Render_Last() { ; }
-	virtual void Render_Actor_Shadow() { ; } //Swartz: actor shadow
 	BENCH_SEC_SCRAMBLEVTBL1
 
 	virtual void OnFrame() { ; }
@@ -40,7 +39,10 @@ public:
 	virtual void OnDisconnected() = 0;
 	virtual void OnConnected() = 0;
 	virtual void RenderActiveItemUI() = 0;
+	virtual void RenderCamAttachedUI() = 0;
 	virtual bool RenderActiveItemUIQuery() = 0;
+	virtual bool RenderCamAttachedUIQuery() = 0;
+	virtual void Render_R1_Attachment_UI() = 0;
 	virtual void net_Relcase(CObject* object) = 0;
 };
 

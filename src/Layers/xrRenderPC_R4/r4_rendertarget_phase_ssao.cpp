@@ -35,9 +35,6 @@ void CRenderTarget::phase_ssao()
 	}*/
 
 	// Compute params
-	Fmatrix m_v2w;
-	m_v2w.invert(Device.mView);
-
 	float fSSAONoise = 2.0f;
 	fSSAONoise *= tan(deg2rad(67.5f));
 	fSSAONoise /= tan(deg2rad(Device.fFOV));
@@ -71,7 +68,7 @@ void CRenderTarget::phase_ssao()
 	RCache.set_Element(s_ssao->E[0]);
 	RCache.set_Geometry(g_combine);
 
-	RCache.set_c("m_v2w", m_v2w);
+	RCache.set_c("m_v2w", Device.mInvView);
 	RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
 	RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
 	RCache.set_c("resolution", _w, _h, 1.0f / _w, 1.0f / _h);
@@ -137,9 +134,6 @@ void CRenderTarget::phase_downsamp()
 	RCache.set_Stencil(FALSE);
 
 	{
-		Fmatrix m_v2w;
-		m_v2w.invert(Device.mView);
-
 		// Fill VB
 		float scale_X = float(w) / float(TEX_jitter);
 		float scale_Y = float(h) / float(TEX_jitter);
@@ -159,7 +153,7 @@ void CRenderTarget::phase_downsamp()
 		// Draw
 		RCache.set_Element(s_ssao->E[1]);
 		RCache.set_Geometry(g_combine);
-		RCache.set_c("m_v2w", m_v2w);
+		RCache.set_c("m_v2w", Device.mInvView);
 
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 	}

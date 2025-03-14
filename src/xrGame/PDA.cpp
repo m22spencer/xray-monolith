@@ -110,7 +110,7 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
 			CurrentGameUI()->GetPdaMenu().Enable(false);
 			g_player_hud->reset_thumb(false);
 			CurrentGameUI()->GetPdaMenu().ResetJoystick(false);
-			if (joystick != BI_NONE && HudItemData())
+			if (joystick != BI_NONE)
 				HudItemData()->m_model->LL_GetBoneInstance(joystick).reset_callback();
 			target_screen_switch = Device.fTimeGlobal + m_screen_off_delay;
 		}
@@ -142,10 +142,10 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
 	{
 		PlayAnimIdle();
 
-		if (m_joystick_bone && joystick == BI_NONE && HudItemData())
+		if (m_joystick_bone && joystick == BI_NONE)
 			joystick = HudItemData()->m_model->LL_BoneID(m_joystick_bone);
 
-		if (joystick != BI_NONE && HudItemData())
+		if (joystick != BI_NONE)
 		{
 			CBoneInstance* bi = &HudItemData()->m_model->LL_GetBoneInstance(joystick);
 			if (bi)
@@ -503,7 +503,7 @@ void CPda::OnMoveToRuck(const SInvItemPlace& prev)
 	if (prev.type == eItemPlaceSlot)
 	{
 		SwitchState(eHidden);
-		if (joystick != BI_NONE && HudItemData())
+		if (joystick != BI_NONE)
 			HudItemData()->m_model->LL_GetBoneInstance(joystick).reset_callback();
 		g_player_hud->detach_item(this);
 	}
@@ -520,7 +520,6 @@ void CPda::UpdateHudAdditional(Fmatrix& trans)
 		return;
 
 	attachable_hud_item* hi = HudItemData();
-	R_ASSERT(hi);
 
 	if (pActor->cam_freelook == eflEnabled || pActor->cam_freelook == eflEnabling || g_player_hud->script_anim_part != u8(-1))
 	{
@@ -1011,7 +1010,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
 	g_player_hud->reset_thumb(true);
 	pda->ResetJoystick(true);
 
-	if (joystick != BI_NONE && HudItemData())
+	if (joystick != BI_NONE)
 		HudItemData()->m_model->LL_GetBoneInstance(joystick).reset_callback();
 
 	g_player_hud->detach_item(this);

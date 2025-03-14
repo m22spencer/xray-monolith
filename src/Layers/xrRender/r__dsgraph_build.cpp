@@ -128,7 +128,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 #if RENDER!=R_R1
 			if (sh->flags.bEmissive)
 			{
-				mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
+				mapSorted_Node* N = RI.val_bCamAttached ? mapCamAttachedEmissive.insertInAnyWay(distSQ) : mapHUDEmissive.insertInAnyWay(distSQ);
 				N->val.ssa = SSA;
 				N->val.pObject = RI.val_pObject;
 				N->val.pVisual = pVisual;
@@ -136,7 +136,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 				N->val.se = &*pVisual->shader->E[4]; // 4=L_special
 			}
 #endif // RENDER!=R_R1
-			mapSorted_Node* N = mapHUDSorted.insertInAnyWay(distSQ);
+			mapSorted_Node* N = RI.val_bCamAttached ? mapCamAttachedSorted.insertInAnyWay(distSQ) : mapHUDSorted.insertInAnyWay(distSQ);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;
 			N->val.pVisual = pVisual;
@@ -146,7 +146,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 		}
 		else
 		{
-			mapHUD_Node* N = mapHUD.insertInAnyWay(distSQ);
+			mapHUD_Node* N = RI.val_bCamAttached ? mapCamAttached.insertInAnyWay(distSQ) : mapHUD.insertInAnyWay(distSQ);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;
 			N->val.pVisual = pVisual;
@@ -156,7 +156,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 #if RENDER==R_R4
 			if (RImplementation.o.ssfx_core && !sh->passes[0]->ps->hud_disabled)
 			{
-				HUDMask_Node* N2 = HUDMask.insertInAnyWay(distSQ);
+				HUDMask_Node* N2 = val_bCamAttached ? HUDMaskCamAttached.insertInAnyWay(distSQ) : HUDMask.insertInAnyWay(distSQ);
 				N2->val.ssa = SSA;
 				N2->val.pObject = RI.val_pObject;
 				N2->val.pVisual = pVisual;
@@ -168,7 +168,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 #if RENDER!=R_R1
 			if (sh->flags.bEmissive)
 			{
-				mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
+				mapSorted_Node* N = RI.val_bCamAttached ? mapCamAttachedEmissive.insertInAnyWay(distSQ) : mapHUDEmissive.insertInAnyWay(distSQ);
 				N->val.ssa = SSA;
 				N->val.pObject = RI.val_pObject;
 				N->val.pVisual = pVisual;

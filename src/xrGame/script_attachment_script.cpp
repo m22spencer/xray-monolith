@@ -1,0 +1,62 @@
+#pragma once
+#include "pch_script.h"
+#include "script_attachment_manager.h"
+
+using namespace luabind;
+
+#pragma optimize("s",on)
+void script_attachment::script_register(lua_State* L)
+{
+	module(L)
+	[
+		class_<script_attachment>("ScriptAttachment")
+
+		.def("set_parent", (void (script_attachment::*)(script_attachment*)) &script_attachment::SetParent)
+		.def("set_parent", (void (script_attachment::*)(CScriptGameObject*)) &script_attachment::SetParent)
+		.def("get_parent", &script_attachment::GetParent)
+		.def("set_position", (void (script_attachment::*)(Fvector)) &script_attachment::SetPosition)
+		.def("set_position", (void (script_attachment::*)(float, float, float)) &script_attachment::SetPosition)
+		.def("get_position", &script_attachment::GetPosition)
+		.def("set_rotation", (void (script_attachment::*)(Fvector)) &script_attachment::SetRotation)
+		.def("set_rotation", (void (script_attachment::*)(float, float, float)) &script_attachment::SetRotation)
+		.def("get_rotation", &script_attachment::GetRotation)
+		.def("set_origin", (void (script_attachment::*)(Fvector)) &script_attachment::SetOrigin)
+		.def("set_origin", (void (script_attachment::*)(float, float, float)) &script_attachment::SetOrigin)
+		.def("get_origin", &script_attachment::GetOrigin)
+		.def("set_bone_visible", &script_attachment::SetBoneVisible)
+		.def("get_bone_visible", &script_attachment::GetBoneVisible)
+		.def("set_parent_bone", &script_attachment::SetParentBone)
+		.def("get_parent_bone", &script_attachment::GetParentBone)
+		.def("set_scale", (void (script_attachment::*)(Fvector)) & script_attachment::SetScale)
+		.def("set_scale", (void (script_attachment::*)(float, float, float)) & script_attachment::SetScale)
+		.def("set_scale", (void (script_attachment::*)(float)) & script_attachment::SetScale)
+		.def("get_scale", &script_attachment::GetScale)
+		.def("set_flags", &script_attachment::SetFlags)
+		.def("get_flags", &script_attachment::GetFlags)
+		.def("play_motion", &script_attachment::PlayMotion)
+		.def("add_attachment", &script_attachment::AddAttachment)
+		.def("get_attachment", &script_attachment::GetChild)
+		.def("remove_attachment", &script_attachment::RemoveAttachment)
+		.def("set_model", &script_attachment::LoadModel)
+		.def("get_model", &script_attachment::GetModelScript)
+		.def("set_ui", &script_attachment::SetScriptUI)
+		.def("get_ui", &script_attachment::GetScriptUI)
+		.def("set_ui_bone", &script_attachment::SetScriptUIBone)
+		.def("get_ui_bone", &script_attachment::GetScriptUIBone)
+		.def("set_ui_position", (void (script_attachment::*)(Fvector)) &script_attachment::SetScriptUIPosition)
+		.def("set_ui_position", (void (script_attachment::*)(float, float, float)) &script_attachment::SetScriptUIPosition)
+		.def("set_ui_position", &script_attachment::GetScriptUIPosition)
+		.def("set_ui_rotation", (void (script_attachment::*)(Fvector)) &script_attachment::SetScriptUIRotation)
+		.def("set_ui_rotation", (void (script_attachment::*)(float, float, float)) &script_attachment::SetScriptUIRotation)
+		.def("get_ui_rotation", &script_attachment::GetScriptUIRotation)
+		.def("attach_light", &script_attachment::AttachLight)
+		.def("detach_light", &script_attachment::DetachLight)
+		.def("get_light", &script_attachment::GetLight)
+		.def("remove_bone_callback", &script_attachment::RemoveBoneCallback)
+		.def("get_bone_matrix", &script_attachment::GetBoneMatrix)
+		.def("get_transform", &script_attachment::GetTransform)
+		.def("get_center", &script_attachment::GetCenter)
+		.def("bone_callback", (void (script_attachment::*)(u16,u16,bool)) &script_attachment::SetBoneCallback)
+		.def("bone_callback", (void (script_attachment::*)(u16, const luabind::functor<Fmatrix>&,bool)) &script_attachment::SetBoneCallback)
+	];
+}

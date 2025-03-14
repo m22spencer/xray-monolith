@@ -722,8 +722,15 @@ void CRender::Render()
 	L_Dynamic->render(0); // addititional light sources
 	if (Wallmarks)Wallmarks->Render(); // wallmarks has priority as normal geometry
 
-	if (g_hud && g_hud->RenderActiveItemUIQuery())
-		r_dsgraph_render_hud_ui();
+	if (g_hud)
+	{
+		g_hud->Render_R1_Attachment_UI();
+
+		if (g_hud->RenderActiveItemUIQuery())
+			r_dsgraph_render_hud_ui();
+		if (g_hud->RenderCamAttachedUIQuery())
+			r_dsgraph_render_cam_ui();
+	}
 
 	HOM.Enable();
 	o.vis_intersect = FALSE;

@@ -105,6 +105,13 @@ void CLevel::IR_OnMouseHold(int btn)
 
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
+    luabind::functor<bool> funct;
+    if (ai().script_engine().functor("level_input.on_mouse_move", funct))
+    {
+        if (funct(dx, dy, g_bDisableAllInput))
+            return;
+    }
+
 	if (g_bDisableAllInput) return;
 
 #ifdef MOUSE_INPUT_CALLBACKS

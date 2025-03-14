@@ -14,6 +14,7 @@ class IRenderVisual;
 class IMainMenu;
 class ScriptWallmarksManager;
 class ENGINE_API CPS_Instance;
+class script_attachment;
 
 //-----------------------------------------------------------------------------------------------------------
 class ENGINE_API IGame_Persistent :
@@ -120,6 +121,7 @@ public:
 	ScriptWallmarksManager* m_pWallmarksManager;
 	IC ScriptWallmarksManager& GetWallmarksManager() const { return *m_pWallmarksManager; }
 	ShadersExternalData* m_pGShaderConstants; //--#SM+#--
+	xr_vector<script_attachment*> AttachmentUIsToRender;
 
 	virtual bool OnRenderPPUI_query() { return FALSE; }; // should return true if we want to have second function called
 	virtual void OnRenderPPUI_main()

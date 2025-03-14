@@ -33,6 +33,7 @@
 #include "physicobject.h"
 #include "artefact.h"
 #include "sight_manager_space.h"
+#include "script_attachment_manager.h"
 
 using namespace luabind;
 
@@ -627,6 +628,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
 		.def("set_can_be_harmed", &CScriptGameObject::SetCanBeHarmed)
 		.def("can_be_harmed", &CScriptGameObject::CanBeHarmed)
+
+		// Lucy: Script Attachments
+		.def("add_attachment", &CScriptGameObject::AddAttachment)
+		.def("get_attachment", &CScriptGameObject::GetAttachment)
+		.def("remove_attachment", &CScriptGameObject::RemoveAttachment)
 		;
 	return (instance);
 }

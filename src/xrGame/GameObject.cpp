@@ -32,6 +32,7 @@
 #include "magic_box3.h"
 #include "animation_movement_controller.h"
 #include "../xrengine/xr_collide_form.h"
+#include "script_attachment_manager.h"
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
 #pragma warning(push)
@@ -71,6 +72,7 @@ CGameObject::~CGameObject()
 	xr_delete(m_ai_location);
 	xr_delete(m_callbacks);
 	xr_delete(m_ai_obstacle);
+	delete_data(m_script_attachments);
 }
 
 void CGameObject::init()
@@ -736,6 +738,64 @@ void CGameObject::renderable_Render()
 	::Render->set_Transform(&XFORM());
 	::Render->add_Visual(Visual());
 	Visual()->getVisData().hom_frame = Device.dwFrame;
+	RenderAttachments();
+}
+
+void CGameObject::RenderAttachments()
+{
+	if (m_script_attachments.size())
+	{
+		xr_map<u16, script_attachment*>::iterator it = m_script_attachments.begin();
+		xr_map<u16, script_attachment*>::iterator it_e = m_script_attachments.end();
+		for (; it != it_e; ++it)
+		{
+			script_attachment* att = (*it).second;
+			if (att->GetFFlags().test(eSA_RenderWorld))
+			{
+				att->Render(Visual()->dcast_PKinematics(), &XFORM());
+
+				if (::Render->get_generation() == ::Render->GENERATION_R1)
+					g_pGamePersistent->AttachmentUIsToRender.push_back(att);
+				else
+					att->RenderUI(false);
+			}
+		}
+	}
+}
+
+script_attachment* CGameObject::add_attachment(u16 slot, script_attachment* att)
+{
+	R_ASSERT(att);
+	remove_attachment(slot, true);
+	m_script_attachments.emplace(mk_pair(slot, att));
+	return att;
+}
+
+script_attachment* CGameObject::get_attachment(u16 slot)
+{
+	if (m_script_attachments.size())
+	{
+		xr_map<u16, script_attachment*>::iterator att = m_script_attachments.find(slot);
+		if (att != m_script_attachments.end())
+			return att->second;
+	}
+
+	return nullptr;
+}
+
+void CGameObject::remove_attachment(u16 slot, bool destroy)
+{
+	if (m_script_attachments.size())
+	{
+		script_attachment* attachment = get_attachment(slot);
+		if (!attachment)
+			return;
+
+		if (destroy)
+			xr_delete(attachment);
+			
+		m_script_attachments.erase(slot);
+	}
 }
 
 /*
@@ -1076,13 +1136,15 @@ void CGameObject::UpdateCL()
 {
 	inherited::UpdateCL();
 
-	//	if (!is_ai_obstacle())
-	//		return;
+	if (m_script_attachments.size())
+	{
+		xr_map<u16, script_attachment*>::iterator it = m_script_attachments.begin();
+		xr_map<u16, script_attachment*>::iterator it_e = m_script_attachments.end();
+		for (; it != it_e; ++it)
+			(*it).second->Update();
+	}
 
 	if (H_Parent())
-		return;
-
-	if (similar(XFORM(), m_previous_matrix, EPS))
 		return;
 
 	on_matrix_change(m_previous_matrix);

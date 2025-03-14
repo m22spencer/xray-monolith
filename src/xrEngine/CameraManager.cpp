@@ -444,11 +444,13 @@ void CCameraManager::UpdatePPEffectors()
 	pp_affected.validate("after applying pp");
 }
 
+extern float psHUD_FOV;
 
 void CCameraManager::ApplyDevice(float _viewport_near)
 {
 	// Device params
 	Device.mView.build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
+	Device.mInvView.invert(Device.mView);
 
 	Device.vCameraPosition.set(m_cam_info.p);
 	Device.vCameraDirection.set(m_cam_info.d);
@@ -472,6 +474,10 @@ void CCameraManager::ApplyDevice(float _viewport_near)
 		Device.m_SecondViewport.isCamReady = false;
 
 	Device.mProject.build_projection(deg2rad(Device.fFOV), m_cam_info.fAspect, _viewport_near, m_cam_info.fFar);
+	Device.mProjectHud.build_projection(deg2rad(psHUD_FOV * 83.f), Device.fASPECT, R_VIEWPORT_NEAR, m_cam_info.fFar);
+
+	Device.mInvProject.invert(Device.mProject);
+	Device.mInvProjectHud.invert(Device.mProjectHud);
 	//--#SM+# End--
 
 	if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu->IsActive())
