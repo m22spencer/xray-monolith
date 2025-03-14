@@ -184,6 +184,11 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.14**
+* `use_separate_ubgl_keybind` to enable separate UBGL keybind or return to vanilla system
+* damoldavskiy: Modular Attachment System: alt positions, zoom step count (https://github.com/themrdemonized/xray-monolith/pull/143)
+* Lucy: Script Attachments (https://github.com/themrdemonized/xray-monolith/pull/140)
+
 **2025.03.13**
 * Bence7661: Enable freelook while reloading (https://github.com/themrdemonized/xray-monolith/pull/139)
 
