@@ -146,6 +146,26 @@ Fvector& attachable_hud_item::aim_offset_rot()
 	return m_measures.m_hands_offset[1][1];
 }
 
+Fvector& attachable_hud_item::alt_aim_offset_pos()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[0][9];
+		return g_player_hud->m_adjust_offset[0][3];
+	}
+	return m_measures.m_hands_offset[0][3];
+}
+
+Fvector& attachable_hud_item::alt_aim_offset_rot()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[1][9];
+		return g_player_hud->m_adjust_offset[1][3];
+	}
+	return m_measures.m_hands_offset[1][3];
+}
+
 Fvector& attachable_hud_item::attach_base_offset_pos()
 {
 	if (g_player_hud->m_adjust_mode)
@@ -1095,9 +1115,6 @@ void player_hud::update(const Fmatrix& cam_trans)
 			trans_2.mulB_43(wep->m_shoot_shake_mat);
 	}
 
-	if (m_attached_items[SCOPE_ATTACH_IDX])
-		m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->UpdateHudAdditional(trans);
-	
 	if (m_attached_items[0] && !m_attached_items[1])
 		trans_2 = trans;
 	else if (m_attached_items[1] && !m_attached_items[0])
