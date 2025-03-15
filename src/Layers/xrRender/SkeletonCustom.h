@@ -182,6 +182,8 @@ public:
 	u16 _BCL LL_BoneID(const shared_str& B);
 	LPCSTR _BCL LL_BoneName_dbg(u16 ID);
 
+	xr_vector<xr_pair<u16, shared_str>> list_bones();
+
 	CInifile* _BCL LL_UserData() { return pUserData; }
 	accel* LL_Bones() { return bone_map_N; }
 	ICF CBoneInstance& _BCL LL_GetBoneInstance(u16 bone_id)

@@ -210,18 +210,23 @@ bool CWeaponMagazinedWGrenade::SwitchMode(bool force)
 	return true;
 }
 
+extern BOOL useSeparateUBGLKeybind;
 void CWeaponMagazinedWGrenade::PerformSwitchGL()
 {
 	m_bGrenadeMode = !m_bGrenadeMode;
 
-	u8 newzoomtype = 0;
+	if (useSeparateUBGLKeybind) {
+		u8 newzoomtype = 0;
 
-	if (g_aimmode_remember)
-	{
-		newzoomtype = zoomTypeBeforeLauncher;
-	}
+		if (g_aimmode_remember)
+		{
+			newzoomtype = zoomTypeBeforeLauncher;
+		}
 
-    SetZoomType(m_bGrenadeMode ? 2 : newzoomtype);
+		SetZoomType(m_bGrenadeMode ? 2 : newzoomtype);
+	} else {
+		SetZoomType(m_bGrenadeMode ? 2 : 0);
+	}	
 
 	UpdateUIScope();
 

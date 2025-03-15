@@ -145,6 +145,7 @@ extern BOOL poltergeist_spawn_corpse_on_death;
 extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
 extern BOOL g_freelook_while_reloading;
+extern BOOL useSeparateUBGLKeybind;
 
 ENGINE_API extern float g_console_sensitive;
 
@@ -2839,6 +2840,7 @@ void CCC_RegisterCommands()
 	// UBGL/Aim mode switch separation
 	// When switching to UBGL the weapon will remember what mode you switched from and will put you back in that mode. 
 	// For example: You were aiming down with a canted sight when you switched to UBGL. When you switch back it will put you back into Canted sight aim and not the scope.
+	CMD4(CCC_Integer, "use_separate_ubgl_keybind", &useSeparateUBGLKeybind, 0, 1);
 	CMD4(CCC_Integer, "aimmode_remember", &g_aimmode_remember, 0, 1);
 
 	// Allows freelook during reload animations

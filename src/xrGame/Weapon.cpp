@@ -328,6 +328,7 @@ void CWeapon::UpdateZoomParams() {
 	} else //Main Sight
 	{
 		m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Primary || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
+		u32 stepCount = 0;
 		if (g_player_hud->m_adjust_mode)
 		{
 			m_zoom_params.m_fScopeZoomFactor = g_player_hud->m_adjust_zoom_factor[0] / zoom_multiple;
@@ -336,12 +337,15 @@ void CWeapon::UpdateZoomParams() {
 			m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(GetScopeName(), "scope_zoom_factor") / zoom_multiple;
 			if (m_modular_attachments) {
 				m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
+				stepCount = READ_IF_EXISTS(pSettings, r_float, GetScopeName(), "zoom_step_count", 0);
 			}
 		} else
 		{
 			m_zoom_params.m_fScopeZoomFactor = m_zoom_params.m_fBaseZoomFactor / zoom_multiple;
 		}
-		m_zoom_params.m_fZoomStepCount = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "zoom_step_count", 0);
+		if (stepCount == 0)
+			stepCount = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "zoom_step_count", 0);
+		m_zoom_params.m_fZoomStepCount = stepCount;
 	}
 
 	if (IsZoomed()) {
@@ -421,23 +425,41 @@ void CWeapon::SetUIScope(LPCSTR scope_texture)
 	CUIXmlInit::InitWindow(*pWpnScopeXml, scope_texture, 0, m_UIScope);
 }
 
+BOOL useSeparateUBGLKeybind = TRUE;
 void CWeapon::SwitchZoomType()
 {
-	if (isGrenadeLauncherActive) // The IsGrenadeLauncherAttached() check is handled by ToggleGrenadeLauncher
-	{
-		ToggleGrenadeLauncher();
-	}
+	if (!useSeparateUBGLKeybind) {
+		if (m_zoomtype == 0 && (m_altAimPos || g_player_hud->m_adjust_mode || (IsScopeAttached() && READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "use_alt_aim_hud", false))))
+		{
+			SetZoomType(1);
+			m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Alt || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom_alt", false);
+		} else if (IsGrenadeLauncherAttached())
+		{
+			SwitchState(eSwitch);
+			return;
+		} else if (m_zoomtype != 0)
+		{
+			SetZoomType(0);
+			m_zoom_params.m_bUseDynamicZoom = m_zoom_params.m_bUseDynamicZoom_Primary || READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
+		}
 
-	if (m_zoomtype == 0 && (m_altAimPos || g_player_hud->m_adjust_mode))
-	{
-		SetZoomTypeAndParams(1);
-	}
-	else if (m_zoomtype == 1)
-	{
-		SetZoomTypeAndParams(0);
-	}
+		UpdateUIScope();
+	} else {
+		if (isGrenadeLauncherActive) // The IsGrenadeLauncherAttached() check is handled by ToggleGrenadeLauncher
+		{
+			ToggleGrenadeLauncher();
+		}
 
-	UpdateUIScope();
+		if (m_zoomtype == 0 && (m_altAimPos || g_player_hud->m_adjust_mode || (IsScopeAttached() && READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "use_alt_aim_hud", false))))
+		{
+			SetZoomTypeAndParams(1);
+		} else if (m_zoomtype == 1)
+		{
+			SetZoomTypeAndParams(0);
+		}
+
+		UpdateUIScope();
+	}
 }
 
 void CWeapon::ToggleGrenadeLauncher()
@@ -1514,7 +1536,7 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 			return true;
 		}
 	case kCUSTOM16:
-		if (flags & CMD_START && !IsPending())
+		if (useSeparateUBGLKeybind && flags & CMD_START && !IsPending())
 		{
 			if (pActor && pActor->is_safemode())
 				pActor->set_safemode(false);
@@ -2346,6 +2368,22 @@ ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
 	RQS.r_clear();
 }*/
 
+void CWeapon::InterpolateOffset(Fvector& current, const Fvector& target, const float factor) const
+{
+	if (target.similar(current, EPS))
+	{
+		current.set(target);
+	}
+	else
+	{
+		Fvector diff;
+		diff.set(target);
+		diff.sub(current);
+		diff.mul(factor * 2.5f);
+		current.add(diff);
+	}
+}
+
 // Обновление координат текущего худа
 void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 {
@@ -2389,9 +2427,10 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 
 	//============= Поворот ствола во время аима =============//
 	{
-		Fvector curr_offs, curr_rot, aim_offs;
+		Fvector curr_offs, curr_rot, curr_aim_rot;
+		curr_aim_rot.set(0, 0, 0);
 
-		if (idx == 1 && m_modular_attachments) {
+		if ((idx == 1 || idx == 3) && m_modular_attachments) {
 			if (si) {
 				curr_offs.set(hi->attach_base_offset_pos());
 				curr_rot.set(hi->attach_base_offset_rot());
@@ -2399,10 +2438,16 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 				curr_offs.sub(hi->attach_mount_offset_pos());
 				curr_rot.sub(hi->attach_mount_offset_rot());
 
-				aim_offs.set(si->aim_offset_pos());
+				Fvector aim_offs;
+				if (idx == 1) {
+					aim_offs.set(si->aim_offset_pos());
+					curr_aim_rot.set(si->aim_offset_rot());
+				} else {
+					aim_offs.set(si->alt_aim_offset_pos());
+					curr_aim_rot.set(si->alt_aim_offset_rot());
+				}
 				aim_offs.mul(hi->attach_scale());
 				curr_offs.add(aim_offs);
-				curr_rot.add(si->aim_offset_rot());
 			} else {
 				curr_offs.set(hi->attach_base_offset_pos());
 				curr_rot.set(hi->attach_base_offset_rot());
@@ -2446,31 +2491,9 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 			(m_zoom_params.m_fZoomRotateTime * cur_silencer_koef.zoom_rotate_time * cur_scope_koef.zoom_rotate_time
 					* cur_launcher_koef.zoom_rotate_time);
 
-		if (curr_offs.similar(m_hud_offset[0], EPS))
-		{
-			m_hud_offset[0].set(curr_offs);
-		}
-		else
-		{
-			Fvector diff;
-			diff.set(curr_offs);
-		    diff.sub(m_hud_offset[0]);
-			diff.mul(factor * 2.5f);
-			m_hud_offset[0].add(diff);
-		}
-
-		if (curr_rot.similar(m_hud_offset[1], EPS))
-		{
-			m_hud_offset[1].set(curr_rot);
-		}
-		else
-		{
-			Fvector diff;
-			diff.set(curr_rot);
-			diff.sub(m_hud_offset[1]);
-			diff.mul(factor * 2.5f);
-			m_hud_offset[1].add(diff);
-		}
+		InterpolateOffset(m_hud_offset[0], curr_offs, factor);
+		InterpolateOffset(m_hud_offset[1], curr_rot, factor);
+		InterpolateOffset(m_hud_aim_rot, curr_aim_rot, factor);
 
 		// Remove pending state before weapon has fully moved to the new position to remove some delay
 		if (curr_offs.similar(m_hud_offset[0], .02f) && curr_rot.similar(m_hud_offset[1], .02f))
@@ -2480,6 +2503,10 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 		}
 
 		Fmatrix hud_rotation;
+		hud_rotation.identity();
+		hud_rotation.setHPB(m_hud_aim_rot);
+		trans.mulB_43(hud_rotation);
+
 		hud_rotation.identity();
 		hud_rotation.rotateX(m_hud_offset[1].x);
 
@@ -2491,7 +2518,6 @@ void CWeapon::UpdateHudAdditional(Fmatrix& trans)
 		hud_rotation_y.identity();
 		hud_rotation_y.rotateZ(m_hud_offset[1].z);
 		hud_rotation.mulA_43(hud_rotation_y);
-
 		hud_rotation.translate_over(m_hud_offset[0]);
 		trans.mulB_43(hud_rotation);
 

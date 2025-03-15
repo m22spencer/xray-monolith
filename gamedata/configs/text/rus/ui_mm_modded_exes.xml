@@ -162,11 +162,14 @@
 	<string id="ui_mm_modded_exes_qol_crash_save_count">
 		<text>Сейвы во время вылетов Кол-во (crash_save_count)</text>
 	</string>
+	<string id="ui_mm_modded_exes_qol_use_separate_ubgl_keybind">
+    <text>Отдельная кнопка для подствола (use_separate_ubgl_keybind)</text>
+  </string>
   <string id="ui_mm_modded_exes_qol_aimmode_remember">
-    <text>Режим прицеливания запомнить (aimmode_remember)</text>
+    <text>Запомнить прицел перед переключением на подствол (aimmode_remember)</text>
   </string>
   <string id="ui_mm_modded_exes_qol_freelook_while_reloading">
-    <text>Свободныйвзгляд при перезарядке (freelook_while_reloading)</text>
+    <text>Свободный взгляд при перезарядке (freelook_while_reloading)</text>
   </string>
 
 	<!-- Sounds -->

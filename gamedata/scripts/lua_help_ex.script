@@ -50,10 +50,11 @@
         apply_pdm_to_ads // Enables PDM (handling) values to be applied properly during ADS
         smooth_ads_transition // Smoothly applies the ADS accuracy bonus instead of only being applied when fully ADS
         allow_silencer_hide_tracer // Controls wether or not silencers can hide tracers at all
+        use_separate_ubgl_keybind // Use separate keybind for switching to UBGL, or use vanilla system
         aimmode_remember // When switching to UBGL the weapon will remember what mode you switched from and will put you back in that mode
         freelook_while_reloading // // Allows freelook during reload animations
-		
-		viewport_near [0.0, 1.0] // Adjust the camera near value
+        
+        viewport_near [0.0, 1.0] // Adjust the camera near value
 
         print_bone_warnings // Print warnings when using bone_position and bone_direction functions and encounter invalid bones
 
@@ -375,13 +376,15 @@
         function set_bone_visible(u16 id, bool bVisibility, bool bRecursive, bool bHud)
         function set_bone_visible(string bone_name, bool bVisibility, bool bRecursive, bool bHud)
 
+        function list_bones(bool bHud = false)
+
         // Torch
         function update_torch()
-		
-		// Script Attachments
-		function add_attachment(number, string);
-		function get_attachment(number);
-		function remove_attachment(number);
+        
+        // Script Attachments
+        function add_attachment(number, string);
+        function get_attachment(number);
+        function remove_attachment(number);
     }
 
     class CArtefact : CGameObject {
@@ -549,161 +552,161 @@
         ["flSlowDown"]          = bit.lshift(1, 31),
     }
     
-	// Child class of script_light - used specifically to attach it to script_attachments
-	// set_position and set_direction work as an offset to the parent attachment position/direction
-	class attachment_script_light : script_light {
-		property color;
-		property enabled;
-		property hud_mode;
-		property lanim;
-		property lanim_brightness;
-		property range;
-		property shadow;
-		property texture;
-		property type;
-		property volumetric;
-		property volumetric_distance;
-		property volumetric_intensity;
-		property volumetric_quality;
-		
-		attachment_script_light ();
-		
-		function set_direction(vector);
-		function set_direction(vector, vector);
-		function set_direction(number, number, number);
-		function set_position(vector);
-		function set_position(number, number, number);
-	}
-	
-	class ScriptAttachment {
-		function add_attachment(number, string);
-		function attach_light(attachment_script_light*);
-		function bone_callback(number, number, boolean);
-		function bone_callback(number, const function<matrix>&, boolean);
-		function detach_light();
-		function get_attachment(number);
-		function get_bone_matrix(number);
-		function get_bone_visible(number);
-		function get_center();
-		function get_flags();
-		function get_light();
-		function get_model();
-		function get_origin();
-		function get_parent();
-		function get_parent_bone();
-		function get_position();
-		function get_rotation();
-		function get_scale();
-		function get_transform();
-		function get_ui();
-		function get_ui_bone();
-		function get_ui_rotation();
-		function play_motion(string, boolean, number);
-		function remove_attachment(number);
-		function remove_bone_callback(number);
-		function set_bone_visible(number, boolean);
-		function set_flags(number);
-		function set_model(string, boolean);
-		function set_origin(vector);
-		function set_origin(number, number, number);
-		function set_parent(ScriptAttachment*);
-		function set_parent(game_object*);
-		function set_parent_bone(number);
-		function set_position(vector);
-		function set_position(number, number, number);
-		function set_rotation(vector);
-		function set_rotation(number, number, number);
-		function set_scale(vector);
-		function set_scale(number, number, number);
-		function set_scale(number);
-		function set_ui(string);
-		function set_ui_bone(number);
-		function set_ui_position(vector);
-		function set_ui_position(number, number, number);
-		function set_ui_position();
-		function set_ui_rotation(vector);
-		function set_ui_rotation(number, number, number);
-	}
-	
-	flags:
-	["eSA_RenderHUD"] = 1,
-	["eSA_RenderWorld"] = 2,
-	["eSA_CamAttached"] = 4,
-	
-	Script Attachment examples:
-	
-	-- adds script attachment with model gamedata\meshes\test\box.ogf to the actor's current active item in slot 1 (slots range from 0 to 65535)
-	local att = db.actor:active_item():add_attachment(1, "test\\box")
-	
-	-- setting attachment parameters
-	
-	-- functions accept both vectors or three values, scale even accepts one value
-	att:set_position(0,1,2)
-	att:set_rotation(vector():set(0,90,0))
-	att:set_scale(0.9)
-	
-	-- render both on hud and world model (default is 2 -> only on world model)
-	att:set_flags(3)
-	
-	-- create an attachment_script_light (can use script_light functions and properties)
-	-- ! make sure to keep a reference to the script light or it will be garbage collected !
-	att_light = attachment_script_light()
-	att_light.type = 2
-	att_light.hud_mode = true
-	
-	-- attachment_script_light position and direction work as an offset to the attachment position/direction
-	att_light:set_position(0,0,2)
-	att_light:set_direction(0,90,0)
-	att_light:set_cone(math.rad(0.5))
-	att_light.color = fcolor():set(1,0,0,1)
-	
-	-- attach it to the script attachment
-	att:attach_light(att_light)
-	
-	
-	-- attach the model to the actor instead of their active item
-	att:set_parent(db.actor)
-	
-	-- make it a camera attachment
-	att:set_flags(4)
-	
-	-- you can attach attachments to other attachments
-	att2 = att:add_attachment(0, "test\\box2")
-	att3 = att2:add_attachment(0, "test\\box2")
-	
-	-- and transfer the whole chain of attachments to another parent
-	-- this will transfer att and its child attachments to the new parent
-	att:set_parent(db.actor:active_item())
-	
-	-- same for child attachments
-	att3:set_parent(npc)
-	
-	-- it's also possible to change the model at any time
-	-- the boolean tells the engine if existing bone callbacks should be kept in place or if they should be removed
-	att3:set_model("armor\\boots", false)
-	
-	-- bone callbacks can be added like this
-	-- there are two types of bone callbacks
-	-- this makes the bone 1 of the attachment model follow the position of bone 6 of its parent object, the boolean tells the engine to overwrite any animation positions
-	-- same with bone 2 of the attachment model to bone 10 of the parent object
-	att3:bone_callback(1, 6, false)
-	att3:bone_callback(2, 10, false)
-	
-	-- the second type of bone callbacks uses a script callback to change the position of a bone in real time
-	local lock = db.actor:add_attachment(1234, "interface\\lockpick\\lock3")
-	lock:set_flags(4)
-	lock:set_rotation(90,0,0)
-	lock:set_position(0,0,0.09)
-	-- the callback function "cylinder_callback" will be used to adjust the position of bone 1
-	lock:bone_callback(1, cylinder_callback, false)
-	
-	-- example callback function
-	-- this will adjust the rotation of the bone
-	function cylinder_callback(mat)
-		local temp = mat.c
-		local hpb = mat:getHPB()
-		mat:setHPB(hpb.x, hpb.y + cylinder_rotation, hpb.z)
-		mat.c = temp
-		return mat
-	end
+    // Child class of script_light - used specifically to attach it to script_attachments
+    // set_position and set_direction work as an offset to the parent attachment position/direction
+    class attachment_script_light : script_light {
+        property color;
+        property enabled;
+        property hud_mode;
+        property lanim;
+        property lanim_brightness;
+        property range;
+        property shadow;
+        property texture;
+        property type;
+        property volumetric;
+        property volumetric_distance;
+        property volumetric_intensity;
+        property volumetric_quality;
+        
+        attachment_script_light ();
+        
+        function set_direction(vector);
+        function set_direction(vector, vector);
+        function set_direction(number, number, number);
+        function set_position(vector);
+        function set_position(number, number, number);
+    }
+    
+    class ScriptAttachment {
+        function add_attachment(number, string);
+        function attach_light(attachment_script_light*);
+        function bone_callback(number, number, boolean);
+        function bone_callback(number, const function<matrix>&, boolean);
+        function detach_light();
+        function get_attachment(number);
+        function get_bone_matrix(number);
+        function get_bone_visible(number);
+        function get_center();
+        function get_flags();
+        function get_light();
+        function get_model();
+        function get_origin();
+        function get_parent();
+        function get_parent_bone();
+        function get_position();
+        function get_rotation();
+        function get_scale();
+        function get_transform();
+        function get_ui();
+        function get_ui_bone();
+        function get_ui_rotation();
+        function play_motion(string, boolean, number);
+        function remove_attachment(number);
+        function remove_bone_callback(number);
+        function set_bone_visible(number, boolean);
+        function set_flags(number);
+        function set_model(string, boolean);
+        function set_origin(vector);
+        function set_origin(number, number, number);
+        function set_parent(ScriptAttachment*);
+        function set_parent(game_object*);
+        function set_parent_bone(number);
+        function set_position(vector);
+        function set_position(number, number, number);
+        function set_rotation(vector);
+        function set_rotation(number, number, number);
+        function set_scale(vector);
+        function set_scale(number, number, number);
+        function set_scale(number);
+        function set_ui(string);
+        function set_ui_bone(number);
+        function set_ui_position(vector);
+        function set_ui_position(number, number, number);
+        function set_ui_position();
+        function set_ui_rotation(vector);
+        function set_ui_rotation(number, number, number);
+    }
+    
+    flags:
+    ["eSA_RenderHUD"] = 1,
+    ["eSA_RenderWorld"] = 2,
+    ["eSA_CamAttached"] = 4,
+    
+    Script Attachment examples:
+    
+    -- adds script attachment with model gamedata\meshes\test\box.ogf to the actor's current active item in slot 1 (slots range from 0 to 65535)
+    local att = db.actor:active_item():add_attachment(1, "test\\box")
+    
+    -- setting attachment parameters
+    
+    -- functions accept both vectors or three values, scale even accepts one value
+    att:set_position(0,1,2)
+    att:set_rotation(vector():set(0,90,0))
+    att:set_scale(0.9)
+    
+    -- render both on hud and world model (default is 2 -> only on world model)
+    att:set_flags(3)
+    
+    -- create an attachment_script_light (can use script_light functions and properties)
+    -- ! make sure to keep a reference to the script light or it will be garbage collected !
+    att_light = attachment_script_light()
+    att_light.type = 2
+    att_light.hud_mode = true
+    
+    -- attachment_script_light position and direction work as an offset to the attachment position/direction
+    att_light:set_position(0,0,2)
+    att_light:set_direction(0,90,0)
+    att_light:set_cone(math.rad(0.5))
+    att_light.color = fcolor():set(1,0,0,1)
+    
+    -- attach it to the script attachment
+    att:attach_light(att_light)
+    
+    
+    -- attach the model to the actor instead of their active item
+    att:set_parent(db.actor)
+    
+    -- make it a camera attachment
+    att:set_flags(4)
+    
+    -- you can attach attachments to other attachments
+    att2 = att:add_attachment(0, "test\\box2")
+    att3 = att2:add_attachment(0, "test\\box2")
+    
+    -- and transfer the whole chain of attachments to another parent
+    -- this will transfer att and its child attachments to the new parent
+    att:set_parent(db.actor:active_item())
+    
+    -- same for child attachments
+    att3:set_parent(npc)
+    
+    -- it's also possible to change the model at any time
+    -- the boolean tells the engine if existing bone callbacks should be kept in place or if they should be removed
+    att3:set_model("armor\\boots", false)
+    
+    -- bone callbacks can be added like this
+    -- there are two types of bone callbacks
+    -- this makes the bone 1 of the attachment model follow the position of bone 6 of its parent object, the boolean tells the engine to overwrite any animation positions
+    -- same with bone 2 of the attachment model to bone 10 of the parent object
+    att3:bone_callback(1, 6, false)
+    att3:bone_callback(2, 10, false)
+    
+    -- the second type of bone callbacks uses a script callback to change the position of a bone in real time
+    local lock = db.actor:add_attachment(1234, "interface\\lockpick\\lock3")
+    lock:set_flags(4)
+    lock:set_rotation(90,0,0)
+    lock:set_position(0,0,0.09)
+    -- the callback function "cylinder_callback" will be used to adjust the position of bone 1
+    lock:bone_callback(1, cylinder_callback, false)
+    
+    -- example callback function
+    -- this will adjust the rotation of the bone
+    function cylinder_callback(mat)
+        local temp = mat.c
+        local hpb = mat:getHPB()
+        mat:setHPB(hpb.x, hpb.y + cylinder_rotation, hpb.z)
+        mat.c = temp
+        return mat
+    end
 --]]

@@ -905,6 +905,10 @@ bool CHudItem::IsAttachedToHUD()
 	if (hi && hi->m_parent_hud_item == this)
 		return true;
 
+	hi = g_player_hud->attached_item(SCOPE_ATTACH_IDX);
+	if (hi && hi->m_parent_hud_item == this)
+		return true;
+
 	return false;
 }
 

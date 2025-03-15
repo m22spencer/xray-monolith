@@ -146,6 +146,26 @@ Fvector& attachable_hud_item::aim_offset_rot()
 	return m_measures.m_hands_offset[1][1];
 }
 
+Fvector& attachable_hud_item::alt_aim_offset_pos()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[0][9];
+		return g_player_hud->m_adjust_offset[0][3];
+	}
+	return m_measures.m_hands_offset[0][3];
+}
+
+Fvector& attachable_hud_item::alt_aim_offset_rot()
+{
+	if (g_player_hud->m_adjust_mode) {
+		if (m_attach_place_idx == SCOPE_ATTACH_IDX)
+			return g_player_hud->m_adjust_offset[1][9];
+		return g_player_hud->m_adjust_offset[1][3];
+	}
+	return m_measures.m_hands_offset[1][3];
+}
+
 Fvector& attachable_hud_item::attach_base_offset_pos()
 {
 	if (g_player_hud->m_adjust_mode)
@@ -303,7 +323,7 @@ void attachable_hud_item::render()
 
 	m_parent_hud_item->render_hud_mode();
 
-	if (m_parent_hud_item->object().GetAttachments()->size())
+	if (m_parent_hud_item->has_object() && m_parent_hud_item->object().GetAttachments()->size())
 	{
 		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
 		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
@@ -324,12 +344,14 @@ void attachable_hud_item::render_item_ui()
 {
 	m_parent_hud_item->render_item_3d_ui();
 
-	xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
-	xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
-	for (; it != it_e; ++it)
-	{
-		if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-			(*it).second->RenderUI(true);
+	if (m_parent_hud_item->has_object()) {
+		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
+		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
+		for (; it != it_e; ++it)
+		{
+			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
+				(*it).second->RenderUI(true);
+		}
 	}
 }
 
@@ -624,27 +646,29 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 	}
 
 	R_ASSERT2(m_parent_hud_item, "parent hud item is NULL");
-	CPhysicItem& parent_object = m_parent_hud_item->object();
-	//R_ASSERT2		(parent_object, "object has no parent actor");
-	//CObject*		parent_object = static_cast_checked<CObject*>(&m_parent_hud_item->object());
+	if (m_parent_hud_item->has_object()) {
+		CPhysicItem& parent_object = m_parent_hud_item->object();
+		//R_ASSERT2		(parent_object, "object has no parent actor");
+		//CObject*		parent_object = static_cast_checked<CObject*>(&m_parent_hud_item->object());
 
-	if (IsGameTypeSingle() && parent_object.H_Parent() == Level().CurrentControlEntity())
-	{
-		CActor* current_actor = static_cast_checked<CActor*>(Level().CurrentControlEntity());
-		VERIFY(current_actor);
-
-		string_path ce_path;
-		string_path anm_name;
-		strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
-		if (FS.exist(ce_path, "$game_anims$", anm_name))
+		if (IsGameTypeSingle() && parent_object.H_Parent() == Level().CurrentControlEntity())
 		{
-			int rand = ::Random.randI(5000, 10000);
-			CAnimatorCamEffector* e = xr_new<CAnimatorCamEffector>();
-			e->SetType(ECamEffectorType(rand));
-			e->SetHudAffect(false);
-			e->SetCyclic(false);
-			e->Start(anm_name);
-			current_actor->Cameras().AddCamEffector(e);
+			CActor* current_actor = static_cast_checked<CActor*>(Level().CurrentControlEntity());
+			VERIFY(current_actor);
+
+			string_path ce_path;
+			string_path anm_name;
+			strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
+			if (FS.exist(ce_path, "$game_anims$", anm_name))
+			{
+				int rand = ::Random.randI(5000, 10000);
+				CAnimatorCamEffector* e = xr_new<CAnimatorCamEffector>();
+				e->SetType(ECamEffectorType(rand));
+				e->SetHudAffect(false);
+				e->SetCyclic(false);
+				e->Start(anm_name);
+				current_actor->Cameras().AddCamEffector(e);
+			}
 		}
 	}
 	return ret;
@@ -1095,9 +1119,6 @@ void player_hud::update(const Fmatrix& cam_trans)
 			trans_2.mulB_43(wep->m_shoot_shake_mat);
 	}
 
-	if (m_attached_items[SCOPE_ATTACH_IDX])
-		m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->UpdateHudAdditional(trans);
-	
 	if (m_attached_items[0] && !m_attached_items[1])
 		trans_2 = trans;
 	else if (m_attached_items[1] && !m_attached_items[0])
@@ -1297,7 +1318,7 @@ void player_hud::updateMovementLayerState()
 
 		CWeapon* wep = nullptr;
 
-		if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->object().cast_weapon())
+		if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->has_object() && m_attached_items[0]->m_parent_hud_item->object().cast_weapon())
 			wep = m_attached_items[0]->m_parent_hud_item->object().cast_weapon();
 
 		if (wep && wep->IsZoomed()) {
