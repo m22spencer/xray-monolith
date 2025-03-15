@@ -553,6 +553,33 @@ bool CScriptGameObject::is_bone_visible(u16 bone_id, bool bHud)
 	return !!k->LL_GetBoneVisible(bone_id);
 }
 
+// demonized: list all bones
+luabind::object CScriptGameObject::list_bones(bool bHud)
+{
+	luabind::object result = luabind::newtable(ai().script_engine().lua());
+	IKinematics* k = nullptr;
+
+	if (bHud)
+	{
+		CActor* act = smart_cast<CActor*>(&object());
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			k = itm->HudItemData()->m_model;
+		else if (act)
+			k = g_player_hud->m_model->dcast_PKinematics();
+	} else {
+		k = object().Visual()->dcast_PKinematics();
+	}
+
+	if (!k) return result;
+
+	auto bones = k->list_bones();
+	for (const auto& bone : bones)
+		result[bone.first] = bone.second.c_str();
+
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////

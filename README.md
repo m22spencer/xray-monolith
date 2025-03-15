@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.15**
+* `obj:list_bones(bHud = false)` to return a table of all bones of an object in `[bone_id] = bone_name` form. If `bHud` is true, then use hud model
+
 **2025.03.14**
 * `use_separate_ubgl_keybind` to enable separate UBGL keybind or return to vanilla system
 * damoldavskiy: Modular Attachment System: alt positions, zoom step count (https://github.com/themrdemonized/xray-monolith/pull/143)

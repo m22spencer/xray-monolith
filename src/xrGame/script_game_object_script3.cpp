@@ -153,6 +153,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("set_bone_visible", (void (CScriptGameObject::*)(LPCSTR, bool, bool))(&CScriptGameObject::set_bone_visible))
 		.def("set_bone_visible", (void (CScriptGameObject::*)(LPCSTR, bool, bool, bool))(&CScriptGameObject::set_bone_visible))
 
+		// demonized: list all bones
+		.def("list_bones", &CScriptGameObject::list_bones)
+
 		//////////////////////////////////////////////////////////////////////////
 		// Space restrictions
 		//////////////////////////////////////////////////////////////////////////
