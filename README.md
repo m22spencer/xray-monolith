@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.16**
+* Lucy: Fix headlamp position (https://github.com/themrdemonized/xray-monolith/pull/145)
+
 **2025.03.15**
 * `obj:list_bones(bHud = false)` to return a table of all bones of an object in `[bone_id] = bone_name` form. If `bHud` is true, then use hud model
 * damoldavskiy: Repaired MAS for Script Attachments (https://github.com/themrdemonized/xray-monolith/pull/144)
