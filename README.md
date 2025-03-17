@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.17**
+* Fix of (https://github.com/themrdemonized/xray-monolith/issues/146)
+
 **2025.03.16**
 * Lucy: Fix headlamp position (https://github.com/themrdemonized/xray-monolith/pull/145)
 
