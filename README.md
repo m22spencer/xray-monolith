@@ -184,6 +184,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.18**
+* Lucy: Remove hardcoded hud_mode for Flashlight class (https://github.com/themrdemonized/xray-monolith/pull/148), Fix of (https://github.com/themrdemonized/xray-monolith/issues/147)
+
 **2025.03.17**
 * Fix of (https://github.com/themrdemonized/xray-monolith/issues/146)
 

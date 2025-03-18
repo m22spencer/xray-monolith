@@ -47,6 +47,9 @@
         detector_ui_bone - specifying a custom UI bone for Svarog/Veles in the hud sections of detectors
         lh_lead_gun - Device/Detector animations can now use the lead_gun bone if their hud section has lh_lead_gun = true (script animations can also use this config toggle in their section)
 
+    Flashlight definitions
+        hud_mode - toggles hud_mode for lighting, may result in different lighting and shadows
+
     Anomalies
         blowout_disable_idle - Setting option to true (false by default) in a config will make anomaly temporarily turn off idle particles when anomaly's blowout is triggered, particles are returned upon return to idle state.
         tele_type - New optional telekinesis type for gravitational anomalies behavior
