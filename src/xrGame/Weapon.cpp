@@ -1259,9 +1259,6 @@ bool CWeapon::NeedBlendAnm()
 	if (IsZoomed() && psDeviceFlags2.test(rsAimSway))
 		return true;
 
-	if (psDeviceFlags2.test(rsAimSway))
-		return true;
-
 	return inherited::NeedBlendAnm();
 }
 
