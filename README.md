@@ -25,6 +25,10 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
 * Q: The game crashes when using reshade and trying to switch resolution/change graphics settings/init `vid_restart` command
 * A: This is due to Reshade versions shenanigans. The latest tested version that doesn't crash while doing stuff in question is 5.7.0, you can download it here: https://reshade.me/downloads/ReShade_Setup_5.7.0_Addon.exe. If you wish to use later versions, try not to change graphics settings with them.
 
+
+* Q: The game crashes on DX11 Fullscreen on Linux
+* A: You need to add `--dxgi-old` parameter into `commandline.txt` file or via making a shotcut to exe and adding argument there
+
 * Q: I have conflicts, crashes and bugs with shaders when i use Beef NVG, SSS, or Enhanced Shaders
 * A: If you are using those mods, install this package via MO2, and put it higher priority than those mods: https://github.com/deggua/xray-hdr10-shaders/releases/latest
 
@@ -184,6 +188,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.21**
+* `--dxgi-old` command line argument to fix Linux issue (https://github.com/themrdemonized/xray-monolith/issues/95)
+
 **2025.03.18**
 * Lucy: Remove hardcoded hud_mode for Flashlight class (https://github.com/themrdemonized/xray-monolith/pull/148), Fix of (https://github.com/themrdemonized/xray-monolith/issues/147)
 
