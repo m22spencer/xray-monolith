@@ -41,6 +41,8 @@ IDirect3DStateBlock9*	dwDebugSB = 0;
 #endif
 */
 
+LPCSTR dxgiOld = "--dxgi-old";
+
 CHW::CHW() :
     //	hD3D(NULL),
 	//pD3D(NULL),
@@ -563,10 +565,6 @@ void CHW::CreateDevice(HWND hwnd, bool move_window)
     }
     */
 
-    // u32	memory									= pDevice->GetAvailableTextureMem	();
-    size_t memory = Desc.DedicatedVideoMemory;
-    Msg("*     Texture memory: %d M", memory / (1024 * 1024));
-
     // Capture misc data
     //	DX10: Don't neeed this?
 	//#ifdef DEBUG
@@ -576,8 +574,25 @@ void CHW::CreateDevice(HWND hwnd, bool move_window)
 
     // NOTE: this seems required to get the default render target to match the swap chain resolution
     // probably the sequence ResizeTarget, ResizeBuffers, and UpdateViews is important
-    Reset(hwnd);
-    fill_vid_mode_list(this);
+    
+    // u32	memory									= pDevice->GetAvailableTextureMem	();
+    if (strstr(Core.Params, dxgiOld)) {
+        Msg("* %s enabled", dxgiOld);
+        UpdateViews();
+        size_t memory = Desc.DedicatedVideoMemory;
+        Msg("*     Texture memory: %d M", memory / (1024 * 1024));
+
+#ifndef _EDITOR
+        updateWindowProps(hwnd);
+        fill_vid_mode_list(this);
+#endif
+    } else {
+        size_t memory = Desc.DedicatedVideoMemory;
+        Msg("*     Texture memory: %d M", memory / (1024 * 1024));
+        Reset(hwnd);
+        fill_vid_mode_list(this);
+    }
+    
 
     // #ifndef _EDITOR
     //    updateWindowProps(hwnd); // Reset() does this as well
@@ -613,6 +628,20 @@ void CHW::DestroyDevice()
 
     if (!is_windowed) {
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
+
+        if (strstr(Core.Params, dxgiOld)) {
+#ifdef USE_DX11
+            const auto& cd = m_ChainDesc;
+            CHK_DX(m_pSwapChain->ResizeBuffers(
+                cd.BufferCount,
+                cd.Width,
+                cd.Height,
+                cd.Format,
+                DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+
+            UpdateViews();
+#endif
+		}
     }
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
@@ -942,11 +971,13 @@ void CHW::OnAppActivate()
         m_pSwapChain->SetFullscreenState(TRUE, NULL);
 
 #ifdef USE_DX11
-        _SHOW_REF("refCount:pBaseZB", pBaseZB);
-        _RELEASE(pBaseZB);
+        if (!strstr(Core.Params, dxgiOld)) {
+            _SHOW_REF("refCount:pBaseZB", pBaseZB);
+            _RELEASE(pBaseZB);
 
-        _SHOW_REF("refCount:pBaseRT", pBaseRT);
-        _RELEASE(pBaseRT);
+            _SHOW_REF("refCount:pBaseRT", pBaseRT);
+            _RELEASE(pBaseRT);
+        }
 
         const auto& cd = m_ChainDesc;
 
@@ -980,11 +1011,13 @@ void CHW::OnAppDeactivate()
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
 
 #ifdef USE_DX11
-        _SHOW_REF("refCount:pBaseZB", pBaseZB);
-        _RELEASE(pBaseZB);
+        if (!strstr(Core.Params, dxgiOld)) {
+            _SHOW_REF("refCount:pBaseZB", pBaseZB);
+            _RELEASE(pBaseZB);
 
-        _SHOW_REF("refCount:pBaseRT", pBaseRT);
-        _RELEASE(pBaseRT);
+            _SHOW_REF("refCount:pBaseRT", pBaseRT);
+            _RELEASE(pBaseRT);
+        }
 
         const auto& cd = m_ChainDesc;
 
