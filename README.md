@@ -188,6 +188,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.03.22**
+* Fix issue (https://github.com/themrdemonized/xray-monolith/issues/149)
+
 **2025.03.21**
 * `--dxgi-old` command line argument to fix Linux issue (https://github.com/themrdemonized/xray-monolith/issues/95)
 
