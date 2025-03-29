@@ -1943,10 +1943,10 @@ void CWeapon::UpdateAddonsVisibility()
 		{
 			if (!pWeaponVisual->LL_GetBoneVisible(bone_id))
 				pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
-			isGrenadeLauncherActive = false;
 		}
 		else
 		{
+			isGrenadeLauncherActive = false;
 			if (pWeaponVisual->LL_GetBoneVisible(bone_id))
 				pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
 		}
