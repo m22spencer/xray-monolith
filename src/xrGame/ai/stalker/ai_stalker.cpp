@@ -95,6 +95,10 @@ CAI_Stalker::CAI_Stalker() :
 	m_dbg_hud_draw					= false;
 #endif // DEBUG
 	m_registered_in_combat_on_migration = false;
+
+#ifdef HOLDERCUSTOM_NEW
+	m_holder = nullptr;
+#endif
 }
 
 CAI_Stalker::~CAI_Stalker()
@@ -601,6 +605,10 @@ void CAI_Stalker::Die(CObject* who)
 
 	inherited::Die(who);
 
+#ifdef HOLDERCUSTOM_NEW
+	detach_Holder();
+#endif
+
 	//запретить использование слотов в инвенторе
 	inventory().SetSlotsUseful(false);
 
@@ -791,6 +799,9 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 
 void CAI_Stalker::net_Destroy()
 {
+#ifdef HOLDERCUSTOM_NEW
+	detach_Holder();
+#endif
 	inherited::net_Destroy();
 	CInventoryOwner::net_Destroy();
 	m_pPhysics_support->in_NetDestroy();
@@ -1577,3 +1588,56 @@ void CAI_Stalker::ChangeVisual(shared_str NewVisual)
 	Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
 	Visual()->dcast_PKinematics()->CalculateBones(TRUE);
 };
+
+#ifdef HOLDERCUSTOM_NEW
+bool CAI_Stalker::attach_Holder(CHolderCustom *holder)
+{
+	if (holder == NULL)
+		return false;
+	if (m_holder)
+		return false;
+
+	CWeaponStatMgun *stm = smart_cast<CWeaponStatMgun *>(holder);
+	if (stm)
+	{
+		if (stm->attach_Actor(cast_game_object()))
+		{
+			m_holder = holder;
+
+			character_physics_support()->movement()->DestroyCharacter();
+			stm->PlayAnimation();
+			return true;
+		}
+		return false;
+	}
+
+	return false;
+}
+
+void CAI_Stalker::detach_Holder()
+{
+	if (m_holder == nullptr)
+		return;
+
+	CWeaponStatMgun *stm = smart_cast<CWeaponStatMgun *>(m_holder);
+	if (stm)
+	{
+		ForceTransform(Fmatrix().set(XFORM()).translate_over(stm->ExitPosition()));
+		stm->detach_Actor();
+		m_holder = nullptr;
+
+		character_physics_support()->movement()->CreateCharacter();
+		return;
+	}
+}
+
+bool CAI_Stalker::use_HolderEx(CHolderCustom *object)
+{
+	if (object)
+	{
+		return attach_Holder(object);
+	}
+	detach_Holder();
+	return true;
+}
+#endif

@@ -2108,8 +2108,16 @@ void CSE_ALifeMountedWeapon::FillProps			(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
+#ifdef STATIONARYMGUN_NEW
+CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection)
+#else
 CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
+#endif
 {
+#ifdef STATIONARYMGUN_NEW
+	ammo_type = 0;
+	a_elapsed = 0;
+#endif
 }
 
 CSE_ALifeStationaryMgun::~CSE_ALifeStationaryMgun()
@@ -2118,33 +2126,109 @@ CSE_ALifeStationaryMgun::~CSE_ALifeStationaryMgun()
 
 void CSE_ALifeStationaryMgun::UPDATE_Read(NET_Packet& tNetPacket)
 {
+#ifdef STATIONARYMGUN_NEW
+	inherited1::UPDATE_Read(tNetPacket);
+	inherited2::UPDATE_Read(tNetPacket);
+#else
 	inherited::UPDATE_Read(tNetPacket);
+#endif
 	m_bWorking = !!tNetPacket.r_u8();
 	load_data(m_destEnemyDir, tNetPacket);
+
+#ifdef STATIONARYMGUN_NEW
+	ammo_type = tNetPacket.r_u8();
+	a_elapsed = tNetPacket.r_u16();
+#endif
 }
 
 void CSE_ALifeStationaryMgun::UPDATE_Write(NET_Packet& tNetPacket)
 {
+#ifdef STATIONARYMGUN_NEW
+	inherited1::UPDATE_Write(tNetPacket);
+	inherited2::UPDATE_Write(tNetPacket);
+#else
 	inherited::UPDATE_Write(tNetPacket);
+#endif
 	tNetPacket.w_u8(m_bWorking ? 1 : 0);
 	save_data(m_destEnemyDir, tNetPacket);
+
+#ifdef STATIONARYMGUN_NEW
+	tNetPacket.w_u8(ammo_type);
+	tNetPacket.w_u16(a_elapsed);
+#endif
 }
 
+#ifdef STATIONARYMGUN_NEW
+u16 CSE_ALifeStationaryMgun::get_ammo_elapsed()
+{
+	return ((u16)a_elapsed);
+}
+
+void CSE_ALifeStationaryMgun::set_ammo_elapsed(u16 count)
+{
+	a_elapsed = count;
+}
+
+u16 CSE_ALifeStationaryMgun::get_ammo_magsize()
+{
+	return READ_IF_EXISTS(pSettings, r_u16, s_name.c_str(), "ammo_mag_size", 0);
+}
+
+bool CSE_ALifeStationaryMgun::can_save() const
+{
+	return CSE_PHSkeleton::need_save();
+}
+
+void CSE_ALifeStationaryMgun::load(NET_Packet &tNetPacket)
+{
+	inherited1::load(tNetPacket);
+	inherited2::load(tNetPacket);
+}
+
+void CSE_ALifeStationaryMgun::data_load(NET_Packet &tNetPacket)
+{
+	inherited2::data_load(tNetPacket);
+	tNetPacket.r_vec3(o_Position);
+	tNetPacket.r_vec3(o_Angle);
+}
+
+void CSE_ALifeStationaryMgun::data_save(NET_Packet &tNetPacket)
+{
+	inherited2::data_save(tNetPacket);
+	tNetPacket.w_vec3(o_Position);
+	tNetPacket.w_vec3(o_Angle);
+}
+#endif
 
 void CSE_ALifeStationaryMgun::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
+#ifdef STATIONARYMGUN_NEW
+	inherited1::STATE_Read(tNetPacket, size);
+	inherited2::STATE_Read(tNetPacket, size);
+#else
 	inherited::STATE_Read(tNetPacket, size);
+#endif
 }
 
 void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket)
 {
+#ifdef STATIONARYMGUN_NEW
+	inherited1::STATE_Write(tNetPacket);
+	inherited2::STATE_Write(tNetPacket);
+#else
 	inherited::STATE_Write(tNetPacket);
+#endif
 }
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeStationaryMgun::FillProps			(LPCSTR pref, PropItemVec& values)
 {
+#ifdef STATIONARYMGUN_NEW
+	inherited1::FillProps			(pref,values);
+	inherited2::FillProps			(pref,values);
+#else
 	inherited::FillProps			(pref,values);
+#endif
 }
 #endif // #ifndef XRGAME_EXPORTS
 

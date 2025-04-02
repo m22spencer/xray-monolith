@@ -13,6 +13,7 @@
 #include "../../AI_PhraseDialogManager.h"
 #include "../../step_manager.h"
 #include "../../../xrServerEntities/script_export_space.h"
+#include "../../WeaponStatMgun.h"
 
 #ifdef DEBUG
 	template <typename _object_type>
@@ -852,6 +853,17 @@ public:
 
 private:
 	ignored_touched_objects_type m_ignored_touched_objects;
+
+#ifdef HOLDERCUSTOM_NEW
+private:
+	CHolderCustom *m_holder = nullptr;
+
+public:
+	CHolderCustom *Holder() { return m_holder; }
+	bool attach_Holder(CHolderCustom *holder);
+	void detach_Holder();
+	bool use_HolderEx(CHolderCustom *object);
+#endif
 
 public:
 DECLARE_SCRIPT_REGISTER_FUNCTION

@@ -576,6 +576,19 @@ CCar* CScriptGameObject::get_car()
 	return car;
 }
 
+#ifdef STATIONARYMGUN_NEW
+CWeaponStatMgun *CScriptGameObject::get_stmgun()
+{
+	CWeaponStatMgun *stm = smart_cast<CWeaponStatMgun *>(&object());
+	if (!stm)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CGameObject : cannot access class member get_stmgun!");
+		NODEFAULT;
+	}
+	return stm;
+}
+#endif
+
 #ifdef DEBUG
 void CScriptGameObject::debug_planner				(const script_planner *planner)
 {
