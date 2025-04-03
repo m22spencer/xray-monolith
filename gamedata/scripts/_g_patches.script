@@ -58,10 +58,26 @@ end
 _G.one_space = function(s)
 	return string_gsub(s, "  *", " ")
 end
+function string.one_space(s)
+	return one_space(s)
+end
 
 -- Removes newline characters from string
 _G.one_line = function(s)
     return s:gsub("[\n\r]", "")
+end
+function string.one_line(s)
+	return one_line(s)
+end
+
+-- Checks if string starts with string
+function string.startswith(str, s)
+	return str:sub(1, #s) == s
+end
+
+-- Checks if string ends with string
+function string.endswith(str, s)
+	return str:sub(-#s) == s
 end
 
 -- Iterative print of tables with optional sorting for spairs, formatting is similar to PHP print_r
@@ -322,6 +338,32 @@ _G.table_equals = function(actual, expected, cycleDetectTable)
     cycleDetectTable.actual[ actual ] = nil
     cycleDetectTable.expected[ expected ] = nil
     return true
+end
+
+-- Generic sorting funcs for spairs
+_G.sort_func_keys_ascend = function(t, a, b)
+	return a < b
+end
+_G.sort_func_keys_descend = function(t, a, b)
+	return a > b
+end
+_G.sort_func_keys_length_ascend = function(t, a, b)
+	return (#a < #b)
+end
+_G.sort_func_keys_length_descend = function(t, a, b)
+	return #a > #b
+end
+_G.sort_func_values_ascend = function(t, a, b)
+	return t[a] < t[b]
+end
+_G.sort_func_values_descend = function(t, a, b)
+	return t[a] > t[b]
+end
+_G.sort_func_values_length_ascend = function(t, a, b)
+	return (#t[a] < #t[b])
+end
+_G.sort_func_values_length_descend = function(t, a, b)
+	return #t[a] > #t[b]
 end
 
 -- Additional params for callbacks
