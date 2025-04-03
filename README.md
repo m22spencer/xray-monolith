@@ -188,6 +188,11 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.03**
+* Script fixes
+  * Fixed `axr_trade_manager.npc_trade_buy_sell` and `axr_trade_manager.npc_tech_upgrade_sell` functions
+  * Fixed `item_weapon.detach_scope` giving wrong addon items on some occassions
+
 **2025.03.29**
 * Bence7661: Fix issue (https://github.com/themrdemonized/xray-monolith/issues/153)
 
