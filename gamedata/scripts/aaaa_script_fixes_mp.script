@@ -509,6 +509,29 @@ function axr_trade_manager.npc_tech_upgrade_sell(npc)
 	end
 end
 
+-- Fix for returning wrong attached scope
+utils_item.has_scope = function(section)
+	if not utils_item.scopes_list then
+		utils_item.scopes_list = utils_data.collect_section(ini_sys, "addons_table")
+	end
+
+	local function sort_func(t, a, b)
+		if #t[a] ~= #t[b] then 
+			return sort_func_values_length_descend(t, a, b) 
+		else
+			return sort_func_values_descend(t, a, b)
+		end
+	end
+	
+	-- Determine which addon is attached to the weapon.
+	-- demonized: Sort addons by descend and check if the weapon section ends with addon section instead of string.find
+	for k, v in spairs(utils_item.scopes_list, sort_func) do
+		if section:endswith(v) then
+			return v
+		end
+	end
+end
+
 -- Fix for returning wrong scope section on detaching
 function item_weapon.detach_scope(weapon)
 	-- Return if the weapon is not valid.
