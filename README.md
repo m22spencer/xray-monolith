@@ -188,6 +188,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.05**
+* removed `FreeRoom_inBelt` check for attachments
+
 **2025.04.04**
 * Script fixes
   * Fixed `utils_item.has_scope` returning wrong addon items on some occassions
