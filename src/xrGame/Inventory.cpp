@@ -1235,7 +1235,9 @@ bool CInventory::CanPutInBelt(PIItem pIItem)
 	if (!pIItem || !pIItem->Belt()) return false;
 	if (m_belt.size() >= BeltWidth()) return false;
 
-	return FreeRoom_inBelt(m_belt, pIItem, BeltWidth(), 1);
+	// demonized: Commented out freeroom check
+	return true;
+	//return FreeRoom_inBelt(m_belt, pIItem, BeltWidth(), 1);
 }
 
 //проверяет можем ли поместить вещь в рюкзак,
