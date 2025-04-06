@@ -5301,6 +5301,7 @@
     <ClCompile Include="..\weaponshotgun_script.cpp" />
     <ClCompile Include="..\WeaponStatMgun.cpp" />
     <ClCompile Include="..\HolderEntityObject.cpp" />
+    <ClCompile Include="..\WeaponStatMgunBarrel.cpp" />
     <ClCompile Include="..\WeaponStatMgunFire.cpp" />
     <ClCompile Include="..\WeaponStatMgunIR.cpp" />
     <ClCompile Include="..\WeaponSVD.cpp" />

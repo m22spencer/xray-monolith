@@ -46,6 +46,13 @@ void CWeaponStatMgun::FireEnd()
 	inheritedShooting::FireEnd();
 	StopFlameParticles();
 	RemoveShotEffector();
+
+#ifdef STATIONARYMGUN_NEW
+	for (auto &B : m_barrels)
+	{
+		B.StopFlameParticles();
+	}
+#endif
 }
 
 void CWeaponStatMgun::UpdateFire()
@@ -54,6 +61,18 @@ void CWeaponStatMgun::UpdateFire()
 
 	inheritedShooting::UpdateFlameParticles();
 	inheritedShooting::UpdateLight();
+
+#ifdef STATIONARYMGUN_NEW
+	if (m_barrels.size())
+	{
+		for (auto &B : m_barrels)
+		{
+			B.fShotTimeCounter -= Device.fTimeDelta;
+			B.UpdateFlameParticles();
+			B.UpdateLight();
+		}
+	}
+#endif
 
 	if (m_overheat_enabled)
 	{
@@ -85,6 +104,15 @@ void CWeaponStatMgun::UpdateFire()
 	{
 		clamp(fShotTimeCounter, 0.0f, flt_max);
 		clamp(m_overheat_value, 0.0f, m_overheat_threshold);
+#ifdef STATIONARYMGUN_NEW
+		if (m_barrels.size())
+		{
+			for (auto &B : m_barrels)
+			{
+				clamp(B.fShotTimeCounter, 0.0f, flt_max);
+			}
+		}
+#endif
 		return;
 	}
 
@@ -114,11 +142,41 @@ void CWeaponStatMgun::UpdateFire()
 		}
 	}
 
+#ifdef STATIONARYMGUN_NEW
 	if (!IsUnlimitedAmmo() && (m_magazine.size() == 0))
 	{
 		SwitchState(eStateIdle);
 		return;
 	}
+
+	if (m_barrels.size())
+	{
+		int barrel_shoot_num = 0;
+		for (auto &B : m_barrels)
+		{
+			if (!IsUnlimitedAmmo() && (m_magazine.size() == 0))
+			{
+				SwitchState(eStateIdle);
+				break;
+			}
+			if (B.fShotTimeCounter <= 0)
+			{
+				if (BarrelAllowFire(B))
+				{
+					OnShot(B);
+					++barrel_shoot_num;
+				}
+				B.fShotTimeCounter += B.fOneShotTime;
+			}
+		}
+		for (int i = 0; i < barrel_shoot_num; i++)
+		{
+			angle_lerp(m_dAngle.x, 0.f, 5.f, Device.fTimeDelta);
+			angle_lerp(m_dAngle.y, 0.f, 5.f, Device.fTimeDelta);
+		}
+		return;
+	}
+#endif
 
 	if (fShotTimeCounter <= 0)
 	{
@@ -136,15 +194,13 @@ void CWeaponStatMgun::UpdateFire()
 void CWeaponStatMgun::OnShot()
 {
 #ifdef STATIONARYMGUN_NEW
-	if (!Owner())
-		return;
-
+	CGameObject *owner = (Owner()) ? Owner() : cast_game_object();
 	CCartridge &l_cartridge = (m_magazine.size() > 0) ? m_magazine.back() : m_DefaultCartridge;
-	FireBullet(m_fire_pos, m_fire_dir, GetFireDispersion(true), l_cartridge, Owner()->ID(), ID(), SendHitAllowed(Owner()), GetAmmoElapsed());
-
+	FireBullet(m_fire_pos, m_fire_dir, GetFireDispersion(true), l_cartridge, owner->ID(), ID(), SendHitAllowed(owner), iAmmoElapsed);
 	++m_iShotNum;
+
 	m_lastCartridge = l_cartridge;
-	if (!m_unlimited_ammo)
+	if (!IsUnlimitedAmmo())
 	{
 		m_magazine.pop_back();
 		--iAmmoElapsed;
@@ -168,15 +224,14 @@ void CWeaponStatMgun::OnShot()
 #ifdef STATIONARYMGUN_NEW
 	if (m_drop_bone != BI_NONE)
 	{
-		Fvector pos = Visual()->dcast_PKinematics()->LL_GetTransform(m_drop_bone).c;
-		OnShellDrop(pos, zero_vel);
+		OnShellDrop(Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_drop_bone)).c, zero_vel);
 	}
 #else
 	OnShellDrop(m_fire_pos, zero_vel);
 #endif
 
 #ifdef STATIONARYMGUN_NEW
-	m_sounds.PlaySound("sndShot", m_fire_pos, Owner(), IsCameraZoom());
+	m_sounds.PlaySound("sndShot", m_fire_pos, owner, IsCameraZoom());
 #else
 	bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
 
@@ -187,6 +242,61 @@ void CWeaponStatMgun::OnShot()
 	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase),
 	             ::Random.randF(-fireDispersionBase, fireDispersionBase));
 }
+
+#ifdef STATIONARYMGUN_NEW
+void CWeaponStatMgun::OnShot(SStmBarrel &B)
+{
+	CGameObject *owner = (Owner()) ? Owner() : cast_game_object();
+	CCartridge &l_cartridge = (m_magazine.size() > 0) ? m_magazine.back() : m_DefaultCartridge;
+	FireBullet(B.m_fire_pos, B.m_fire_dir, GetFireDispersion(true), l_cartridge, owner->ID(), ID(), SendHitAllowed(owner), B.iShotElapsed);
+	++B.iShotElapsed;
+
+	m_lastCartridge = l_cartridge;
+	if (!IsUnlimitedAmmo())
+	{
+		m_magazine.pop_back();
+		--iAmmoElapsed;
+		VERIFY((u32)iAmmoElapsed == m_magazine.size());
+	}
+
+	if (B.m_bLightShotEnabled)
+		B.Light_Start();
+
+	B.StartFlameParticles();
+	B.StartSmokeParticles(B.m_fire_pos, zero_vel);
+
+	if (B.m_drop_bid != BI_NONE)
+	{
+		B.OnShellDrop(Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(B.m_drop_bid)).c, zero_vel);
+	}
+
+	m_sounds.PlaySound("sndShot", B.m_fire_pos, owner, IsCameraZoom());
+
+	AddShotEffector();
+	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase), ::Random.randF(-fireDispersionBase, fireDispersionBase));
+}
+
+bool CWeaponStatMgun::BarrelAllowFire(SStmBarrel &B)
+{
+	/*
+		Barrels may don't have the same RPM.
+		This ensure that all barrels have their equad shares of rounds being shot. Stop when having shot enough.
+		Ignore if infinite ammo or setting ammo elapsed.
+	*/
+	if (IsUnlimitedAmmo())
+		return true;
+	/* Hasn't reached ammo size for each barrel yet. */
+	if (B.iShotElapsed * m_barrels.size() < iMagazineSize)
+		return true;
+	/* Rounds being shot in all barrels must be synchronized with ammo elapsed. */
+	int num = 0;
+	for (auto i : m_barrels)
+	{
+		num += i.iShotElapsed;
+	}
+	return num != iMagazineSize - iAmmoElapsed;
+}
+#endif
 
 void CWeaponStatMgun::AddShotEffector()
 {
@@ -235,7 +345,7 @@ float CWeaponStatMgun::GetFireDispersion(float cartridge_k, bool for_crosshair)
 	float fire_disp = GetBaseDispersion(cartridge_k);
 	if (Owner())
 	{
-		fire_disp += Owner()->cast_inventory_owner()->GetWeaponAccuracy();
+		fire_disp += (Owner()->cast_inventory_owner()->GetWeaponAccuracy() * fireDispOwnerFactor);
 	}
 	return fire_disp;
 }
@@ -292,7 +402,7 @@ void CWeaponStatMgun::switch2_Fire()
 
 void CWeaponStatMgun::switch2_Reload()
 {
-	if (GetAmmoElapsed() == GetAmmoMagSize())
+	if (iAmmoElapsed == iMagazineSize)
 		return;
 	if (IsReloadConsume() && (GetAmmoCount_allType() == 0))
 		return;
@@ -309,7 +419,7 @@ void CWeaponStatMgun::switch2_Reload()
 
 void CWeaponStatMgun::switch2_Unload()
 {
-	if (GetAmmoElapsed() == 0)
+	if (iAmmoElapsed == 0)
 	{
 		return;
 	}
@@ -351,6 +461,11 @@ void CWeaponStatMgun::UpdateUnload()
 		m_state_delay = 0;
 		UnloadMagazine(true);
 		m_sounds.StopSound("sndUnload");
+
+		for (auto &B : m_barrels)
+		{
+			B.iShotElapsed = 0;
+		}
 	}
 }
 
@@ -639,7 +754,7 @@ bool CWeaponStatMgun::GetBriefInfo(II_BriefInfo &info)
 {
 	string32 int_str;
 
-	xr_sprintf(int_str, "%d", GetAmmoElapsed());
+	xr_sprintf(int_str, "%d", iAmmoElapsed);
 	info.cur_ammo._set(int_str);
 	info.fire_mode._set("A");
 	info.grenade._set("");
@@ -674,7 +789,7 @@ bool CWeaponStatMgun::GetBriefInfo(II_BriefInfo &info)
 		}
 	}
 
-	if (GetAmmoElapsed() != 0 && m_magazine.size() != 0)
+	if (iAmmoElapsed != 0 && m_magazine.size() != 0)
 	{
 		LPCSTR ammo_type = m_ammoTypes[m_magazine.back().m_LocalAmmoType].c_str();
 		info.name = CStringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));

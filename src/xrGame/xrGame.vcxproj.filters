@@ -9410,6 +9410,9 @@
     <ClCompile Include="WeaponStatMgun.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClCompile>
+    <ClCompile Include="WeaponStatMgunBarrel.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
+    </ClCompile>
     <ClCompile Include="WeaponStatMgunFire.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClCompile>

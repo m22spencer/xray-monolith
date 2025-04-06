@@ -20,12 +20,70 @@ class CCameraBase;
 class CActor;
 class CInventoryOwner;
 class CInventory;
+class CWeaponStatMgun;
 
 struct SStmAnimation
 {
 	LPCSTR m_anim_body;
 	LPCSTR m_anim_legs;
 	SStmAnimation();
+};
+
+struct SStmBarrel
+{
+	CWeaponStatMgun *m_stm;
+	shared_str m_name;
+	u16 m_fire_bid;
+	Fmatrix m_fire_xfm;
+	Fvector m_fire_pos;
+	Fvector m_fire_dir;
+	u16 m_drop_bid;
+
+	float fShotTimeCounter;
+	float fOneShotTime;
+	int iShotElapsed;
+
+	shared_str m_sShellParticles;
+	shared_str m_sFlameParticles;
+	CParticlesObject *m_pFlameParticles;
+	shared_str m_sSmokeParticles;
+
+	Fcolor light_base_color;
+	float light_base_range;
+	Fcolor light_build_color;
+	float light_build_range;
+	ref_light light_render;
+	float light_var_color;
+	float light_var_range;
+	float light_lifetime;
+	u32 light_frame;
+	float light_time;
+	bool m_bLightShotEnabled;
+
+	SStmBarrel(CWeaponStatMgun *stm, LPCSTR name);
+	~SStmBarrel();
+	void reinit();
+	void Load(LPCSTR section);
+	LPCSTR Name() { return m_name.c_str(); };
+	void UpdateEx();
+	void StartParticles(CParticlesObject *&pParticles, LPCSTR particles_name, const Fvector &pos, const Fvector &vel = zero_vel, bool auto_remove_flag = false);
+	void StopParticles(CParticlesObject *&pParticles);
+	void UpdateParticles(CParticlesObject *&pParticles, const Fvector &pos, const Fvector &vel = zero_vel);
+	void LoadShellParticles(LPCSTR section, LPCSTR prefix);
+	void LoadFlameParticles(LPCSTR section, LPCSTR prefix);
+	void StartFlameParticles();
+	void StopFlameParticles();
+	void UpdateFlameParticles();
+	void StartSmokeParticles(const Fvector &play_pos, const Fvector &parent_vel);
+	void LoadLights(LPCSTR section, LPCSTR prefix);
+	void Light_Create();
+	void Light_Destroy();
+	void Light_Start();
+	void Light_Render(const Fvector &P);
+	void RenderLight();
+	void UpdateLight();
+	void StopLight();
+	void OnShellDrop(const Fvector &play_pos, const Fvector &parent_vel);
 };
 #endif
 
@@ -163,8 +221,8 @@ private:
 	Fvector2 m_desire_angle;
 	bool m_desire_angle_enable;
 
-	float m_min_gun_speed;
-	float m_max_gun_speed;
+	float m_rotate_x_speed;
+	float m_rotate_y_speed;
 	u16 m_drop_bone;
 	u16 m_actor_bone;
 	Fvector m_exit_position;
@@ -173,9 +231,13 @@ private:
 	u16 m_camera_bone_aim;
 	float m_zoom_factor_def;
 	float m_zoom_factor_aim;
+	Fvector m_camera_position;
 	bool m_zoom_status;
 
 	SStmAnimation m_animation;
+
+	float fireDispOwnerFactor;
+	LPCSTR m_on_before_use_callback;
 
 	void CreateSkeleton(CSE_Abstract *po);
 	virtual void PhDataUpdate(float step) {};
@@ -184,7 +246,9 @@ private:
 	static void IgnoreOwnerCallback(bool &do_colide, bool bo1, dContact &c, SGameMtl *mt1, SGameMtl *mt2);
 	void OnCameraChange(u16 type);
 
-	LPCSTR m_on_before_use_callback;
+	xr_vector<SStmBarrel> m_barrels;
+	bool BarrelAllowFire(SStmBarrel &B);
+
 protected:
 	virtual void SpawnInitPhysics(CSE_Abstract *D);
 	virtual void net_Save(NET_Packet &P);
@@ -208,7 +272,6 @@ public:
 
 	virtual BOOL AlwaysTheCrow();
 	virtual bool is_ai_obstacle() const;
-	virtual CGameObject *cast_game_object() { return this; }
 	virtual CPhysicsShellHolder *cast_physics_shell_holder() { return this; }
 
 	IC bool IsActive() { return m_bActive; }
@@ -219,6 +282,10 @@ public:
 	bool IsCameraZoom() { return m_zoom_status; }
 	void PlayAnimation();
 	bool InFieldOfView(Fvector pos);
+
+	/* Barrels APIs */
+	SStmBarrel *Barrel(LPCSTR name);
+	float BarrelRPM(LPCSTR name);
 
 	/*----------------------------------------------------------------------------------------------------
 		Ammo
@@ -242,6 +309,7 @@ public:
 	};
 
 protected:
+	virtual void OnShot(SStmBarrel &B);
 	IC u16 GetState() const { return m_state_index; }
 	virtual void SwitchState(u16 new_tate);
 	virtual void switch2_Idle();
@@ -278,7 +346,6 @@ protected:
 	bool m_single_shot_wpn;
 
 	int GetAmmoCount(u8 ammo_type);
-	int GetAmmoCount_forType(shared_str const &ammo_type);
 	int GetAmmoCount_allType();
 	virtual u16 AddCartridge(u16 cnt);
 	void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL);
@@ -313,6 +380,8 @@ public:
 	{
 		return m_bAutoSpawnAmmo;
 	};
+
+	int GetAmmoCount_forType(shared_str const &ammo_type);
 
 public:
 DECLARE_SCRIPT_REGISTER_FUNCTION

@@ -61,8 +61,8 @@ CWeaponStatMgun::CWeaponStatMgun()
 	p_overheat = NULL;
 
 #ifdef STATIONARYMGUN_NEW
-	m_min_gun_speed = 0.0F;
-	m_max_gun_speed = 0.0F;
+	m_rotate_x_speed = 0.0F;
+	m_rotate_y_speed = 0.0F;
 	m_drop_bone = BI_NONE;
 	m_desire_angle.set(0.0F, 0.0F);
 	m_desire_angle_enable = false;
@@ -74,7 +74,11 @@ CWeaponStatMgun::CWeaponStatMgun()
 	m_camera_bone_aim = BI_NONE;
 	m_zoom_factor_def = 1.0F;
 	m_zoom_factor_aim = 1.0F;
+	m_camera_position.set(0, 0, 0);
 	m_zoom_status = false;
+
+	m_barrels.clear();
+	m_iShotNum = 0;
 
 	m_reload_delay = 0.0F;
 	m_unload_delay = 0.0F;
@@ -86,6 +90,7 @@ CWeaponStatMgun::CWeaponStatMgun()
 	m_ammoTypes.clear();
 	iMagazineSize = 1;
 
+	fireDispOwnerFactor = 1.0F;
 	m_on_before_use_callback = NULL;
 #endif
 }
@@ -108,8 +113,8 @@ void CWeaponStatMgun::SetBoneCallbacks()
 	Fvector vec;
 	Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_y_bone).getHPB(vec);
 	m_cur_x_rot = 0.0F;
-	m_cur_y_rot = -vec.x;
-	ClampRotationHorz(m_cur_y_rot, -vec.x, -m_lim_y_rot.y, -m_lim_y_rot.x);
+	m_cur_y_rot = vec.x;
+	ClampRotationHorz(m_cur_y_rot, vec.x, -m_lim_y_rot.y, -m_lim_y_rot.x);
 #endif
 
 	CBoneInstance& biX = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(m_rotate_x_bone);
@@ -201,6 +206,7 @@ void CWeaponStatMgun::Load(LPCSTR section)
 	iMagazineSize = READ_IF_EXISTS(pSettings, r_s32, section, "ammo_mag_size", 1);
 	SetAmmoElapsed(READ_IF_EXISTS(pSettings, r_s32, section, "ammo_elapsed", iMagazineSize));
 
+	fireDispOwnerFactor = READ_IF_EXISTS(pSettings, r_float, section, "fire_disp_owner_factor", 1.0F);
 	if (pSettings->line_exist(cNameSect_str(), "on_before_use"))
 	{
 		m_on_before_use_callback = READ_IF_EXISTS(pSettings, r_string, cNameSect_str(), "on_before_use", "");
@@ -267,41 +273,28 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 	CInifile *ini = K->LL_UserData();
 	LPCSTR mwd = "mounted_weapon_definition";
 
+	if (pSettings->line_exist(cNameSect_str(), "traverse_lim_vert"))
 	{
-		LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect_str(), "traverse_lim_vert", NULL);
-		if (str && (_GetItemCount(str) >= 2))
-		{
-			string16 tmp;
-			_GetItem(str, 0, tmp);
-			m_lim_x_rot.y = max(deg2rad(-std::stof(tmp)), 0.0F);
-			_GetItem(str, 1, tmp);
-			m_lim_x_rot.x = min(deg2rad(-std::stof(tmp)), 0.0F);
-		}
+		Fvector2 vec = pSettings->r_fvector2(cNameSect_str(), "traverse_lim_vert");
+		m_lim_x_rot.set(min(deg2rad(-vec.y), 0.0F), max(deg2rad(-vec.x), 0.0F));
 	}
+	if (pSettings->line_exist(cNameSect_str(), "traverse_lim_horz"))
 	{
-		LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect_str(), "traverse_lim_horz", NULL);
-		if (str && (_GetItemCount(str) >= 2))
-		{
-			string16 tmp;
-			_GetItem(str, 0, tmp);
-			m_lim_y_rot.y = max(deg2rad(-std::stof(tmp)), 0.0F);
-			_GetItem(str, 1, tmp);
-			m_lim_y_rot.x = min(deg2rad(-std::stof(tmp)), 0.0F);
-		}
+		Fvector2 vec = pSettings->r_fvector2(cNameSect_str(), "traverse_lim_horz");
+		m_lim_y_rot.set(min(deg2rad(-vec.y), 0.0F), max(deg2rad(-vec.x), 0.0F));
 	}
 
-	m_min_gun_speed = deg2rad(READ_IF_EXISTS(ini, r_float, mwd, "min_gun_speed", 10.0F));
-	m_max_gun_speed = deg2rad(READ_IF_EXISTS(ini, r_float, mwd, "max_gun_speed", 10.0F));
+	m_rotate_x_speed = deg2rad(READ_IF_EXISTS(ini, r_float, mwd, "rotate_x_speed", 10.0F));
+	m_rotate_y_speed = deg2rad(READ_IF_EXISTS(ini, r_float, mwd, "rotate_y_speed", 10.0F));
 	m_drop_bone = ini->line_exist(mwd, "drop_bone") ? K->LL_BoneID(ini->r_string(mwd, "drop_bone")) : BI_NONE;
-
 	m_actor_bone = ini->line_exist(mwd, "actor_bone") ? K->LL_BoneID(ini->r_string(mwd, "actor_bone")) : BI_NONE;
 
 	m_exit_position = READ_IF_EXISTS(ini, r_fvector3, mwd, "exit_position", Fvector().set(0, 0, 0));
-
 	m_camera_bone_def = ini->line_exist(mwd, "camera_bone_def") ? K->LL_BoneID(ini->r_string(mwd, "camera_bone_def")) : BI_NONE;
 	m_camera_bone_aim = ini->line_exist(mwd, "camera_bone_aim") ? K->LL_BoneID(ini->r_string(mwd, "camera_bone_aim")) : BI_NONE;
 	m_zoom_factor_def = READ_IF_EXISTS(ini, r_float, mwd, "zoom_factor_def", 1.0F);
 	m_zoom_factor_aim = READ_IF_EXISTS(ini, r_float, mwd, "zoom_factor_aim", 1.0F);
+	m_camera_position = READ_IF_EXISTS(ini, r_fvector3, mwd, "camera_position", Fvector().set(0, 1, 0));
 
 	if (ini->section_exist("animation"))
 	{
@@ -319,6 +312,27 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 	if (custom_cam_chase && pSettings->section_exist(custom_cam_chase))
 	{
 		camera[eCamChase]->Load(custom_cam_chase);
+	}
+
+	m_barrels.clear();
+	if (ini->section_exist("barrel"))
+	{
+		int n = ini->line_count("barrel");
+		for (int k = 0; k < n; k++)
+		{
+			LPCSTR sec, val;
+			ini->r_line("barrel", k, &sec, &val);
+			if (sec && strlen(sec) && ini->section_exist(sec))
+			{
+				m_barrels.push_back(SStmBarrel(this, sec));
+				m_barrels.back().Load(cNameSect_str());
+				m_barrels.back().Light_Create();
+			}
+		}
+		if (m_barrels.size() && iMagazineSize && (iMagazineSize % m_barrels.size() > 0))
+		{
+			Msg("[%s] magazine size %d does not match the number of barrels %d", cName(), iMagazineSize, m_barrels.size());
+		}
 	}
 #endif
 
@@ -350,25 +364,35 @@ void CWeaponStatMgun::net_Destroy()
 		CParticlesObject::Destroy(p_overheat);
 	}
 
-#ifdef STATIONARYMGUN_NEW
+#ifdef HOLDERCUSTOM_NEW
 	if (Owner())
 	{
-#ifdef HOLDERCUSTOM_NEW
 		if (Owner()->cast_stalker() && !Owner()->cast_stalker()->g_Alive())
 		{
 			Owner()->cast_stalker()->detach_Holder();
-			return;
 		}
-#endif
 	}
+#endif
 
+#ifdef STATIONARYMGUN_NEW
+	Action(eWpnActivate, 0);
 	PPhysicsShell()->remove_ObjectContactCallback(IgnoreOwnerCallback);
-	ResetBoneCallbacks();
-	CPHUpdateObject::Deactivate();
-	CPHSkeleton::RespawnInit();
 #endif
 
 	inheritedPH::net_Destroy();
+#ifdef STATIONARYMGUN_NEW
+	CShootingObject::StopFlameParticles();
+	CShootingObject::StopLight();
+	CShootingObject::Light_Destroy();
+	for (auto &B : m_barrels)
+	{
+		B.StopFlameParticles();
+		B.StopLight();
+		B.Light_Destroy();
+	}
+	CPHUpdateObject::Deactivate();
+	CPHSkeleton::RespawnInit();
+#endif
 	processing_deactivate();
 }
 
@@ -518,6 +542,11 @@ void CWeaponStatMgun::UpdateBarrelDir()
 	Fvector dep;
 
 #ifdef STATIONARYMGUN_NEW
+	for (auto &B : m_barrels)
+	{
+		B.UpdateEx();
+	}
+
 	if (!IsActive())
 		return;
 	/*
@@ -555,8 +584,8 @@ void CWeaponStatMgun::UpdateBarrelDir()
 		ClampRotationHorz(m_tgt_y_rot, m_cur_y_rot, -m_lim_y_rot.y, -m_lim_y_rot.x);
 	}
 
-	m_cur_x_rot = angle_inertion_var(m_cur_x_rot, m_tgt_x_rot, m_min_gun_speed, m_max_gun_speed, PI, Device.fTimeDelta);
-	m_cur_y_rot = angle_inertion_var(m_cur_y_rot, m_tgt_y_rot, m_min_gun_speed, m_max_gun_speed, PI, Device.fTimeDelta);
+	m_cur_x_rot = angle_inertion_var(m_cur_x_rot, m_tgt_x_rot, m_rotate_x_speed, m_rotate_x_speed, PI, Device.fTimeDelta);
+	m_cur_y_rot = angle_inertion_var(m_cur_y_rot, m_tgt_y_rot, m_rotate_y_speed, m_rotate_y_speed, PI, Device.fTimeDelta);
 	static float dir_eps = deg2rad(5.0f);
 	if (!fsimilar(m_cur_x_rot, m_tgt_x_rot, dir_eps) || !fsimilar(m_cur_y_rot, m_tgt_y_rot, dir_eps))
 	{
@@ -600,24 +629,25 @@ void CWeaponStatMgun::cam_Update(float dt, float fov)
 	switch (cam->tag)
 	{
 	case eCamFirst:
-	case eCamChase:
 	{
 		u16 bone_id = m_camera_bone;
 		if (m_camera_bone_def != BI_NONE)
 		{
 			bone_id = (IsCameraZoom() && (m_camera_bone_aim != BI_NONE)) ? m_camera_bone_aim : m_camera_bone_def;
 		}
-
-		IKinematics *K = Visual()->dcast_PKinematics();
-		Fmatrix xform = K->LL_GetTransform(bone_id);
-		XFORM().transform_tiny(P, xform.c);
-
+		Fmatrix xfm = Visual()->dcast_PKinematics()->LL_GetTransform(bone_id);
+		XFORM().transform_tiny(P, xfm.c);
 		if (OwnerActor())
 			OwnerActor()->Orientation().yaw = -cam->yaw;
 		if (OwnerActor())
 			OwnerActor()->Orientation().pitch = -cam->pitch;
-		break;
 	}
+	break;
+	case eCamChase:
+	{
+		XFORM().transform_tiny(P, m_camera_position);
+	}
+	break;
 	}
 
 	float zoom_factor = (IsCameraZoom()) ? m_zoom_factor_aim : m_zoom_factor_def;
@@ -797,7 +827,7 @@ bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 	{
 		OnCameraChange(eCamFirst);
 		Camera()->pitch = 0.0F;
-		Camera()->yaw = -m_cur_y_rot;
+		Camera()->yaw = m_cur_y_rot;
 	}
 	return true;
 #else
