@@ -114,6 +114,9 @@ void CWeaponMagazined::Load(LPCSTR section)
 	if (WeaponSoundExist(section, "snd_shoot_actor_first"))
 		m_sounds.LoadSound(section, "snd_shoot_actor_first", "sndShotActorFirst", false, m_eSoundShot);
 
+	if (WeaponSoundExist(section, "snd_shoot_indoor"))
+		m_sounds.LoadSound(section, "snd_shoot_indoor", "sndShootIndoor", false, m_eSoundShot);
+
 	//misfire shot
 	if (WeaponSoundExist(section, "snd_shot_misfire"))
 		m_sounds.LoadSound(section, "snd_shot_misfire", "sndShotMisfire", false, m_eSoundShot);
@@ -888,6 +891,7 @@ void CWeaponMagazined::PlaySoundShot()
 		strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
 		if (m_sounds.FindSoundItem(sndName, false))
 		{
+			printf(sndName)
 			m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
 			return;
 		}
