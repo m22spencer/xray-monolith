@@ -865,7 +865,7 @@ void CWeaponMagazined::PlaySoundShot()
 			}
 		}
 		// INDOOR
-		if psActorFlags.test(AF_GUNSND_INDOOR)
+		if (psActorFlags.test(AF_GUNSND_INDOOR))
 		{
 			string128 sndNameIndoor;
 			strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
