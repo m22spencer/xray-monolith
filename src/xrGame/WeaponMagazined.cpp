@@ -864,7 +864,7 @@ void CWeaponMagazined::PlaySoundShot()
 				return;
 			}
 		}
-
+		// INDOOR
 		if psActorFlags.test(AF_GUNSND_INDOOR)
 		{
 			string128 sndNameIndoor;
