@@ -616,9 +616,12 @@ void CWeaponStatMgun::UpdateBarrelDir()
 	Fvector dep;
 
 #ifdef STATIONARYMGUN_NEW
-	for (auto &B : m_barrels)
+	if (m_barrels.size())
 	{
-		B.UpdateEx();
+		for (auto &B : m_barrels)
+		{
+			B.UpdateEx();
+		}
 	}
 
 	if (!IsActive())
@@ -770,6 +773,16 @@ void CWeaponStatMgun::renderable_Render()
 	inheritedPH::renderable_Render();
 
 	RenderLight();
+
+#ifdef STATIONARYMGUN_NEW
+	if (m_barrels.size())
+	{
+		for (auto &B : m_barrels)
+		{
+			B.RenderLight();
+		}
+	}
+#endif
 }
 
 void CWeaponStatMgun::SetDesiredDir(float h, float p)

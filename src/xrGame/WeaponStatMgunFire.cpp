@@ -231,14 +231,18 @@ void CWeaponStatMgun::OnShot()
 #endif
 
 #ifdef STATIONARYMGUN_NEW
-	m_sounds.PlaySound("sndShot", m_fire_pos, owner, IsCameraZoom());
+	m_sounds.PlaySound("sndShoot", m_fire_pos, owner, IsCameraZoom());
 #else
 	bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
 
 	m_sounds.PlaySound("sndShot", m_fire_pos, Owner(), b_hud_mode);
 #endif
 
+#ifdef STATIONARYMGUN_NEW
+	/* Can't make a suitable effector. Should be one that only changes roll. Don't change yaw and pitch. */
+#else
 	AddShotEffector();
+#endif
 	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase),
 	             ::Random.randF(-fireDispersionBase, fireDispersionBase));
 }
@@ -271,9 +275,9 @@ void CWeaponStatMgun::OnShot(SStmBarrel &B)
 		B.OnShellDrop(Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(B.m_drop_bid)).c, zero_vel);
 	}
 
-	m_sounds.PlaySound("sndShot", B.m_fire_pos, owner, IsCameraZoom());
+	m_sounds.PlaySound("sndShoot", B.m_fire_pos, owner, IsCameraZoom());
 
-	AddShotEffector();
+	// AddShotEffector();
 	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase), ::Random.randF(-fireDispersionBase, fireDispersionBase));
 }
 

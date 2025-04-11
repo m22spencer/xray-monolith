@@ -159,6 +159,7 @@ void SStmBarrel::StartFlameParticles()
     StopFlameParticles();
     m_pFlameParticles = CParticlesObject::Create(m_sFlameParticles.c_str(), FALSE);
     UpdateFlameParticles();
+    m_pFlameParticles->Play(false);
 }
 
 void SStmBarrel::StopFlameParticles()
