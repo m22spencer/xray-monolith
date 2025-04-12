@@ -1614,6 +1614,15 @@ void CScriptGameObject::DetachVehicle(bool bForce)
 
 CScriptGameObject* CScriptGameObject::GetAttachedVehicle()
 {
+#ifdef HOLDERCUSTOM_NEW
+	CAI_Stalker *stalker = smart_cast<CAI_Stalker *>(&object());
+	if (stalker && stalker->Holder())
+	{
+		CGameObject *GO = smart_cast<CGameObject *>(stalker->Holder());
+		return (GO) ? GO->lua_game_object() : nullptr;
+	}
+#endif
+
 	CActor* actor = smart_cast<CActor*>(&object());
 	if (!actor)
 		return (0);
@@ -1772,7 +1781,6 @@ void CScriptGameObject::ForceSetPosition(Fvector pos, bool enable)
 	if (shell)
 	{
 		shell->SetGlTransformDynamic(M);
-		sh->correct_spawn_pos();
 		if (enable)
 			shell->Enable();
 	}
@@ -1797,7 +1805,6 @@ void CScriptGameObject::ForceSetRotation(Fvector rot, bool enable)
 	if (shell)
 	{
 		shell->SetGlTransformDynamic(M);
-		sh->correct_spawn_pos();
 		if (enable)
 			shell->Enable();
 	}

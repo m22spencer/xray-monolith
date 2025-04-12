@@ -147,6 +147,10 @@ void CWeaponStatMgun::ResetBoneCallbacks()
 	biY.reset_callback();
 #endif
 
+#ifdef STATIONARYMGUN_NEW
+	biX.mTransform.mulB_43(Fmatrix().rotateY(-m_cur_x_rot));
+	biY.mTransform.mulB_43(Fmatrix().rotateY(-m_cur_y_rot));
+#endif
 	//m_pPhysicsShell->EnabledCallbacks(TRUE);
 }
 
@@ -344,13 +348,11 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 			if (idx < m_barrels.size())
 			{
 				m_barrels.at(idx).SetAmmoElapsed(E->m_barrels.at(idx).a_elapsed);
-				Msg("%s:%d iAmmoElapsed: [%d] = %d", __FUNCTION__, __LINE__, idx, m_barrels.at(idx).iAmmoElapsed);
 			}
 		}
 
 		iAmmoElapsed = E->a_elapsed;
 		SetAmmoElapsed(iAmmoElapsed);
-		Msg("%s:%d iAmmoElapsed: all = %d", __FUNCTION__, __LINE__, iAmmoElapsed);
 	}
 
 	LPCSTR custom_cam_first = READ_IF_EXISTS(ini, r_string, "camera", "cam_first", nullptr);
@@ -914,7 +916,7 @@ bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 	{
 		OnCameraChange(eCamFirst);
 		Camera()->yaw = m_cur_y_rot;
-		Camera()->pitch = 0.0F;
+		Camera()->pitch = m_cur_x_rot;
 	}
 	return true;
 #else
@@ -1185,12 +1187,14 @@ void CWeaponStatMgun::UpdateAnimation()
 		head.target.pitch = 0.0F;
 		head.current.yaw = 0.0F;
 		head.current.pitch = 0.0F;
-
+#if 0
+		/* Not working. */
 		stalker->movement().set_desired_direction(0);
 		if (stalker->best_weapon())
 		{
 			stalker->CObjectHandler::set_goal(eObjectActionIdle, stalker->best_weapon());
 		}
+#endif
 	}
 }
 

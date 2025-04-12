@@ -483,6 +483,14 @@ void CScriptGameObject::SetMovementSpeed(Fvector vel)
 
 CHolderCustom* CScriptGameObject::get_current_holder()
 {
+#ifdef HOLDERCUSTOM_NEW
+	CAI_Stalker *stalker = smart_cast<CAI_Stalker *>(&object());
+	if (stalker)
+	{
+		return stalker->Holder();
+	}
+#endif
+
 	CActor* actor = smart_cast<CActor*>(&object());
 
 	if (actor)
