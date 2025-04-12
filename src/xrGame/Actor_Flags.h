@@ -23,7 +23,6 @@ enum
 	AF_AIM_TOGGLE = (1 << 19),
 	AF_3D_PDA = (1 << 20),
 	AF_FIREPOS_ZOOM =(1 << 21),
-	AF_GUNSND_INDOOR =(1 << 22)
 };
 
 extern Flags32 psActorFlags;

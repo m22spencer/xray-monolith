@@ -29,6 +29,7 @@
 
 extern ENGINE_API bool g_dedicated_server;
 ENGINE_API extern float psHUD_FOV_def;
+float g_gunsnd_indoor = 0.f
 
 CUIXml* pWpnScopeXml = NULL;
 
@@ -860,19 +861,40 @@ void CWeaponMagazined::PlaySoundShot()
 			strconcat(sizeof(sndNameMisfire), sndNameMisfire, m_sSndShotCurrent.c_str(), "MisfireActor");
 			if (m_sounds.FindSoundItem(sndNameMisfire, false))
 			{
+				m_sounds.set_volume
 				m_sounds.PlaySound(sndNameMisfire, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
 				return;
 			}
 		}
 		// INDOOR
-		if (psActorFlags.test(AF_GUNSND_INDOOR))
+		if (g_gunsnd_indoor>0.f)
 		{
 			string128 sndNameIndoor;
 			strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
 			if (m_sounds.FindSoundItem(sndNameIndoor, false))
 			{
+				m_sounds.set_volume(g_gunsnd_indoor)
 				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
-				return;
+				if (1-g_gunsnd_indoor>0.f) 
+				{
+					string128 sndNameFirst;
+					m_sounds.set_volume(1-g_gunsnd_indoor)
+					strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
+					if (m_iShotNum == 1 && m_sounds.FindSoundItem(sndNameFirst, false))
+					{
+						m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+						return;
+					}
+			
+					string128 sndName;
+					strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
+					if (m_sounds.FindSoundItem(sndName, false))
+					{
+						m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+						return;
+					}
+					return;
+				}
 			}
 		}
 
