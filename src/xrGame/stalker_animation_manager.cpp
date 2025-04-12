@@ -73,6 +73,7 @@ void CStalkerAnimationManager::reinit()
 void CStalkerAnimationManager::reload()
 {
 	m_visual = object().Visual();
+	R_ASSERT(m_visual);
 
 	m_crouch_state_config = object().SpecificCharacter().crouch_type();
 	VERIFY((m_crouch_state_config == 0) || (m_crouch_state_config == 1) || (m_crouch_state_config == -1));
@@ -84,7 +85,7 @@ void CStalkerAnimationManager::reload()
 	m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_visual);
 	VERIFY(m_skeleton_animated);
 
-	m_data_storage = stalker_animation_data_storage().object(m_skeleton_animated);
+	m_data_storage = stalker_animation_data_storage().object(smart_cast<IKinematicsAnimated*>(::Render->model_Instance(*object().cNameVisual())));
 	VERIFY(m_data_storage);
 
 	if (!object().g_Alive())

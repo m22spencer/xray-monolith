@@ -188,6 +188,21 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.11**
+* Lucy: Scripted game_object shader/texture changing (https://github.com/themrdemonized/xray-monolith/pull/157)
+
+**2025.04.05**
+* removed `FreeRoom_inBelt` check for attachments
+
+**2025.04.04**
+* Script fixes
+  * Fixed `utils_item.has_scope` returning wrong addon items on some occassions
+
+**2025.04.03**
+* Script fixes
+  * Fixed `axr_trade_manager.npc_trade_buy_sell` and `axr_trade_manager.npc_tech_upgrade_sell` functions
+  * Fixed `item_weapon.detach_scope` giving wrong addon items on some occassions
+
 **2025.03.29**
 * Bence7661: Fix issue (https://github.com/themrdemonized/xray-monolith/issues/153)
 
