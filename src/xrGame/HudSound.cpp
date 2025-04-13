@@ -126,7 +126,7 @@ void HUD_SOUND_ITEM::PlaySound(HUD_SOUND_ITEM& hud_snd,
 		                                          flags & sm_2D
 			                                          ? &Fvector().set(0, 0, 0)
 			                                          : &Fvector().set(position.x, position.y, position.z),
-		                                          volume_mult, 0, 0);
+		                                          &volume_mult, 0, 0);
 	}
 
 	//hud_snd.m_activeSnd->snd.set_volume		(hud_snd.m_activeSnd->volume * b_hud_mode?psHUDSoundVolume:1.0f);
