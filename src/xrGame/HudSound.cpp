@@ -85,8 +85,8 @@ void HUD_SOUND_ITEM::PlaySound(HUD_SOUND_ITEM& hud_snd,
                                const CObject* parent,
                                bool b_hud_mode,
                                bool looped,
-                               u8 index
-							   float volume_mult = 1.f)
+                               u8 index,
+							   float volume_mult)
 {
 	if (hud_snd.sounds.empty()) return;
 
@@ -174,8 +174,8 @@ void HUD_SOUND_COLLECTION::PlaySound(LPCSTR alias,
                                      const CObject* parent,
                                      bool hud_mode,
                                      bool looped,
-                                     u8 index
-									 float volume_mult = 1.f)
+                                     u8 index,
+									 float volume_mult)
 {
 	xr_vector<HUD_SOUND_ITEM>::iterator it = m_sound_items.begin();
 	xr_vector<HUD_SOUND_ITEM>::iterator it_e = m_sound_items.end();
@@ -280,7 +280,7 @@ void HUD_SOUND_COLLECTION_LAYERED::SetPosition(LPCSTR alias, const Fvector& pos)
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent,
-                                             bool hud_mode, bool looped, u8 index, float volume_mult = 1.f)
+                                             bool hud_mode, bool looped, u8 index, float volume_mult)
 {
 	xr_vector<HUD_SOUND_COLLECTION>::iterator it = m_sound_items.begin();
 	xr_vector<HUD_SOUND_COLLECTION>::iterator it_e = m_sound_items.end();
