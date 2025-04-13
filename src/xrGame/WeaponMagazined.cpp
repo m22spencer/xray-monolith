@@ -31,6 +31,7 @@ extern ENGINE_API bool g_dedicated_server;
 ENGINE_API extern float psHUD_FOV_def;
 
 float g_gunsnd_indoor = 0.f;
+float g_gunsnd_indoor_volume = 1.f;
 
 CUIXml* pWpnScopeXml = NULL;
 
@@ -877,7 +878,7 @@ void CWeaponMagazined::PlaySoundShot()
 			strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
 			if (m_sounds.FindSoundItem(sndNameIndoor, false))
 			{
-				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor);
+				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor*g_gunsnd_indoor_volume);
 				if (1.f-g_gunsnd_indoor>0.f) 
 				{
 					string128 sndNameFirst;
@@ -935,7 +936,7 @@ void CWeaponMagazined::PlaySoundShot()
 		strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
 		if (m_sounds.FindSoundItem(sndNameIndoor, false))
 		{
-			m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f);
+			m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f*g_gunsnd_indoor_volume);
 			return;
 		}
 	}

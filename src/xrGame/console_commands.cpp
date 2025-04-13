@@ -147,6 +147,7 @@ extern BOOL g_aimmode_remember;
 extern BOOL g_freelook_while_reloading;
 extern BOOL useSeparateUBGLKeybind;
 extern float g_gunsnd_indoor;
+extern float g_gunsnd_indoor_volume;
 
 ENGINE_API extern float g_console_sensitive;
 
@@ -2849,4 +2850,5 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "freelook_while_reloading", &g_freelook_while_reloading, 0, 1);
 	// Indoor weapon sounds
 	CMD3(CCC_Float, "g_gunsnd_indoor", &g_gunsnd_indoor, 0.0f, 1.0f);
+	CMD3(CCC_Float, "g_gunsnd_indoor_volume", &g_gunsnd_indoor_volume, 0.0f, 5.0f);
 }
