@@ -85,7 +85,8 @@ void HUD_SOUND_ITEM::PlaySound(HUD_SOUND_ITEM& hud_snd,
                                const CObject* parent,
                                bool b_hud_mode,
                                bool looped,
-                               u8 index)
+                               u8 index
+							   float volume_mult = 1.f)
 {
 	if (hud_snd.sounds.empty()) return;
 
@@ -129,7 +130,7 @@ void HUD_SOUND_ITEM::PlaySound(HUD_SOUND_ITEM& hud_snd,
 	}
 
 	//hud_snd.m_activeSnd->snd.set_volume		(hud_snd.m_activeSnd->volume * b_hud_mode?psHUDSoundVolume:1.0f);
-	hud_snd.m_activeSnd->snd.set_volume(hud_snd.m_activeSnd->volume * (b_hud_mode ? psHUDSoundVolume : 1.0f));
+	hud_snd.m_activeSnd->snd.set_volume(hud_snd.m_activeSnd->volume * (b_hud_mode ? psHUDSoundVolume : 1.0f)*volume_mult);
 }
 
 void HUD_SOUND_ITEM::StopSound(HUD_SOUND_ITEM& hud_snd)
@@ -173,7 +174,8 @@ void HUD_SOUND_COLLECTION::PlaySound(LPCSTR alias,
                                      const CObject* parent,
                                      bool hud_mode,
                                      bool looped,
-                                     u8 index)
+                                     u8 index
+									 float volume_mult = 1.f)
 {
 	xr_vector<HUD_SOUND_ITEM>::iterator it = m_sound_items.begin();
 	xr_vector<HUD_SOUND_ITEM>::iterator it_e = m_sound_items.end();
@@ -185,7 +187,7 @@ void HUD_SOUND_COLLECTION::PlaySound(LPCSTR alias,
 
 	HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, false);
 	if (snd_item)
-		HUD_SOUND_ITEM::PlaySound(*snd_item, position, parent, hud_mode, looped, index);
+		HUD_SOUND_ITEM::PlaySound(*snd_item, position, parent, hud_mode, looped, index, volume_mult);
 }
 
 void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
@@ -278,7 +280,7 @@ void HUD_SOUND_COLLECTION_LAYERED::SetPosition(LPCSTR alias, const Fvector& pos)
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent,
-                                             bool hud_mode, bool looped, u8 index)
+                                             bool hud_mode, bool looped, u8 index, float volume_mult = 1.f)
 {
 	xr_vector<HUD_SOUND_COLLECTION>::iterator it = m_sound_items.begin();
 	xr_vector<HUD_SOUND_COLLECTION>::iterator it_e = m_sound_items.end();
@@ -286,7 +288,7 @@ void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& positi
 	for (; it != it_e; ++it)
 	{
 		if (it->m_alias == alias)
-			it->PlaySound(alias, position, parent, hud_mode, looped, index);
+			it->PlaySound(alias, position, parent, hud_mode, looped, index, volume_mult);
 	}
 }
 

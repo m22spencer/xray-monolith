@@ -29,7 +29,8 @@
 
 extern ENGINE_API bool g_dedicated_server;
 ENGINE_API extern float psHUD_FOV_def;
-float g_gunsnd_indoor = 0.f
+
+float g_gunsnd_indoor = 0.f;
 
 CUIXml* pWpnScopeXml = NULL;
 
@@ -861,7 +862,6 @@ void CWeaponMagazined::PlaySoundShot()
 			strconcat(sizeof(sndNameMisfire), sndNameMisfire, m_sSndShotCurrent.c_str(), "MisfireActor");
 			if (m_sounds.FindSoundItem(sndNameMisfire, false))
 			{
-				m_sounds.set_volume
 				m_sounds.PlaySound(sndNameMisfire, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
 				return;
 			}
@@ -873,16 +873,14 @@ void CWeaponMagazined::PlaySoundShot()
 			strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
 			if (m_sounds.FindSoundItem(sndNameIndoor, false))
 			{
-				m_sounds.set_volume(g_gunsnd_indoor)
-				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
-				if (1-g_gunsnd_indoor>0.f) 
+				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor);
+				if (1.f-g_gunsnd_indoor>0.f) 
 				{
 					string128 sndNameFirst;
-					m_sounds.set_volume(1-g_gunsnd_indoor)
 					strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
 					if (m_iShotNum == 1 && m_sounds.FindSoundItem(sndNameFirst, false))
 					{
-						m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+						m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f-g_gunsnd_indoor);
 						return;
 					}
 			
@@ -895,6 +893,7 @@ void CWeaponMagazined::PlaySoundShot()
 					}
 					return;
 				}
+				return;
 			}
 		}
 
