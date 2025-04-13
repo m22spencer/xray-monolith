@@ -30,6 +30,9 @@
 extern ENGINE_API bool g_dedicated_server;
 ENGINE_API extern float psHUD_FOV_def;
 
+float g_gunsnd_indoor = 0.f;
+float g_gunsnd_indoor_volume = 1.f;
+
 CUIXml* pWpnScopeXml = NULL;
 
 void createWpnScopeXML()
@@ -106,8 +109,10 @@ void CWeaponMagazined::Load(LPCSTR section)
 	m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
 	if (WeaponSoundExist(section, "snd_shoot_actor"))
 		m_sounds.LoadSound(section, "snd_shoot_actor", "sndShotActor", false, m_eSoundShot);
+	// Indoor
+	if (WeaponSoundExist(section, "snd_shoot_indoor"))
+		m_sounds.LoadSound(section, "snd_shoot_indoor", "sndShotIndoor", false, m_eSoundShot);
 	//-Alundaio
-
 	// Cyclic fire sounds
 	if (WeaponSoundExist(section, "snd_shoot_actor_first"))
 		m_sounds.LoadSound(section, "snd_shoot_actor_first", "sndShotActorFirst", false, m_eSoundShot);
@@ -165,6 +170,10 @@ void CWeaponMagazined::Load(LPCSTR section)
 		// Cyclic fire sounds w/ silencer
 		if (WeaponSoundExist(section, "snd_silncer_shoot_actor_first"))
 			m_sounds.LoadSound(section, "snd_silncer_shoot_actor_first", "sndSilencerShotActorFirst", false, m_eSoundShot);
+
+		// Indoor
+		if (WeaponSoundExist(section, "snd_silncer_shoot_indoor"))
+			m_sounds.LoadSound(section, "snd_silncer_shoot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
 
 		//misfire shot
 		if (WeaponSoundExist(section, "snd_silncer_shot_misfire"))
@@ -721,6 +730,8 @@ void CWeaponMagazined::UpdateSounds()
 		m_sounds.SetPosition("sndShotMisfireActor", P);
 	if (m_sounds.FindSoundItem("sndShotActorFirst", false))
 		m_sounds.SetPosition("sndShotActorFirst", P);
+	if (m_sounds.FindSoundItem("sndShotIndoor", false))
+		m_sounds.SetPosition("sndShotIndoor", P);
 }
 
 // demonized: check if cycle_down is enabled and shot num below max possible burst. Adds support for arbitrary burst shot at rpm_mode_2 with cycling down to rpm after maxBurstAmount
@@ -860,6 +871,35 @@ void CWeaponMagazined::PlaySoundShot()
 				return;
 			}
 		}
+		// INDOOR
+		if (g_gunsnd_indoor>0.f)
+		{
+			string128 sndNameIndoor;
+			strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
+			if (m_sounds.FindSoundItem(sndNameIndoor, false))
+			{
+				m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor*g_gunsnd_indoor_volume);
+				if (1.f-g_gunsnd_indoor>0.f) 
+				{
+					string128 sndNameFirst;
+					strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
+					if (m_iShotNum == 1 && m_sounds.FindSoundItem(sndNameFirst, false))
+					{
+						m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f-g_gunsnd_indoor);
+						return;
+					}
+			
+					string128 sndName;
+					strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
+					if (m_sounds.FindSoundItem(sndName, false))
+					{
+						m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1,  1.f-g_gunsnd_indoor);
+						return;
+					}
+				}
+				return;
+			}
+		}
 
 		string128 sndNameFirst;
 		strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
@@ -878,6 +918,7 @@ void CWeaponMagazined::PlaySoundShot()
 		}
 	}
 
+
 	if (bMisfire)
 	{
 		string128 sndNameMisfire;
@@ -885,6 +926,17 @@ void CWeaponMagazined::PlaySoundShot()
 		if (m_sounds.FindSoundItem(sndNameMisfire, false))
 		{
 			m_sounds.PlaySound(sndNameMisfire, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+			return;
+		}
+	}
+
+	if (g_gunsnd_indoor==1.f)
+	{
+		string128 sndNameIndoor;
+		strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
+		if (m_sounds.FindSoundItem(sndNameIndoor, false))
+		{
+			m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f*g_gunsnd_indoor_volume);
 			return;
 		}
 	}

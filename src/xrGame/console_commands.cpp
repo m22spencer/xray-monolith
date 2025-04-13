@@ -146,6 +146,8 @@ extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
 extern BOOL g_freelook_while_reloading;
 extern BOOL useSeparateUBGLKeybind;
+extern float g_gunsnd_indoor;
+extern float g_gunsnd_indoor_volume;
 
 ENGINE_API extern float g_console_sensitive;
 
@@ -2837,6 +2839,7 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "zoom_step_count", &n_zoom_step_count, 1.0f, 10.0f);
 
+
 	// UBGL/Aim mode switch separation
 	// When switching to UBGL the weapon will remember what mode you switched from and will put you back in that mode. 
 	// For example: You were aiming down with a canted sight when you switched to UBGL. When you switch back it will put you back into Canted sight aim and not the scope.
@@ -2845,4 +2848,7 @@ void CCC_RegisterCommands()
 
 	// Allows freelook during reload animations
 	CMD4(CCC_Integer, "freelook_while_reloading", &g_freelook_while_reloading, 0, 1);
+	// Indoor weapon sounds
+	CMD3(CCC_Float, "g_gunsnd_indoor", &g_gunsnd_indoor, 0.0f, 1.0f);
+	CMD3(CCC_Float, "g_gunsnd_indoor_volume", &g_gunsnd_indoor_volume, 0.0f, 5.0f);
 }
