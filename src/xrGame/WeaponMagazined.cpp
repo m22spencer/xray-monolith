@@ -918,7 +918,6 @@ void CWeaponMagazined::PlaySoundShot()
 		}
 	}
 
-
 	if (bMisfire)
 	{
 		string128 sndNameMisfire;
