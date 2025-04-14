@@ -188,6 +188,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.14**
+* Lucy: Fixes (https://github.com/themrdemonized/xray-monolith/pull/165)
+
 **2025.04.13**
 * Kutez: Indoor Gunsound Framework (https://github.com/themrdemonized/xray-monolith/pull/161)
 
