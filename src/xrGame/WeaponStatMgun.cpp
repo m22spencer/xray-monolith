@@ -382,16 +382,6 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 	{
 		CPhysicsShellHolder::active_ignore_collision();
 	}
-
-	/*
-		Allow stalkers to see through this so gunner and their enemies can see and shoot each others.
-		Maybe consider switching this flag on/off if having Owner() or not?
-	*/
-	ISpatial *self = smart_cast<ISpatial *>(this);
-	if (self)
-	{
-		self->spatial.type &= ~STYPE_VISIBLEFORAI;
-	}
 #endif
 
 	return TRUE;
@@ -911,6 +901,7 @@ bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 
 	inheritedHolder::attach_Actor(actor);
 	Action(eWpnActivate, 1);
+	SetFeelVisionIgnore(true);
 
 	if (OwnerActor())
 	{
@@ -942,6 +933,7 @@ void CWeaponStatMgun::detach_Actor()
 	}
 	inheritedHolder::detach_Actor();
 	Action(eWpnActivate, 0);
+	SetFeelVisionIgnore(false);
 #else
 	Owner()->setVisible(1);
 	inheritedHolder::detach_Actor();
@@ -1104,6 +1096,18 @@ void CWeaponStatMgun::OnCameraChange(u16 type)
 	}
 }
 
+void CWeaponStatMgun::SetFeelVisionIgnore(bool enable)
+{
+#ifdef FEEL_ENHANCED
+	ISpatial *IS = smart_cast<ISpatial *>(this);
+	R_ASSERT(IS);
+	if (enable)
+		IS->spatial.type |= STYPE_FEELVISIONIGNORE;
+	else
+		IS->spatial.type &= ~STYPE_FEELVISIONIGNORE;
+#endif
+}
+
 void CWeaponStatMgun::UpdateAnimation()
 {
 	if (Owner() == nullptr)
@@ -1181,20 +1185,14 @@ void CWeaponStatMgun::UpdateAnimation()
 		SBoneRotation &head = stalker->movement().m_head;
 		body.target.yaw = 0.0F;
 		body.target.pitch = 0.0F;
-		body.current.yaw = 0.0F;
-		body.current.pitch = 0.0F;
 		head.target.yaw = 0.0F;
 		head.target.pitch = 0.0F;
-		head.current.yaw = 0.0F;
-		head.current.pitch = 0.0F;
-#if 0
-		/* Not working. */
+
 		stalker->movement().set_desired_direction(0);
-		if (stalker->best_weapon())
+		if (stalker->inventory().ActiveItem())
 		{
-			stalker->CObjectHandler::set_goal(eObjectActionIdle, stalker->best_weapon());
+			stalker->inventory().Activate(NO_ACTIVE_SLOT);
 		}
-#endif
 	}
 }
 

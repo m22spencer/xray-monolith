@@ -285,6 +285,7 @@ public:
 	Fvector GetFireDir() { return m_fire_dir; }
 	float FireDispersionBase() { return fireDispersionBase; }
 	bool IsCameraZoom() { return m_zoom_status; }
+	void SetFeelVisionIgnore(bool enable);
 	void UpdateAnimation();
 	Fvector2 GetTraverseLimitHorz();
 	void SetTraverseLimitHorz(Fvector2 vec);

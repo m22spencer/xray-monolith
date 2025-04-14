@@ -42,8 +42,9 @@
 #define NEW_ANIMS										// use new animations. Please enclose any new animation addions with this define
 //-TWEAKS
 
-#define HOLDERCUSTOM_NEW                                // Upgrade CHolderCustom.
-#define STATIONARYMGUN_NEW                              // Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
+#define HOLDERCUSTOM_NEW								// Upgrade CHolderCustom.
+#define STATIONARYMGUN_NEW								// Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
+#define FEEL_ENHANCED									// Upgrade Feel.
 
 /*LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.
