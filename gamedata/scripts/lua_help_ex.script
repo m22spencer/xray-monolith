@@ -389,6 +389,8 @@
 		// Shader/Textures
 		function get_shaders(bool)
 		function set_shader(number, string, string, bool)
+		function get_default_shaders(bool)
+		function reset_shader(number, bool)
 		
 		get_shaders(hud_mode)
 		hud_mode is optional and will default to false
@@ -406,10 +408,16 @@
 			},
 		},
 		
+		get_default_shaders(hud_mode)
+		returns similar table as get_shaders but containing the default shader and texture names, even after they were changed by set_shader
+		
 		set_shader(id, shader, texture, hud_mode) can assign a new shader/texture to the submesh ID
 		id can be -1 to apply the shader/texture to all submeshes at once
 		shader/texture can be nil if you only want to apply one of them
 		hud_mode is optional and will default to false
+		
+		reset_shader(id, hud_mode)
+		same as set_shader but resets to the default shader/texture values, so you don't need to store them in a table to reset them later
     }
 
     class CArtefact : CGameObject {
