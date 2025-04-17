@@ -337,7 +337,7 @@ void set_box_y_offset(LPCSTR section, CPHMovementControl& mc, u32 box_num, float
 	string64 buff, buff1;
 	strconcat(sizeof(buff), buff, "ph_box", itoa(box_num, buff1, 10), "_center");
 	vBOX_center = pSettings->r_fvector3(section, buff);
-	vBOX_center.y = offset
+	vBOX_center.y = offset;
 	strconcat(sizeof(buff), buff, "ph_box", itoa(box_num, buff1, 10), "_size");
 	vBOX_size = pSettings->r_fvector3(section, buff);
 	vBOX_size.y += (cammera_into_collision_shift / 2.f) + offset;
