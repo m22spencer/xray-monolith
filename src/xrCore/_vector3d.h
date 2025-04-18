@@ -702,6 +702,15 @@ public:
 		Device.mInvView.transform_tiny(pos);
 	}
 
+	IC static void world_to_hud(Self& pos)
+	{
+		Device.mInvView.transform_tiny(pos);
+		Device.mInvProject.transform_tiny(pos);
+
+		Device.mProjectHud.transform_tiny(pos);
+		Device.mView.transform_tiny(pos);
+	}
+
 	IC static void hud_to_world_dir(Self& dir)
 	{
 		Device.mView.transform_dir(dir);
@@ -709,6 +718,15 @@ public:
 
 		Device.mInvProject.transform_dir(dir);
 		Device.mInvView.transform_dir(dir);
+	}
+
+	IC static void world_to_hud_dir(Self& dir)
+	{
+		Device.mInvView.transform_dir(dir);
+		Device.mInvProject.transform_dir(dir);
+
+		Device.mProjectHud.transform_dir(dir);
+		Device.mView.transform_dir(dir);
 	}
 };
 
