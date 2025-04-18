@@ -147,6 +147,12 @@ void dxRender_Visual::SetShaderTexture(LPCSTR s_shader, LPCSTR s_texture)
 	shader.create(*dbg_shader, *dbg_texture);
 }
 
+void dxRender_Visual::ResetShaderTexture()
+{
+	if (!dbg_shader.equal(dbg_shader_def) || !dbg_texture.equal(dbg_texture_def))
+		SetShaderTexture(*dbg_shader_def, *dbg_texture_def);
+}
+
 #define PCOPY(a)	a = pFrom->a
 
 void dxRender_Visual::Copy(dxRender_Visual* pFrom)
@@ -160,6 +166,8 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 	PCOPY(flags);
 	PCOPY(dbg_name);
 	PCOPY(dbg_shader);
+	PCOPY(dbg_shader_def);
 	PCOPY(dbg_texture);
+	PCOPY(dbg_texture_def);
 	PCOPY(skinning);
 }

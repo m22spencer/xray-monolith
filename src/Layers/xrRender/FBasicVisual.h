@@ -85,7 +85,7 @@ public:
 	//	virtual IParticleCustom*	dcast_ParticleCustom		()				{ return 0;	}
 
 	virtual void SetShaderTexture(LPCSTR shader, LPCSTR texture);
-	virtual void ResetShaderTexture() { SetShaderTexture(*dbg_shader_def, *dbg_texture_def); }
+	virtual void ResetShaderTexture();
 
 	virtual vis_data& _BCL getVisData() { return vis; }
 	virtual u32 getType() { return Type; }

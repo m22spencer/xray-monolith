@@ -312,8 +312,13 @@ void CModelPool::DeleteInternal(dxRender_Visual* & V, BOOL bDiscard)
 		if (it != Registry.end())
 		{
 			// Registry entry found - move it to pool and reset changed shader/texture if necessary
-			if (!V->dbg_shader.equal(V->dbg_shader_def) || !V->dbg_texture.equal(V->dbg_texture_def))
+			xr_vector<IRenderVisual*>* children = V->get_children();
+			if (children)
+				for (auto* child : *children)
+					child->ResetShaderTexture();
+			else
 				V->ResetShaderTexture();
+
 			Pool.insert(mk_pair(it->second, V));
 		}
 		else
