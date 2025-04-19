@@ -1147,7 +1147,58 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 	return table;
 }
 
-void set_shader_tex(IRenderVisual* vis, int id, char* shader, LPCSTR texture)
+luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
+{
+	IKinematics* k = nullptr;
+
+	if (bHud)
+	{
+		CActor* act = smart_cast<CActor*>(&object());
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			k = itm->HudItemData()->m_model;
+		else if (act)
+			k = g_player_hud->m_model->dcast_PKinematics();
+	}
+
+	if (!k)
+		k = object().Visual()->dcast_PKinematics();
+
+	luabind::object table = luabind::newtable(ai().script_engine().lua());
+
+	if (!k)
+	{
+		table["error"] = true;
+		return table;
+	}
+
+	IRenderVisual* vis = k->dcast_RenderVisual();
+	xr_vector<IRenderVisual*>* children = vis->get_children();
+
+	if (!children)
+	{
+		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = vis->getDebugShaderDef();
+		subtable["texture"] = vis->getDebugTextureDef();
+		table[1] = subtable;
+		return table;
+	}
+
+	int i = 1;
+
+	for (auto* child : *children)
+	{
+		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShaderDef();
+		subtable["texture"] = child->getDebugTextureDef();
+		table[i] = subtable;
+		++i;
+	}
+
+	return table;
+}
+
+void set_shader_tex(IRenderVisual* vis, int id, LPCSTR shader, LPCSTR texture)
 {
 	xr_vector<IRenderVisual*>* children = vis->get_children();
 
@@ -1172,6 +1223,31 @@ void set_shader_tex(IRenderVisual* vis, int id, char* shader, LPCSTR texture)
 		children->at(id)->SetShaderTexture(shader, texture);
 }
 
+void reset_shader_tex(IRenderVisual* vis, int id)
+{
+	xr_vector<IRenderVisual*>* children = vis->get_children();
+
+	if (!children)
+	{
+		vis->ResetShaderTexture();
+		return;
+	}
+
+	if (id == -1)
+	{
+		for (auto* child : *children)
+		{
+			child->ResetShaderTexture();
+		}
+		return;
+	}
+
+	id--;
+
+	if (id >= 0 && children->size() > id)
+		children->at(id)->ResetShaderTexture();
+}
+
 void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, bool bHud)
 {
 	IKinematics* k = nullptr;
@@ -1184,8 +1260,8 @@ void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, 
 			k = itm->HudItemData()->m_model;
 		else if (act)
 		{
-			set_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id, xr_strdup(shader), texture);
-			set_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id, xr_strdup(shader), texture);
+			set_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id, shader, texture);
+			set_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id, shader, texture);
 			return;
 		}
 	}
@@ -1195,5 +1271,31 @@ void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, 
 
 	if (!k) return;
 
-	set_shader_tex(k->dcast_RenderVisual(), id, xr_strdup(shader), texture);
+	set_shader_tex(k->dcast_RenderVisual(), id, shader, texture);
+}
+
+void CScriptGameObject::ResetShaderTexture(int id, bool bHud)
+{
+	IKinematics* k = nullptr;
+
+	if (bHud)
+	{
+		CActor* act = smart_cast<CActor*>(&object());
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			k = itm->HudItemData()->m_model;
+		else if (act)
+		{
+			reset_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id);
+			reset_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id);
+			return;
+		}
+	}
+
+	if (!k)
+		k = object().Visual()->dcast_PKinematics();
+
+	if (!k) return;
+
+	reset_shader_tex(k->dcast_RenderVisual(), id);
 }
