@@ -31,6 +31,7 @@ void CDestroyablePhysicsObject::OnChangeVisual()
 {
 	if (m_pPhysicsShell)
 	{
+		m_pPhysicsShell->set_Kinematics(nullptr);
 		m_pPhysicsShell->Deactivate();
 		xr_delete(m_pPhysicsShell);
 		VERIFY(0==Visual());

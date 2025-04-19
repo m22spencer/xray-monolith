@@ -2257,7 +2257,8 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy
 	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(inventory_item);
 	if (outfit && inventory_item->m_ItemCurrPlace.type == eItemPlaceSlot)
 	{
-		outfit->ApplySkinModel(this, false, false);
+		if (!(just_before_destroy && psDeviceFlags.test(rsDisableObjectsAsCrows)))
+			outfit->ApplySkinModel(this, false, false);
 	}
 
 	CWeapon* weapon = smart_cast<CWeapon*>(inventory_item);
