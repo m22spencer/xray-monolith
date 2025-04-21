@@ -272,6 +272,12 @@ Example
 	end
 
 Possible aliases:
+	"catch_snd"
+	"found_snd"
+	"NightVisionBrokenSnd"
+	"NightVisionIdleSnd"
+	"NightVisionOffSnd"
+	"NightVisionOnSnd"
 	"sndAddCartridge"
 	"sndBore"
 	"sndButtonPress"
