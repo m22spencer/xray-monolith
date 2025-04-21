@@ -728,6 +728,50 @@ public:
 		Device.mProjectHud.transform_dir(dir);
 		Device.mView.transform_dir(dir);
 	}
+
+	IC SelfRef hud_to_world_self()
+	{
+		SelfRef tmp = *this;
+		Device.mView.transform_tiny(tmp);
+		Device.mProjectHud.transform_tiny(tmp);
+
+		Device.mInvProject.transform_tiny(tmp);
+		Device.mInvView.transform_tiny(tmp);
+		return *this;
+	}
+
+	IC SelfRef world_to_hud_self()
+	{
+		SelfRef tmp = *this;
+		Device.mInvView.transform_tiny(tmp);
+		Device.mInvProject.transform_tiny(tmp);
+
+		Device.mProjectHud.transform_tiny(tmp);
+		Device.mView.transform_tiny(tmp);
+		return *this;
+	}
+
+	IC SelfRef hud_to_world_dir_self()
+	{
+		SelfRef tmp = *this;
+		Device.mView.transform_dir(tmp);
+		Device.mProjectHud.transform_dir(tmp);
+
+		Device.mInvProject.transform_dir(tmp);
+		Device.mInvView.transform_dir(tmp);
+		return *this;
+	}
+
+	IC SelfRef world_to_hud_dir_self()
+	{
+		SelfRef tmp = *this;
+		Device.mInvView.transform_dir(tmp);
+		Device.mInvProject.transform_dir(tmp);
+
+		Device.mProjectHud.transform_dir(tmp);
+		Device.mView.transform_dir(tmp);
+		return *this;
+	}
 };
 
 typedef _vector3<float> Fvector;
