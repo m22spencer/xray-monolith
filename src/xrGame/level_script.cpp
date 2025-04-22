@@ -1725,7 +1725,7 @@ void ui2world(Fvector2 pos, Fvector& res, u16& obj_id)
 
 void ui2world(Fvector& pos, Fvector& res, u16& obj_id)
 {
-	ui2world(Fvector2().set(pos.x, pos.y), false, res, obj_id);
+	ui2world(Fvector2().set(pos.x, pos.y), res, obj_id);
 }
 
 void ui2world_offscreen(Fvector2 pos, Fvector& res, u16& obj_id)
