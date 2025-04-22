@@ -17,6 +17,10 @@ void CScriptFvector::script_register(lua_State* L)
 	module(L)
 	[
 		class_<Fvector>("vector")
+		.scope[
+			def("generate_orthonormal_basis", &Fvector::generate_orthonormal_basis),
+			def("generate_orthonormal_basis_normalized", &Fvector::generate_orthonormal_basis_normalized)
+		]
 		.def_readwrite("x", &Fvector::x)
 		.def_readwrite("y", &Fvector::y)
 		.def_readwrite("z", &Fvector::z)
@@ -98,7 +102,6 @@ void CScriptFvector::script_register(lua_State* L)
 
 		.def("reflect", &Fvector::reflect, return_reference_to(_1))
 		.def("slide", &Fvector::slide, return_reference_to(_1))
-		.def("generate_orthonormal_basis",	&Fvector::generate_orthonormal_basis)
 		.def("hud_to_world", &Fvector::hud_to_world_self, return_reference_to(_1))
 		.def("world_to_hud", &Fvector::world_to_hud_self, return_reference_to(_1))
 		.def("hud_to_world_dir", &Fvector::hud_to_world_dir_self, return_reference_to(_1))
@@ -108,6 +111,7 @@ void CScriptFvector::script_register(lua_State* L)
 		.def_readwrite("x", &Fvector2::x)
 		.def_readwrite("y", &Fvector2::y)
 		.def(constructor<>())
+		.def("normalize", (Fvector2 & (Fvector2::*)(void))(&Fvector2::normalize), return_reference_to(_1))
 		.def("set", (Fvector2 & (Fvector2::*)(float, float))(&Fvector2::set), return_reference_to(_1))
 		.def("set", (Fvector2 & (Fvector2::*)(const Fvector2&))(&Fvector2::set), return_reference_to(_1)),
 
