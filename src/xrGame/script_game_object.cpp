@@ -396,92 +396,6 @@ u16 CScriptGameObject::bone_id(LPCSTR bone_name, bool bHud)
 	return bone_id;
 }
 
-Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
-{
-	//if (bone_id == BI_NONE) return Fvector().set(0, 0, 0);
-
-	IKinematics* k = nullptr;
-	Fmatrix* xform = nullptr;
-
-	if (bHud)
-	{
-		CActor* act = smart_cast<CActor*>(&object());
-		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm)
-		{
-			k = itm->HudItemData()->m_model;
-			xform = &itm->HudItemData()->m_item_transform;
-		}
-		else if (act)
-		{
-			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();
-			xform = (bone_id > 20) ? &g_player_hud->m_transform : &g_player_hud->m_transform_2;
-		}
-	} else {
-		k = object().Visual()->dcast_PKinematics();
-		xform = &object().XFORM();
-	}
-
-	if (!k) return Fvector().set(0, 0, 0);
-
-	// demonized: backwards compatibility with scripts, get root bone if bone_id is BI_NONE
-	if (bone_id == BI_NONE) {
-		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
-			Msg("![bone_position] Incorrect bone_id provided for %s (%d), fallback to root bone", object().cNameSect_str(), object().ID());
-			ai().script_engine().print_stack();
-		}
-		bone_id = k->LL_GetBoneRoot();
-	}
-
-	Fmatrix matrix;
-	matrix.mul_43(*xform, k->LL_GetTransform(bone_id));
-	return (matrix.c);
-}
-
-Fvector CScriptGameObject::bone_direction(u16 bone_id, bool bHud)
-{
-	//if (bone_id == BI_NONE) return Fvector().set(0, 0, 0);
-
-	IKinematics* k = nullptr;
-	Fmatrix* xform = nullptr;
-
-	if (bHud)
-	{
-		CActor* act = smart_cast<CActor*>(&object());
-		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm)
-		{
-			k = itm->HudItemData()->m_model;
-			xform = &itm->HudItemData()->m_item_transform;
-		}
-		else if (act)
-		{
-			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();
-			xform = (bone_id > 20) ? &g_player_hud->m_transform : &g_player_hud->m_transform_2;
-		}
-	} else {
-		k = object().Visual()->dcast_PKinematics();
-		xform = &object().XFORM();
-	}
-
-	if (!k) return Fvector().set(0, 0, 0);
-
-	// demonized: backwards compatibility with scripts, get root bone if bone_id is BI_NONE
-	if (bone_id == BI_NONE) {
-		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
-			Msg("![bone_direction] Incorrect bone_id provided for %s (%d), fallback to root bone", object().cNameSect_str(), object().ID());
-			ai().script_engine().print_stack();
-		}
-		bone_id = k->LL_GetBoneRoot();
-	}
-
-	Fmatrix matrix;
-	Fvector res;
-	matrix.mul_43(*xform, k->LL_GetTransform(bone_id));
-	matrix.getHPB(res);
-	return (res);
-}
-
 Fmatrix CScriptGameObject::bone_transform(u16 bone_id, bool bHud)
 {
 	//if (bone_id == BI_NONE) return Fvector().set(0, 0, 0);
@@ -521,6 +435,19 @@ Fmatrix CScriptGameObject::bone_transform(u16 bone_id, bool bHud)
 	Fmatrix matrix;
 	matrix.mul_43(*xform, k->LL_GetTransform(bone_id));
 	return matrix;
+}
+
+Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
+{
+	return bone_transform(bone_id, bHud).c;
+}
+
+Fvector CScriptGameObject::bone_direction(u16 bone_id, bool bHud)
+{
+	Fmatrix matrix = bone_transform(bone_id, bHud);
+	Fvector res;
+	matrix.getHPB(res);
+	return res;
 }
 
 u16 CScriptGameObject::bone_parent(u16 bone_id, bool bHud)
