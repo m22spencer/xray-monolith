@@ -182,6 +182,9 @@ protected:
 	CParticlesObject* m_pExpParticle;
 	virtual void UpdateExplosionParticles();
 
+	template <typename T>
+	IC static bool process_if_exists_set(LPCSTR section, LPCSTR name, T(CInifile::* method)(LPCSTR, LPCSTR) const, T& value, bool test);
+
 	// эффектор
 	struct
 	{
@@ -189,6 +192,8 @@ protected:
 	} effector;
 
 DECLARE_SCRIPT_REGISTER_FUNCTION
+	// Check sounds exist for custom sounds
+	bool SoundExist(LPCSTR section, LPCSTR sound_name);
 };
 
 add_to_type_list(CExplosive)
@@ -203,4 +208,25 @@ IC void random_point_in_object_box(Fvector& out_pos, CObject* obj)
 	out_pos.random_point(l_d);
 	obj->XFORM().transform_tiny(out_pos);
 	out_pos.add(l_c);
+}
+
+template <typename T>
+IC bool CExplosive::process_if_exists_set(LPCSTR section, LPCSTR name, T (CInifile::*method)(LPCSTR, LPCSTR) const,
+                                              T& value, bool test)
+{
+	if (!pSettings->line_exist(section, name))
+	{
+		return false;
+	}
+	LPCSTR str = pSettings->r_string(section, name);
+	if (!str || !xr_strlen(str))
+	{
+		return false;
+	}
+
+	if (!test)
+	{
+		value = (pSettings->*method)(section, name); // set
+	}
+	return true;
 }

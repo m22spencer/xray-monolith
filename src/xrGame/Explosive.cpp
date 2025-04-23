@@ -41,6 +41,8 @@
 const u16 TEST_RAYS_PER_OBJECT = 5;
 const u16 BLASTED_OBJ_PROCESSED_PER_FRAME = 3;
 const float exp_dist_extinction_factor = 3.f;
+extern float g_gunsnd_indoor;
+extern float g_gunsnd_indoor_volume;
 //(>1.f, 1.f -means no dist change of exp effect)	on the dist of m_fBlastRadius exp. wave effect in exp_dist_extinction_factor times less than maximum
 
 CExplosive::CExplosive(void)
@@ -75,6 +77,21 @@ CExplosive::CExplosive(void)
 	m_fExplodeHideDurationMax = 0;
 	m_bDynamicParticles = FALSE;
 	m_pExpParticle = NULL;
+}
+
+bool CExplosive::SoundExist(LPCSTR section, LPCSTR sound_name)
+{
+	LPCSTR str;
+	bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
+	if (sec_exist)
+		return true;
+	else
+	{
+#ifdef DEBUG
+        Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+#endif
+		return false;
+	}
 }
 
 void CExplosive::LightCreate()
@@ -133,6 +150,8 @@ void CExplosive::Load(CInifile const* ini, LPCSTR section)
 	m_fFragmentSpeed = ini->r_float(section, "fragment_speed");
 
 	m_layered_sounds.LoadSound(ini, section, "snd_explode", "sndExplode", false, m_eSoundExplode);
+	if (SoundExist(section, "snd_explode_indoor"))
+		m_layered_sounds.LoadSound(section, "snd_explode_indoor", "sndExplodeIndoor", false, m_eSoundExplode);
 
 	m_fExplodeDurationMax = ini->r_float(section, "explode_duration");
 	if( ini->line_exist(section,"explode_effector_sect_name") )
@@ -367,7 +386,14 @@ void CExplosive::Explode()
 	OnBeforeExplosion();
 	//играем звук взрыва
 
-	m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+	// Indoor explodesion sounds
+	if (g_gunsnd_indoor>0.f) {
+		if (m_layered_sounds.FindSoundItem("sndExplodeIndoor", false)) {
+			m_layered_sounds.PlaySound("sndExplodeIndoor", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+		}
+	} else {
+		m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+	}
 
 	//показываем эффекты
 
