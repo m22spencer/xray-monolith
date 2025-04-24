@@ -97,6 +97,7 @@
     namespace game {
         Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
         function ui2world(Fvector2 pos) -> Fvector result, u16 object_id
+        function ui2world_offscreen(Fvector2 pos) -> Fvector result, u16 object_id
         change_game_news_show_time(CUIWindow* UIWindow, float show_time)
         update_pda_news_from_uiwindow(CUIWindow* UIWindow)
     }
@@ -224,15 +225,28 @@
     }
 
     class Fvector {
+        static functions:
+            vector.generate_orthonormal_basis(Fvector dir, Fvector up, Fvector right)
+            vector.generate_orthonormal_basis_normalized(Fvector dir, Fvector up, Fvector right)
+
         function add(float x, float y, float z)
         function sub(float x, float y, float z)
         function mul(float x, float y, float z)
         function div(float x, float y, float z)
         function distance_to_xz_sqr(Fvector)
-        function hud_to_world()
-        function world_to_hud()
+        function project(Fvector u, Fvector v)
+        function project(Fvector v)
+
+        // tiny - use transform_tiny in engine instead of transform, use if transform gives wrong position
+        function hud_to_world(bool tiny = false)
+        function world_to_hud(bool tiny = false)
+
         function hud_to_world_dir()
         function world_to_hud_dir()
+    }
+
+    class Fvector2 {
+        function normalize()
     }
 
     class Fmatrix {
@@ -281,8 +295,16 @@
         function setXYZi(float x, float y, float z)
         function setXYZi(Fvector)
         Fvector getHPB()
-        function hud_to_world()
-        function world_to_hud()
+        function transform(Fvector, Fvector)
+        function transform(Fvector)
+        function transform_tiny(Fvector, Fvector)
+        function transform_tiny(Fvector)
+        function transform_dir(Fvector, Fvector)
+        function transform_dir(Fvector)
+
+        // tiny - use transform_tiny in engine instead of transform, use if transform gives wrong position
+        function hud_to_world(bool tiny = false)
+        function world_to_hud(bool tiny = false)
     }
 
     class particle_object {
