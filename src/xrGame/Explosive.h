@@ -182,6 +182,9 @@ protected:
 	CParticlesObject* m_pExpParticle;
 	virtual void UpdateExplosionParticles();
 
+	// Check sounds exist for custom sounds
+	bool SoundExist(LPCSTR section, LPCSTR sound_name);
+
 	template <typename T>
 	IC static bool process_if_exists_set(LPCSTR section, LPCSTR name, T(CInifile::* method)(LPCSTR, LPCSTR) const, T& value, bool test);
 
@@ -192,8 +195,7 @@ protected:
 	} effector;
 
 DECLARE_SCRIPT_REGISTER_FUNCTION
-	// Check sounds exist for custom sounds
-	bool SoundExist(LPCSTR section, LPCSTR sound_name);
+
 };
 
 add_to_type_list(CExplosive)
