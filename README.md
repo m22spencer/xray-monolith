@@ -186,6 +186,29 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.25**
+* `game.ui2world_offscreen(pos)` function for unprojecting from ui coordinates outside of screen
+* Additional vector exports:
+  * static functions:
+    * `vector.generate_orthonormal_basis(Fvector dir, Fvector up, Fvector right)`
+    * `vector.generate_orthonormal_basis_normalized(Fvector dir, Fvector up, Fvector right)`
+  * `function project(Fvector u, Fvector v)`
+  * `function project(Fvector v)`
+* Additional matrix exports:
+  * `function transform(Fvector, Fvector)`
+  * `function transform(Fvector)`
+  * `function transform_tiny(Fvector, Fvector)`
+  * `function transform_tiny(Fvector)`
+  * `function transform_dir(Fvector, Fvector)`
+  * `function transform_dir(Fvector)`
+  * `function hud_to_world()`
+  * `function world_to_hud()`
+* Kutez: Update v0.3 Indoor Gunsound Framework (https://github.com/themrdemonized/xray-monolith/pull/176)
+* ProfLander:
+  * HUD <-> World Transforms (https://github.com/themrdemonized/xray-monolith/pull/179)
+  * Fix weapon particle projection in third-person (https://github.com/themrdemonized/xray-monolith/pull/180)
+  * Reduce code duplication in bone_position / bone_direction (https://github.com/themrdemonized/xray-monolith/pull/182)
+
 **2025.04.22**
 * `on_before_play_hud_sound` callback, possibility to override hud sound with another one
 * `obj:bone_transform` functions to get transform matrix of a bone
