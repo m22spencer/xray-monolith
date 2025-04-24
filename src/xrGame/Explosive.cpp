@@ -390,6 +390,8 @@ void CExplosive::Explode()
 	if (g_gunsnd_indoor>0.f) {
 		if (m_layered_sounds.FindSoundItem("sndExplodeIndoor", false)) {
 			m_layered_sounds.PlaySound("sndExplodeIndoor", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+		} else {
+			m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
 		}
 	} else {
 		m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
