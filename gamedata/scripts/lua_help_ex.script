@@ -359,6 +359,11 @@
         string bone_name(u16 id)
         string bone_name(u16 id, bool bHud)
 
+        Fmatrix bone_transform(u16 id)
+        Fmatrix bone_transform(u16 id, bool bHud)
+        Fmatrix bone_transform(string)
+        Fmatrix bone_transform(string, bool bHud)
+
         Fvector bone_position(u16 id)
         Fvector bone_position(u16 id, bool bHud)
         Fvector bone_position(string)
@@ -368,11 +373,6 @@
         Fvector bone_direction(u16 id, bool bHud)
         Fvector bone_direction(string)
         Fvector bone_direction(string, bool bHud)
-
-        Fmatrix bone_transform(u16 id)
-        Fmatrix bone_transform(u16 id, bool bHud)
-        Fmatrix bone_transform(string)
-        Fmatrix bone_transform(string, bool bHud)
 
         u16 bone_parent(u16 id)
         u16 bone_parent(u16 id, bool bHud)
