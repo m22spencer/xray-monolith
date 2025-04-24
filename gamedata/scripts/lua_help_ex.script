@@ -281,6 +281,8 @@
         function setXYZi(float x, float y, float z)
         function setXYZi(Fvector)
         Fvector getHPB()
+        function hud_to_world()
+        function world_to_hud()
     }
 
     class particle_object {
@@ -529,7 +531,7 @@
         function GetZoomRotateTime()
         function SetZoomRotateTime(float)
     }
-
+	
     enum rq_target { (sum them up to target multiple types)
         rqtNone     = 0,
         rqtObject   = 1,

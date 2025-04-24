@@ -916,11 +916,16 @@ public:
 		xyz.mul(-1.f);
 	}
 
-	IC static void hud_to_world(Self& xform)
+	IC SelfRef hud_to_world()
 	{
-		Fvector::hud_to_world(xform.c);
-		Fvector::hud_to_world_dir(xform.k);
-		Fvector::generate_orthonormal_basis_normalized(xform.k, xform.j, xform.i);
+		Device.hud_to_world(*this);
+		return *this;
+	}
+
+	IC SelfRef world_to_hud()
+	{
+		Device.world_to_hud(*this);
+		return *this;
 	}
 };
 

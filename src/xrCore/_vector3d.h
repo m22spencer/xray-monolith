@@ -706,67 +706,27 @@ public:
 		}
 	}
 
-	// demonized: Adjust pos.z for Device.ViewportNear, add world_to_hud
-	IC static void hud_to_world(Self& pos)
+	IC SelfRef hud_to_world()
 	{
-		Device.mView.transform_tiny(pos);
-		Device.mProjectHud.transform_tiny(pos);
-		pos.z -= Device.ViewportNear;
-
-		Device.mInvProject.transform_tiny(pos);
-		Device.mInvView.transform_tiny(pos);
-	}
-
-	IC static void world_to_hud(Self& pos)
-	{
-		Device.mInvView.transform_tiny(pos);
-		Device.mInvProject.transform_tiny(pos);
-
-		pos.z += Device.ViewportNear;
-		Device.mProjectHud.transform_tiny(pos);
-		Device.mView.transform_tiny(pos);
-	}
-
-	IC static void hud_to_world_dir(Self& dir)
-	{
-		Device.mView.transform_dir(dir);
-		Device.mProjectHud.transform_dir(dir);
-
-		Device.mInvProject.transform_dir(dir);
-		Device.mInvView.transform_dir(dir);
-	}
-
-	IC static void world_to_hud_dir(Self& dir)
-	{
-		Device.mInvView.transform_dir(dir);
-		Device.mInvProject.transform_dir(dir);
-
-		Device.mProjectHud.transform_dir(dir);
-		Device.mView.transform_dir(dir);
-	}
-
-	// Self functions for Lua
-	IC SelfRef hud_to_world_self()
-	{
-		hud_to_world(*this);
+		Device.hud_to_world(*this);
 		return *this;
 	}
 
-	IC SelfRef world_to_hud_self()
+	IC SelfRef world_to_hud()
 	{
-		world_to_hud(*this);
+		Device.world_to_hud(*this);
 		return *this;
 	}
 
-	IC SelfRef hud_to_world_dir_self()
+	IC SelfRef hud_to_world_dir()
 	{
-		hud_to_world_dir(*this);
+		Device.hud_to_world_dir(*this);
 		return *this;
 	}
 
-	IC SelfRef world_to_hud_dir_self()
+	IC SelfRef world_to_hud_dir()
 	{
-		world_to_hud_dir(*this);
+		Device.world_to_hud_dir(*this);
 		return *this;
 	}
 };
