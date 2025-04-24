@@ -916,15 +916,15 @@ public:
 		xyz.mul(-1.f);
 	}
 
-	IC SelfRef hud_to_world()
+	IC SelfRef hud_to_world(bool tiny = false)
 	{
-		Device.hud_to_world(*this);
+		Device.hud_to_world(*this, tiny);
 		return *this;
 	}
 
-	IC SelfRef world_to_hud()
+	IC SelfRef world_to_hud(bool tiny = false)
 	{
-		Device.world_to_hud(*this);
+		Device.world_to_hud(*this, tiny);
 		return *this;
 	}
 };
