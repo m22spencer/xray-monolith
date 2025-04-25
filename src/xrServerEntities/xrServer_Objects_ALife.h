@@ -670,9 +670,11 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeStationaryMgun, CSE_ALifeDynamicObjectVisua
 	virtual ~CSE_ALifeStationaryMgun();
 
 #ifdef STATIONARYMGUN_NEW
+	u16 get_ammo_magsize();
 	u16 get_ammo_elapsed();
 	void set_ammo_elapsed(u16 count);
-	u16 get_ammo_magsize();
+	u8 get_ammo_type();
+	void set_ammo_type(u8 type);
 
 	virtual bool used_ai_locations() const;
 	virtual void load(NET_Packet& tNetPacket);

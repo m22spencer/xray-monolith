@@ -2271,6 +2271,11 @@ bool CSE_ALifeStationaryMgun::used_ai_locations() const
 	return false;
 }
 
+u16 CSE_ALifeStationaryMgun::get_ammo_magsize()
+{
+	return READ_IF_EXISTS(pSettings, r_u16, s_name.c_str(), "ammo_mag_size", 0);
+}
+
 u16 CSE_ALifeStationaryMgun::get_ammo_elapsed()
 {
 	return ((u16)a_elapsed);
@@ -2281,9 +2286,14 @@ void CSE_ALifeStationaryMgun::set_ammo_elapsed(u16 count)
 	a_elapsed = count;
 }
 
-u16 CSE_ALifeStationaryMgun::get_ammo_magsize()
+u8 CSE_ALifeStationaryMgun::get_ammo_type()
 {
-	return READ_IF_EXISTS(pSettings, r_u16, s_name.c_str(), "ammo_mag_size", 0);
+	return ((u8)ammo_type);
+}
+
+void CSE_ALifeStationaryMgun::set_ammo_type(u8 type)
+{
+	ammo_type = type;
 }
 
 CSE_ALifeStationaryMgun::SBarrel::SBarrel()

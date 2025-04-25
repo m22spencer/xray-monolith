@@ -5,6 +5,8 @@
 #include "WeaponAmmo.h"
 #include "script_game_object.h"
 #include "string_table.h"
+#include "PHSkeleton.h"
+#include "../xrphysics/PHUpdateObject.h"
 #endif
 
 #include "holder_custom.h"
@@ -22,12 +24,11 @@ class CInventoryOwner;
 class CInventory;
 class CWeaponStatMgun;
 
-struct SStmAnimation
-{
-	LPCSTR m_anim_body;
-	LPCSTR m_anim_legs;
-	SStmAnimation();
-};
+/*
+If you want CWeaponStatMgun to be an item too - putting in inventory, cost, weight, icon, condition, etc,
+replace CPhysicsShellHolder with CInventoryItem or CInventoryItemObject and fix all the problems coming along.
+Check [jup_b32_scanner_device]
+*/
 
 struct SStmBarrel
 {
@@ -230,6 +231,7 @@ private:
 	u16 m_drop_bone;
 	u16 m_actor_bone;
 	Fvector m_exit_position;
+	Fvector m_actor_offsets;
 
 	u16 m_camera_bone_def;
 	u16 m_camera_bone_aim;
@@ -238,7 +240,20 @@ private:
 	Fvector m_camera_position;
 	bool m_zoom_status;
 
-	SStmAnimation m_animation;
+	struct SStmAnimActor
+	{
+		enum
+		{
+			eAnimBody = 0,
+			eAnimLegs,
+			eAnimSize,
+		};
+		shared_str m_idle[eAnimSize];
+		SStmAnimActor();
+		IC LPCSTR GetAnimation(u8 id);
+		IC void SetAnimation(u8 id, LPCSTR anim);
+	};
+	SStmAnimActor m_animation;
 
 	float fireDispersionOwnerScale;
 	LPCSTR m_on_before_use_callback;
@@ -249,6 +264,7 @@ private:
 	virtual CPhysicsShellHolder *PPhysicsShellHolder() { return static_cast<CPhysicsShellHolder *>(this); }
 	static void IgnoreOwnerCallback(bool &do_colide, bool bo1, dContact &c, SGameMtl *mt1, SGameMtl *mt2);
 	void OnCameraChange(u16 type);
+	void UpdateCamera();
 
 	xr_vector<SStmBarrel> m_barrels;
 	bool BarrelAllowFire(SStmBarrel &B);
@@ -259,6 +275,23 @@ protected:
 	virtual void SpawnInitPhysics(CSE_Abstract *D);
 	virtual void net_Save(NET_Packet &P);
 	virtual BOOL net_SaveRelevant();
+
+	/*----------------------------------------------------------------------------------------------------
+		Weapon animations
+	----------------------------------------------------------------------------------------------------*/
+	enum EStmAnimWeapon
+	{
+		eStmAnimWeapon_idle = 0,
+		eStmAnimWeapon_shot,
+		eStmAnimWeapon_reload0,
+		eStmAnimWeapon_reload1,
+		eStmAnimWeapon_chamber,
+		eStmAnimWeapon_size
+	};
+	MotionID m_anim_weapon[eStmAnimWeapon_size];
+	MotionID m_anim_weapon_current;
+	void PlayAnimWeapon(u16 anim);
+	static void AnimWeaponCallback(CBlend *B);
 
 public:
 	enum
@@ -272,6 +305,7 @@ public:
 		eWpnUnload,
 	};
 	virtual void SetParam(int id, Fvector val);
+	IC BOOL IsWorking() { return CShootingObject::IsWorking(); }
 	virtual void UpdateEx(float fov);
 	virtual void shedule_Update(u32 dt);
 
@@ -284,17 +318,45 @@ public:
 	Fvector GetFirePos() { return m_fire_pos; }
 	Fvector GetFireDir() { return m_fire_dir; }
 	float FireDispersionBase() { return fireDispersionBase; }
-	bool IsCameraZoom() { return m_zoom_status; }
+	bool IsCameraZoom();
 	void SetFeelVisionIgnore(bool enable);
 	void UpdateAnimation();
 	Fvector2 GetTraverseLimitHorz();
 	void SetTraverseLimitHorz(Fvector2 vec);
 	Fvector2 GetTraverseLimitVert();
 	void SetTraverseLimitVert(Fvector2 vec);
+	Fvector GetActorOffsets() { return m_actor_offsets; }
+	void SetActorOffsets(Fvector vec) { m_actor_offsets.set(vec); }
+	LPCSTR GetAnimation(int id) { return m_animation.GetAnimation(id); }
+	void SetAnimation(int id, LPCSTR anim) { m_animation.SetAnimation(id, anim); }
 
 	/* Barrels APIs */
 	SStmBarrel *Barrel(LPCSTR name);
 	float BarrelRPM(LPCSTR name);
+
+	/*----------------------------------------------------------------------------------------------------
+		Sounds
+	----------------------------------------------------------------------------------------------------*/
+	struct SStmSound
+	{
+		CWeaponStatMgun *m_stm;
+		float m_volume;
+
+		ref_sound m_rotate_snd;
+		u16 m_rotate_bid;
+		bool m_rotating_x;
+		bool m_rotating_y;
+
+		void Init(CWeaponStatMgun *stm);
+		BOOL net_Spawn(CSE_Abstract *DC);
+		void Update();
+		void RotatePlay(bool state);
+		void RotateVolume(float vol);
+
+		SStmSound();
+		~SStmSound();
+	} m_sound_mgr;
+	void UpdateSound();
 
 	/*----------------------------------------------------------------------------------------------------
 		Ammo
@@ -308,6 +370,10 @@ private:
 	u16 m_state_index;
 	float m_state_delay;
 
+	xr_vector<u16> m_bullet_bones;
+	u16 m_bullet_count;
+	void UpdateBulletVisibility(u16 num);
+
 public:
 	enum eState
 	{
@@ -320,6 +386,7 @@ public:
 protected:
 	virtual void OnShot(SStmBarrel &B);
 	IC u16 GetState() const { return m_state_index; }
+	IC float GetStateDelay() const { return m_state_delay; }
 	virtual void SwitchState(u16 new_tate);
 	virtual void switch2_Idle();
 	virtual void switch2_Fire();
@@ -331,8 +398,21 @@ protected:
 	virtual void UpdateUnload();
 
 public:
-	xr_vector<shared_str> m_ammoTypes;
+	struct SStmNextAmmoTypeOnReload
+	{
+		enum
+		{
+			undefined = u8(-1),
+		};
+		u8 m_ammo_type;
+		u8 get() { return m_ammo_type; }
+		void set(u8 ammo_type) { m_ammo_type = ammo_type; }
+		void reset() { m_ammo_type = undefined; }
+		bool valid() { return m_ammo_type != undefined; }
+	} m_next_ammoType_on_reload;
+
 	u8 m_ammoType;
+	xr_vector<shared_str> m_ammoTypes;
 
 	xr_vector<CCartridge> m_magazine;
 	CCartridge m_DefaultCartridge;
@@ -345,6 +425,7 @@ public:
 	virtual void ReloadMagazine();
 	virtual void UnloadMagazine(bool spawn_ammo = true);
 	virtual bool GetBriefInfo(II_BriefInfo &info);
+	virtual void SetNextAmmoTypeOnReload(u8 ammo_type = SStmNextAmmoTypeOnReload::undefined);
 
 protected:
 	int m_iShotNum;
@@ -352,17 +433,12 @@ protected:
 	bool m_bLockType;
 	float m_reload_delay;
 	float m_unload_delay;
-	BOOL m_bAutoSpawnAmmo;
 	bool m_single_shot_wpn;
 
 	int GetAmmoCount(u8 ammo_type);
 	int GetAmmoCount_allType();
 	virtual u16 AddCartridge(u16 cnt);
 	void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL, u32 ParentID = 0xffffffff);
-
-	float GetBaseDispersion(float cartridge_k);
-	float GetFireDispersion(bool with_cartridge, bool for_crosshair = false);
-	virtual float GetFireDispersion(float cartridge_k, bool for_crosshair = false);
 
 public:
 	IC int GetAmmoMagSize() const
@@ -386,12 +462,15 @@ public:
 	}
 	void SetAmmoType(u8 type);
 
-	BOOL AutoSpawnAmmo() const
-	{
-		return m_bAutoSpawnAmmo;
-	};
-
 	int GetAmmoCount_forType(shared_str const &ammo_type);
+
+	float GetBaseDispersion(float cartridge_k);
+	float GetFireDispersion(bool with_cartridge, bool for_crosshair = false);
+	virtual float GetFireDispersion(float cartridge_k, bool for_crosshair = false);
+	float GetFireDispersionScript(bool wc = true, bool fc = false);
+
+	float GetReloadDelay() { return m_reload_delay; }
+	float GetUnloadDelay() { return m_unload_delay; }
 
 public:
 DECLARE_SCRIPT_REGISTER_FUNCTION

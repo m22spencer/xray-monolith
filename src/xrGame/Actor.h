@@ -18,6 +18,10 @@
 #include "step_manager.h"
 #include "script_export_space.h"
 
+#ifdef STATIONARYMGUN_NEW
+#include "WeaponStatMgun.h"
+#endif
+
 using namespace ACTOR_DEFS;
 
 class CInfoPortion;
@@ -505,6 +509,10 @@ public:
 	virtual float MaxCarryWeight() const;
 	float MaxWalkWeight() const;
 	float get_additional_weight() const;
+	
+#ifdef STATIONARYMGUN_NEW
+	virtual float GetWeaponAccuracyStm();
+#endif
 
 protected:
 	CFireDispertionController m_fdisp_controller;

@@ -205,7 +205,10 @@ void CWeaponStatMgun::OnShot()
 		m_magazine.pop_back();
 		--iAmmoElapsed;
 		VERIFY((u32)iAmmoElapsed == m_magazine.size());
+		UpdateBulletVisibility(iAmmoElapsed);
 	}
+
+	PlayAnimWeapon(eStmAnimWeapon_shot);
 #else
 	VERIFY(Owner());
 
@@ -231,18 +234,15 @@ void CWeaponStatMgun::OnShot()
 #endif
 
 #ifdef STATIONARYMGUN_NEW
-	m_sounds.PlaySound("sndShoot", m_fire_pos, owner, IsCameraZoom());
+	m_sounds.PlaySound("sndShoot", m_fire_pos, owner, false);
 #else
 	bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
 
 	m_sounds.PlaySound("sndShot", m_fire_pos, Owner(), b_hud_mode);
 #endif
 
-#ifdef STATIONARYMGUN_NEW
-	/* Can't make a suitable effector. Should be one that only changes roll. Don't change yaw and pitch. */
-#else
 	AddShotEffector();
-#endif
+
 	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase),
 	             ::Random.randF(-fireDispersionBase, fireDispersionBase));
 }
@@ -260,6 +260,7 @@ void CWeaponStatMgun::OnShot(SStmBarrel &B)
 		m_magazine.pop_back();
 		--iAmmoElapsed;
 		VERIFY((u32)iAmmoElapsed == m_magazine.size());
+		UpdateBulletVisibility(iAmmoElapsed);
 		B.SetAmmoElapsed(B.iAmmoElapsed - 1);
 		BarrelAmmoElapsedCorrecting();
 	}
@@ -275,7 +276,7 @@ void CWeaponStatMgun::OnShot(SStmBarrel &B)
 		B.OnShellDrop(Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(B.m_drop_bid)).c, zero_vel);
 	}
 
-	m_sounds.PlaySound("sndShoot", B.m_fire_pos, owner, IsCameraZoom());
+	m_sounds.PlaySound("sndShoot", B.m_fire_pos, owner, false);
 
 	// AddShotEffector();
 	m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase), ::Random.randF(-fireDispersionBase, fireDispersionBase));
@@ -335,6 +336,33 @@ void CWeaponStatMgun::AddShotEffector()
 {
 	if (OwnerActor())
 	{
+#if 0
+		CameraRecoil camera_recoil;
+		camera_recoil.MaxAngleVert = camMaxAngle;
+		camera_recoil.RelaxSpeed = camRelaxSpeed;
+		camera_recoil.MaxAngleHorz = deg2rad(20.0f);
+		camera_recoil.StepAngleHorz = deg2rad(1.15f);
+		camera_recoil.DispersionFrac = 0.0f;
+		CCameraShotEffector *E = smart_cast<CCameraShotEffector *>(Cameras().GetCamEffector(eCEShot));
+		if (E == nullptr)
+		{
+			E = (CCameraShotEffector *)OwnerActor()->Cameras().AddCamEffector(xr_new<CCameraShotEffector>(camera_recoil));
+		}
+		else
+		{
+			if (E->m_WeaponID != weapon->ID())
+			{
+				E->Initialize(camera_recoil);
+			}
+			else
+			{
+				E->UpdateCameraRecoil(camera_recoil);
+			}
+		}
+		R_ASSERT(E);
+		E->Initialize(camera_recoil);
+		E->Shot2(0.01f);
+#else
 		CCameraShotEffector* S = smart_cast<CCameraShotEffector*>(OwnerActor()->Cameras().GetCamEffector(eCEShot));
 		CameraRecoil camera_recoil;
 		//( camMaxAngle,camRelaxSpeed, 0.25f, 0.01f, 0.7f )
@@ -349,6 +377,7 @@ void CWeaponStatMgun::AddShotEffector()
 		R_ASSERT(S);
 		S->Initialize(camera_recoil);
 		S->Shot2(0.01f);
+#endif
 	}
 }
 
@@ -376,11 +405,20 @@ float CWeaponStatMgun::GetFireDispersion(bool with_cartridge, bool for_crosshair
 float CWeaponStatMgun::GetFireDispersion(float cartridge_k, bool for_crosshair)
 {
 	float fire_disp = GetBaseDispersion(cartridge_k);
-	if (Owner())
+	if (OwnerActor())
 	{
-		fire_disp += (Owner()->cast_inventory_owner()->GetWeaponAccuracy() * fireDispersionOwnerScale);
+		fire_disp += (OwnerActor()->GetWeaponAccuracyStm() * fireDispersionOwnerScale);
+	}
+	else if (Owner())
+	{
+		fire_disp += (Owner()->cast_stalker()->GetWeaponAccuracy() * fireDispersionOwnerScale);
 	}
 	return fire_disp;
+}
+
+float CWeaponStatMgun::GetFireDispersionScript(bool wc, bool fc)
+{
+	return GetFireDispersion(wc, fc);
 }
 
 void CWeaponStatMgun::SwitchState(u16 state)
@@ -410,6 +448,7 @@ void CWeaponStatMgun::switch2_Idle()
 	FireEnd();
 	m_sounds.StopSound("sndReload");
 	m_sounds.StopSound("sndUnload");
+	m_next_ammoType_on_reload.reset();
 }
 
 void CWeaponStatMgun::switch2_Fire()
@@ -431,14 +470,25 @@ void CWeaponStatMgun::switch2_Fire()
 	FireStart();
 	m_sounds.StopSound("sndReload");
 	m_sounds.StopSound("sndUnload");
+	m_next_ammoType_on_reload.reset();
 }
 
 void CWeaponStatMgun::switch2_Reload()
 {
-	if (iAmmoElapsed == iMagazineSize)
+	if (iAmmoElapsed == iMagazineSize && !m_next_ammoType_on_reload.valid())
 		return;
+
 	if (IsReloadConsume() && (GetAmmoCount_allType() == 0))
+	{
+		m_next_ammoType_on_reload.reset();
 		return;
+	}
+
+	if (m_next_ammoType_on_reload.valid() && (GetAmmoCount_forType(m_ammoTypes[m_next_ammoType_on_reload.get()]) == 0))
+	{
+		m_next_ammoType_on_reload.reset();
+		return;
+	}
 
 	FireEnd();
 	m_state_index = eStateReload;
@@ -447,6 +497,16 @@ void CWeaponStatMgun::switch2_Reload()
 	{
 		Fmatrix xfm = Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_x_bone));
 		m_sounds.PlaySound("sndReload", Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_x_bone)).c, Owner(), false);
+	}
+
+	if (iAmmoElapsed == 0)
+	{
+		PlayAnimWeapon(eStmAnimWeapon_reload0);
+	}
+	else
+	{
+
+		PlayAnimWeapon(eStmAnimWeapon_reload1);
 	}
 }
 
@@ -493,10 +553,13 @@ void CWeaponStatMgun::UpdateReload()
 	m_state_delay = m_state_delay - Device.fTimeDelta;
 	if (m_state_delay < 0)
 	{
-		m_state_index = eStateIdle;
-		m_state_delay = 0;
+		if (m_next_ammoType_on_reload.valid())
+		{
+			m_ammoType = m_next_ammoType_on_reload.get();
+			m_next_ammoType_on_reload.reset();
+		}
 		ReloadMagazine();
-		m_sounds.StopSound("sndReload");
+		switch2_Idle();
 	}
 }
 
@@ -508,10 +571,8 @@ void CWeaponStatMgun::UpdateUnload()
 	m_state_delay = m_state_delay - Device.fTimeDelta;
 	if (m_state_delay < 0)
 	{
-		m_state_index = eStateIdle;
-		m_state_delay = 0;
 		UnloadMagazine(!IsUnlimitedAmmo());
-		m_sounds.StopSound("sndUnload");
+		switch2_Idle();
 	}
 }
 
@@ -537,6 +598,27 @@ bool CWeaponStatMgun::IsReloadConsume()
 		}
 	}
 	return false;
+}
+
+void CWeaponStatMgun::UpdateBulletVisibility(u16 num)
+{
+	if (m_bullet_bones.size() == 0)
+		return;
+	m_bullet_count = num;
+	IKinematics *K = Visual()->dcast_PKinematics();
+	for (int k = 0, n = m_bullet_bones.size(); k < n; ++k)
+	{
+		u16 bid = m_bullet_bones.at(k);
+		BOOL visibility = FALSE;
+		if (k < m_bullet_count)
+		{
+			visibility = TRUE;
+		}
+		if (K->LL_GetBoneVisible(bid) != visibility)
+		{
+			K->LL_SetBoneVisible(bid, visibility, FALSE);
+		}
+	}
 }
 
 CInventory *CWeaponStatMgun::GetInventory()
@@ -566,6 +648,7 @@ void CWeaponStatMgun::SetAmmoElapsed(int ammo_count)
 		}
 	}
 
+	UpdateBulletVisibility(iAmmoElapsed);
 	BarrelAmmoElapsedCorrecting();
 }
 
@@ -576,6 +659,7 @@ void CWeaponStatMgun::SetAmmoType(u8 type)
 	m_bLockType = true;
 	ReloadMagazine();
 	m_bLockType = false;
+	m_next_ammoType_on_reload.reset();
 }
 
 void CWeaponStatMgun::ReloadMagazine()
@@ -591,18 +675,23 @@ void CWeaponStatMgun::ReloadMagazine()
 	{
 		if (m_ammoTypes.size() <= m_ammoType)
 		{
+			/* Invalid ammo type. */
+			UpdateBulletVisibility(iAmmoElapsed);
 			BarrelAmmoElapsedCorrecting();
 			return;
 		}
 		LPCSTR tmp_sect_name = m_ammoTypes[m_ammoType].c_str();
 		if (!tmp_sect_name)
 		{
+			/* Invalid ammo type. */
+			UpdateBulletVisibility(iAmmoElapsed);
 			BarrelAmmoElapsedCorrecting();
 			return;
 		}
 		m_pCurrentAmmo = smart_cast<CWeaponAmmo *>(GetInventory()->GetAny(tmp_sect_name));
 		if (!m_pCurrentAmmo && !m_bLockType && iAmmoElapsed == 0)
 		{
+			/* Try to switch to another ammo type if current ammo is out. */
 			for (u8 i = 0; i < u8(m_ammoTypes.size()); ++i)
 			{
 				m_pCurrentAmmo = smart_cast<CWeaponAmmo *>(GetInventory()->GetAny(m_ammoTypes[i].c_str()));
@@ -617,6 +706,8 @@ void CWeaponStatMgun::ReloadMagazine()
 
 	if (!m_pCurrentAmmo && is_consume_ammo)
 	{
+		/* Completely out of ammo of all types. */
+		UpdateBulletVisibility(iAmmoElapsed);
 		BarrelAmmoElapsedCorrecting();
 		return;
 	}
@@ -659,6 +750,7 @@ void CWeaponStatMgun::ReloadMagazine()
 	}
 	VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
+	UpdateBulletVisibility(iAmmoElapsed);
 	BarrelAmmoElapsedCorrecting();
 }
 
@@ -704,6 +796,7 @@ void CWeaponStatMgun::UnloadMagazine(bool spawn_ammo)
 		}
 	}
 
+	UpdateBulletVisibility(iAmmoElapsed);
 	BarrelAmmoElapsedCorrecting();
 }
 
@@ -873,5 +966,15 @@ bool CWeaponStatMgun::GetBriefInfo(II_BriefInfo &info)
 		info.icon = ammo_type;
 	}
 	return true;
+}
+
+void CWeaponStatMgun::SetNextAmmoTypeOnReload(u8 ammo_type)
+{
+	if (ammo_type == SStmNextAmmoTypeOnReload::undefined)
+	{
+		m_next_ammoType_on_reload.reset();
+		return;
+	}
+	m_next_ammoType_on_reload.set(ammo_type % m_ammoTypes.size());
 }
 #endif

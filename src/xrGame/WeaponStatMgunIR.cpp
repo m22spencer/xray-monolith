@@ -135,6 +135,19 @@ void CWeaponStatMgun::script_register(lua_State* L)
 		]
 		.def("Action", &CWeaponStatMgun::Action)
 		.def("SetParam", (void (CWeaponStatMgun::*)(int, Fvector))&CWeaponStatMgun::SetParam)
+		.def("IsWorking", &CWeaponStatMgun::IsWorking)
+
+		.enum_("stm_state")
+		[
+			value("eStateIdle", int(CWeaponStatMgun::eStateIdle)),
+			value("eStateFire", int(CWeaponStatMgun::eStateFire)),
+			value("eStateReload", int(CWeaponStatMgun::eStateReload)),
+			value("eStateUnload", int(CWeaponStatMgun::eStateUnload))
+		]
+		.def("GetState", &CWeaponStatMgun::GetState)
+		.def("GetStateDelay", &CWeaponStatMgun::GetStateDelay)
+		.def("GetReloadDelay", &CWeaponStatMgun::GetReloadDelay)
+		.def("GetUnloadDelay", &CWeaponStatMgun::GetUnloadDelay)
 
 		.def("GetOwner", &CWeaponStatMgun::GetOwner)
 		.def("GetFirePos", &CWeaponStatMgun::GetFirePos)
@@ -144,6 +157,26 @@ void CWeaponStatMgun::script_register(lua_State* L)
 		.def("SetTraverseLimitHorz", &CWeaponStatMgun::SetTraverseLimitHorz)
 		.def("GetTraverseLimitVert", &CWeaponStatMgun::GetTraverseLimitVert)
 		.def("SetTraverseLimitVert", &CWeaponStatMgun::SetTraverseLimitVert)
+		.def("GetActorOffsets", &CWeaponStatMgun::GetActorOffsets)
+		.def("SetActorOffsets", &CWeaponStatMgun::SetActorOffsets)
+
+		.def("GetBaseDispersion", &CWeaponStatMgun::GetBaseDispersion)
+		.def("GetFireDispersion", &CWeaponStatMgun::GetFireDispersionScript)
+
+		.enum_("stm_animation")
+		[
+			value("eAnimBody", int(CWeaponStatMgun::SStmAnimActor::eAnimBody)),
+			value("eAnimLegs", int(CWeaponStatMgun::SStmAnimActor::eAnimLegs))
+		]
+		.def("GetAnimation", &CWeaponStatMgun::GetAnimation)
+		.def("SetAnimation", &CWeaponStatMgun::SetAnimation)
+
+		.def("GetAmmoMagSize", &CWeaponStatMgun::GetAmmoMagSize)
+		.def("GetAmmoElapsed", &CWeaponStatMgun::GetAmmoElapsed)
+		.def("SetAmmoElapsed", &CWeaponStatMgun::SetAmmoElapsed)
+		.def("GetAmmoType", &CWeaponStatMgun::GetAmmoType)
+		.def("SetAmmoType", &CWeaponStatMgun::SetAmmoType)
+		.def("SetNextAmmoTypeOnReload", &CWeaponStatMgun::SetNextAmmoTypeOnReload)
 		.def(constructor<>())
 	];
 }
