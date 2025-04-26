@@ -637,6 +637,19 @@ public:
 		return mad(dir, norm, -dir.dotproduct(norm));
 	}
 
+	// demonized: Calculate the projection of the vector onto the vector
+	IC SelfRef project(const Self& v, const Self& other)
+	{
+		auto dot = v.dotproduct(other);
+		auto other_len_sq = other.square_magnitude();
+		return set(other).mul(dot / other_len_sq);
+	}
+
+	IC SelfRef project(const Self& other)
+	{
+		return project(*this, other);
+	}
+
 	IC static void generate_orthonormal_basis(const _vector3<T>& dir, _vector3<T>& up, _vector3<T>& right)
 	{
 		T fInvLength;
@@ -693,22 +706,28 @@ public:
 		}
 	}
 
-	IC static void hud_to_world(Self& pos)
+	IC SelfRef hud_to_world()
 	{
-		Device.mView.transform_tiny(pos);
-		Device.mProjectHud.transform_tiny(pos);
-
-		Device.mInvProject.transform_tiny(pos);
-		Device.mInvView.transform_tiny(pos);
+		Device.hud_to_world(*this);
+		return *this;
 	}
 
-	IC static void hud_to_world_dir(Self& dir)
+	IC SelfRef world_to_hud()
 	{
-		Device.mView.transform_dir(dir);
-		Device.mProjectHud.transform_dir(dir);
+		Device.world_to_hud(*this);
+		return *this;
+	}
 
-		Device.mInvProject.transform_dir(dir);
-		Device.mInvView.transform_dir(dir);
+	IC SelfRef hud_to_world_dir()
+	{
+		Device.hud_to_world_dir(*this);
+		return *this;
+	}
+
+	IC SelfRef world_to_hud_dir()
+	{
+		Device.world_to_hud_dir(*this);
+		return *this;
 	}
 };
 

@@ -138,6 +138,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("bone_direction", (Fvector(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::bone_direction))
 		.def("bone_direction", (Fvector(CScriptGameObject::*)(LPCSTR, bool))(&CScriptGameObject::bone_direction))
 
+		.def("bone_transform", (Fmatrix(CScriptGameObject::*)(u16))(&CScriptGameObject::bone_transform))
+		.def("bone_transform", (Fmatrix(CScriptGameObject::*)(u16, bool))(&CScriptGameObject::bone_transform))
+		.def("bone_transform", (Fmatrix(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::bone_transform))
+		.def("bone_transform", (Fmatrix(CScriptGameObject::*)(LPCSTR, bool))(&CScriptGameObject::bone_transform))
+
 		.def("bone_parent", (u16(CScriptGameObject::*)(u16))(&CScriptGameObject::bone_parent))
 		.def("bone_parent", (u16(CScriptGameObject::*)(u16, bool))(&CScriptGameObject::bone_parent))
 		.def("bone_parent", (u16(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::bone_parent))
@@ -598,6 +603,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		// demonized: Additional exports
 		.def("get_actor_walk_accel", &CScriptGameObject::GetActorWalkAccel)
 		.def("set_actor_walk_accel", &CScriptGameObject::SetActorWalkAccel)
+		.def("set_actor_box_y_offset", &CScriptGameObject::SetActorCamBoxYOffset)
 		.def("get_actor_walk_back_coef", &CScriptGameObject::GetActorWalkBackCoef)
 		.def("set_actor_walk_back_coef", &CScriptGameObject::SetActorWalkBackCoef)
 		.def("get_actor_crouch_coef", &CScriptGameObject::GetActorCrouchCoef)
@@ -641,7 +647,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("remove_attachment", &CScriptGameObject::RemoveAttachment)
 
 		.def("get_shaders", &CScriptGameObject::GetShaders)
+		.def("get_default_shaders", &CScriptGameObject::GetDefaultShaders)
 		.def("set_shader", &CScriptGameObject::SetShaderTexture)
+		.def("reset_shader", &CScriptGameObject::ResetShaderTexture)
 		;
 	return (instance);
 }

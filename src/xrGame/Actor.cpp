@@ -333,9 +333,25 @@ void set_box(LPCSTR section, CPHMovementControl& mc, u32 box_num)
 	mc.SetBox(box_num, bb);
 }
 
+void set_box_y_offset(LPCSTR section, CPHMovementControl& mc, u32 box_num, float offset)
+{
+	Fbox bb;
+	Fvector vBOX_center, vBOX_size;
+	// m_PhysicMovementControl: BOX
+	string64 buff, buff1;
+	strconcat(sizeof(buff), buff, "ph_box", itoa(box_num, buff1, 10), "_center");
+	vBOX_center = pSettings->r_fvector3(section, buff);
+	vBOX_center.y = offset;
+	strconcat(sizeof(buff), buff, "ph_box", itoa(box_num, buff1, 10), "_size");
+	vBOX_size = pSettings->r_fvector3(section, buff);
+	vBOX_size.y += (cammera_into_collision_shift / 2.f) + offset;
+	bb.set(vBOX_center, vBOX_center);
+	bb.grow(vBOX_size);
+	mc.SetBox(box_num, bb);
+}
+
 void CActor::Load(LPCSTR section)
 {
-	// Msg						("Loading actor: %s",section);
 	inherited::Load(section);
 	material().Load(section);
 	CInventoryOwner::Load(section);
@@ -510,6 +526,11 @@ void CActor::Load(LPCSTR section)
 	m_sInventoryBoxUseAction = "inventory_box_use";
 	//---------------------------------------------------------------------
 	m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
+}
+
+void CActor::set_actor_box_y_offset(u32 box_num, float offset)
+{
+	set_box_y_offset("actor", *character_physics_support()->movement(), box_num, offset);
 }
 
 void CActor::PHHit(SHit& H)

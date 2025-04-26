@@ -32,10 +32,14 @@ public:
 #endif
 	virtual LPCSTR _BCL getDebugShader() { return nullptr; }
 	virtual LPCSTR _BCL getDebugTexture() { return nullptr; }
+	
+	virtual LPCSTR _BCL getDebugShaderDef() { return nullptr; }
+	virtual LPCSTR _BCL getDebugTextureDef() { return nullptr; }
 
 	virtual xr_vector<IRenderVisual*>* get_children() { return nullptr; };
 
-	virtual void SetShaderTexture(char* shader, LPCSTR texture) {};
+	virtual void SetShaderTexture(LPCSTR shader, LPCSTR texture) {};
+	virtual void ResetShaderTexture() {};
 	virtual void MarkAsHot(bool is_hot) {};				//--DSR-- HeatVision
 	virtual void MarkAsGlowing(bool is_glowing) {};		//--DSR-- SilencerOverheat
 

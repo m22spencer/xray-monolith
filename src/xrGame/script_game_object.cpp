@@ -68,6 +68,29 @@ Fvector CScriptGameObject::Center(bool bHud)
 	return c;
 }
 
+Fmatrix CScriptGameObject::Xform(bool bHud)
+{
+	Fmatrix* xform = nullptr;
+
+	if (bHud)
+	{
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+		{
+			xform = &itm->HudItemData()->m_item_transform;
+		}
+	} else {
+		xform = &object().XFORM();
+	}
+
+	if (!xform) {
+		Msg("!CScriptGameObject::XForm xform is null for %s", object().Name());
+		return Fmatrix().identity();
+	}
+
+	return *xform;
+}
+
 BIND_FUNCTION10(&object(), CScriptGameObject::Position, CGameObject, Position, Fvector, Fvector());
 BIND_FUNCTION10(&object(), CScriptGameObject::Direction, CGameObject, Direction, Fvector, Fvector());
 BIND_FUNCTION10(&object(), CScriptGameObject::Mass, CPhysicsShellHolder, GetMass, float, float(-1));
@@ -373,7 +396,7 @@ u16 CScriptGameObject::bone_id(LPCSTR bone_name, bool bHud)
 	return bone_id;
 }
 
-Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
+Fmatrix CScriptGameObject::bone_transform(u16 bone_id, bool bHud)
 {
 	//if (bone_id == BI_NONE) return Fvector().set(0, 0, 0);
 
@@ -388,8 +411,7 @@ Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
 		{
 			k = itm->HudItemData()->m_model;
 			xform = &itm->HudItemData()->m_item_transform;
-		}
-		else if (act)
+		} else if (act)
 		{
 			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();
 			xform = (bone_id > 20) ? &g_player_hud->m_transform : &g_player_hud->m_transform_2;
@@ -399,7 +421,7 @@ Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
 		xform = &object().XFORM();
 	}
 
-	if (!k) return Fvector().set(0, 0, 0);
+	if (!k) return Fmatrix().identity();
 
 	// demonized: backwards compatibility with scripts, get root bone if bone_id is BI_NONE
 	if (bone_id == BI_NONE) {
@@ -412,51 +434,20 @@ Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
 
 	Fmatrix matrix;
 	matrix.mul_43(*xform, k->LL_GetTransform(bone_id));
-	return (matrix.c);
+	return matrix;
+}
+
+Fvector CScriptGameObject::bone_position(u16 bone_id, bool bHud)
+{
+	return bone_transform(bone_id, bHud).c;
 }
 
 Fvector CScriptGameObject::bone_direction(u16 bone_id, bool bHud)
 {
-	//if (bone_id == BI_NONE) return Fvector().set(0, 0, 0);
-
-	IKinematics* k = nullptr;
-	Fmatrix* xform = nullptr;
-
-	if (bHud)
-	{
-		CActor* act = smart_cast<CActor*>(&object());
-		CHudItem* itm = smart_cast<CHudItem*>(&object());
-		if (itm)
-		{
-			k = itm->HudItemData()->m_model;
-			xform = &itm->HudItemData()->m_item_transform;
-		}
-		else if (act)
-		{
-			k = (bone_id > 20) ? g_player_hud->m_model->dcast_PKinematics() : g_player_hud->m_model_2->dcast_PKinematics();
-			xform = (bone_id > 20) ? &g_player_hud->m_transform : &g_player_hud->m_transform_2;
-		}
-	} else {
-		k = object().Visual()->dcast_PKinematics();
-		xform = &object().XFORM();
-	}
-
-	if (!k) return Fvector().set(0, 0, 0);
-
-	// demonized: backwards compatibility with scripts, get root bone if bone_id is BI_NONE
-	if (bone_id == BI_NONE) {
-		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
-			Msg("![bone_direction] Incorrect bone_id provided for %s (%d), fallback to root bone", object().cNameSect_str(), object().ID());
-			ai().script_engine().print_stack();
-		}
-		bone_id = k->LL_GetBoneRoot();
-	}
-
-	Fmatrix matrix;
+	Fmatrix matrix = bone_transform(bone_id, bHud);
 	Fvector res;
-	matrix.mul_43(*xform, k->LL_GetTransform(bone_id));
 	matrix.getHPB(res);
-	return (res);
+	return res;
 }
 
 u16 CScriptGameObject::bone_parent(u16 bone_id, bool bHud)
@@ -1197,7 +1188,58 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 	return table;
 }
 
-void set_shader_tex(IRenderVisual* vis, int id, char* shader, LPCSTR texture)
+luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
+{
+	IKinematics* k = nullptr;
+
+	if (bHud)
+	{
+		CActor* act = smart_cast<CActor*>(&object());
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			k = itm->HudItemData()->m_model;
+		else if (act)
+			k = g_player_hud->m_model->dcast_PKinematics();
+	}
+
+	if (!k)
+		k = object().Visual()->dcast_PKinematics();
+
+	luabind::object table = luabind::newtable(ai().script_engine().lua());
+
+	if (!k)
+	{
+		table["error"] = true;
+		return table;
+	}
+
+	IRenderVisual* vis = k->dcast_RenderVisual();
+	xr_vector<IRenderVisual*>* children = vis->get_children();
+
+	if (!children)
+	{
+		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = vis->getDebugShaderDef();
+		subtable["texture"] = vis->getDebugTextureDef();
+		table[1] = subtable;
+		return table;
+	}
+
+	int i = 1;
+
+	for (auto* child : *children)
+	{
+		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShaderDef();
+		subtable["texture"] = child->getDebugTextureDef();
+		table[i] = subtable;
+		++i;
+	}
+
+	return table;
+}
+
+void set_shader_tex(IRenderVisual* vis, int id, LPCSTR shader, LPCSTR texture)
 {
 	xr_vector<IRenderVisual*>* children = vis->get_children();
 
@@ -1222,6 +1264,31 @@ void set_shader_tex(IRenderVisual* vis, int id, char* shader, LPCSTR texture)
 		children->at(id)->SetShaderTexture(shader, texture);
 }
 
+void reset_shader_tex(IRenderVisual* vis, int id)
+{
+	xr_vector<IRenderVisual*>* children = vis->get_children();
+
+	if (!children)
+	{
+		vis->ResetShaderTexture();
+		return;
+	}
+
+	if (id == -1)
+	{
+		for (auto* child : *children)
+		{
+			child->ResetShaderTexture();
+		}
+		return;
+	}
+
+	id--;
+
+	if (id >= 0 && children->size() > id)
+		children->at(id)->ResetShaderTexture();
+}
+
 void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, bool bHud)
 {
 	IKinematics* k = nullptr;
@@ -1234,8 +1301,8 @@ void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, 
 			k = itm->HudItemData()->m_model;
 		else if (act)
 		{
-			set_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id, xr_strdup(shader), texture);
-			set_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id, xr_strdup(shader), texture);
+			set_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id, shader, texture);
+			set_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id, shader, texture);
 			return;
 		}
 	}
@@ -1245,5 +1312,31 @@ void CScriptGameObject::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, 
 
 	if (!k) return;
 
-	set_shader_tex(k->dcast_RenderVisual(), id, xr_strdup(shader), texture);
+	set_shader_tex(k->dcast_RenderVisual(), id, shader, texture);
+}
+
+void CScriptGameObject::ResetShaderTexture(int id, bool bHud)
+{
+	IKinematics* k = nullptr;
+
+	if (bHud)
+	{
+		CActor* act = smart_cast<CActor*>(&object());
+		CHudItem* itm = smart_cast<CHudItem*>(&object());
+		if (itm)
+			k = itm->HudItemData()->m_model;
+		else if (act)
+		{
+			reset_shader_tex(g_player_hud->m_model->dcast_RenderVisual(), id);
+			reset_shader_tex(g_player_hud->m_model_2->dcast_RenderVisual(), id);
+			return;
+		}
+	}
+
+	if (!k)
+		k = object().Visual()->dcast_PKinematics();
+
+	if (!k) return;
+
+	reset_shader_tex(k->dcast_RenderVisual(), id);
 }

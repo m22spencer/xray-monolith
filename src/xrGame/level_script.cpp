@@ -1633,10 +1633,10 @@ const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = fa
 
 // demonized: unproject ui coordinates (ie mouse cursor coordinates) to world coordinates
 // returns position and underlying object id if found. If there is no object, obj_id will be 65535
-void ui2world(Fvector2 pos, Fvector& res, u16& obj_id)
+void ui2world(Fvector2 pos, bool allow_offscreen, Fvector& res, u16& obj_id)
 {
 	res.set(0, 0, 0);
-	if (pos.x < 0 || pos.x > UI_BASE_WIDTH || pos.y < 0 || pos.y > UI_BASE_HEIGHT) {
+	if (!allow_offscreen && (pos.x < 0 || pos.x > UI_BASE_WIDTH || pos.y < 0 || pos.y > UI_BASE_HEIGHT)) {
 		return;
 	}
 
@@ -1718,9 +1718,24 @@ void ui2world(Fvector2 pos, Fvector& res, u16& obj_id)
 	}
 }
 
+void ui2world(Fvector2 pos, Fvector& res, u16& obj_id)
+{
+	ui2world(pos, false, res, obj_id);
+}
+
 void ui2world(Fvector& pos, Fvector& res, u16& obj_id)
 {
 	ui2world(Fvector2().set(pos.x, pos.y), res, obj_id);
+}
+
+void ui2world_offscreen(Fvector2 pos, Fvector& res, u16& obj_id)
+{
+	ui2world(pos, true, res, obj_id);
+}
+
+void ui2world_offscreen(Fvector& pos, Fvector& res, u16& obj_id)
+{
+	ui2world_offscreen(Fvector2().set(pos.x, pos.y), res, obj_id);
 }
 
 const float get_env_rads()
@@ -2445,6 +2460,8 @@ void CLevel::script_register(lua_State* L)
 		def("world2ui", world2ui),
 		def("ui2world", (void (*)(Fvector2, Fvector&, u16&))&ui2world, pure_out_value(_2) + pure_out_value(_3)),
 		def("ui2world", (void (*)(Fvector&, Fvector&, u16&))&ui2world, pure_out_value(_2) + pure_out_value(_3)),
+		def("ui2world_offscreen", (void (*)(Fvector2, Fvector&, u16&))& ui2world_offscreen, pure_out_value(_2) + pure_out_value(_3)),
+		def("ui2world_offscreen", (void (*)(Fvector&, Fvector&, u16&))& ui2world_offscreen, pure_out_value(_2) + pure_out_value(_3)),
 		
 		// demonized: adjust game news time
 		def("change_game_news_show_time", &change_game_news_show_time),

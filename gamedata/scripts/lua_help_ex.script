@@ -97,6 +97,7 @@
     namespace game {
         Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
         function ui2world(Fvector2 pos) -> Fvector result, u16 object_id
+        function ui2world_offscreen(Fvector2 pos) -> Fvector result, u16 object_id
         change_game_news_show_time(CUIWindow* UIWindow, float show_time)
         update_pda_news_from_uiwindow(CUIWindow* UIWindow)
     }
@@ -224,11 +225,27 @@
     }
 
     class Fvector {
+        static functions:
+            vector.generate_orthonormal_basis(Fvector dir, Fvector up, Fvector right)
+            vector.generate_orthonormal_basis_normalized(Fvector dir, Fvector up, Fvector right)
+
         function add(float x, float y, float z)
         function sub(float x, float y, float z)
         function mul(float x, float y, float z)
         function div(float x, float y, float z)
         function distance_to_xz_sqr(Fvector)
+        function project(Fvector u, Fvector v)
+        function project(Fvector v)
+
+        function hud_to_world()
+        function world_to_hud()
+
+        function hud_to_world_dir()
+        function world_to_hud_dir()
+    }
+
+    class Fvector2 {
+        function normalize()
     }
 
     class Fmatrix {
@@ -277,6 +294,15 @@
         function setXYZi(float x, float y, float z)
         function setXYZi(Fvector)
         Fvector getHPB()
+        function transform(Fvector, Fvector)
+        function transform(Fvector)
+        function transform_tiny(Fvector, Fvector)
+        function transform_tiny(Fvector)
+        function transform_dir(Fvector, Fvector)
+        function transform_dir(Fvector)
+
+        function hud_to_world()
+        function world_to_hud()
     }
 
     class particle_object {
@@ -296,8 +322,8 @@
     }
 
     class game_object {
-        // Skeletons
-        function bone_direction(string bone_name, bool bHud = false)
+        // General
+        Fmatrix xform(bool bHud)
 
         // Player
         function get_actor_walk_accel()
@@ -328,7 +354,7 @@
         function get_actor_object_looking_at()
         function get_actor_person_looking_at()
         function get_actor_default_action_for_object()
-
+		function set_actor_box_y_offset(u32 box_num, float offset) --box_num:0 for stand, 1 for crouch, 2 for prone;
         // Stalker NPCs
         function get_enable_anomalies_pathfinding()
         function set_enable_anomalies_pathfinding(bool)
@@ -352,6 +378,11 @@
 
         string bone_name(u16 id)
         string bone_name(u16 id, bool bHud)
+
+        Fmatrix bone_transform(u16 id)
+        Fmatrix bone_transform(u16 id, bool bHud)
+        Fmatrix bone_transform(string)
+        Fmatrix bone_transform(string, bool bHud)
 
         Fvector bone_position(u16 id)
         Fvector bone_position(u16 id, bool bHud)
@@ -389,6 +420,8 @@
 		// Shader/Textures
 		function get_shaders(bool)
 		function set_shader(number, string, string, bool)
+		function get_default_shaders(bool)
+		function reset_shader(number, bool)
 		
 		get_shaders(hud_mode)
 		hud_mode is optional and will default to false
@@ -406,10 +439,16 @@
 			},
 		},
 		
+		get_default_shaders(hud_mode)
+		returns similar table as get_shaders but containing the default shader and texture names, even after they were changed by set_shader
+		
 		set_shader(id, shader, texture, hud_mode) can assign a new shader/texture to the submesh ID
 		id can be -1 to apply the shader/texture to all submeshes at once
 		shader/texture can be nil if you only want to apply one of them
 		hud_mode is optional and will default to false
+		
+		reset_shader(id, hud_mode)
+		same as set_shader but resets to the default shader/texture values, so you don't need to store them in a table to reset them later
     }
 
     class CArtefact : CGameObject {
@@ -512,7 +551,7 @@
         function GetZoomRotateTime()
         function SetZoomRotateTime(float)
     }
-
+	
     enum rq_target { (sum them up to target multiple types)
         rqtNone     = 0,
         rqtObject   = 1,
@@ -651,6 +690,10 @@
         function set_ui_position();
         function set_ui_rotation(vector);
         function set_ui_rotation(number, number, number);
+		function get_shaders()
+		function get_default_shaders()
+		function set_shader(number, string, string)
+		function reset_shader(number)
     }
     
     flags:

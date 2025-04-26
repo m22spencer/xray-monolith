@@ -171,6 +171,9 @@ void CModelPool::Instance_Register(LPCSTR N, dxRender_Visual* V)
 
 void CModelPool::Destroy()
 {
+	// Pool
+	Pool.clear();
+
 	// Registry
 	while (!Registry.empty())
 	{
@@ -237,21 +240,37 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 	strlwr(low_name);
 	if (strext(low_name)) *strext(low_name) = 0;
 	
-	// 1. Search for already loaded model (reference, base model)
-	dxRender_Visual* Base = Instance_Find(low_name);
-	if (0 == Base)
+	// 0. Search POOL
+	POOL_IT it = Pool.find(low_name);
+	if (it != Pool.end())
 	{
-		// 2. If not found
-		bAllowChildrenDuplicate = FALSE;
-		if (data) Base = Instance_Load(low_name, data, TRUE);
-		else Base = Instance_Load(low_name, TRUE);
-		bAllowChildrenDuplicate = TRUE;
+		// 1. Instance found
+		dxRender_Visual* Model = it->second;
+		Model->Spawn();
+		Pool.erase(it);
+		return Model;
 	}
+	else
+	{
+		// 1. Search for already loaded model (reference, base model)
+		dxRender_Visual* Base = Instance_Find(low_name);
 
-	// 3. If found - return (cloned) reference
-	dxRender_Visual* Model = Instance_Duplicate(Base);
-	Registry.insert(mk_pair(Model, low_name));
-	return Model;
+		if (0 == Base)
+		{
+			// 2. If not found
+			bAllowChildrenDuplicate = FALSE;
+			if (data) Base = Instance_Load(low_name, data, TRUE);
+			else Base = Instance_Load(low_name, TRUE);
+			bAllowChildrenDuplicate = TRUE;
+#ifdef _EDITOR
+			if (!Base)		return 0;
+#endif
+		}
+		// 3. If found - return (cloned) reference
+		dxRender_Visual* Model = Instance_Duplicate(Base);
+		Registry.insert(mk_pair(Model, low_name));
+		return Model;
+	}
 }
 
 dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
@@ -282,7 +301,32 @@ void CModelPool::DeleteInternal(dxRender_Visual* & V, BOOL bDiscard)
 	VERIFY(!g_bRendering);
 	if (!V) return;
 	V->Depart();
-	Discard(V, bDiscard || bForceDiscard);
+	if (bDiscard || bForceDiscard)
+	{
+		Discard(V, TRUE);
+	}
+	else
+	{
+		//
+		REGISTRY_IT it = Registry.find(V);
+		if (it != Registry.end())
+		{
+			// Registry entry found - move it to pool and reset changed shader/texture if necessary
+			xr_vector<IRenderVisual*>* children = V->get_children();
+			if (children)
+				for (auto* child : *children)
+					child->ResetShaderTexture();
+			else
+				V->ResetShaderTexture();
+
+			Pool.insert(mk_pair(it->second, V));
+		}
+		else
+		{
+			// Registry entry not-found - just special type of visual / particles / etc.
+			xr_delete(V);
+		}
+	}
 	V = NULL;
 }
 
@@ -291,18 +335,20 @@ void CModelPool::Delete(dxRender_Visual* & V, BOOL bDiscard)
 	if (NULL == V) return;
 	if (g_bRendering)
 	{
-		ModelsToDelete.insert(mk_pair(V, !!bDiscard));
+		VERIFY(!bDiscard);
+		ModelsToDelete.push_back(V);
 	}
 	else
 	{
 		DeleteInternal(V, bDiscard);
 	}
+	V = NULL;
 }
 
 void CModelPool::DeleteQueue()
 {
-	for (xr_map<dxRender_Visual*, bool>::iterator it = ModelsToDelete.begin(); it != ModelsToDelete.end(); it++)
-		DeleteInternal((dxRender_Visual*)it->first, it->second);
+	for (u32 it = 0; it < ModelsToDelete.size(); it++)
+		DeleteInternal(ModelsToDelete[it]);
 	ModelsToDelete.clear();
 }
 
@@ -391,6 +437,17 @@ dxRender_Visual* CModelPool::CreatePG(PS::CPGDef* source)
 	return V;
 }
 
+void CModelPool::ClearPool(BOOL b_complete)
+{
+	POOL_IT _I = Pool.begin();
+	POOL_IT _E = Pool.end();
+	for (; _I != _E; _I++)
+	{
+		Discard(_I->second, b_complete);
+	}
+	Pool.clear();
+}
+
 void CModelPool::dump()
 {
 	Log("--- model pool --- begin:");
@@ -409,6 +466,7 @@ void CModelPool::dump()
 	Msg("--- models: %d, mem usage: %d Kb ", k, sz / 1024);
 	sz = 0;
 	k = 0;
+	int free_cnt = 0;
 	for (REGISTRY_IT it = Registry.begin(); it != Registry.end(); it++)
 	{
 		CKinematics* K = PCKinematics((dxRender_Visual*)it->first);
@@ -417,10 +475,12 @@ void CModelPool::dump()
 		{
 			u32 cur = K->mem_usage(true);
 			sz += cur;
-			Msg("#%3d: [%5d Kb] - %s", k++, cur / 1024, it->second.c_str());
+			bool b_free = (Pool.find(it->second) != Pool.end());
+			if (b_free) ++free_cnt;
+			Msg("#%3d: [%s] [%5d Kb] - %s", k++, (b_free) ? "free" : "used", cur / 1024, it->second.c_str());
 		}
 	}
-	Msg("--- instances: %d, mem usage: %d Kb ", k, sz / 1024);
+	Msg("--- instances: %d, free %d, mem usage: %d Kb ", k, free_cnt, sz / 1024);
 	Log("--- model pool --- end.");
 }
 
