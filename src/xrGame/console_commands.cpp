@@ -150,6 +150,7 @@ extern float g_gunsnd_indoor;
 extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
 extern int g_nearwall_trace;
+extern BOOL drawPickupItemNames;
 
 extern string32 crosshair_shader;
 extern string32 crosshair_texture;
@@ -2869,4 +2870,7 @@ void CCC_RegisterCommands()
 	// Indoor weapon sounds
 	CMD4(CCC_Float, "g_gunsnd_indoor", &g_gunsnd_indoor, 0.0f, 1.0f);
 	CMD4(CCC_Float, "g_gunsnd_indoor_volume", &g_gunsnd_indoor_volume, 0.0f, 5.0f);
+
+	// Draw pickup item names
+	CMD4(CCC_Integer, "g_draw_pickup_item_names", &drawPickupItemNames, 0, 1);
 }
