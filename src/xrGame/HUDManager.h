@@ -33,7 +33,7 @@ struct SPickParam
 	{
 		defs.start.set(0, 0, 0);
 		defs.dir.set(0, 0, 0);
-		defs.range = g_pGamePersistent->Environment().CurrentEnv->far_plane * 0.99f;
+		defs.range = g_pGamePersistent->Environment().CurrentEnv->far_plane;
 		barrel_blocked = false;
 		barrel_dist = 0.f;
 		barrel_matrix.identity();

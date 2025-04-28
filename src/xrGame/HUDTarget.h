@@ -14,9 +14,6 @@ private:
 
 	Fvector crosshairPos;
 	float crosshairOpacity;
-	float occludedOpacity;
-	float occlusionFadeRate;
-	float distanceLerpRate;
 
 	bool m_bShowCrosshair;
 	CHUDCrosshair HUDCrosshair;

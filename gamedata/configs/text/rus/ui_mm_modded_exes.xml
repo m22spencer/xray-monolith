@@ -26,11 +26,20 @@
 	<string id="ui_mm_hud_modded_exes">
 		<text>HUD</text>
 	</string>
+	<string id="ui_mm_modded_exes_misc_g_use_shader_crosshair">
+		<text>Использовать шейдерное перекрестие (g_use_shader_crosshair)</text>
+	</string>
 	<string id="ui_mm_modded_exes_misc_g_crosshair_near_size">
 		<text>Размер перекрестия вблизи камеры (g_crosshair_near_size)</text>
 	</string>
-	<string id="ui_mm_modded_exes_misc_g_use_shader_crosshair">
-		<text>Использовать шейдерное перекрестие (g_use_shader_crosshair)</text>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_distance_lerp_rate">
+		<text>Скорость анимации дальности перекрестия (g_crosshair_distance_lerp_rate)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_occluded_opacity">
+		<text>Непрозрачность перекрестия при заслонении объектом (g_crosshair_occluded_opacity)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_occlusion_fade_rate">
+		<text>Скорость анимации непрозрачности перекрестия (g_crosshair_occlusion_fade_rate)</text>
 	</string>
 
 	<!-- Particles -->

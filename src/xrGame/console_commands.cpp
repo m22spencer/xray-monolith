@@ -154,6 +154,9 @@ extern int g_nearwall_trace;
 extern string32 crosshair_shader;
 extern string32 crosshair_texture;
 extern float crosshair_near_size;
+extern float crosshair_occluded_opacity;
+extern float crosshair_occlusion_fade_rate;
+extern float crosshair_distance_lerp_rate;
 
 ENGINE_API extern float g_console_sensitive;
 
@@ -2495,6 +2498,9 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
 	CMD4(CCC_Float, "g_crosshair_near_size", &crosshair_near_size, 1.f, 16.f);
+	CMD4(CCC_Float, "g_crosshair_distance_lerp_rate", &crosshair_distance_lerp_rate, 1.f, 100.f);
+	CMD4(CCC_Float, "g_crosshair_occluded_opacity", &crosshair_occluded_opacity, 0.f, 1.f);
+	CMD4(CCC_Float, "g_crosshair_occlusion_fade_rate", &crosshair_occlusion_fade_rate, 1.f, 100.f);
 	CMD3(CCC_Mask, "g_use_shader_crosshair", &psHUD_Flags, HUD_SHADER_CROSSHAIR);
 	CMD3(CCC_String, "g_crosshair_shader", crosshair_shader, 32);
 	CMD3(CCC_String, "g_crosshair_texture", crosshair_texture, 32);

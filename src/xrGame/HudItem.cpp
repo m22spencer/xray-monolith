@@ -22,8 +22,6 @@
 #include "weaponpistol.h"
 #include "HUDManager.h"
 
-#define NEAR_LIM	0.5f
-
 ENGINE_API extern float psHUD_FOV_def;
 int g_nearwall = NW_FOV;
 int g_nearwall_trace = NT_CAM;
@@ -269,7 +267,14 @@ void CHudItem::SendHiddenItem()
 
 float CHudItem::GetNearWallOffset()
 {
-	return m_nearwall_factor * GetNearWallRange() * GetBaseHudFov();
+	if (g_nearwall_trace == NT_CAM)
+	{
+		return m_nearwall_factor * GetNearWallRange() * GetBaseHudFov();
+	}
+	else if (g_nearwall_trace == NT_ITEM)
+	{
+		return m_nearwall_factor * GetBaseHudFov();
+	}
 }
 
 void CHudItem::UpdateHudAdditional(Fmatrix& trans)
@@ -498,28 +503,28 @@ void CHudItem::UpdateCL()
 {
 	if (g_nearwall && ParentIsActor() && Level().CurrentViewEntity() == object().H_Parent())
 	{
-		collide::rq_result* rq = NULL;
+		float fac;
+
 		// If firepos is active
 		if (g_nearwall_trace == NT_CAM)
 		{
-			// Use the HUD trace
-			rq = &HUD().GetRQ();
+			// Use the HUD trace, and lerp between min and max distances
+			collide::rq_result& rq = HUD().GetRQ();
+
+			float dist = rq.range;
+			clamp(dist, m_nearwall_dist_min, m_nearwall_dist_max);
+			fac = 1 - ((dist - m_nearwall_dist_min) / GetNearWallRange());
 		}
 		else if (g_nearwall_trace == NT_ITEM)
 		{
-			// Use the HUD item trace
-			rq = &GetRQ();
-		}
-		VERIFY(rq);
-
-		float dist = rq->range;
-		clamp(dist, m_nearwall_dist_min, m_nearwall_dist_max);
-
-		float fac = 1 - ((dist - m_nearwall_dist_min) / GetNearWallRange());
+			// Take the item's trace range and invert it, as negative ranges encode penetration distance
+			collide::rq_result& rq = GetRQ();
+			fac = -rq.range;
+			clamp(fac, 0.f, fac);
+;		}
 
 		float t = m_nearwall_speed_mod * Device.fTimeDelta;
 		clamp(t, 0.f, 1.f);
-
 		m_nearwall_factor = m_nearwall_factor * (1 - t) + fac * t;
 	}
 
@@ -1010,7 +1015,6 @@ void CHudItem::Ray(SPickParam& pp)
 	Fmatrix matrix = RayTransform();
 	pp.barrel_matrix = matrix;
 
-	Fmatrix mn = matrix;
 	// If we're in first-person...
 	if (GetHUDmode())
 	{
@@ -1023,7 +1027,7 @@ void CHudItem::Ray(SPickParam& pp)
 		);
 
 		// Transform from non-offset HUD space to world space
-		Device.hud_to_world(mn, proj);
+		Device.hud_to_world(matrix, proj);
 	}
 
 	// Detect wall penetration
@@ -1046,7 +1050,7 @@ void CHudItem::Ray(SPickParam& pp)
 	// Trace from eye -> barrel
 	SPickParam pn;
 	pn.defs.start = eye_pos;
-	pn.defs.dir = Fvector3().sub(mn.c, eye_pos);
+	pn.defs.dir = Fvector3().sub(matrix.c, eye_pos);
 	pn.defs.range = pn.defs.dir.magnitude();
 	VERIFY(!fis_zero(pn.defs.range));
 	pn.defs.dir.normalize();
@@ -1055,7 +1059,9 @@ void CHudItem::Ray(SPickParam& pp)
 	// If the eye -> barrel vector is obstructed...
 	if (HUD().DoPick(pn))
 	{
-		// If we're in third person...
+		pp.barrel_blocked = true;
+
+		// If we're in first person...
 		if (GetHUDmode())
 		{
 			// Use the eye -> barrel trace directly
@@ -1076,21 +1082,13 @@ void CHudItem::Ray(SPickParam& pp)
 
 			// Move to the intersection point and trace to the barrel
 			pp.defs.start.add(pn.defs.start, Fvector().mul(pn.defs.dir, pn.result.range * 0.99));
-			pp.defs.dir.sub(mn.c, pp.defs.start);
+			pp.defs.dir.sub(matrix.c, pp.defs.start);
 			pp.defs.range = pp.defs.dir.magnitude();
 			pp.defs.dir.normalize();
 		}
 
-		// Derive pick param state
-		pp.barrel_dist = pp.defs.range;
-		pp.barrel_blocked = true;
 		return;
 	}
-
-	// If we're in first-person...
-	if (GetHUDmode())
-		// Project barrel matrix from HUD space to world space
-		Device.hud_to_world(matrix);
 
 	// And trace from it
 	pp.defs.start = matrix.c;
@@ -1101,9 +1099,8 @@ void CHudItem::OnFrame()
 {
 	Ray(PP);
 	HUD().DoPick(PP);
-	if (!PP.barrel_blocked)
-		PP.result.range += PP.barrel_dist;
-	clamp(PP.result.range, NEAR_LIM, PP.result.range);
+	if (PP.barrel_blocked)
+		PP.result.range -= PP.barrel_dist;
 }
 
 void CHudItem::net_Relcase(CObject* O)

@@ -26,11 +26,20 @@
 	<string id="ui_mm_hud_modded_exes">
 		<text>HUD</text>
 	</string>
+	<string id="ui_mm_modded_exes_misc_g_use_shader_crosshair">
+		<text>Use shader crosshair (g_use_shader_crosshair)</text>
+	</string>
 	<string id="ui_mm_modded_exes_misc_g_crosshair_near_size">
 		<text>Crosshair size near the camera (g_crosshair_near_size)</text>
 	</string>
-	<string id="ui_mm_modded_exes_misc_g_use_shader_crosshair">
-		<text>Use shader crosshair (g_use_shader_crosshair)</text>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_distance_lerp_rate">
+		<text>Crosshair range animation speed (g_crosshair_distance_lerp_rate)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_occluded_opacity">
+		<text>Crosshair opacity when obscured by an object (g_crosshair_occluded_opacity)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_occlusion_fade_rate">
+		<text>Crosshair opacity animation speed (g_crosshair_occlusion_fade_rate)</text>
 	</string>
 	
 	<!-- Particles -->

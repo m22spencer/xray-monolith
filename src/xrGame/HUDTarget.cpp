@@ -71,11 +71,6 @@ CHUDTarget::CHUDTarget()
 	crosshairPos = Fvector();
 	crosshairOpacity = 1.f;
 
-	occludedOpacity = .6f;
-
-	occlusionFadeRate = 20.f;
-	distanceLerpRate = 35.f;
-
 	Load();
 	m_bShowCrosshair = false;
 }
@@ -84,11 +79,12 @@ CHUDTarget::~CHUDTarget()
 {
 }
 
+float crosshair_occluded_opacity = .6f;
+float crosshair_occlusion_fade_rate = 20.f;
+float crosshair_distance_lerp_rate = 30.f;
+
 void CHUDTarget::Load()
 {
-	occludedOpacity = pSettings->r_float(HUD_CURSOR_SECTION, "occluded_opacity");
-	occlusionFadeRate = pSettings->r_float(HUD_CURSOR_SECTION, "occlusion_fade_rate");
-	distanceLerpRate = pSettings->r_float(HUD_CURSOR_SECTION, "distance_lerp_rate");
 	HUDCrosshair.Load();
 }
 
@@ -104,10 +100,6 @@ float CHUDTarget::GetUIDist() const
 {
 	const SPickParam& pp = Actor()->GetPick();
 	float dist = pp.result.range;
-	if (!pp.barrel_blocked)
-	{
-		dist -= pp.barrel_dist;
-	}
 	return dist;
 }
 
@@ -138,7 +130,7 @@ float CHUDTarget::GetTargetOpacity() const
 	}
 
 	// If it is, apply fade
-	return occludedOpacity;
+	return crosshair_occluded_opacity;
 }
 
 void CHUDTarget::IntegratePosition()
@@ -152,13 +144,16 @@ void CHUDTarget::IntegratePosition()
 	Device.mView.transform_dir(dir);
 
 	float dist = GetUIDist();
+	Fvector target;
+	if (dist > 0.f)
+		target = Fvector().add(pos, Fvector().mul(dir, dist));
+	else
+		target = Fvector().add(pos, Fvector().mul(dir, pp.barrel_dist));
 
 	// Interpolate crosshair position toward target
-	crosshairPos.lerp(
-		crosshairPos,
-		Fvector().add(pos, Fvector().mul(dir, dist)),
-		Device.fTimeDelta * distanceLerpRate
-	);
+	float t = Device.fTimeDelta * crosshair_distance_lerp_rate;
+	clamp(t, 0.f, 1.f);
+	crosshairPos.lerp(crosshairPos, target, t);
 }
 
 void CHUDTarget::IntegrateOpacity()
@@ -166,7 +161,7 @@ void CHUDTarget::IntegrateOpacity()
 	float opacity_target = GetTargetOpacity();
 
 	// Interpolate opacity offset toward target
-	crosshairOpacity = lerp(crosshairOpacity, opacity_target, Device.fTimeDelta * occlusionFadeRate);
+	crosshairOpacity = lerp(crosshairOpacity, opacity_target, Device.fTimeDelta * crosshair_occlusion_fade_rate);
 }
 
 void CHUDTarget::Render()
@@ -200,8 +195,7 @@ void CHUDTarget::Render()
 	mat_aim.mulB_43(Fmatrix().translate(crosshairPos));
 	mat_aim.mulB_43(Fmatrix().setHPB(0, 0, hpb_barrel.z - hpb_cam.z));
 
-	float result_dist = pp.result.range - pp.barrel_dist;
-	clamp(result_dist, 0.f, result_dist);
+	float result_dist = GetUIDist();
 
 	Fvector4 pt;
 	Device.mFullTransform.transform(pt, mat_aim.c);

@@ -76,7 +76,7 @@ void CPda::Load(LPCSTR section)
 	m_screen_off_delay = READ_IF_EXISTS(pSettings, r_float, section, "screen_off_delay", 0.f);
 	m_thumb_rot[0] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_x", 0.f);
 	m_thumb_rot[1] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_y", 0.f);
-	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", .4f);
+	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", .1f);
 }
 
 Fmatrix CPda::RayTransform()
@@ -95,13 +95,10 @@ static float lerp(float a, float b, float t)
 
 float CPda::GetNearWallOffset()
 {
-	float range = GetNearWallRange();
-	if (GetHUDmode())
-	{
-		range = lerp(range, m_nearwall_zoomed_range, m_fZoomfactor);
-		range *= GetBaseHudFov();
-	}
-	return m_nearwall_factor * range;
+	float ofs = CHudItem::GetNearWallOffset();
+	float ofs_ads = ofs;
+	clamp(ofs_ads, ofs_ads, m_nearwall_zoomed_range);
+	return lerp(ofs, ofs_ads, m_fZoomfactor);
 }
 
 void CPda::OnStateSwitch(u32 S, u32 oldState)

@@ -535,13 +535,12 @@ static float lerp(float a, float b, float t)
 
 float CWeapon::GetNearWallOffset()
 {
-	float range = GetNearWallRange();
-	if (GetHUDmode())
-	{
-		range = lerp(range, m_nearwall_zoomed_range, GetZRotatingFactor());
-		range *= GetBaseHudFov();
-	}
-	return m_nearwall_factor * range;
+	float ofs = CHudItem::GetNearWallOffset();
+	float ofs_ads = ofs;
+	clamp(ofs_ads, ofs_ads, m_nearwall_zoomed_range);
+	Log("ofs", ofs);
+	Log("ofs_ads", ofs_ads);
+	return lerp(ofs, ofs_ads, GetZRotatingFactor());
 }
 
 void CWeapon::ForceUpdateFireParticles()
@@ -899,7 +898,7 @@ void CWeapon::Load(LPCSTR section)
 	}
 	//--DSR-- SilencerOverheat_end
 
-	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", 0.14f);
+	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", 0.04f);
 }
 
 // demonized: World model on stalkers adjustments
