@@ -82,7 +82,7 @@ struct CRayPick
 	float range;
 	collide::rq_target flags;
 	script_rq_result result;
-	CObject* ignore;
+	xr_vector<CObject*> ignore;
 
 	CRayPick();
 	CRayPick(const Fvector& P, const Fvector& D, float R, collide::rq_target F, CScriptGameObject* I);
@@ -91,7 +91,14 @@ struct CRayPick
 	IC void set_direction(Fvector& D) { direction = D; };
 	IC void set_range(float R) { range = R; };
 	IC void set_flags(collide::rq_target F) { flags = F; };
-	void set_ignore_object(CScriptGameObject* I) { if (I) ignore = smart_cast<CObject*>(&(I->object())); };
+	void set_ignore_object(CScriptGameObject* I) { 
+		if (I) {
+			CObject* obj = smart_cast<CObject*>(&(I->object()));
+			if (obj) {
+				ignore.push_back(obj);
+			}
+		}
+	};
 
 	bool query();
 

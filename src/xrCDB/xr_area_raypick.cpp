@@ -117,8 +117,17 @@ BOOL CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
 BOOL CObjectSpace::RayPick(const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R,
                            CObject* ignore_object)
 {
+	xr_vector<CObject*> ignore_objects;
+	if (ignore_object)
+		ignore_objects.push_back(ignore_object);
+	return RayPick(start, dir, range, tgt, R, ignore_objects);
+}
+
+BOOL CObjectSpace::RayPick(const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R,
+	xr_vector<CObject*>& ignore_objects)
+{
 	Lock.Enter();
-	BOOL _res = _RayPick(start, dir, range, tgt, R, ignore_object);
+	BOOL _res = _RayPick(start, dir, range, tgt, R, ignore_objects);
 	r_spatial.clear();
 	Lock.Leave();
 	return _res;
@@ -126,6 +135,15 @@ BOOL CObjectSpace::RayPick(const Fvector& start, const Fvector& dir, float range
 
 BOOL CObjectSpace::_RayPick(const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R,
                             CObject* ignore_object)
+{
+	xr_vector<CObject*> ignore_objects;
+	if (ignore_object)
+		ignore_objects.push_back(ignore_object);
+	return _RayPick(start, dir, range, tgt, R, ignore_objects);
+}
+
+BOOL CObjectSpace::_RayPick(const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R,
+	xr_vector<CObject*>& ignore_objects)
 {
 	r_temp.r_clear();
 	R.O = 0;
@@ -152,7 +170,17 @@ BOOL CObjectSpace::_RayPick(const Fvector& start, const Fvector& dir, float rang
 			ISpatial* spatial = r_spatial[o_it];
 			CObject* collidable = spatial->dcast_CObject();
 			if (0 == collidable) continue;
-			if (collidable == ignore_object) continue;
+
+			// demonized: support for multiple objects
+			bool ignore = false;
+			for (const auto& it : ignore_objects) {
+				if (collidable == it) {
+					ignore = true;
+					break;
+				}
+			}
+			if (ignore) continue;
+
 			ECollisionFormType tp = collidable->collidable.model->Type();
 			if (((tgt & (rqtObject | rqtObstacle)) && (tp == cftObject)) || ((tgt & rqtShape) && (tp == cftShape)))
 			{
@@ -164,9 +192,9 @@ BOOL CObjectSpace::_RayPick(const Fvector& start, const Fvector& dir, float rang
 					R.set_if_less(r_temp.r_begin());
 				}
 #ifdef DEBUG
-				if (bDebug()){
+				if (bDebug()) {
 					Fsphere	S;		S.P = spatial->spatial.sphere.P; S.R = spatial->spatial.sphere.R;
-					(*m_pRender)->dbgAddSphere(S,C);
+					(*m_pRender)->dbgAddSphere(S, C);
 					//dbg_S.push_back	(mk_pair(S,C));
 				}
 #endif
