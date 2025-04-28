@@ -186,6 +186,15 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.29**
+* Possibility to set multiple objects to ignore for `ray_pick` via multiple `set_ignore_object` calls: 
+  ```lua
+    ray:set_ignore_object(obj_1)
+    ray:set_ignore_object(obj_2)
+    ...
+  ```
+* ProfLander: Implement g_firepos (https://github.com/themrdemonized/xray-monolith/pull/190)
+
 **2025.04.27**
 * Removed duplicate stack traces on Lua-related CTD
 * `obj:bounding_box(bool bHud)` method to get bounding box of an object
