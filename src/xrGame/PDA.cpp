@@ -76,6 +76,29 @@ void CPda::Load(LPCSTR section)
 	m_screen_off_delay = READ_IF_EXISTS(pSettings, r_float, section, "screen_off_delay", 0.f);
 	m_thumb_rot[0] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_x", 0.f);
 	m_thumb_rot[1] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_y", 0.f);
+	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", .1f);
+}
+
+Fmatrix CPda::RayTransform()
+{
+	Fmatrix matrix = CHudItem::RayTransform();
+	matrix.i = Device.vCameraRight;
+	matrix.j = Device.vCameraTop;
+	matrix.k = Device.vCameraDirection;
+	return matrix;
+}
+
+static float lerp(float a, float b, float t)
+{
+	return a * (1 - t) + b * t;
+}
+
+float CPda::GetNearWallOffset()
+{
+	float ofs = CHudItem::GetNearWallOffset();
+	float ofs_ads = ofs;
+	clamp(ofs_ads, ofs_ads, m_nearwall_zoomed_range);
+	return lerp(ofs, ofs_ads, m_fZoomfactor);
 }
 
 void CPda::OnStateSwitch(u32 S, u32 oldState)

@@ -149,10 +149,14 @@ extern BOOL useSeparateUBGLKeybind;
 extern float g_gunsnd_indoor;
 extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
+extern int g_nearwall_trace;
 
 extern string32 crosshair_shader;
 extern string32 crosshair_texture;
 extern float crosshair_near_size;
+extern float crosshair_occluded_opacity;
+extern float crosshair_occlusion_fade_rate;
+extern float crosshair_distance_lerp_rate;
 
 ENGINE_API extern float g_console_sensitive;
 
@@ -2480,8 +2484,6 @@ void CCC_RegisterCommands()
 		//CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
 		CMD1(CCC_PHGravity, "ph_gravity");
 		CMD3(CCC_Mask, "log_missing_ini", &FS.m_Flags, FS.flPrintLTX);
-		CMD3(CCC_Mask, "g_firepos", &psActorFlags, AF_FIREPOS);
-		CMD3(CCC_Mask, "g_firepos_zoom", &psActorFlags, AF_FIREPOS_ZOOM);
 		CMD4(CCC_Float, "g_end_modif", &g_end_modif, 0.f, 10.f);
 	}
 #endif // MASTER_GOLD
@@ -2490,8 +2492,15 @@ void CCC_RegisterCommands()
 
 	CMD1(CCC_TimeFactor, "time_factor");
 	CMD1(CCC_FreezeTime, "freeze_time");
+	CMD3(CCC_Mask, "g_firepos", &psActorFlags, AF_FIREPOS);
+	CMD3(CCC_Mask, "g_firepos_zoom", &psActorFlags, AF_FIREPOS_ZOOM);
+	CMD3(CCC_Mask, "g_firedir_third_person", &psActorFlags, AF_FIREDIR_THIRD_PERSON);
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
+	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
 	CMD4(CCC_Float, "g_crosshair_near_size", &crosshair_near_size, 1.f, 16.f);
+	CMD4(CCC_Float, "g_crosshair_distance_lerp_rate", &crosshair_distance_lerp_rate, 1.f, 100.f);
+	CMD4(CCC_Float, "g_crosshair_occluded_opacity", &crosshair_occluded_opacity, 0.f, 1.f);
+	CMD4(CCC_Float, "g_crosshair_occlusion_fade_rate", &crosshair_occlusion_fade_rate, 1.f, 100.f);
 	CMD3(CCC_Mask, "g_use_shader_crosshair", &psHUD_Flags, HUD_SHADER_CROSSHAIR);
 	CMD3(CCC_String, "g_crosshair_shader", crosshair_shader, 32);
 	CMD3(CCC_String, "g_crosshair_texture", crosshair_texture, 32);

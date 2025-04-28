@@ -121,7 +121,8 @@ void CHUDCrosshair::RenderShaderCrosshair()
 	// Calculate size from linear depth
 	float zNear = Device.ViewportNear;
 	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float size = lerp(zNear + (crosshair_near_size - 1), zFar, (pos_.z - zNear) / (zFar - zNear)) + (zFar * dispersionRadius);
+	float t = (pos_.z - zNear - 1) / (zFar - zNear);
+	float size = lerp(crosshair_near_size, zFar, t);
 
 	// Transform and push vertices
 	for (int i = 0; i < 4; i++)
@@ -177,7 +178,8 @@ void CHUDCrosshair::RenderWireCrosshair()
 	// Calculate size from linear depth
 	float zNear = Device.ViewportNear;
 	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float size = lerp(zNear + (crosshair_near_size - 1), zFar, (pos_.z - zNear) / (zFar - zNear)) + (zFar * dispersionRadius);
+	float t = (pos_.z - zNear - 1) / (zFar - zNear);
+	float size = lerp(crosshair_near_size, zFar, t);
 
 	// Project into NDC with W-divide
 	Device.mProject.transform(pos);

@@ -34,6 +34,14 @@ void CWeaponBinoculars::Load(LPCSTR section)
 	m_bVision = !!pSettings->r_bool(section, "vision_present");
 }
 
+Fmatrix CWeaponBinoculars::RayTransform()
+{
+	Fmatrix matrix = CHudItem::RayTransform();
+	matrix.i = Device.vCameraTop;
+	matrix.j = Device.vCameraRight;
+	matrix.k = Device.vCameraDirection;
+	return matrix;
+}
 
 bool CWeaponBinoculars::Action(u16 cmd, u32 flags)
 {
@@ -191,7 +199,7 @@ bool CWeaponBinoculars::GetBriefInfo(II_BriefInfo& info)
 
 void CWeaponBinoculars::net_Relcase(CObject* object)
 {
-	inherited::net_Relcase(object);
+	CHudItem::net_Relcase(object);
 
 	if (!m_binoc_vision)
 		return;
