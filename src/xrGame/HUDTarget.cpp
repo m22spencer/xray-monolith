@@ -197,9 +197,12 @@ void CHUDTarget::Render()
 
 	float result_dist = GetUIDist();
 
-	Fvector4 pt;
-	Device.mFullTransform.transform(pt, mat_aim.c);
-	pt.y = -pt.y;
+	Fvector4 pt = Fvector4();
+	if (HUD().FireposActive())
+	{
+		Device.mFullTransform.transform(pt, mat_aim.c);
+		pt.y = -pt.y;
+	}
 
 	// Crosshair color
 	u32 color_readout = C_DEFAULT;
