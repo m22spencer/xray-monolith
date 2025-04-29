@@ -186,6 +186,13 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.04.30**
+* `g_draw_pickup_item_names` cvar for disabling item names on holding key (https://github.com/themrdemonized/xray-monolith/issues/191)
+* ProfLander: 
+  * Fix logspam in CWeapon::GetNearWallOffset (https://github.com/themrdemonized/xray-monolith/pull/192)
+  * Fix option defaults for firepos settings (https://github.com/themrdemonized/xray-monolith/pull/193)
+  * Fix crosshair readout jitter (https://github.com/themrdemonized/xray-monolith/pull/194)
+
 **2025.04.28**
 * Possibility to set multiple objects to ignore for `ray_pick` via multiple `set_ignore_object` calls: 
   ```lua
