@@ -538,8 +538,6 @@ float CWeapon::GetNearWallOffset()
 	float ofs = CHudItem::GetNearWallOffset();
 	float ofs_ads = ofs;
 	clamp(ofs_ads, ofs_ads, m_nearwall_zoomed_range);
-	Log("ofs", ofs);
-	Log("ofs_ads", ofs_ads);
 	return lerp(ofs, ofs_ads, GetZRotatingFactor());
 }
 
