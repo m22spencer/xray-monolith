@@ -1761,7 +1761,8 @@ void spawn_section(LPCSTR sSection, Fvector3 vPosition, u32 LevelVertexID, u16 P
 }
 
 enum ETraceTarget {
-	TT_CAMERA = 0,
+	TT_ACTOR = -1,
+	TT_CAMERA,
 	TT_WEAPON,
 	TT_DEVICE,
 	TT_MAX
@@ -1769,11 +1770,13 @@ enum ETraceTarget {
 
 static collide::rq_result* get_rq(ETraceTarget tt)
 {
-	R_ASSERT(tt >= 0, tt < TT_MAX);
+	R_ASSERT(tt >= TT_ACTOR, tt < TT_MAX);
 
 	const attachable_hud_item* item = NULL;
 	switch (tt)
 	{
+	case TT_ACTOR:
+		return &Actor()->GetPick().result;
 	case TT_CAMERA:
 		return &HUD().GetRQ();
 	case TT_WEAPON:
@@ -1805,7 +1808,7 @@ CScriptGameObject* g_get_target_obj(ETraceTarget tt)
 
 CScriptGameObject* g_get_target_obj()
 {
-	return g_get_target_obj(TT_CAMERA);
+	return g_get_target_obj(TT_ACTOR);
 }
 
 float g_get_target_dist(ETraceTarget tt)
@@ -1818,7 +1821,7 @@ float g_get_target_dist(ETraceTarget tt)
 
 float g_get_target_dist()
 {
-	return g_get_target_dist(TT_CAMERA);
+	return g_get_target_dist(TT_ACTOR);
 }
 
 u32 g_get_target_element(ETraceTarget tt)
@@ -1833,7 +1836,7 @@ u32 g_get_target_element(ETraceTarget tt)
 
 u32 g_get_target_element()
 {
-	return g_get_target_element(TT_CAMERA);
+	return g_get_target_element(TT_ACTOR);
 }
 
 // demonized: get world position under crosshair
@@ -1849,7 +1852,7 @@ Fvector g_get_target_pos(ETraceTarget tt)
 
 Fvector g_get_target_pos()
 {
-	return g_get_target_pos(TT_CAMERA);
+	return g_get_target_pos(TT_ACTOR);
 }
 
 // demonized: get result of crosshair ray query
@@ -1865,7 +1868,7 @@ script_rq_result g_get_target_result(ETraceTarget tt)
 
 script_rq_result g_get_target_result()
 {
-	return g_get_target_result(TT_CAMERA);
+	return g_get_target_result(TT_ACTOR);
 }
 
 u8 get_active_cam()
@@ -2195,6 +2198,7 @@ void CLevel::script_register(lua_State* L)
 			class_<enum_exporter<ETraceTarget>>("ETraceTarget")
 				.enum_("trace_targets")
 				[
+					value("Actor", int(ETraceTarget::TT_ACTOR)),
 					value("Camera", int(ETraceTarget::TT_CAMERA)),
 					value("Weapon", int(ETraceTarget::TT_WEAPON)),
 					value("Device", int(ETraceTarget::TT_DEVICE))
