@@ -1955,7 +1955,7 @@ void player_hud::OnFrame()
 		if (m_attached_items[SCOPE_ATTACH_IDX])
 		{
 			CHudItem* parent = m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item;
-			m_attached_items[SCOPE_ATTACH_IDX]->m_item_transform.translate_add(nearwall_0);
+			m_attached_items[SCOPE_ATTACH_IDX]->m_item_transform.mulB_43(nearwall_0);
 		}
 	}
 }
