@@ -178,10 +178,10 @@
     // Query data from actor ray queries
     // Actor = Pick active ray from Weapon / Device / Camera
 	enum ETraceTarget {
-		Actor       = -1,
 		Camera      = 0,
 		Weapon      = 1,
 		Device      = 2,
+		Actor       = 3,
 	}
 		
     namespace level {
