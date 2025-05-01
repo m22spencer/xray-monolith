@@ -1113,12 +1113,17 @@ void CHudItem::Ray(SPickParam& pp)
 	pp.defs.dir = matrix.k;
 }
 
-void CHudItem::OnFrame()
+void CHudItem::UpdatePick()
 {
 	Ray(PP);
 	HUD().DoPick(PP);
 	if (PP.barrel_blocked)
 		PP.result.range -= PP.barrel_dist;
+}
+
+void CHudItem::OnFrame()
+{
+	UpdatePick();
 }
 
 void CHudItem::net_Relcase(CObject* O)

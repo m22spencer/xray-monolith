@@ -134,6 +134,28 @@ end
 -- 	end)
 -- end
 
+-- HUD item callbacks
+
+-- Near-wall transform callback
+-- Intercepts the transforms applied to the HUD when near a wall
+-- Receives the following table:
+-- {
+--   target: int
+--   offset: float
+--   direction: vector
+--   matrix: matrix
+--   override: bool
+-- }
+-- `target` corresponds to the Weapon and Camera variants of ETraceTarget in lua_help_ex.script
+-- `offset` is the signed distance from the barrel to the wall
+-- `direction` is the vector along which the offset is applied
+-- `matrix` is the mutable offset transform
+-- `override` is a mutable flag for suppressing the built-in position offset
+AddScriptCallback("actor_hud_on_nearwall")
+_G.CActorHudOnNearWall = function(arg)
+	SendScriptCallback("actor_hud_on_nearwall", arg)
+end
+
 -- Mouse callbacks
 -- Scroll wheel callback, sends mouse wheel direction as a number
 -- 1 is up, 0 is down

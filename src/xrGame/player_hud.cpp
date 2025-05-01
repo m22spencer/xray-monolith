@@ -1838,52 +1838,124 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 	updateMovementLayerState();
 }
 
+bool nearwall_callback(int target, float ofs, const Fvector& dir, Fmatrix& mat)
+{
+	luabind::functor<void> on_nearwall;
+	if (!ai().script_engine().functor("_G.CActorHudOnNearWall", on_nearwall))
+	{
+		return false;
+	}
+
+	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	table["target"] = target;
+	table["offset"] = ofs;
+	table["direction"] = dir;
+	table["matrix"] = mat;
+	table["override"] = false;
+	on_nearwall(table);
+	mat = luabind::object_cast<Fmatrix>(table["matrix"]);
+	return luabind::object_cast<bool>(table["override"]);
+}
+
+void update_nearwall(int target, const attachable_hud_item* item, Fmatrix& nearwall)
+{
+	CHudItem* parent = item->m_parent_hud_item;
+	const SPickParam& pp = parent->GetPick();
+	float ofs = parent->GetNearWallOffset();
+	nearwall = Fmatrix().identity();
+	Fvector dir = Fvector().mul(pp.barrel_matrix.k, -1);
+	Device.mView.transform_dir(dir);
+
+	if (!nearwall_callback(target, ofs, dir, nearwall))
+	{
+		dir.mul(ofs);
+		nearwall.translate_add(dir);
+	}
+}
+
+void apply_nearwall(Fmatrix& transform, Fmatrix& nearwall, attachable_hud_item* item)
+{
+	transform.mulB_43(nearwall);
+
+	Fmatrix mInv = transform;
+	mInv.invert();
+
+	Fmatrix delta = mInv;
+	delta.mulB_43(item->m_item_transform);
+	Fmatrix deltaInv = delta;
+	deltaInv.invert();
+
+	nearwall.mulA_43(deltaInv);
+	nearwall.mulB_43(delta);
+	item->m_item_transform.mulB_43(nearwall);
+	item->m_parent_hud_item->UpdatePick();
+}
+
 void player_hud::OnFrame()
 {
+	// If we have a main-hand item...
 	if (m_attached_items[0])
+		// Delegate control
 		m_attached_items[0]->m_parent_hud_item->OnFrame();
 
+	// If we have an off-hand item...
 	if (m_attached_items[1])
+		// Delegate control
 		m_attached_items[1]->m_parent_hud_item->OnFrame();
 
 	// If near-wall is in position mode...
 	if (g_nearwall == NW_POS)
 	{
-		Fvector nearwall_0;
+		Fmatrix nearwall_0;
+
+		// If we have a main-hand item...
 		if (m_attached_items[0])
 		{
-			CHudItem* parent = m_attached_items[0]->m_parent_hud_item;
-			const SPickParam& pp = parent->GetPick();
-			float ofs = parent->GetNearWallOffset();
-			nearwall_0 = Fvector().mul(pp.barrel_matrix.k, -ofs);
-			m_transform.translate_add(nearwall_0);
-			m_attached_items[0]->m_item_transform.translate_add(nearwall_0);
+			update_nearwall(1, m_attached_items[0], nearwall_0);
+
+			// If we have no off-hand item
 			if (!m_attached_items[1])
 			{
-				m_transform_2.translate_add(nearwall_0);
+				// Apply the main hand item's nearwall to the left arm
+				m_transform_2.mulB_43(nearwall_0);
 			}
+
+			apply_nearwall(m_transform, nearwall_0, m_attached_items[0]);
 		}
 
+		// If we have an off-hand item...
 		if (m_attached_items[1])
 		{
-			CHudItem* parent = m_attached_items[1]->m_parent_hud_item;
-			const SPickParam& pp = parent->GetPick();
-			float ofs = parent->GetNearWallOffset();
-			Fvector nearwall_1 = Fvector().mul(pp.barrel_matrix.k, -ofs);
+			Fmatrix nearwall_1 = Fmatrix().identity();
+			update_nearwall(2, m_attached_items[1], nearwall_1);
+
+			// If we have a main-hand item...
 			if (m_attached_items[0])
 			{
+				// And it is a weapon...
 				CWeapon* pWeapon = smart_cast<CWeapon*>(m_attached_items[0]->m_parent_hud_item);
 				if (pWeapon)
-					nearwall_1.lerp(nearwall_1, nearwall_0, pWeapon->GetZRotatingFactor());
+				{
+					// Interpolate between main and off -hand transforms based on aim factor
+					float fac = pWeapon->GetZRotatingFactor();
+					nearwall_1.i.lerp(nearwall_1.i, nearwall_0.i, fac);
+					nearwall_1.i.normalize();
+					nearwall_1.j.lerp(nearwall_1.j, nearwall_0.j, fac);
+					nearwall_1.j.normalize();
+					nearwall_1.k.lerp(nearwall_1.k, nearwall_0.k, fac);
+					nearwall_1.k.normalize();
+					nearwall_1.c.lerp(nearwall_1.c, nearwall_0.c, fac);
+				}
 			}
-			m_transform_2.translate_add(nearwall_1);
-			m_attached_items[1]->m_item_transform.translate_add(nearwall_1);
+
+			// Apply nearwall to left arm
+			apply_nearwall(m_transform_2, nearwall_1, m_attached_items[1]);
 		}
 
 		if (m_attached_items[SCOPE_ATTACH_IDX])
 		{
 			CHudItem* parent = m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item;
-			m_attached_items[SCOPE_ATTACH_IDX]->m_item_transform.translate_add(nearwall_0);
+			m_attached_items[SCOPE_ATTACH_IDX]->m_item_transform.mulB_43(nearwall_0);
 		}
 	}
 }
