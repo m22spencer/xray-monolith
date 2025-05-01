@@ -532,8 +532,8 @@ private:
 	float m_nearwall_zoomed_range;
 
 public:
-	float GetNearWallOffset();
-	float GetHudFov();
+	float GetTargetNearWallOffset();
+	float GetTargetHudFov();
 
 public:
 	Fmatrix RayTransform();

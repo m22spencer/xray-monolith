@@ -265,18 +265,6 @@ void CHudItem::SendHiddenItem()
 	}
 }
 
-float CHudItem::GetNearWallOffset()
-{
-	if (g_nearwall_trace == NT_CAM)
-	{
-		return m_nearwall_factor * GetNearWallRange() * GetBaseHudFov();
-	}
-	else if (g_nearwall_trace == NT_ITEM)
-	{
-		return m_nearwall_factor * GetBaseHudFov();
-	}
-}
-
 void CHudItem::UpdateHudAdditional(Fmatrix& trans)
 {
 	CActor* pActor = smart_cast<CActor*>(object().H_Parent());
@@ -499,12 +487,38 @@ float CHudItem::GetNearWallRange()
 	return m_nearwall_dist_max - m_nearwall_dist_min;
 }
 
+static float lerp(float a, float b, float t)
+{
+	clamp(t, 0.f, 1.f);
+	return a * (1 - t) + b * t;
+}
+
+float CHudItem::GetTargetHudFov()
+{
+	float target_fov = GetBaseHudFov();
+	if (g_nearwall == NW_FOV)
+		target_fov -= m_nearwall_target_hud_fov * m_nearwall_factor;
+	return target_fov;
+}
+
+float CHudItem::GetTargetNearWallOffset()
+{
+	if (g_nearwall_trace == NT_CAM)
+	{
+		return m_nearwall_factor * GetNearWallRange() * GetBaseHudFov();
+	}
+	else if (g_nearwall_trace == NT_ITEM)
+	{
+		return m_nearwall_factor * GetBaseHudFov();
+	}
+
+	return 0.f;
+}
+
 void CHudItem::UpdateCL()
 {
 	if (g_nearwall && ParentIsActor() && Level().CurrentViewEntity() == object().H_Parent())
 	{
-		float fac;
-
 		// If firepos is active
 		if (g_nearwall_trace == NT_CAM)
 		{
@@ -513,20 +527,24 @@ void CHudItem::UpdateCL()
 
 			float dist = rq.range;
 			clamp(dist, m_nearwall_dist_min, m_nearwall_dist_max);
-			fac = 1 - ((dist - m_nearwall_dist_min) / GetNearWallRange());
+			m_nearwall_factor = 1 - ((dist - m_nearwall_dist_min) / GetNearWallRange());
 		}
 		else if (g_nearwall_trace == NT_ITEM)
 		{
 			// Take the item's trace range and invert it, as negative ranges encode penetration distance
 			collide::rq_result& rq = GetRQ();
-			fac = -rq.range;
-			clamp(fac, 0.f, fac);
+			m_nearwall_factor = -rq.range;
+			clamp(m_nearwall_factor, 0.f, m_nearwall_factor);
 ;		}
-
-		float t = m_nearwall_speed_mod * Device.fTimeDelta;
-		clamp(t, 0.f, 1.f);
-		m_nearwall_factor = m_nearwall_factor * (1 - t) + fac * t;
 	}
+
+	float t = m_nearwall_speed_mod * Device.fTimeDelta;
+	
+	float target_fov = GetTargetHudFov();
+	m_hud_fov = lerp(m_hud_fov, target_fov, t);
+
+	float target_ofs = GetTargetNearWallOffset();
+	m_nearwall_ofs = lerp(m_nearwall_ofs, target_ofs, t);
 
 	if (m_current_motion_def)
 	{
@@ -1116,10 +1134,12 @@ float CHudItem::GetBaseHudFov()
 
 float CHudItem::GetHudFov()
 {
-	float fov = GetBaseHudFov();
-	if (g_nearwall == NW_FOV)
-		fov -= m_nearwall_target_hud_fov * m_nearwall_factor;
-	return fov;
+	return m_hud_fov;
+}
+
+float CHudItem::GetNearWallOffset()
+{
+	return m_nearwall_ofs;
 }
 
 CAnonHudItem::CAnonHudItem() { }

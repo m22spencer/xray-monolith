@@ -509,9 +509,9 @@ inline float smoothstep(float x)
 	return x * x * (3 - 2 * x);
 }
 
-float CWeapon::GetHudFov()
+float CWeapon::GetTargetHudFov()
 {
-	float base = inherited::GetHudFov();
+	float base = inherited::GetTargetHudFov();
 
 	float x = smoothstep(m_zoom_params.m_fZoomRotationFactor);
 	float factor = hud_fov_aim_factor > 0 ? hud_fov_aim_factor : 1;
@@ -533,9 +533,9 @@ static float lerp(float a, float b, float t)
 	return a * (1 - t) + b * t;
 }
 
-float CWeapon::GetNearWallOffset()
+float CWeapon::GetTargetNearWallOffset()
 {
-	float ofs = CHudItem::GetNearWallOffset();
+	float ofs = inherited::GetTargetNearWallOffset();
 	float ofs_ads = ofs;
 	clamp(ofs_ads, ofs_ads, m_nearwall_zoomed_range);
 	return lerp(ofs, ofs_ads, GetZRotatingFactor());

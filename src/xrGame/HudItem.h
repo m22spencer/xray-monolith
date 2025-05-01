@@ -202,9 +202,11 @@ public:
 	bool IsAttachedToHUD();
 	virtual bool ParentIsActor();
 	virtual float GetNearWallRange();
-	virtual float GetNearWallOffset();
 	virtual float GetBaseHudFov();
-	virtual float GetHudFov();
+	virtual float GetTargetHudFov();
+	virtual float GetTargetNearWallOffset();
+	float GetNearWallOffset();
+	float GetHudFov();
 	virtual void on_outfit_changed();
 	virtual void on_a_hud_attach();
 	virtual void on_b_hud_detach();
@@ -276,6 +278,8 @@ public:
 	float m_nearwall_target_hud_fov;
 	float m_nearwall_speed_mod;
 	float m_base_fov;
+	float m_hud_fov;
+	float m_nearwall_ofs;
 
 	virtual CHudItem* cast_hud_item() { return this; }
 	virtual bool PlayAnimCrouchIdleMoving(); //AVO: new crouch idle animation
