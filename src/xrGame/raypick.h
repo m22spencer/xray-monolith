@@ -94,7 +94,7 @@ struct CRayPick
 	void set_ignore_object(CScriptGameObject* I) { 
 		if (I) {
 			CObject* obj = smart_cast<CObject*>(&(I->object()));
-			if (obj) {
+			if (obj && std::find(ignore.begin(), ignore.end(), obj) != ignore.end()) {
 				ignore.push_back(obj);
 			}
 		}
