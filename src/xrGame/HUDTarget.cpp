@@ -192,7 +192,9 @@ void CHUDTarget::Render()
 	Fmatrix mat_aim = Fmatrix().identity();
 	mat_aim.mulB_43(Device.mInvView);
 	mat_aim.mulB_43(Fmatrix().translate(crosshairPos));
-	mat_aim.mulB_43(Fmatrix().setHPB(0, 0, hpb_barrel.z - hpb_cam.z));
+
+	if (HUD().FireposActive())
+		mat_aim.mulB_43(Fmatrix().setHPB(0, 0, hpb_barrel.z - hpb_cam.z));
 
 	float result_dist = GetUIDist();
 
