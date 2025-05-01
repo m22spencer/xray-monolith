@@ -228,6 +228,13 @@ _G.CAI_Stalker__OnBeforeOwnershipTake = function(npc, item)
 	return flags.ret_value
 end
 
+AddScriptCallback("npc_set_body_state")
+function _G.CAI_Stalker__SetBodyState(npc, state)
+	local flags = {ret_value = state}
+	SendScriptCallback("npc_set_body_state",npc, state, flags)
+	return flags.ret_value
+end
+
 -- actor_on_task_callback
 AddScriptCallback("actor_on_task_callback")
 task_callback = task_manager.task_callback
