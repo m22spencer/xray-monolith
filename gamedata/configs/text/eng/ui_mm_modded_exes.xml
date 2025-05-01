@@ -35,6 +35,9 @@
 	<string id="ui_mm_modded_exes_misc_g_crosshair_near_size">
 		<text>Crosshair size near the camera (g_crosshair_near_size)</text>
 	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_far_size">
+		<text>Crosshair size at the horizon (g_crosshair_far_size)</text>
+	</string>
 	<string id="ui_mm_modded_exes_misc_g_crosshair_distance_lerp_rate">
 		<text>Crosshair range animation speed (g_crosshair_distance_lerp_rate)</text>
 	</string>
