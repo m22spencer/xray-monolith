@@ -25,6 +25,8 @@ private:
 
 	float dispersionRadius;
 
+	void PushVerts(Fvector* verts, Fvector* uvs, int count, Fmatrix mat, Fvector4 pos);
+
 	void DeinitShaderCrosshair();
 	bool InitShaderCrosshair();
 	void RenderShaderCrosshair();

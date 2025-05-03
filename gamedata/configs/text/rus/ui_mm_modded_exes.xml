@@ -38,6 +38,12 @@
 	<string id="ui_mm_modded_exes_misc_g_crosshair_far_size">
 		<text>–азмер перекрести€ на горизонте (g_crosshair_far_size)</text>
 	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_depth_begin">
+		<text>ќграничение рассто€ни€ дл€ близкого размера (g_crosshair_depth_begin)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_depth_end">
+		<text>ѕредельное рассто€ние дл€ дальнего размера (g_crosshair_depth_end)</text>
+	</string>
 	<string id="ui_mm_modded_exes_misc_g_crosshair_distance_lerp_rate">
 		<text>—корость анимации дальности перекрести€ (g_crosshair_distance_lerp_rate)</text>
 	</string>

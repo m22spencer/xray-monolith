@@ -38,6 +38,12 @@
 	<string id="ui_mm_modded_exes_misc_g_crosshair_far_size">
 		<text>Crosshair size at the horizon (g_crosshair_far_size)</text>
 	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_depth_begin">
+		<text>Distance limit for near size (g_crosshair_depth_begin)</text>
+	</string>
+	<string id="ui_mm_modded_exes_misc_g_crosshair_depth_end">
+		<text>Distance limit for far size (g_crosshair_depth_end)</text>
+	</string>
 	<string id="ui_mm_modded_exes_misc_g_crosshair_distance_lerp_rate">
 		<text>Crosshair range animation speed (g_crosshair_distance_lerp_rate)</text>
 	</string>

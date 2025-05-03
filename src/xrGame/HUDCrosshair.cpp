@@ -13,6 +13,8 @@ string32 crosshair_shader = "hud\\cursor";
 string32 crosshair_texture = "ui\\cursor";
 float crosshair_near_size = 1.f;
 float crosshair_far_size = 1.f;
+float crosshair_depth_begin = 0.f;
+float crosshair_depth_end = 100.f;
 
 CHUDCrosshair::CHUDCrosshair()
 {
@@ -56,7 +58,12 @@ extern ENGINE_API BOOL g_bRendering;
 
 static float lerp(float a, float b, float t)
 {
+	clamp(t, 0.f, 1.f);
 	return a * (1 - t) + b * t;
+}
+
+static float remap(float value, float from1, float to1, float from2, float to2) {
+	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 }
 
 void CHUDCrosshair::DeinitShaderCrosshair()
@@ -83,15 +90,43 @@ bool CHUDCrosshair::InitShaderCrosshair()
 	return shaderCrosshair->inited();
 }
 
+void CHUDCrosshair::PushVerts(Fvector* verts, Fvector* uvs, int count, Fmatrix mat, Fvector4 pos)
+{
+	Fvector2 scr_size = {
+		float(::Render->getTarget()->get_width()),
+		float(::Render->getTarget()->get_height())
+	};
+
+	// Calculate size from linear depth
+	float zNear = Device.ViewportNear;
+	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
+	float t = remap(pos.w / zFar, crosshair_depth_begin / zFar, crosshair_depth_end / zFar, 0.f, 1.f);
+	float size = pos.w * lerp(crosshair_near_size, crosshair_far_size, t) * (Device.fFOV / 90.0);
+
+	for (int i = 0; i < count; i++)
+	{
+		Fvector vert = verts[i];
+		Fvector uv;
+		if (uvs)
+			uv = uvs[i];
+
+		vert.mul(size);
+		mat.transform(vert);
+		vert.x *= scr_size.x / scr_size.y;
+		vert.y *= -1;
+		vert.x += pos.x;
+		vert.y += pos.y;
+		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, uv.x, uv.y);
+	}
+}
+
 void CHUDCrosshair::RenderShaderCrosshair()
 {
-	UIRender->StartPrimitive(4, IUIRender::ptTriStrip, UI().m_currentPointType);
-
-	Fvector4 pt;
-	Device.mFullTransform.transform(pt, transform.c);
-	pt.y = -pt.y;
-
-	Fvector2 scr_size = { float(Device.dwWidth), float(Device.dwHeight) };
+	// Fetch the render target size
+	Fvector2 scr_size = {
+		float(::Render->getTarget()->get_width()),
+		float(::Render->getTarget()->get_height())
+	};
 
 	float min = minRadius;
 	float max = maxRadius;
@@ -103,41 +138,22 @@ void CHUDCrosshair::RenderShaderCrosshair()
 		{max, max},
 	};
 
-	Fvector2 uvs[4] = {
+	Fvector uvs[4] = {
 		{0, 1},
 		{0, 0},
 		{1, 1},
 		{1, 0},
 	};
 
-	// Bring our transform into view space
-	Fvector pos = Fvector();
-	transform.transform_tiny(pos);
-	Device.mView.transform_tiny(pos);
+	Fmatrix mat = Fmatrix().mul(Device.mFullTransform, transform);
+	Fvector4 pos = Fvector4().set(mat._41, mat._42, mat._43, mat._44);
 
-	// Project without W-divide to retrieve linear depth
-	Fvector pos_ = Fvector().set(pos);
-	Device.mProject.transform_tiny(pos_);
+	// Apply perspective divide to aim point and transform into screen space
+	pos.x = ((pos.x / pos.w) + 1.f) * 0.5f * scr_size.x;
+	pos.y = (-(pos.y / pos.w) + 1.f) * 0.5f * scr_size.y;
 
-	// Calculate size from linear depth
-	float zNear = Device.ViewportNear;
-	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float t = (pos_.z - zNear - 1) / (zFar - zNear);
-	float size = lerp(crosshair_near_size, crosshair_far_size * zFar, t);
-
-	// Transform and push vertices
-	for (int i = 0; i < 4; i++)
-	{
-		Fvector vert = verts[i];
-		vert.mul(size);
-		transform.transform_tiny(vert);
-		Device.mView.transform_tiny(vert);
-		Device.mProject.transform(vert);
-		vert.x = (vert.x + 1.f) * 0.5f * scr_size.x;
-		vert.y = (-vert.y + 1.f) * 0.5f * scr_size.y;
-		Fvector2 uv = uvs[i];
-		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, uv.x, uv.y);
-	}
+	UIRender->StartPrimitive(4, IUIRender::ptTriStrip, UI().m_currentPointType);
+	PushVerts(verts, uvs, 4, mat, pos);
 
 	// Draw
 	UIRender->SetShader(*shaderCrosshair);
@@ -167,41 +183,18 @@ void CHUDCrosshair::RenderWireCrosshair()
 		{ 0, -max },
 	};
 
-	// Transform into view space
-	Fvector pos = Fvector();
-	transform.transform_tiny(pos);
-	Device.mView.transform_tiny(pos);
+	Fvector uvs[8];
 
-	// Project without W-divide to retrieve linear depth
-	Fvector pos_ = Fvector().set(pos);
-	Device.mProject.transform_tiny(pos_);
+	Fmatrix mat = Fmatrix().mul(Device.mFullTransform, transform);
+	Fvector4 pos = Fvector4().set(mat._41, mat._42, mat._43, mat._44);
 
-	// Calculate size from linear depth
-	float zNear = Device.ViewportNear;
-	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float t = (pos_.z - zNear - 1) / (zFar - zNear);
-	float size = lerp(crosshair_near_size, crosshair_far_size * zFar, t);
-
-	// Project into NDC with W-divide
-	Device.mProject.transform(pos);
+	// Apply perspective divide to aim point and transform into screen space
+	pos.x = ((pos.x / pos.w) + 1.f) * 0.5f * scr_size.x;
+	pos.y = (-(pos.y / pos.w) + 1.f) * 0.5f * scr_size.y;
 
 	// Project vertices for accurate scaling
 	UIRender->StartPrimitive(8, IUIRender::ptLineList, UI().m_currentPointType);
-	for (int i = 0; i < 8; i++)
-	{
-		Fvector vert = verts[i];
-		vert.mul(size);
-		transform.transform_tiny(vert);
-		Device.mView.transform_tiny(vert);
-		Device.mProject.transform(vert);
-		vert.x = (vert.x + 1.f) * 0.5f * scr_size.x;
-		vert.y = (-vert.y + 1.f) * 0.5f * scr_size.y;
-		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, 0, 0);
-	}
-
-	// Apply perspective divide to aim point and transform into screen space
-	pos.x = (pos.x + 1.f) * 0.5f * scr_size.x;
-	pos.y = (-pos.y + 1.f) * 0.5f * scr_size.y;
+	PushVerts(verts, NULL, 8, mat, pos);
 
 	// Render a 1px wide line  for the center dot
 	UIRender->PushPoint(pos.x - 0.5f, pos.y, 0, crossColor, 0, 0);

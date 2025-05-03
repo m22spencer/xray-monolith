@@ -81,7 +81,7 @@ CHUDTarget::~CHUDTarget()
 
 float crosshair_occluded_opacity = .6f;
 float crosshair_occlusion_fade_rate = 20.f;
-float crosshair_distance_lerp_rate = 30.f;
+float crosshair_distance_lerp_rate = 40.f;
 
 void CHUDTarget::Load()
 {
@@ -151,9 +151,16 @@ void CHUDTarget::IntegratePosition()
 		target = Fvector().add(pos, Fvector().mul(dir, pp.barrel_dist));
 
 	// Interpolate crosshair position toward target
-	float t = Device.fTimeDelta * crosshair_distance_lerp_rate;
-	clamp(t, 0.f, 1.f);
-	crosshairPos.lerp(crosshairPos, target, t);
+	if (psHUD_Flags.is(HUD_CROSSHAIR_DISTANCE_LERP))
+	{
+		float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
+		float fac = 1 - (target.z / zFar);
+		float t = Device.fTimeDelta * (fac + crosshair_distance_lerp_rate);
+		clamp(t, 0.f, 1.f);
+		crosshairPos.lerp(crosshairPos, target, t);
+	}
+	else
+		crosshairPos = target;
 }
 
 void CHUDTarget::IntegrateOpacity()
@@ -192,7 +199,9 @@ void CHUDTarget::Render()
 	Fmatrix mat_aim = Fmatrix().identity();
 	mat_aim.mulB_43(Device.mInvView);
 	mat_aim.mulB_43(Fmatrix().translate(crosshairPos));
-	mat_aim.mulB_43(Fmatrix().setHPB(0, 0, hpb_barrel.z - hpb_cam.z));
+
+	if (HUD().FireposActive())
+		mat_aim.mulB_43(Fmatrix().setHPB(0, 0, hpb_barrel.z - hpb_cam.z));
 
 	float result_dist = GetUIDist();
 
