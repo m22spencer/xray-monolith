@@ -2499,6 +2499,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "g_firepos", &psActorFlags, AF_FIREPOS);
 	CMD3(CCC_Mask, "g_firepos_zoom", &psActorFlags, AF_FIREPOS_ZOOM);
 	CMD3(CCC_Mask, "g_firedir_third_person", &psActorFlags, AF_FIREDIR_THIRD_PERSON);
+	CMD3(CCC_Mask, "g_aimpos", &psActorFlags, AF_AIMPOS);
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psHUD_Flags, HUD_CROSSHAIR_SHOW_ALWAYS);

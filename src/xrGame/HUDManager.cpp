@@ -164,9 +164,29 @@ void CHUDManager::OnFrame()
 		pUIGame->OnFrame();
 
 	PP.CameraPick();
-	DoPick(PP);
 
 	g_player_hud->OnFrame();
+
+	// If aim position is not enabled
+	bool aimpos = psActorFlags.test(AF_AIMPOS);
+	if (aimpos)
+	{
+		CHudItem* pItem = smart_cast<CHudItem*>(Actor()->inventory().ActiveItem());
+		if (pItem)
+		{
+			attachable_hud_item* hi = pItem->HudItemData();
+			hud_item_measures measures = hi->m_measures;
+			Fmatrix matrix = hi->m_item_transform;
+			matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
+			matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
+
+			// Use weapon aim direction
+			PP.defs.dir = Fvector().mul(matrix.k, PP.defs.range);
+			PP.defs.dir.normalize();
+		}
+	}
+
+	DoPick(PP);
 }
 
 //--------------------------------------------------------------------
