@@ -1,0 +1,62 @@
+--- Crosshair options tree
+
+-- Import smart constructors
+options_builder.import_into(this)
+
+-- Options page
+PAGE = page {
+	{ id = "crosshair" },
+
+	check { id = "g_crosshair_show_always" },
+	check { id = "g_use_shader_crosshair" },
+	track {
+		id = "g_crosshair_near_size",
+		def = 1,
+		min = 1,
+		max = 64,
+		step = 1,
+	},
+	track {
+		id = "g_crosshair_far_size",
+		def = 1,
+		min = 1,
+		max = 64,
+		step = 1,
+	},
+	track {
+		id = "g_crosshair_depth_begin",
+		def = 0,
+		min = 0,
+		max = 300,
+		step = 1,
+	},
+	track {
+		id = "g_crosshair_depth_end",
+		def = 25,
+		min = 0,
+		max = 300,
+		step = 1,
+	},
+	check { id = "g_crosshair_distance_lerp" },
+	track {
+		id = "g_crosshair_distance_lerp_rate",
+		def = 40,
+		min = 1,
+		max = 100,
+		step = 1,
+	},
+	track {
+		id = "g_crosshair_occluded_opacity",
+		def = 0.6,
+		min = 0,
+		max = 1,
+		step = 0.05,
+	},
+	track {
+		id = "g_crosshair_occlusion_fade_rate",
+		def = 20,
+		min = 1,
+		max = 100,
+		step = 1,
+	},
+}
