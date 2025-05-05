@@ -3240,9 +3240,11 @@ Fmatrix CWeapon::RayTransform()
 			Fvector target = Fvector().add(pick.defs.start, Fvector().mul(pick.defs.dir, pick.defs.range));
 			Fvector delta = Fvector().sub(target, pos).normalize();
 
-			float h, p;
+			float h, p, b;
 			delta.getHP(h, p);
-			matrix.setHPB(h, p, 0);
+			float _h, _p;
+			Device.mInvView.getHPB(_h, _p, b);
+			matrix.setHPB(h, p, b);
 			matrix.c = pos;
 		}
 	}
