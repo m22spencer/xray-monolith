@@ -162,7 +162,10 @@ local options = group(
 			list_bool { id = "r__3Dfakescope" },
 
 			slide("2d_scopes"),
-			check{id = "sds_enable", def = true},
+			check {
+				id = "sds_enable",
+				def = true
+			},
 			check {
 				id = "sds_speed_enable",
 				def = true
