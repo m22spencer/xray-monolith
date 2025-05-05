@@ -63,7 +63,7 @@ PAGE = page {
 		step = 0.0005,
 	},
 					
-	line(),
+	line {},
 					
 	track {
 		id = "scope_fog_radius",

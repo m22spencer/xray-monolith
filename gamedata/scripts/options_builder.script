@@ -10,11 +10,10 @@ function is_string(arg)
 end
 
 -- Divider line
-function line()
-	return {
-		id = "divider",
-		type = "line"
-	}
+function line(args)
+	args.id = args.id or "divider"
+	args.type = "line"
+	return args
 end
 
 -- Image with text

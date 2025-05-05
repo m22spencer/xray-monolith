@@ -150,7 +150,7 @@ PAGE = page {
 		cmd = "r4_hdr10_ui_saturation",
 	},
 					
-	line(),
+	line {},
 					
 	list_bool {
 		id = "bloom_on",
@@ -186,7 +186,7 @@ PAGE = page {
 		cmd = "r4_hdr10_bloom_intensity",
 	},
 					
-	line(),
+	line {},
 					
 	list_bool {
 		id = "flare_on",
@@ -303,7 +303,7 @@ PAGE = page {
 		cmd = "r4_hdr10_flare_halo_intensity",
 	},
 					
-	line(),
+	line {},
 					
 	list_bool {
 		id = "sun_on",
