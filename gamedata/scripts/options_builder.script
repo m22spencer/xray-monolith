@@ -99,6 +99,8 @@ function list_bool(args)
 end
 
 -- Settings page
+-- Takes a list; expects the first element to be a table of page settings,
+-- and subsequent elements to be child controls
 function page(args)
 	assert(is_table(args), "Page argument is not a table")
 	local head = table.remove(args, 1)
@@ -110,6 +112,8 @@ function page(args)
 end
 
 -- Page group
+-- Takes a list; expects the first element to be a table of group settings,
+-- and subsequent elements to be child controls
 function group(args)
 	assert(is_table(args), "Group argument is not a table")
 	local head = table.remove(args, 1)
