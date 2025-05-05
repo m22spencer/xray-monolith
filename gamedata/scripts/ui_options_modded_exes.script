@@ -7,14 +7,14 @@ function line()
 end
 
 -- Image with text
-function slide(id)
-	return {
-		id = "slide_modded_exes_" .. id,
-		type = "slide",
-		link = "ui_options_slider_other",
-		text = "ui_mm_" .. id .. "_modded_exes",
-		size = { 512, 50 },
-	}
+function slide(args)
+	local id = args.id
+	args.id = "slide_modded_exes_" .. id
+	args.type = "slide"
+	args.link = args.link or "ui_options_slider_other"
+	args.text = args.text or ("ui_mm_" .. id .. "_modded_exes")
+	args.size = args.size or { 512, 50 }
+	return args
 end
 
 -- Boolean checkbox
@@ -77,7 +77,7 @@ function page(id, ...)
 		id = id,
 		sh = true,
 		gr = {
-			slide(id),
+			slide { id = id },
 			...
 		}
 	}
@@ -170,7 +170,7 @@ local options = group {
 			
 			list_bool { id = "r__3Dfakescope" },
 
-			slide("2d_scopes"),
+			slide { id = "2d_scopes" },
 			check {
 				id = "sds_enable",
 				def = true
