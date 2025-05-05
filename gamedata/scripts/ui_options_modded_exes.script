@@ -1,8 +1,7 @@
-function group(id, ...)
-   return {
-      id = id,
-	  gr = {...}
-   }
+function group(arg)
+	local head = table.remove(arg, 1)
+	head.gr = arg
+	return head
 end
 
 function slide(id)
@@ -82,10 +81,10 @@ function page(id, ...)
 	}
 end
 
-local options = group(
-	"modded_exes",
-	group(
-		"visual",
+local options = group {
+	{ id = "modded_exes" },
+	group {
+		{ id = "visual" },
 
 		-- UI / HUD
 		page(
@@ -99,8 +98,8 @@ local options = group(
 
 		-- Crosshair
 		page(
-		  "crosshair",
-		  
+			"crosshair",
+
 			check { id = "g_crosshair_show_always" },
 			check { id = "g_use_shader_crosshair" },
 			track {
@@ -615,12 +614,12 @@ local options = group(
 				step = 0.01,
 				cmd = "r4_hdr10_sun_outer_radius",
 			}
-		)
-	),
+		),
+	},
 
 	-- Sound
-	group(
-		"sound",
+	group {
+		{ id = "sound" },
 		page(
 			"doppler",			
 			track {
@@ -637,12 +636,12 @@ local options = group(
 				max = 100,
 				step = 1,
 			}
-		)
-	),
+		),
+	},
 
 	-- Control
-	group(
-		"control",
+	group {
+		{ id = "control" },
 
 		-- Keyboard
 		page(
@@ -682,12 +681,12 @@ local options = group(
 			"pda",
 			list_bool { id = "pda_map_zoom_in_to_mouse"},
 			list_bool { id = "pda_map_zoom_out_to_mouse" }
-		)
-	),
+		),
+	},
 
 	-- Gameplay
-	group(
-		"gameplay",
+	group {
+		{ id = "gameplay" },
 					
 		page(
 			"aim",
@@ -752,12 +751,12 @@ local options = group(
 				id = "monster_stuck_fix",
 				restart = true,
 			}
-		)
-	),
+		),
+	},
 
 	-- Saves
-	group(
-		"saves",
+	group {
+		{ id = "saves" },
 		page(
 			"crash_saves",
 			list_bool { id = "crash_save" },
@@ -768,12 +767,12 @@ local options = group(
 				max = 20,
 				step = 1,
 			}
-		)
-	),
+		),
+	},
 
 	-- Debug
-	group(
-		"debug",
+	group {
+		{ id = "debug" },
 		page(
 			"logging",
 			list_bool { id = "string_table_error_msg" },
@@ -803,9 +802,9 @@ local options = group(
 				max = 512,
 				step = 32,
 			}
-		)
-	)
-)
+		),
+	},
+}
 
 function init_opt_base()
 	-- printf("working?")
