@@ -333,11 +333,15 @@ local options = group(
 				step = 0.01,
 				cmd = "r4_hdr10_pda_intensity",
 			},
-			list {
+			list_enum {
 				id = "colorspace",
 				tag = "hdr10",
 				curr = {function() return get_console_cmd(0, "r4_hdr10_colorspace") end},
-				content = {{"0", "hdr10_colorspace_rec709"}, {"1", "hdr10_colorspace_p3d65"}, {"2", "hdr10_colorspace_rec2020"}},
+				content = {
+					"hdr10_colorspace_rec709",
+					"hdr10_colorspace_p3d65",
+					"hdr10_colorspace_rec2020"
+				},
 				cmd = "r4_hdr10_colorspace",
 			},
 			list_enum {
