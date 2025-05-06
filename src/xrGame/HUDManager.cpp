@@ -167,24 +167,37 @@ void CHUDManager::OnFrame()
 
 	g_player_hud->OnFrame();
 
-	// If aim position is enabled
+	// If aim position is enabled...
 	bool aimpos = psActorFlags.test(AF_AIMPOS);
 	if (aimpos)
 	{
-		// Ensure we have a HUD item
-		CHudItem* pItem = smart_cast<CHudItem*>(Actor()->inventory().ActiveItem());
-		if (pItem)
+		// And we have a valid actor...
+		CActor* pActor = Actor();
+		if (pActor)
 		{
-			// Aim along barrel rotation
-			attachable_hud_item* hi = pItem->HudItemData();
-			hud_item_measures measures = hi->m_measures;
-			Fmatrix matrix = hi->m_item_transform;
-			matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
-			matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
-
-			// Use weapon aim direction
-			PP.defs.dir = Fvector().mul(matrix.k, PP.defs.range);
-			PP.defs.dir.normalize();
+			// And a valid HUD item...
+			PIItem pItem = pActor->inventory().ActiveItem();
+			if (pItem)
+			{
+				CHudItem* pHudItem = pItem->cast_hud_item();
+				if (pHudItem)
+				{
+					attachable_hud_item* hi = pHudItem->HudItemData();
+					if (hi)
+					{
+						// Ensure the HUD item's transform is valid
+						hud_item_measures measures = hi->m_measures;
+						Fmatrix matrix = hi->m_item_transform;
+						if (matrix.k.square_magnitude() > 0.0)
+						{
+							// Aim along barrel rotation
+							matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
+							matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
+							PP.defs.dir = matrix.k;
+						}
+					}
+				}
+			}
 		}
 	}
 
