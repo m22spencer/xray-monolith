@@ -7392,6 +7392,9 @@
     <ClInclude Include="..\NewZoomFlag.h">
       <Filter>Core\Common\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\HUDRecon.h">
+      <Filter>UI\Cursor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\damage_manager.cpp">
@@ -11083,6 +11086,9 @@
     </ClCompile>
     <ClCompile Include="..\medkit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HUDRecon.cpp">
+      <Filter>UI\Cursor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

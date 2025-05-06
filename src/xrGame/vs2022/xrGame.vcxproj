@@ -1198,6 +1198,7 @@
     <ClInclude Include="..\HUDCrosshair.h" />
     <ClInclude Include="..\HudItem.h" />
     <ClInclude Include="..\HUDManager.h" />
+    <ClInclude Include="..\HUDRecon.h" />
     <ClInclude Include="..\HudSound.h" />
     <ClInclude Include="..\HUDTarget.h" />
     <ClInclude Include="..\hud_item_object.h" />
@@ -2951,6 +2952,7 @@
     <ClCompile Include="..\HUDCrosshair.cpp" />
     <ClCompile Include="..\HudItem.cpp" />
     <ClCompile Include="..\HUDManager.cpp" />
+    <ClCompile Include="..\HUDRecon.cpp" />
     <ClCompile Include="..\HudSound.cpp" />
     <ClCompile Include="..\HUDTarget.cpp" />
     <ClCompile Include="..\hud_item_object.cpp" />

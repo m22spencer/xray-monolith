@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HUDRecon.h"
 #include "HUDCrosshair.h"
 #include "../xrcdb/xr_collide_defs.h"
 
@@ -10,13 +11,12 @@ class CLAItem;
 class CHUDTarget
 {
 private:
-	float fuzzyShowInfo;
-
 	Fvector crosshairPos;
 	float crosshairOpacity;
 
 	bool m_bShowCrosshair;
 	bool m_bFirstUpdate;
+	CHUDRecon HUDRecon;
 	CHUDCrosshair HUDCrosshair;
 
 private:
