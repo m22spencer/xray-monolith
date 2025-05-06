@@ -16,6 +16,7 @@ private:
 	float crosshairOpacity;
 
 	bool m_bShowCrosshair;
+	bool m_bFirstUpdate;
 	CHUDCrosshair HUDCrosshair;
 
 private:

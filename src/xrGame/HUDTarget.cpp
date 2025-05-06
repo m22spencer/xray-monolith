@@ -73,6 +73,7 @@ CHUDTarget::CHUDTarget()
 
 	Load();
 	m_bShowCrosshair = false;
+	m_bFirstUpdate = true;
 }
 
 CHUDTarget::~CHUDTarget()
@@ -151,7 +152,7 @@ void CHUDTarget::IntegratePosition()
 		target = Fvector().add(pos, Fvector().mul(dir, pp.barrel_dist));
 
 	// Interpolate crosshair position toward target
-	if (psHUD_Flags.is(HUD_CROSSHAIR_DISTANCE_LERP))
+	if (!m_bFirstUpdate && psHUD_Flags.is(HUD_CROSSHAIR_DISTANCE_LERP))
 	{
 		float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
 		float fac = 1 - (target.z / zFar);
@@ -161,6 +162,8 @@ void CHUDTarget::IntegratePosition()
 	}
 	else
 		crosshairPos = target;
+
+	m_bFirstUpdate = false;
 }
 
 void CHUDTarget::IntegrateOpacity()

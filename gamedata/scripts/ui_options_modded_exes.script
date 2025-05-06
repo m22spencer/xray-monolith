@@ -717,6 +717,13 @@ function init_opt_base()
 						cmd = "g_firepos_zoom",
 					},
 					{
+						id = "g_aimpos",
+						type = "check",
+						val = 1,
+						def = false,
+						cmd = "g_aimpos",
+					},
+					{
 						id = "g_firedir_third_person",
 						type = "check",
 						val = 1,

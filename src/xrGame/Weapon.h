@@ -530,6 +530,7 @@ public:
 
 private:
 	float m_nearwall_zoomed_range;
+	float m_aimpos;
 
 public:
 	float GetTargetNearWallOffset();
