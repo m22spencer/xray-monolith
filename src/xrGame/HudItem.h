@@ -205,6 +205,7 @@ public:
 	virtual float GetBaseHudFov();
 	virtual float GetTargetHudFov();
 	virtual float GetTargetNearWallOffset();
+	void UpdateNearWall();
 	float GetNearWallOffset();
 	float GetHudFov();
 	virtual void on_outfit_changed();
