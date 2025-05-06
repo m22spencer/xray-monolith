@@ -186,6 +186,15 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.05.06**
+* `get_console():get_variable_bounds(cvar)` function to get bounds of cvar
+* damoldavskiy:
+  * MAS scope spawn fix (https://github.com/themrdemonized/xray-monolith/pull/217)
+* ProfLander:
+  * Fix scriptable near-wall jitter (https://github.com/themrdemonized/xray-monolith/pull/213)
+  * Implement g_aimpos to govern bullet direction (https://github.com/themrdemonized/xray-monolith/pull/214)
+  * Improved categorization and definition machinery for settings menu (https://github.com/themrdemonized/xray-monolith/pull/215)
+
 **2025.05.03**
 * `ray_pick:query()` will clear previous query result
 * GhenTuong: Merge force-body-state, axr_beh improvements, vignette_control (https://github.com/themrdemonized/xray-monolith/pull/209)
