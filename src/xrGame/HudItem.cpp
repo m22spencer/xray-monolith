@@ -515,7 +515,7 @@ float CHudItem::GetTargetNearWallOffset()
 	return 0.f;
 }
 
-void CHudItem::UpdateCL()
+void CHudItem::UpdateNearWall()
 {
 	if (g_nearwall && ParentIsActor() && Level().CurrentViewEntity() == object().H_Parent())
 	{
@@ -535,17 +535,12 @@ void CHudItem::UpdateCL()
 			collide::rq_result& rq = GetRQ();
 			m_nearwall_factor = -rq.range;
 			clamp(m_nearwall_factor, 0.f, m_nearwall_factor);
-;		}
+		}
 	}
+}
 
-	float t = m_nearwall_speed_mod * Device.fTimeDelta;
-	
-	float target_fov = GetTargetHudFov();
-	m_hud_fov = lerp(m_hud_fov, target_fov, t);
-
-	float target_ofs = GetTargetNearWallOffset();
-	m_nearwall_ofs = lerp(m_nearwall_ofs, target_ofs, t);
-
+void CHudItem::UpdateCL()
+{
 	if (m_current_motion_def)
 	{
 		if (m_bStopAtEndAnimIsRunning)
@@ -1124,6 +1119,17 @@ void CHudItem::UpdatePick()
 void CHudItem::OnFrame()
 {
 	UpdatePick();
+
+	if (g_nearwall)
+		UpdateNearWall();
+
+	float t = m_nearwall_speed_mod * Device.fTimeDelta;
+
+	float target_fov = GetTargetHudFov();
+	m_hud_fov = lerp(m_hud_fov, target_fov, t);
+
+	float target_ofs = GetTargetNearWallOffset();
+	m_nearwall_ofs = lerp(m_nearwall_ofs, target_ofs, t);
 }
 
 void CHudItem::net_Relcase(CObject* O)
