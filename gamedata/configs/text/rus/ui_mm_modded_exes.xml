@@ -29,10 +29,10 @@
 		<text>UI/HUD</text>
 	</string>
 	
-	<string id="ui_mm_modded_exes_ui_hud_g_draw_pickup_item_names">
+	<string id="ui_mm_modded_exes_visual_ui_hud_g_draw_pickup_item_names">
 		<text>Отрисовывать имена предметов при подъеме (g_draw_pickup_item_names)</text>
 	</string>
-	<string id="ui_mm_modded_exes_ui_hud_use_english_text_for_missing_translations">
+	<string id="ui_mm_modded_exes_visual_ui_hud_use_english_text_for_missing_translations">
 		<text>Использовать английский язык для отсуствующего перевода (use_english_text_for_missing_translations)</text>
 	</string>
 
@@ -40,7 +40,7 @@
 	<string id="ui_mm_crosshair_modded_exes">
 		<text>Перекрестье</text>
 	</string>
-	<string id="ui_mm_menu_crosshair_modded_exes">
+	<string id="ui_mm_menu_crosshair">
 		<text>Перекрестье</text>
 	</string>
 	
@@ -84,6 +84,9 @@
 	</string>
 	<string id="ui_mm_modded_exes_visual_3d_scopes_r__3Dfakescope">
 		<text>Включение 3D Shader Scopes (r__3Dfakescope)</text>
+	</string>
+	<string id="ui_mm_2d_scopes_modded_exes">
+		<text>2D Shader Scopes</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_3d_scopes_sds_enable">
 		<text>Включение 2D Shader Scopes (sds_enable)</text>
@@ -141,7 +144,7 @@
 	<string id="ui_mm_particles_modded_exes">
 		<text>Партикли</text>
 	</string>
-	<string id="ui_mm_menu_particles_modded_exes">
+	<string id="ui_mm_menu_particles">
 		<text>Партикли</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_particles_particle_update_mod">
@@ -153,13 +156,20 @@
 	<string id="ui_mm_modded_exes_visual_particles_allow_silencer_hide_tracer">
 		<text>Позволить глушителям скрывать трассирующие элементы (allow_silencer_hide_tracer)</text>
 	</string>
+	
 
 	<!-- HDR10 -->
+	<string id="ui_mm_menu_hdr10">
+		<text>HDR 10</text>
+	</string>
+	<string id="ui_mm_hdr10_modded_exes">
+		<text>HDR 10</text>
+	</string>
 	<string id="ui_mm_modded_exes_visual_hdr10_enabled">
 		<text>Включить HDR10 (требуется перезагрузка) (r4_hdr10_on)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_hdr10_enabled_desc">
-		<text>несовместим с MSAA, при включении HDR, MSAA будет выключен</text>
+		<text>HDR10 несовместим с MSAA, при включении HDR, MSAA будет выключен</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_hdr10_whitepoint_nits">
 		<text>Белая точка (nits) (r4_hdr10_whitepoint_nits)</text>
@@ -185,13 +195,13 @@
 	<string id="ui_mm_modded_exes_visual_hdr10_colorspace_desc">
 		<text>Целевое цветовое пространство для рендеринга. Если ваш монитор имеет хороший охват большего цветового пространства (DCI-P3 или Rec.2020), используйте одно из них вместо sRGB.</text>
 	</string>
-	<string id="ui_mm_lst_hdr10_rec709">
+	<string id="ui_mm_lst_hdr10_colorspace_rec709">
 		<text>Rec.709 (sRGB)</text>
 	</string>
-	<string id="ui_mm_lst_hdr10_dcip3">
+	<string id="ui_mm_lst_hdr10_colorspace_p3d65">
 		<text>P3-D65 (DCI-P3)</text>
 	</string>
-	<string id="ui_mm_lst_hdr10_rec2020">
+	<string id="ui_mm_lst_hdr10_colorspace_rec2020">
 		<text>Rec.2020</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_hdr10_tonemapper">
@@ -418,7 +428,7 @@
 	<string id="ui_mm_sound_modded_exes">
 		<text>Звуки</text>
 	</string>
-
+	
 	<string id="ui_mm_menu_doppler">
 		<text>Допплер эффект</text>
 	</string>
@@ -445,11 +455,10 @@
 	<string id="ui_mm_keyboard_modded_exes">
 		<text>Клавиатура</text>
 	</string>
-	
-	<string id="ui_mm_modded_exes_qol_use_separate_ubgl_keybind">
+	<string id="ui_mm_modded_exes_control_keyboard_use_separate_ubgl_keybind">
 		<text>Отдельная кнопка для подствола (use_separate_ubgl_keybind)</text>
 	</string>
-
+	
 	<!-- Mouse -->
 	<string id="ui_mm_menu_mouse">
 		<text>Мышь</text>
@@ -508,10 +517,10 @@
 
 	<!-- Aim -->
 	<string id="ui_mm_menu_aim">
-		<text>Цель</text>
+		<text>Aim</text>
 	</string>
 	<string id="ui_mm_aim_modded_exes">
-		<text>Цель</text>
+		<text>Aim</text>
 	</string>
 	
 	<string id="ui_mm_modded_exes_gameplay_aim_aimmode_remember">
@@ -570,7 +579,7 @@
 		<text>Камера</text>
 	</string>
 	<string id="ui_mm_lst_nearwall_item">
-		<text>Артикул</text>
+		<text>Предмет</text>
 	</string>
 
 	<!-- First Person Death -->
@@ -580,7 +589,7 @@
 	<string id="ui_mm_first_person_death_modded_exes">
 		<text>Смерть от первого лица</text>
 	</string>
-	
+
 	<string id="ui_mm_modded_exes_gameplay_first_person_death_first_person_death">
 		<text>Камера смерти от первого лица (first_person_death)</text>
 	</string>
@@ -608,9 +617,10 @@
 	<string id="ui_mm_modded_exes_gameplay_monsters_telekinetic_objects_include_corpses">
 		<text>Полтеры и бюреры кидают трупы (telekinetic_objects_include_corpses)</text>
 	</string>
-	<string id="ui_mm_modded_exes_gameplay_monsters_crash_save">
-		<text>Сейвы во время вылетов (crash_save)</text>
-	</string>
+	<string id="ui_mm_modded_exes_gameplay_monsters_monster_stuck_fix">
+		<text>Фикс застревающих монстров (проседает FPS) (monster_stuck_fix)</text>
+	</string>	
+
 
 	<!-- Saves -->
 	<string id="ui_mm_saves_modded_exes">
@@ -627,15 +637,12 @@
 	<string id="ui_mm_menu_crash_saves">
 		<text>Сейвы во время вылетов</text>
 	</string>
-	
+	<string id="ui_mm_modded_exes_saves_crash_saves_crash_save">
+		<text>Сейвы во время вылетов (crash_save)</text>
+	</string>
 	<string id="ui_mm_modded_exes_saves_crash_saves_crash_save_count">
 		<text>Сейвы во время вылетов Кол-во (crash_save_count)</text>
 	</string>
-
-	<string id="ui_mm_modded_exes_saves_crash_saves_monster_stuck_fix">
-		<text>Фикс застревающих монстров (проседает FPS) (monster_stuck_fix)</text>
-	</string>
-
 	<!-- Debugging -->
 	<string id="ui_mm_menu_debug">
 		<text>Отладка</text>
@@ -646,10 +653,10 @@
 
 	<!-- Logging -->
 	<string id="ui_mm_menu_logging">
-		<text>Логах</text>
+		<text>Логи</text>
 	</string>
 	<string id="ui_mm_logging_modded_exes">
-		<text>Логах</text>
+		<text>Логи</text>
 	</string>
 	
 	<string id="ui_mm_modded_exes_debug_logging_string_table_error_msg">
