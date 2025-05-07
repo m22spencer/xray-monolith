@@ -186,6 +186,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.05.07**
+* Upgrade bug fix for MAS (https://github.com/themrdemonized/xray-monolith/pull/219)
+
 **2025.05.06**
 * `get_console():get_variable_bounds(cvar)` function to get bounds of cvar
 * damoldavskiy:

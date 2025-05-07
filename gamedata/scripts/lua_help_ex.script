@@ -90,11 +90,15 @@
         table get_string_table() // Returns all translated strings in [string id] = string text format 
     }
 
-    namespace alife() {
+    get_console() {
+        table get_variable_bounds(cmd)   
+    }
+
+    alife() {
         void iterate_objects(function(se_obj))
     }
 
-    namespace game {
+    game {
         Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
         function ui2world(Fvector2 pos) -> Fvector result, u16 object_id
         function ui2world_offscreen(Fvector2 pos) -> Fvector result, u16 object_id
@@ -132,7 +136,7 @@
         sphere,
         box,
     }
-    namespace debug_render {
+    debug_render {
         DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
         void remove_object(u16 id)
         DBG_ScriptObject* get_object(u16 id)
@@ -184,7 +188,7 @@
 		Actor       = 3,
 	}
 		
-    namespace level {
+    level {
         float get_music_volume()
         void set_music_volume(float)
 
