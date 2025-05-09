@@ -91,6 +91,8 @@ public:
 	void AttachLight(AttachmentScriptLight* light);
 	AttachmentScriptLight* DetachLight();
 	AttachmentScriptLight* GetLight();
+	void SetScriptLightBone(u16 bone) { m_script_light_bone = bone; }
+	u16 GetScriptLightBone() { return m_script_light_bone; }
 
 	void RecalcOffset();
 

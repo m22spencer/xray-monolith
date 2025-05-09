@@ -677,6 +677,7 @@
         function get_center();
         function get_flags();
         function get_light();
+        function get_light_bone();
         function get_model();
         function get_origin();
         function get_parent();
@@ -694,6 +695,7 @@
         function remove_bone_callback(number);
         function set_bone_visible(number, boolean);
         function set_flags(number);
+        function set_light_bone(number);
         function set_model(string, boolean);
         function set_origin(vector);
         function set_origin(number, number, number);

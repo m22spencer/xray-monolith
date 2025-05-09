@@ -54,7 +54,12 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat, bool hud_mode)
 	if (m_script_light && (hud_mode != !!m_flags.test(eSA_RenderWorld)))
 	{
 		Fmatrix LM;
-		Fmatrix light_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_light_bone);
+		Fmatrix light_bone;
+		if (m_model->dcast_PKinematics()->LL_BoneCount() > m_script_light_bone)
+			light_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_light_bone);
+		else
+			light_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_model->dcast_PKinematics()->LL_GetBoneRoot());
+
 		LM.mul(m_transform, light_bone);
 		m_script_light->SetXFORM(LM);
 	}
@@ -173,27 +178,29 @@ void script_attachment::RenderUI(bool hud_mode)
 	{
 		if (m_script_ui)
 		{
-			if (hud_mode)
+			IUIRender::ePointType bk;
+
+			if (!hud_mode)
 			{
-				Fmatrix LM;
-				Fmatrix ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_ui_bone);
-				LM.mul(m_transform, ui_bone);
-				LM.mulB_43(m_script_ui_mat);
-				UIRender->CacheSetXformWorld(LM);
-				m_script_ui->Draw();
-			}
-			else
-			{
-				IUIRender::ePointType bk = UI().m_currentPointType;
+				bk = UI().m_currentPointType;
 				UI().m_currentPointType = IUIRender::pttLIT;
 				UIRender->CacheSetCullMode(IUIRender::cmNONE);
+			}
 
-				Fmatrix LM;
-				Fmatrix ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_ui_bone);
-				LM.mul(m_transform, ui_bone);
-				LM.mulB_43(m_script_ui_mat);
-				UIRender->CacheSetXformWorld(LM);
-				m_script_ui->Draw();
+			Fmatrix LM;
+			Fmatrix ui_bone;
+			if (m_model->dcast_PKinematics()->LL_BoneCount() > m_script_ui_bone)
+				ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_ui_bone);
+			else
+				ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_model->dcast_PKinematics()->LL_GetBoneRoot());
+
+			LM.mul(m_transform, ui_bone);
+			LM.mulB_43(m_script_ui_mat);
+			UIRender->CacheSetXformWorld(LM);
+			m_script_ui->Draw();
+
+			if (!hud_mode)
+			{
 				UIRender->CacheSetCullMode(IUIRender::cmCCW);
 				UI().m_currentPointType = bk;
 			}
