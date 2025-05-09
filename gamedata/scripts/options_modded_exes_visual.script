@@ -5,6 +5,7 @@ local page_crosshair = options_modded_exes_crosshair.PAGE
 local page_hdr10 = options_modded_exes_hdr10.PAGE
 local page_3d_scopes = options_modded_exes_3d_scopes.PAGE
 local page_particles = options_modded_exes_particles.PAGE
+local page_wallmarks = options_modded_exes_wallmarks.PAGE
 
 -- Import smart constructors
 options_builder.import_into(this)
@@ -16,5 +17,6 @@ GROUP = group {
 	page_crosshair,
 	page_3d_scopes,
 	page_particles,
+	page_wallmarks,
 	page_hdr10,
 }

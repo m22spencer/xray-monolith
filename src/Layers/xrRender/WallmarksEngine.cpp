@@ -10,6 +10,8 @@
 #include "../../xrEngine/GameFont.h"
 #include "SkeletonCustom.h"
 
+float wallmark_range_static = 100.f;
+float wallmark_range_skeleton = 50.f;
 
 namespace WallmarksEngine
 {
@@ -317,7 +319,7 @@ void CWallmarksEngine::AddStaticWallmark(CDB::TRI* pTri, const Fvector* pVerts, 
 	ref_shader hShader, float sz, float ttl, bool ignore_opt, float rotation)
 {
 	// optimization cheat: don't allow wallmarks more than 100 m from viewer/actor
-	if (!ignore_opt && contact_point.distance_to_sqr(Device.vCameraPosition) > _sqr(100.f))
+	if (!ignore_opt && contact_point.distance_to_sqr(Device.vCameraPosition) > _sqr(wallmark_range_static))
 		return;
 
 	// Physics may add wallmarks in parallel with rendering
@@ -331,7 +333,7 @@ void CWallmarksEngine::AddSkeletonWallmark(const Fmatrix* xf, CKinematics* obj, 
 {
 	if (::RImplementation.phase != CRender::PHASE_NORMAL) return;
 	// optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
-	if (!ignore_opt && xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f)) return;
+	if (!ignore_opt && xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(wallmark_range_skeleton)) return;
 
 	VERIFY(obj&&xf&&(size>EPS_L));
 	lock.Enter();

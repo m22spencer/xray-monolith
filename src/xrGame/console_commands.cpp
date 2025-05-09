@@ -152,6 +152,9 @@ extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
 
+extern float wallmark_range_static;
+extern float wallmark_range_skeleton;
+
 extern string32 crosshair_shader;
 extern string32 crosshair_texture;
 extern float crosshair_near_size;
@@ -2882,4 +2885,8 @@ void CCC_RegisterCommands()
 
 	// Draw pickup item names
 	CMD4(CCC_Integer, "g_draw_pickup_item_names", &drawPickupItemNames, 0, 1);
+
+	// Wallmark distances
+	CMD4(CCC_Float, "g_wallmark_range_static", &wallmark_range_static, 0.f, 1000.f);
+	CMD4(CCC_Float, "g_wallmark_range_skeleton", &wallmark_range_skeleton, 0.f, 1000.f);
 }
