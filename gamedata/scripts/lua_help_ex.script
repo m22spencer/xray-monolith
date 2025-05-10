@@ -435,9 +435,10 @@
         function update_torch()
         
         // Script Attachments
-        function add_attachment(number, string);
-        function get_attachment(number);
-        function remove_attachment(number);
+        function add_attachment(string, string)
+        function get_attachment(string)
+        function remove_attachment(string)
+        function iterate_attachments(function)
 		
 		// Shader/Textures
 		function get_shaders(bool)
@@ -665,17 +666,18 @@
     }
     
     class ScriptAttachment {
-        function add_attachment(number, string);
+        function add_attachment(string, string);
         function attach_light(attachment_script_light*);
         function bone_callback(number, number, boolean);
         function bone_callback(number, const function<matrix>&, boolean);
         function detach_light();
-        function get_attachment(number);
+        function get_attachment(string);
         function get_bone_matrix(number);
         function get_bone_visible(number);
         function get_center();
         function get_flags();
         function get_light();
+        function get_light_bone();
         function get_model();
         function get_origin();
         function get_parent();
@@ -687,11 +689,13 @@
         function get_ui();
         function get_ui_bone();
         function get_ui_rotation();
+        function iterate_attachments(function);
         function play_motion(string, boolean, number);
-        function remove_attachment(number);
+        function remove_attachment(string);
         function remove_bone_callback(number);
         function set_bone_visible(number, boolean);
         function set_flags(number);
+        function set_light_bone(number);
         function set_model(string, boolean);
         function set_origin(vector);
         function set_origin(number, number, number);
@@ -725,8 +729,8 @@
     
     Script Attachment examples:
     
-    -- adds script attachment with model gamedata\meshes\test\box.ogf to the actor's current active item in slot 1 (slots range from 0 to 65535)
-    local att = db.actor:active_item():add_attachment(1, "test\\box")
+    -- adds script attachment with name "test" and model gamedata\meshes\test\box.ogf to the actor's current active item
+    local att = db.actor:active_item():add_attachment("test", "test\\box")
     
     -- setting attachment parameters
     
@@ -761,8 +765,8 @@
     att:set_flags(4)
     
     -- you can attach attachments to other attachments
-    att2 = att:add_attachment(0, "test\\box2")
-    att3 = att2:add_attachment(0, "test\\box2")
+    att2 = att:add_attachment("box2", "test\\box2")
+    att3 = att2:add_attachment("box2", "test\\box2")
     
     -- and transfer the whole chain of attachments to another parent
     -- this will transfer att and its child attachments to the new parent
@@ -783,7 +787,7 @@
     att3:bone_callback(2, 10, false)
     
     -- the second type of bone callbacks uses a script callback to change the position of a bone in real time
-    local lock = db.actor:add_attachment(1234, "interface\\lockpick\\lock3")
+    local lock = db.actor:add_attachment("lock", "interface\\lockpick\\lock3")
     lock:set_flags(4)
     lock:set_rotation(90,0,0)
     lock:set_position(0,0,0.09)

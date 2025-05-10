@@ -1134,9 +1134,10 @@ public:
 	void SetShaderTexture(int id, LPCSTR shader, LPCSTR texture, bool bHud = false);
 	void ResetShaderTexture(int id, bool bHud = false);
 
-	script_attachment* AddAttachment(u16 slot, LPCSTR model_name);
-	script_attachment* GetAttachment(u16 slot);
-	void RemoveAttachment(u16 slot);
+	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
+	script_attachment* GetAttachment(LPCSTR name);
+	void RemoveAttachment(LPCSTR name);
+	void IterateAttachments(::luabind::functor<bool> functor);
 
 	doors::door* m_door;
 

@@ -745,11 +745,9 @@ void CGameObject::RenderAttachments()
 {
 	if (m_script_attachments.size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = m_script_attachments.begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_script_attachments.end();
-		for (; it != it_e; ++it)
+		for (auto& pair : m_script_attachments)
 		{
-			script_attachment* att = (*it).second;
+			script_attachment* att = pair.second;
 			if (att->GetFFlags().test(eSA_RenderWorld))
 			{
 				att->Render(Visual()->dcast_PKinematics(), &XFORM());
@@ -763,19 +761,19 @@ void CGameObject::RenderAttachments()
 	}
 }
 
-script_attachment* CGameObject::add_attachment(u16 slot, script_attachment* att)
+script_attachment* CGameObject::add_attachment(LPCSTR name, script_attachment* att)
 {
 	R_ASSERT(att);
-	remove_attachment(slot, true);
-	m_script_attachments.emplace(mk_pair(slot, att));
+	remove_attachment(name, true);
+	m_script_attachments.emplace(mk_pair(name, att));
 	return att;
 }
 
-script_attachment* CGameObject::get_attachment(u16 slot)
+script_attachment* CGameObject::get_attachment(LPCSTR name)
 {
 	if (m_script_attachments.size())
 	{
-		xr_map<u16, script_attachment*>::iterator att = m_script_attachments.find(slot);
+		auto& att = m_script_attachments.find(name);
 		if (att != m_script_attachments.end())
 			return att->second;
 	}
@@ -783,18 +781,18 @@ script_attachment* CGameObject::get_attachment(u16 slot)
 	return nullptr;
 }
 
-void CGameObject::remove_attachment(u16 slot, bool destroy)
+void CGameObject::remove_attachment(LPCSTR name, bool destroy)
 {
 	if (m_script_attachments.size())
 	{
-		script_attachment* attachment = get_attachment(slot);
+		script_attachment* attachment = get_attachment(name);
 		if (!attachment)
 			return;
 
 		if (destroy)
 			xr_delete(attachment);
 			
-		m_script_attachments.erase(slot);
+		m_script_attachments.erase(name);
 	}
 }
 
@@ -1138,10 +1136,8 @@ void CGameObject::UpdateCL()
 
 	if (m_script_attachments.size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = m_script_attachments.begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_script_attachments.end();
-		for (; it != it_e; ++it)
-			(*it).second->Update();
+		for (auto& pair : m_script_attachments)
+			pair.second->Update();
 	}
 
 	if (H_Parent())

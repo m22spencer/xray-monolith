@@ -1932,11 +1932,9 @@ void CActor::RenderCamAttached()
 			Fmatrix cam = Fidentity;
 			Cameras().camera_Matrix(cam);
 
-			xr_map<u16, script_attachment*>::iterator it = GetAttachments()->begin();
-			xr_map<u16, script_attachment*>::iterator it_e = GetAttachments()->end();
-			for (; it != it_e; ++it)
+			for (auto& pair : m_script_attachments)
 			{
-				script_attachment* att = (*it).second;
+				script_attachment* att = pair.second;
 
 				if (att->GetFFlags().test(eSA_CamAttached))
 					att->Render(nullptr, &cam, true);

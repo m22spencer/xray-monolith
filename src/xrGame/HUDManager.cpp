@@ -278,11 +278,9 @@ bool CHUDManager::RenderCamAttachedUIQuery()
 {
 	if (!g_actor) return false;
 
-	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-	for (; it != it_e; ++it)
+	for (auto& pair : *g_actor->GetAttachments())
 	{
-		script_attachment* att = (*it).second;
+		script_attachment* att = pair.second;
 		if (att->GetFFlags().test(eSA_CamAttached))
 			return true;
 	}
@@ -299,11 +297,9 @@ void CHUDManager::RenderActiveItemUI()
 
 void CHUDManager::RenderCamAttachedUI()
 {
-	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-	for (; it != it_e; ++it)
+	for (auto& pair : *g_actor->GetAttachments())
 	{
-		script_attachment* att = (*it).second;
+		script_attachment* att = pair.second;
 		if (att->GetFFlags().test(eSA_CamAttached))
 			att->RenderUI(false);
 	}

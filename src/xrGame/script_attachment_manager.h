@@ -32,6 +32,7 @@ struct script_attachment_bone_cb
 	{
 		m_attachment_bone_id = id;
 		m_attachment = att;
+		m_func = nullptr;
 		m_mat = Fidentity;
 		m_bone_id = bone;
 		m_overwrite = overwrite;
@@ -43,13 +44,15 @@ struct script_attachment_bone_cb
 class script_attachment
 {
 private:
+	shared_str m_name;
+
 	Fmatrix m_offset, m_transform;
 	Fvector m_position, m_rotation, m_scale, m_origin;
 
 	IRenderVisual* m_model;
 	shared_str m_model_name;
 	shared_str m_current_motion;
-	u16 m_slot, m_parent_bone;
+	u16 m_parent_bone;
 
 	LPCSTR m_script_ui_func;
 	CUIWindow* m_script_ui;
@@ -66,13 +69,13 @@ private:
 	Flags32 m_flags;
 	script_attachment* m_parent_attachment;
 	CGameObject* m_parent_object;
-	xr_map<u16, script_attachment*> m_children;
+	xr_map<shared_str, script_attachment*> m_children;
 	xr_map<u16, script_attachment_bone_cb*> m_bone_callbacks;
 
 	u32 m_last_upd_frame;
 
 public:
-	script_attachment(u16 id, LPCSTR model_name);
+	script_attachment(LPCSTR name, LPCSTR model_name);
 	~script_attachment()
 	{
 		::Render->model_Delete(m_model);
@@ -88,6 +91,8 @@ public:
 	void AttachLight(AttachmentScriptLight* light);
 	AttachmentScriptLight* DetachLight();
 	AttachmentScriptLight* GetLight();
+	void SetScriptLightBone(u16 bone) { m_script_light_bone = bone; }
+	u16 GetScriptLightBone() { return m_script_light_bone; }
 
 	void RecalcOffset();
 
@@ -130,11 +135,12 @@ public:
 	void SetScriptUIBone(u16 bone) { m_script_ui_bone = bone; }
 	u16 GetScriptUIBone() { return m_script_ui_bone; }
 
-	script_attachment* AddAttachment(u16 slot, LPCSTR model_name);
-	void RemoveAttachment(u16 slot) { RemoveChild(slot, true); }
-	script_attachment* AddChild(u16 slot, script_attachment* att);
-	script_attachment* GetChild(u16 slot);
-	void RemoveChild(u16 slot, bool destroy = false);
+	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
+	void RemoveAttachment(LPCSTR name) { RemoveChild(name, true); }
+	script_attachment* AddChild(LPCSTR name, script_attachment* att);
+	script_attachment* GetChild(LPCSTR name);
+	void RemoveChild(LPCSTR name, bool destroy = false);
+	void IterateAttachments(::luabind::functor<bool> functor);
 
 	void SetFlags(u32 flags) { m_flags.assign(flags); }
 	u32 GetFlags() { return m_flags.get(); }

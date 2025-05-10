@@ -327,12 +327,10 @@ void attachable_hud_item::render()
 
 	if (m_parent_hud_item->has_object() && m_parent_hud_item->object().GetAttachments()->size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
-		for (; it != it_e; ++it)
+		for (auto& pair : *m_parent_hud_item->object().GetAttachments())
 		{
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->Render(m_model, &m_item_transform, true);
+			if (pair.second->GetFFlags().test(eSA_RenderHUD))
+				pair.second->Render(m_model, &m_item_transform, true);
 		}
 	}
 }
@@ -346,13 +344,12 @@ void attachable_hud_item::render_item_ui()
 {
 	m_parent_hud_item->render_item_3d_ui();
 
-	if (m_parent_hud_item->has_object()) {
-		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
-		for (; it != it_e; ++it)
+	if (m_parent_hud_item->has_object() && m_parent_hud_item->object().GetAttachments()->size())
+	{
+		for (auto& pair : *m_parent_hud_item->object().GetAttachments())
 		{
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->RenderUI(true);
+			if (pair.second->GetFFlags().test(eSA_RenderHUD))
+				pair.second->RenderUI(true);
 		}
 	}
 }
@@ -901,11 +898,9 @@ void player_hud::render_item_ui()
 
 	if (g_actor->GetAttachments()->size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-		for (; it != it_e; ++it)
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->RenderUI(true);
+		for (auto& pair : *g_actor->GetAttachments())
+			if (pair.second->GetFFlags().test(eSA_RenderHUD))
+				pair.second->RenderUI(true);
 	}
 
 	UIRender->CacheSetCullMode(IUIRender::cmCCW);
@@ -941,11 +936,9 @@ void player_hud::render_hud()
 
 	if (g_actor->GetAttachments()->size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-		for (; it != it_e; ++it)
+		for (auto& pair : *g_actor->GetAttachments())
 		{
-			script_attachment* att = (*it).second;
+			script_attachment* att = pair.second;
 
 			if (att->GetFFlags().test(eSA_RenderHUD))
 			{

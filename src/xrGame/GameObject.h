@@ -63,7 +63,7 @@ class CGameObject :
 protected:
 	//время удаления объекта
 	bool m_bObjectRemoved;
-	xr_map<u16, script_attachment*> m_script_attachments;
+	xr_map<shared_str, script_attachment*> m_script_attachments;
 public:
 	CGameObject();
 	virtual ~CGameObject();
@@ -181,9 +181,9 @@ public:
 	///////////////////// network /////////////////////////////////////////
 	bool object_removed() const { return m_bObjectRemoved; };
 
-	virtual script_attachment* add_attachment(u16 slot, script_attachment* att);
-	virtual script_attachment* get_attachment(u16 slot);
-	virtual void remove_attachment(u16 slot, bool destroy = false);
+	virtual script_attachment* add_attachment(LPCSTR name, script_attachment* att);
+	virtual script_attachment* get_attachment(LPCSTR name);
+	virtual void remove_attachment(LPCSTR name, bool destroy = false);
 
 private:
 	bool m_bCrPr_Activated;
@@ -343,7 +343,7 @@ public:
 	virtual void on_matrix_change(const Fmatrix& previous);
 
 	void FootStepCallback(float power, bool b_play, bool b_on_ground, bool b_hud_view);
-	xr_map<u16, script_attachment*>* GetAttachments() { return &m_script_attachments; }
+	xr_map<shared_str, script_attachment*>* GetAttachments() { return &m_script_attachments; }
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
