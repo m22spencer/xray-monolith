@@ -186,6 +186,13 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.05.10**
+* added ScrollView instance in `on_news_received` callback
+* Lucy:
+  * Script attachments now use strings instead of IDs (https://github.com/themrdemonized/xray-monolith/pull/221)
+  * [ReShade] Fix crash in fullscreen mode (https://github.com/themrdemonized/xray-monolith/pull/223)
+* Lander: Expose wallmark range via options menu (https://github.com/themrdemonized/xray-monolith/pull/222)
+
 **2025.05.07**
 * Upgrade bug fix for MAS (https://github.com/themrdemonized/xray-monolith/pull/219)
 
