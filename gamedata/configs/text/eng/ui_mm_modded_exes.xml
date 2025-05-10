@@ -156,8 +156,21 @@
 	<string id="ui_mm_modded_exes_visual_particles_allow_silencer_hide_tracer">
 		<text>Allow silencers to hide tracers (allow_silencer_hide_tracer)</text>
 	</string>
-	
 
+	<!-- Wallmarks -->
+	<string id="ui_mm_wallmarks_modded_exes">
+		<text>Wallmarks</text>
+	</string>
+	<string id="ui_mm_menu_wallmarks">
+		<text>Wallmarks</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_wallmarks_g_wallmark_range_static">
+		<text>Static wallmark range (g_wallmark_range_static)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_wallmarks_g_wallmark_range_skeleton">
+		<text>Skeletal wallmark range (g_wallmark_range_skeleton)</text>
+	</string>
+	
 	<!-- HDR10 -->
 	<string id="ui_mm_menu_hdr10">
 		<text>HDR 10</text>
