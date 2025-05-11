@@ -68,6 +68,15 @@ function track(args)
 	return args
 end
 
+-- String input
+function input(args)
+	assert(is_table(args), "Input argument is not a table")
+	args.type = "input"
+	args.val = 0
+	args.cmd = args.cmd or args.id
+	return args
+end
+
 -- Multiple-choice key-value list
 function list(args)
 	assert(is_table(args), "List argument is not a table")
