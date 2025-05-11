@@ -24,5 +24,8 @@ void CUIProgressBar::script_register(lua_State* L)
 		.def("SetMinColor", &CUIProgressBar::SetMinColor)
 		.def("SetMiddleColor", &CUIProgressBar::SetMinColor)
 		.def("SetMaxColor", &CUIProgressBar::SetMinColor)
+
+		// NLTP_ASHES
+		.def("GetProgressStatic", &CUIProgressBar::GetProgressStatic)
 	];
 }
