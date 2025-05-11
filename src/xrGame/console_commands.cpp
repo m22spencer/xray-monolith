@@ -170,7 +170,8 @@ extern CrosshairSettings g_crosshair_device_far;
 	CMD3(CCC_String, Concat3(g_crosshair_, suffix, _shader ), crosshair.shader, 32); \
 	CMD3(CCC_String, Concat3(g_crosshair_, suffix, _texture), crosshair.texture, 32); \
 	CMD4(CCC_Float, Concat3(g_crosshair_, suffix, _size), &crosshair.size, 1.f, 64.f); \
-	CMD4(CCC_Float, Concat3(g_crosshair_, suffix, _depth), &crosshair.depth, 0.f, 300.f);
+	CMD4(CCC_Float, Concat3(g_crosshair_, suffix, _depth), &crosshair.depth, 0.f, 300.f); \
+	CMD2(CCC_Color, Concat3(g_crosshair_, suffix, _color), &crosshair.color);
 
 #define CrosshairDistanceCommands(crosshair, suffix) \
 	CMD3(CCC_Mask, Concat3(g_crosshair_, suffix, _distance_lerp), &crosshair.flags, CROSSHAIR_DISTANCE_LERP); \

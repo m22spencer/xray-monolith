@@ -6,10 +6,6 @@
 #include "HUDItem.h"
 #include "Actor.h"
 
-#define C_TRANSPARENT	D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0x00)
-#define C_WHITE			D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0xff)
-#define C_DEFAULT		D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0x80)
-
 Flags32 psCrosshair_Flags = {};
 
 extern ENGINE_API BOOL g_bRendering;
@@ -25,6 +21,7 @@ CrosshairSettings g_crosshair_camera_far = CrosshairSettings(
 	40.f,
 	1.f,
 	25.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -38,6 +35,7 @@ CrosshairSettings g_crosshair_camera_near = CrosshairSettings(
 	40.f,
 	16.f,
 	0.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -52,6 +50,7 @@ CrosshairSettings g_crosshair_weapon_far = CrosshairSettings(
 	40.f,
 	4.f,
 	25.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -66,6 +65,7 @@ CrosshairSettings g_crosshair_weapon_near = CrosshairSettings(
 	40.f,
 	16.f,
 	0.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -80,6 +80,7 @@ CrosshairSettings g_crosshair_device_far = CrosshairSettings(
 	40.f,
 	4.f,
 	25.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -94,6 +95,7 @@ CrosshairSettings g_crosshair_device_near = CrosshairSettings(
 	40.f,
 	16.f,
 	0.f,
+	C_WHITE,
 	.25f,
 	40.f,
 	.5f
@@ -188,7 +190,15 @@ void TargetCrosshair::Update(const SPickParam& pp, bool is_far)
 
 	// Use the crosshair color unless the readout color is non-default
 	u32 color_readout = recon.GetColor();
-	u32 color_crosshair = (color_readout & color_rgba(0xff, 0xff, 0xff, 0)) == (C_WHITE & color_rgba(0xff, 0xff, 0xff, 0)) ? g_crosshair_color : color_readout;
+	u32 color_crosshair = (color_readout & color_rgba(0xff, 0xff, 0xff, 0)) == (C_WHITE & color_rgba(0xff, 0xff, 0xff, 0)) ? settings.color : color_readout;
+
+	// Modulate by global crosshair color
+	color_crosshair = D3DCOLOR_RGBA(
+		(u8)(((color_get_R(color_crosshair) / 255.f) * (color_get_R(g_crosshair_color) / 255.f)) * 255.f),
+		(u8)(((color_get_G(color_crosshair) / 255.f) * (color_get_G(g_crosshair_color) / 255.f)) * 255.f),
+		(u8)(((color_get_B(color_crosshair) / 255.f) * (color_get_B(g_crosshair_color) / 255.f)) * 255.f),
+		(u8)(((color_get_A(color_crosshair) / 255.f) * (color_get_A(g_crosshair_color) / 255.f)) * 255.f)
+	);
 
 	// Modulate color alpha
 	DWORD alpha_mask = 0xff000000;
@@ -293,14 +303,17 @@ void CrosshairPair::RenderAimLine(
 	vd.x = (vd.x + 1.f) * 0.5f * scr_size.x;
 	vd.y = (-vd.y + 1.f) * 0.5f * scr_size.y;
 
-	UIRender->PushPoint(va.x, va.y, 0, C_TRANSPARENT, 0, 0);
-	UIRender->PushPoint(vb.x, vb.y, 0, C_WHITE, 0, 0);
+	u32 near_color = crosshair_near.crosshair.GetColor();
+	u32 far_color = crosshair_far.crosshair.GetColor();
+
+	UIRender->PushPoint(va.x, va.y, 0, subst_alpha(near_color, 0), 0, 0);
+	UIRender->PushPoint(vb.x, vb.y, 0, near_color, 0, 0);
 
 	if (crosshair_near.Is(CROSSHAIR_LINE))
-		UIRender->PushPoint(vc.x, vc.y, 0, crosshair_near.crosshair.GetColor(), 0, 0);
+		UIRender->PushPoint(vc.x, vc.y, 0, near_color, 0, 0);
 
 	if (crosshair_far.Is(CROSSHAIR_LINE))
-		UIRender->PushPoint(vd.x, vd.y, 0, crosshair_far.crosshair.GetColor(), 0, 0);
+		UIRender->PushPoint(vd.x, vd.y, 0, far_color, 0, 0);
 
 	UIRender->SetShader(*shaderWire);
 	UIRender->FlushPrimitive();

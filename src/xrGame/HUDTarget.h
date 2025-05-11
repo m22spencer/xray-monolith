@@ -3,6 +3,9 @@
 #include "HUDRecon.h"
 #include "HUDCrosshair.h"
 
+#define C_TRANSPARENT	D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0x00)
+#define C_WHITE			D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0xff)
+
 class CHUDManager;
 class CLAItem;
 
@@ -31,6 +34,8 @@ struct CrosshairSettings
 	float size;
 	float depth;
 
+	u32 color;
+
 	float occluded_opacity;
 	float occlusion_fade_rate;
 	float recon_max_opacity;
@@ -42,6 +47,7 @@ struct CrosshairSettings
 		float _distance_lerp_rate,
 		float _size,
 		float _depth,
+		u32 _color,
 		float _occluded_opacity,
 		float _occlusion_fade_rate,
 		float _recon_max_opacity
@@ -50,6 +56,7 @@ struct CrosshairSettings
 		distance_lerp_rate(_distance_lerp_rate),
 		size(_size),
 		depth(_depth),
+		color(_color),
 		occluded_opacity(_occluded_opacity),
 		occlusion_fade_rate(_occlusion_fade_rate),
 		recon_max_opacity(_recon_max_opacity)
