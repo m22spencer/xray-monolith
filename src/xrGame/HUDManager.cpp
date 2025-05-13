@@ -363,7 +363,20 @@ bool CHUDManager::FireposActive()
 
 bool CHUDManager::AimposActive()
 {
-	return psActorFlags.test(AF_AIMPOS);
+	// If we have an actor...
+	CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
+	if (!pActor)
+		return psActorFlags.test(AF_AIMPOS);
+
+	// And a weapon...
+	CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
+	if (!pWeapon)
+		return psActorFlags.test(AF_AIMPOS);
+
+	// Firepos is active if a setting matches its respective zoom state
+	float zFac = pWeapon->GetZRotatingFactor();
+	return (psActorFlags.test(AF_AIMPOS) && zFac < 1.f)
+		|| (psActorFlags.test(AF_AIMPOS_ZOOM) && zFac >= 1.f);
 }
 
 ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)

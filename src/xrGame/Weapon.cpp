@@ -3244,7 +3244,7 @@ Fmatrix CWeapon::RayTransform()
 		matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
 
 		// If aim position is not enabled
-		bool aimpos = m_aimpos && psActorFlags.test(AF_AIMPOS);
+		bool aimpos = m_aimpos && HUD().AimposActive();
 		if (!aimpos)
 		{
 			// Aim toward camera look position
