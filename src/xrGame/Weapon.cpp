@@ -3297,8 +3297,8 @@ Fmatrix CWeapon::RayTransform()
 
 void CWeapon::g_fireParams(SPickParam& pp)
 {
-	// Block base implmentation if firepos is enabled
-	if (HUD().FireposActive())
+	// Block base implementation if aimpos is enabled
+	if (HUD().AimposActive())
 	{
 		return;
 	}
