@@ -3,8 +3,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-
 #include "HUDCrosshair.h"
+#include "HUDTarget.h"
+
 #include "../xrEngine/CustomHUD.h"
 #include "../xrEngine/igame_persistent.h"
 #include "ui_base.h"
@@ -18,9 +19,10 @@ float crosshair_depth_end = 100.f;
 
 CHUDCrosshair::CHUDCrosshair()
 {
+	crosshairShader = NULL;
+	crosshairTexture = NULL;
 	strcpy(lastCrosshairShader, "");
 	strcpy(lastCrosshairTexture, "");
-	shaderWire->create("hud\\crosshair");
 	transform = Fmatrix().identity();
 	minRadius = 0.001f;
 	maxRadius = 0.004f;
@@ -44,6 +46,11 @@ void CHUDCrosshair::SetTransform(const Fmatrix& m)
 	transform.set(m);
 }
 
+void CHUDCrosshair::SetScale(float s)
+{
+	scale = s;
+}
+
 void CHUDCrosshair::SetColor(u32 c)
 {
 	crossColor = c;
@@ -62,8 +69,10 @@ static float lerp(float a, float b, float t)
 	return a * (1 - t) + b * t;
 }
 
-static float remap(float value, float from1, float to1, float from2, float to2) {
-	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+void CHUDCrosshair::InitShaderWire()
+{
+	if (!shaderWire->inited())
+		shaderWire->create("hud\\crosshair");
 }
 
 void CHUDCrosshair::DeinitShaderCrosshair()
@@ -78,39 +87,36 @@ void CHUDCrosshair::DeinitShaderCrosshair()
 
 bool CHUDCrosshair::InitShaderCrosshair()
 {
-	if (strcmp(lastCrosshairShader, crosshair_shader) || strcmp(lastCrosshairTexture, crosshair_texture))
+	if (!crosshairShader || !crosshairTexture)
+		return false;
+
+	if (strcmp(lastCrosshairShader, *crosshairShader) || strcmp(lastCrosshairTexture, *crosshairTexture))
 	{
 		DeinitShaderCrosshair();
 
-		shaderCrosshair->create(crosshair_shader, crosshair_texture);
-		strcpy(lastCrosshairShader, crosshair_shader);
-		strcpy(lastCrosshairTexture, crosshair_texture);
+		shaderCrosshair->create(*crosshairShader, *crosshairTexture);
+		strcpy(lastCrosshairShader, *crosshairShader);
+		strcpy(lastCrosshairTexture, *crosshairTexture);
 	}
 
 	return shaderCrosshair->inited();
 }
 
-void CHUDCrosshair::PushVerts(Fvector* verts, Fvector* uvs, int count, Fmatrix mat, Fvector4 pos)
+void CHUDCrosshair::PushVerts(Fvector* verts, Fvector* uvs, int count, Fmatrix mat, Fvector4 pos) const
 {
 	Fvector2 scr_size = {
 		float(::Render->getTarget()->get_width()),
 		float(::Render->getTarget()->get_height())
 	};
 
-	// Calculate size from linear depth
-	float zNear = Device.ViewportNear;
-	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float t = remap(pos.w / zFar, crosshair_depth_begin / zFar, crosshair_depth_end / zFar, 0.f, 1.f);
-	float size = pos.w * lerp(crosshair_near_size, crosshair_far_size, t) * (Device.fFOV / 90.0);
-
 	for (int i = 0; i < count; i++)
 	{
 		Fvector vert = verts[i];
-		Fvector uv;
+		Fvector uv = Fvector();
 		if (uvs)
 			uv = uvs[i];
 
-		vert.mul(size);
+		vert.mul(scale);
 		mat.transform(vert);
 		vert.x *= scr_size.x / scr_size.y;
 		vert.y *= -1;
@@ -128,7 +134,6 @@ void CHUDCrosshair::RenderShaderCrosshair()
 		float(::Render->getTarget()->get_height())
 	};
 
-	float min = minRadius;
 	float max = maxRadius;
 
 	Fvector verts[4] = {
@@ -183,8 +188,6 @@ void CHUDCrosshair::RenderWireCrosshair()
 		{ 0, -max },
 	};
 
-	Fvector uvs[8];
-
 	Fmatrix mat = Fmatrix().mul(Device.mFullTransform, transform);
 	Fvector4 pos = Fvector4().set(mat._41, mat._42, mat._43, mat._44);
 
@@ -204,11 +207,11 @@ void CHUDCrosshair::RenderWireCrosshair()
 	UIRender->FlushPrimitive();
 }
 
-void CHUDCrosshair::OnRender()
+void CHUDCrosshair::OnRender(bool use_shader)
 {
 	VERIFY(g_bRendering);
 
-	if (psHUD_Flags.is(HUD_SHADER_CROSSHAIR))
+	if (use_shader)
 	{
 		if (InitShaderCrosshair())
 			RenderShaderCrosshair();
@@ -216,6 +219,7 @@ void CHUDCrosshair::OnRender()
 	else
 	{
 		DeinitShaderCrosshair();
+		InitShaderWire();
 		RenderWireCrosshair();
 	}
 }

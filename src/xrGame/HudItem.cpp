@@ -1061,7 +1061,7 @@ void CHudItem::Ray(SPickParam& pp)
 	}
 
 	// Trace from eye -> barrel
-	SPickParam pn;
+	SPickParam pn = SPickParam(CDB::OPT_CULL | CDB::OPT_ONLYFIRST);
 	pn.defs.start = eye_pos;
 	pn.defs.dir = Fvector3().sub(matrix.c, eye_pos);
 	pn.defs.range = pn.defs.dir.magnitude();
@@ -1098,6 +1098,7 @@ void CHudItem::Ray(SPickParam& pp)
 			pp.defs.dir.sub(matrix.c, pp.defs.start);
 			pp.defs.range = pp.defs.dir.magnitude();
 			pp.defs.dir.normalize();
+			pp.barrel_dist = pp.defs.range;
 		}
 
 		return;

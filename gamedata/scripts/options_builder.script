@@ -50,21 +50,130 @@ end
 -- Numeric slider
 function track(args)
 	assert(is_table(args), "Track argument is not a table")
+
+	-- Populate typing information
 	args.type = "track"
 	args.val = 2
-	args.cmd = args.cmd or args.id
 
+	-- Use ID as command unless specified explicitly
+	if args.cmd == nil then
+		args.cmd = args.id
+	end
+
+	-- If a valid command is specified...
+	if type(args.cmd) == "string" then
 	-- Get bounds of console variable
 	local bounds = get_console():get_variable_bounds(args.cmd)
 	if bounds.min and bounds.max then
 		args.min = args.min or bounds.min
 		args.max = args.max or bounds.max
 	end
+	else
+		-- Otherwise, nil it to ensure data sanity
+		args.cmd = nil
+	end
 
+	-- Ensure provided range is valid
 	if args.min > args.max then
 		args.min, args.max = args.max, args.min
 	end
 
+	return args
+end
+
+-- RGBA color sliders
+function curr_crosshair_clr(id, n)
+	printf("curr_crosshair_clr(%s, %s)", id, n)
+	local curr = get_console_cmd(nil, id)
+	curr = tostring(curr)
+	printf("  curr: %s", curr)
+	local r,g,b,a = string.match(curr,"(%d+), (%d+), (%d+), (%d+)")
+	if n == "a" then
+		return tonumber(a)
+	elseif n == "r" then
+		return tonumber(r)
+	elseif n == "g" then
+		return tonumber(g)
+	elseif n == "b" then
+		return tonumber(b)
+	end
+	return 255
+end
+
+function func_crosshair_clr(id, n)
+	printf("func_crosshair_clr(%s, %s)", id, n)
+	local val = ui_options.opt_temp["modded_exes/visual/crosshair/" .. id .. "_" .. n]
+	printf("val: %s", val)
+	if (val == nil) then
+		return
+	end
+
+	local curr = get_console_cmd(nil, id)
+	curr = tostring(curr)
+	printf("curr: %s", curr)
+	local r,g,b,a = string.match(curr,"(%d+), (%d+), (%d+), (%d+)")
+	if n == "a" then
+		a = val
+	elseif n == "r" then
+		r = val
+	elseif n == "g" then
+		g = val
+	elseif n == "b" then
+		b = val
+	end
+	exec_console_cmd(strformat(id .. " (%s, %s, %s, %s)", r, g, b, a))
+end
+
+function color(args)
+	return
+		track {
+			id = args.id .. "_a",
+			min = 0,
+			max = 255,
+			def = 255,
+			step = 1,
+			curr = {curr_crosshair_clr, args.id, "a"},
+			functor = {func_crosshair_clr, args.id, "a"},
+			cmd = false
+		},
+		track {
+			id = args.id .. "_r",
+			min = 0,
+			max = 255,
+			def = 255,
+			step = 1,
+			curr = {curr_crosshair_clr, args.id, "r"},
+			functor = {func_crosshair_clr, args.id, "r"},
+			cmd = false
+		},
+		track {
+			id = args.id .. "_g",
+			min = 0,
+			max = 255,
+			def = 255,
+			step = 1,
+			curr = {curr_crosshair_clr, args.id, "g"},
+			functor = {func_crosshair_clr, args.id, "g"},
+			cmd = false
+		},
+		track {
+			id = args.id .. "_b",
+			min = 0,
+			max = 255,
+			def = 255,
+			step = 1,
+			curr = {curr_crosshair_clr, args.id, "b"},
+			functor = {func_crosshair_clr, args.id, "b"},
+			cmd = false
+		}
+end
+
+-- String input
+function input(args)
+	assert(is_table(args), "Input argument is not a table")
+	args.type = "input"
+	args.val = 0
+	args.cmd = args.cmd or args.id
 	return args
 end
 

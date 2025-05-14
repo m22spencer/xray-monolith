@@ -43,36 +43,71 @@
 	<string id="ui_mm_menu_crosshair">
 		<text>Crosshair</text>
 	</string>
+
+	<string id="ui_mm_camera_modded_exes">
+		<text>Camera</text>
+	</string>
+
+	<string id="ui_mm_weapon_modded_exes">
+		<text>Weapon</text>
+	</string>
+
+	<string id="ui_mm_device_modded_exes">
+		<text>Device</text>
+	</string>
+
+	<string id="ui_mm_near_modded_exes">
+		<text>Near</text>
+	</string>
+
+	<string id="ui_mm_far_modded_exes">
+		<text>Far</text>
+	</string>
 	
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_show_always">
 		<text>Always show crosshair (g_crosshair_show_always)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_use_shader_crosshair">
-		<text>Use shader crosshair (g_use_shader_crosshair)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_independent">
+		<text>Draw separate crosshairs (g_crosshair_*_independent)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_near_size">
-		<text>Crosshair size near the camera (g_crosshair_near_size)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_show">
+		<text>Show crosshair (g_crosshair_*)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_far_size">
-		<text>Crosshair size at the horizon (g_crosshair_far_size)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_recon">
+		<text>Show recon (g_crosshair_*_recon)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth_begin">
-		<text>Distance limit for near size (g_crosshair_depth_begin)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_recon_max_opacity">
+		<text>Maximum recon opacity (g_crosshair_*_recon_max_opacity)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth_end">
-		<text>Distance limit for far size (g_crosshair_depth_end)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_line">
+		<text>Show aiming line (g_crosshair_*_line)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_use_shader">
+		<text>Use shader crosshair (g_crosshair_*_use_shader)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_shader">
+		<text>Crosshair shader (g_crosshair_*_shader)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_texture">
+		<text>Crosshair texture (g_crosshair_*_texture)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_size">
+		<text>Crosshair size (g_crosshair_*_size)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth">
+		<text>Distance limit for sizing (g_crosshair_*_depth)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_distance_lerp">
-		<text>Animate crosshair distance (g_crosshair_distance_lerp)</text>
+		<text>Animate crosshair position (g_crosshair_*_distance_lerp)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_distance_lerp_rate">
-		<text>Crosshair range animation speed (g_crosshair_distance_lerp_rate)</text>
+		<text>Crosshair position animation speed (g_crosshair_*_distance_lerp_rate)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_occluded_opacity">
-		<text>Crosshair opacity when obscured by an object (g_crosshair_occluded_opacity)</text>
+		<text>Crosshair opacity when obscured by an object (g_crosshair_*_occluded_opacity)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_occlusion_fade_rate">
-		<text>Crosshair opacity animation speed (g_crosshair_occlusion_fade_rate)</text>
+		<text>Crosshair opacity animation speed (g_crosshair_*_occlusion_fade_rate)</text>
 	</string>
 
 	<!-- Shader Scopes -->

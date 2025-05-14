@@ -1227,7 +1227,7 @@ void CActor::UpdateCL()
 		if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
 		{
 			HUD().SetCrosshairDisp(0.f);
-			HUD().ShowCrosshair(false);
+			HUD().ShowCrosshair(psCrosshair_Flags.is(CROSSHAIR_SHOW_ALWAYS));
 
 			// Clearing Weapons Information in Shaders
 			g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f);

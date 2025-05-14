@@ -3010,7 +3010,7 @@ float CWeapon::Weight() const
 
 bool CWeapon::show_crosshair()
 {
-	if (psHUD_Flags.is(HUD_CROSSHAIR_SHOW_ALWAYS))
+	if (psCrosshair_Flags.is(CROSSHAIR_SHOW_ALWAYS))
 		return true;
 
 	return !IsPending() && (!IsZoomed() || !ZoomHideCrosshair());
@@ -3269,9 +3269,16 @@ Fmatrix CWeapon::RayTransform()
 		{
 			// If firedir is enabled, override the barrel orientation with the HUD equivalent
 			Fmatrix hud_rot = hi->m_item_transform;
-			matrix.i = hud_rot.i;
-			matrix.j = hud_rot.j;
-			matrix.k = hud_rot.k;
+
+			float h, p, b;
+			hud_rot.getHPB(h, p, b);
+
+			float _h, _p;
+			matrix.getHPB(_h, _p, b);
+
+			Fvector pos = matrix.c;
+			matrix.setHPB(h, p, b);
+			matrix.c = pos;
 		}
 		else {
 			// Otherwise, transform it by the hands' HUD orientation

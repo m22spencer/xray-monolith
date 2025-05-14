@@ -81,6 +81,11 @@ Fmatrix CWeaponKnife::RayTransform()
 	matrix.i = Device.vCameraTop;
 	matrix.j = Device.vCameraRight;
 	matrix.k = Device.vCameraDirection;
+	Fvector pos = matrix.c;
+	float h, p, b;
+	matrix.getHPB(h, p, b);
+	matrix.setHPB(h, p, -b);
+	matrix.c = pos;
 	return matrix;
 }
 

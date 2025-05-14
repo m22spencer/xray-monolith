@@ -168,8 +168,7 @@ void CHUDManager::OnFrame()
 	g_player_hud->OnFrame();
 
 	// If aim position is enabled...
-	bool aimpos = psActorFlags.test(AF_AIMPOS);
-	if (aimpos)
+	if (!FireposActive() && AimposActive())
 	{
 		// And we have a valid actor...
 		CActor* pActor = Actor();
@@ -362,6 +361,11 @@ bool CHUDManager::FireposActive()
 		|| (psActorFlags.test(AF_FIREPOS_ZOOM) && zFac >= 1.f);
 }
 
+bool CHUDManager::AimposActive()
+{
+	return psActorFlags.test(AF_AIMPOS);
+}
+
 ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
 {
 	SPickParam* pp = (SPickParam*)params;
@@ -413,7 +417,7 @@ bool CHUDManager::DoPick(SPickParam& pp)
 
 void CHUDManager::SetCrosshairDisp(float dispf, float disps)
 {
-	m_pHUDTarget->GetHUDCrosshair().SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
+	m_pHUDTarget->SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
 }
 
 #ifdef DEBUG

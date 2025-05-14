@@ -18,8 +18,8 @@ struct SPickParam
 	float power;
 	u32 pass;
 
-	SPickParam() :
-		defs(collide::ray_defs(Fvector(), Fvector(), 0.f, CDB::OPT_CULL, collide::rqtBoth)),
+	SPickParam(int cull) :
+		defs(collide::ray_defs(Fvector(), Fvector(), 0.f, cull, collide::rqtBoth)),
 		result(collide::rq_result().set(NULL, 0.f, 0)),
 		barrel_dist(0.f),
 		barrel_blocked(false),
@@ -28,6 +28,8 @@ struct SPickParam
 		pass(0)
 	{
 	}
+
+	SPickParam() : SPickParam(CDB::OPT_CULL) {}
 
 	void InitPick()
 	{
@@ -44,6 +46,7 @@ struct SPickParam
 		InitPick();
 		defs.start = Device.vCameraPosition;
 		defs.dir = Device.vCameraDirection;
+		barrel_matrix = Device.mInvView;
 	}
 };
 
@@ -83,6 +86,7 @@ public:
 
 
 	bool FireposActive();
+	bool AimposActive();
 	bool DoPick(SPickParam& pp);
 	SPickParam& GetPick() { return PP; }
 	collide::rq_result& GetRQ() { return GetPick().result; }

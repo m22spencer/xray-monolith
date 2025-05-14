@@ -846,6 +846,7 @@ Fmatrix CMissile::RayTransform()
 void CMissile::g_fireParams(SPickParam& pp)
 {
 	Fmatrix matrix = RayTransform();
+	Device.hud_to_world(matrix);
 	pp.defs.start = matrix.c;
 	pp.defs.dir = matrix.k;
 }

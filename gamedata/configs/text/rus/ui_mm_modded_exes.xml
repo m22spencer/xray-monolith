@@ -43,36 +43,51 @@
 	<string id="ui_mm_menu_crosshair">
 		<text>Перекрестье</text>
 	</string>
-	
+
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_show_always">
 		<text>Всегда показывать перекрестие (g_crosshair_show_always)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_use_shader_crosshair">
-		<text>Использовать шейдерное перекрестие (g_use_shader_crosshair)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_independent">
+		<text>Нарисовать отдельное перекрестие (g_crosshair_*_independent)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_near_size">
-		<text>Размер перекрестия вблизи камеры (g_crosshair_near_size)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_show">
+		<text>Показать перекрестие (g_crosshair_*)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_far_size">
-		<text>Размер перекрестия на горизонте (g_crosshair_far_size)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_recon">
+		<text>Показать расстояние (g_crosshair_*_recon)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth_begin">
-		<text>Ограничение расстояния для близкого размера (g_crosshair_depth_begin)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_recon_max_opacity">
+		<text>Максимальная непрозрачность расстояния (g_crosshair_*_recon_max_opacity)</text>
 	</string>
-	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth_end">
-		<text>Предельное расстояние для дальнего размера (g_crosshair_depth_end)</text>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_line">
+		<text>Показать линию прицеливания (g_crosshair_*_line)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_use_shader">
+		<text>Использовать шейдерное перекрестие (g_crosshair_*_use_shader)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_shader">
+		<text>Шейдер перекрестия (g_crosshair_*_shader)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_texture">
+		<text>Текстура перекрестия (g_crosshair_*_texture)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_size">
+		<text>Размер перекрестия (g_crosshair_*_size)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_depth">
+		<text>Предельное расстояние для определения размера (g_crosshair_*_depth)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_distance_lerp">
-		<text>Анимировать расстояние до перекрестия (g_crosshair_distance_lerp)</text>
+		<text>Анимировать положение перекрестия (g_crosshair_*_distance_lerp)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_distance_lerp_rate">
-		<text>Скорость анимации дальности перекрестия (g_crosshair_distance_lerp_rate)</text>
+		<text>Скорость анимации положения перекрестия (g_crosshair_*_distance_lerp_rate)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_occluded_opacity">
-		<text>Непрозрачность перекрестия при заслонении объектом (g_crosshair_occluded_opacity)</text>
+		<text>Непрозрачность перекрестия при заслонении объектом (g_crosshair_*_occluded_opacity)</text>
 	</string>
 	<string id="ui_mm_modded_exes_visual_crosshair_g_crosshair_occlusion_fade_rate">
-		<text>Скорость анимации непрозрачности перекрестия (g_crosshair_occlusion_fade_rate)</text>
+		<text>Скорость анимации непрозрачности перекрестия (g_crosshair_*_occlusion_fade_rate)</text>
 	</string>
 
 	<!-- Shader Scopes -->
