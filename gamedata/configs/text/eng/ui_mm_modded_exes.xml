@@ -600,13 +600,16 @@
 	</string>
 	
 	<string id="ui_mm_modded_exes_gameplay_3d_ballistics_g_firepos">
-		<text>Enable bullets firing from gun barrel while unaimed (g_firepos)</text>
+		<text>Fire bullets from gun barrel while unaimed (g_firepos)</text>
 	</string>
 	<string id="ui_mm_modded_exes_gameplay_3d_ballistics_g_firepos_zoom">
-		<text>Enable bullets firing from gun barrel while aiming (g_firepos_zoom)</text>
+		<text>Fire bullets from gun barrel while aiming (g_firepos_zoom)</text>
 	</string>
 	<string id="ui_mm_modded_exes_gameplay_3d_ballistics_g_aimpos">
-		<text>Aim bullets along barrel (g_aimpos)</text>
+		<text>Aim bullets along gun barrel while unaimed (g_aimpos)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_3d_ballistics_g_aimpos_zoom">
+		<text>Aim bullets along gun barrel while aiming (g_aimpos_zoom)</text>
 	</string>
 	<string id="ui_mm_modded_exes_gameplay_3d_ballistics_g_firedir_third_person">
 		<text>Use first-person firing direction when in third-person (g_firedir_third_person)</text>
