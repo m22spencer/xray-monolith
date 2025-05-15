@@ -1768,7 +1768,7 @@ enum ETraceTarget {
 	TT_MAX
 };
 
-static collide::rq_result* get_rq(ETraceTarget tt)
+static SPickParam* get_pick(ETraceTarget tt)
 {
 	R_ASSERT(tt >= 0, tt < TT_MAX);
 
@@ -1776,7 +1776,7 @@ static collide::rq_result* get_rq(ETraceTarget tt)
 	switch (tt)
 	{
 	case TT_CAMERA:
-		return &HUD().GetRQ();
+		return &HUD().GetPick();
 	case TT_WEAPON:
 		item = g_player_hud->attached_item(0);
 		break;
@@ -1784,13 +1784,22 @@ static collide::rq_result* get_rq(ETraceTarget tt)
 		item = g_player_hud->attached_item(1);
 		break;
 	case TT_ACTOR:
-		return &Actor()->GetPick().result;
+		return &Actor()->GetPick();
 	}
 
 	if (!item)
 		return (0);
 
-	return &item->m_parent_hud_item->GetRQ();
+	return &item->m_parent_hud_item->GetPick();
+}
+
+static collide::rq_result* get_rq(ETraceTarget tt)
+{
+	SPickParam* pp = get_pick(tt);
+	if (pp)
+		return &pp->result;
+
+	return NULL;
 }
 
 //ability to get the target game_object at crosshair
@@ -1842,10 +1851,10 @@ u32 g_get_target_element()
 // demonized: get world position under crosshair
 Fvector g_get_target_pos(ETraceTarget tt)
 {
-	collide::rq_result* RQ = get_rq(tt);
-	if (RQ && RQ->range)
+	SPickParam* pp = get_pick(tt);
+	if (pp)
 	{
-		return Fvector().mad(Device.vCameraPosition, Device.vCameraDirection, RQ->range);
+		return Fvector().mad(pp->defs.start, pp->defs.dir, pp->result.range);
 	}
 	return Fvector().set(0, 0, 0);
 }
