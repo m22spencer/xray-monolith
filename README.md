@@ -186,6 +186,13 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.05.16**
+* Fixed `get_ui_position` function for script attachments
+* ProfLander:
+  * Multiple crosshairs (https://github.com/themrdemonized/xray-monolith/pull/224)
+  * Implement `g_aimpos_zoom` (https://github.com/themrdemonized/xray-monolith/pull/226)
+  * Use correct trace for `g_get_target_position origin` and direction (https://github.com/themrdemonized/xray-monolith/pull/227)
+
 **2025.05.12**
 * NLTP_ASHES: Expose CUIProgressBar's m_UIProgressItem to LUA (https://github.com/themrdemonized/xray-monolith/pull/225)
 
