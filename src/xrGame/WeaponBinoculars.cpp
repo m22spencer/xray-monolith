@@ -125,13 +125,15 @@ void newGetZoomDelta(const float scope_factor, float& delta, const float min_zoo
 	delta = pow(scope_factor / min_zoom_factor, 1.0f / steps);
 }
 
-void GetZoomData(const float scope_factor, const float zoom_step_count, float& delta, float& min_zoom_factor)
+void GetZoomData(const float scope_factor, const float zoom_step_count, float min_zoom_setting, float& delta, float& min_zoom_factor)
 {
 	float def_fov = float(g_fov);
 	float min_zoom_k = 0.3f;
 	float delta_factor_total = def_fov - scope_factor;
 	VERIFY(delta_factor_total > 0);
 	min_zoom_factor = def_fov - delta_factor_total * min_zoom_k;
+	if (min_zoom_factor > min_zoom_setting)
+		min_zoom_factor = min_zoom_setting;
 	float steps = zoom_step_count ? zoom_step_count : 3.0;
 	delta = (min_zoom_factor - scope_factor) / steps;
 	if (useNewZoomDeltaAlgorithm)
@@ -140,7 +142,7 @@ void GetZoomData(const float scope_factor, const float zoom_step_count, float& d
 
 void newGetZoomData(const float scope_factor, const float zoom_step_count, float& delta, float& min_zoom_factor, float c_zoom)
 {
-	GetZoomData(scope_factor, zoom_step_count, delta, min_zoom_factor);
+	GetZoomData(scope_factor, zoom_step_count, 200.0, delta, min_zoom_factor);
 	float steps = zoom_step_count ? zoom_step_count : n_zoom_step_count;
 	delta = (min_zoom_factor - scope_factor) / steps;
 	if (useNewZoomDeltaAlgorithm)
@@ -153,7 +155,7 @@ void CWeaponBinoculars::ZoomInc()
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);
 	} else {
-		GetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor);
+		GetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, m_zoom_params.m_fMinBaseZoomFactor, delta, min_zoom_factor);
 	}
 
 	float f = useNewZoomDeltaAlgorithm ? GetZoomFactor() * delta : GetZoomFactor() - delta;
@@ -168,7 +170,7 @@ void CWeaponBinoculars::ZoomDec()
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);
 	} else {
-		GetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor);
+		GetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, m_zoom_params.m_fMinBaseZoomFactor, delta, min_zoom_factor);
 	}
 
 	float f = useNewZoomDeltaAlgorithm ? GetZoomFactor() / max(delta, 0.001f) : GetZoomFactor() + delta;
