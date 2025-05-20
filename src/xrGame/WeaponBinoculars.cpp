@@ -34,6 +34,16 @@ void CWeaponBinoculars::Load(LPCSTR section)
 	m_bVision = !!pSettings->r_bool(section, "vision_present");
 }
 
+bool CWeaponBinoculars::NeedBlendAnm()
+{
+	return false;
+}
+
+bool CWeaponBinoculars::MovingAnimAllowedNow()
+{
+	return true;
+}
+
 Fmatrix CWeaponBinoculars::RayTransform()
 {
 	Fmatrix matrix = CHudItem::RayTransform();

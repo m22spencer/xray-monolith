@@ -75,6 +75,16 @@ void CWeaponKnife::Load(LPCSTR section)
 	knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 }
 
+bool CWeaponKnife::NeedBlendAnm()
+{
+	return false;
+}
+
+bool CWeaponKnife::MovingAnimAllowedNow()
+{
+	return true;
+}
+
 Fmatrix CWeaponKnife::RayTransform()
 {
 	Fmatrix matrix = CHudItem::RayTransform();

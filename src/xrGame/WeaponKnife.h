@@ -56,6 +56,9 @@ public:
 
 	void Load(LPCSTR section);
 
+	virtual bool NeedBlendAnm();
+	virtual bool MovingAnimAllowedNow();
+
 	virtual Fmatrix RayTransform();
 	virtual void g_fireParams(SPickParam& pp) {};
 
