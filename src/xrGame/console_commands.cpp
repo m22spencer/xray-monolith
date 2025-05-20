@@ -2751,6 +2751,8 @@ void CCC_RegisterCommands()
 
 	CMD3(CCC_Mask, "weapon_sway", &psDeviceFlags2, rsAimSway);
 
+	CMD3(CCC_Mask, "blend_move_anims", &psDeviceFlags2, rsBlendMoveAnims);
+
 #ifdef DEBUG
 	//extern BOOL g_use_new_ballistics;
 	//CMD4(CCC_Integer,	"use_new_ballistics",	&g_use_new_ballistics, 0, 1);

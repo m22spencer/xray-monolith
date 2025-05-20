@@ -65,6 +65,7 @@ enum
 	rsOptShadowGeom = (1 << 9),
 	rsAimSway = (1 << 10),
 	rsAlwaysActive = (1 << 11),
+	rsBlendMoveAnims = (1 << 12),
 };
 
 // game path definition

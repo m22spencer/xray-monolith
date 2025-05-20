@@ -712,16 +712,20 @@ player_hud::player_hud()
 		char temp[20];
 		string512 tmp;
 		strconcat(sizeof(temp), temp, "movement_layer_", std::to_string(i).c_str());
-		R_ASSERT2(pSettings->line_exist("hud_movement_layers", temp), make_string("Missing definition for [hud_movement_layers] %s", temp));
-		LPCSTR layer_def = pSettings->r_string("hud_movement_layers", temp);
-		R_ASSERT2(_GetItemCount(layer_def) > 0, make_string("Wrong definition for [hud_movement_layers] %s", temp));
 		
-		_GetItem(layer_def, 0, tmp);
-		anm->Load(tmp);
-		_GetItem(layer_def, 1, tmp);
-		anm->anm->Speed() = (atof(tmp) ? atof(tmp) : 1.f);
-		_GetItem(layer_def, 2, tmp);
-		anm->m_power = (atof(tmp) ? atof(tmp) : 1.f);
+		if (pSettings->line_exist("hud_movement_layers", temp))
+		{
+			LPCSTR layer_def = pSettings->r_string("hud_movement_layers", temp);
+			R_ASSERT2(_GetItemCount(layer_def) > 0, make_string("Wrong definition for [hud_movement_layers] %s", temp));
+
+			_GetItem(layer_def, 0, tmp);
+			anm->Load(tmp);
+			_GetItem(layer_def, 1, tmp);
+			anm->anm->Speed() = (atof(tmp) ? atof(tmp) : 1.f);
+			_GetItem(layer_def, 2, tmp);
+			anm->m_power = (atof(tmp) ? atof(tmp) : 1.f);
+		}
+
 		m_movement_layers.push_back(anm);
 	}
 }
@@ -1313,30 +1317,39 @@ void player_hud::updateMovementLayerState()
 
 	bool need_blend = (script_anim_part != u8(-1) || (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->NeedBlendAnm()) || (m_attached_items[1] && m_attached_items[1]->m_parent_hud_item->NeedBlendAnm()));
 
-	if (pActor->AnyMove() && need_blend)
+	if (need_blend)
 	{
-		CEntity::SEntityState state;
-		pActor->g_State(state);
-
 		CWeapon* wep = nullptr;
 
 		if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->has_object() && m_attached_items[0]->m_parent_hud_item->object().cast_weapon())
 			wep = m_attached_items[0]->m_parent_hud_item->object().cast_weapon();
 
 		if (wep && wep->IsZoomed()) {
-			state.bCrouch ? m_movement_layers[eAimCrouch]->Play() : m_movement_layers[eAimWalk]->Play();
+			m_movement_layers[eAimIdle]->Play();
+		} else {
+			m_movement_layers[eIdle]->Play();
 		}
-		else if (state.bCrouch) {
-			m_movement_layers[eCrouch]->Play();
-		}
-		else if (state.bSprint) {
-			m_movement_layers[eSprint]->Play();
-		}
-		else if (!isActorAccelerated(pActor->MovingState(), false)) {
-			m_movement_layers[eWalk]->Play();
-		}
-		else {
-			m_movement_layers[eRun]->Play();
+
+		if (pActor->AnyMove())
+		{
+			CEntity::SEntityState state;
+			pActor->g_State(state);
+
+			if (wep && wep->IsZoomed()) {
+				state.bCrouch ? m_movement_layers[eAimCrouch]->Play() : m_movement_layers[eAimWalk]->Play();
+			}
+			else if (state.bCrouch) {
+				m_movement_layers[eCrouch]->Play();
+			}
+			else if (state.bSprint) {
+				m_movement_layers[eSprint]->Play();
+			}
+			else if (!isActorAccelerated(pActor->MovingState(), false)) {
+				m_movement_layers[eWalk]->Play();
+			}
+			else {
+				m_movement_layers[eRun]->Play();
+			}
 		}
 	}
 }
