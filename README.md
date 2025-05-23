@@ -186,6 +186,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.05.23**
+* damoldavskiy: Procedural move animations (https://github.com/themrdemonized/xray-monolith/pull/230)
+
 **2025.05.19**
 * damoldavskiy: MAS: min zoom handling (https://github.com/themrdemonized/xray-monolith/pull/228)
 
