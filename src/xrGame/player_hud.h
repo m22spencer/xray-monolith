@@ -47,6 +47,8 @@ enum eMovementLayers
 	eWalk,
 	eRun,
 	eSprint,
+	eAimIdle,
+	eIdle,
 	move_anms_end
 };
 
@@ -77,7 +79,7 @@ struct movement_layer
 
 	void Play(bool bLoop = true)
 	{
-		if (!anm->Name())
+		if (!anm->Name() || !xr_strcmp("", anm->Name()))
 			return;
 
 		if (IsPlaying())

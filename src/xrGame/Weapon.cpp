@@ -1288,6 +1288,9 @@ bool CWeapon::NeedBlendAnm()
 	if (IsZoomed() && psDeviceFlags2.test(rsAimSway))
 		return true;
 
+	if (psDeviceFlags2.test(rsBlendMoveAnims))
+		return true;
+	
 	return inherited::NeedBlendAnm();
 }
 
@@ -3119,7 +3122,7 @@ void CWeapon::render_hud_mode()
 
 bool CWeapon::MovingAnimAllowedNow()
 {
-	return !IsZoomed();
+	return !IsZoomed() && !psDeviceFlags2.test(rsBlendMoveAnims);
 }
 
 bool CWeapon::IsHudModeNow()
