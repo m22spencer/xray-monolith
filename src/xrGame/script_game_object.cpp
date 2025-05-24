@@ -1076,17 +1076,17 @@ script_attachment* CScriptGameObject::GetAttachment(LPCSTR name)
 
 void CScriptGameObject::RemoveAttachment(LPCSTR name)
 {
-	object().remove_attachment(name, true);
+	object().remove_attachment(name);
+}
+
+void CScriptGameObject::RemoveAttachment(script_attachment* child)
+{
+	object().remove_attachment(child);
 }
 
 void CScriptGameObject::IterateAttachments(::luabind::functor<bool> functor)
 {
-	if (!object().GetAttachments()->size())
-		return;
-
-	for (auto& pair : *object().GetAttachments())
-		if (functor(pair.first.c_str(), pair.second) == true)
-			return;
+	object().iterate_attachments(functor);
 }
 
 CGameObject& CScriptGameObject::object() const

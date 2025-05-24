@@ -280,7 +280,7 @@ bool CHUDManager::RenderCamAttachedUIQuery()
 	for (auto& pair : *g_actor->GetAttachments())
 	{
 		script_attachment* att = pair.second;
-		if (att->GetFFlags().test(eSA_CamAttached))
+		if (att->GetType() == eSA_CamAttached)
 			return true;
 	}
 	return false;
@@ -299,8 +299,8 @@ void CHUDManager::RenderCamAttachedUI()
 	for (auto& pair : *g_actor->GetAttachments())
 	{
 		script_attachment* att = pair.second;
-		if (att->GetFFlags().test(eSA_CamAttached))
-			att->RenderUI(false);
+		if (att->GetType() == eSA_CamAttached)
+			att->RenderUI();
 	}
 }
 

@@ -748,14 +748,14 @@ void CGameObject::RenderAttachments()
 		for (auto& pair : m_script_attachments)
 		{
 			script_attachment* att = pair.second;
-			if (att->GetFFlags().test(eSA_RenderWorld))
+			if (att->GetType() == eSA_World)
 			{
 				att->Render(Visual()->dcast_PKinematics(), &XFORM());
 
 				if (::Render->get_generation() == ::Render->GENERATION_R1)
 					g_pGamePersistent->AttachmentUIsToRender.push_back(att);
 				else
-					att->RenderUI(false);
+					att->RenderUI();
 			}
 		}
 	}
@@ -764,7 +764,7 @@ void CGameObject::RenderAttachments()
 script_attachment* CGameObject::add_attachment(LPCSTR name, script_attachment* att)
 {
 	R_ASSERT(att);
-	remove_attachment(name, true);
+	remove_child(name, true);
 	m_script_attachments.emplace(mk_pair(name, att));
 	return att;
 }
@@ -781,7 +781,7 @@ script_attachment* CGameObject::get_attachment(LPCSTR name)
 	return nullptr;
 }
 
-void CGameObject::remove_attachment(LPCSTR name, bool destroy)
+void CGameObject::remove_child(LPCSTR name, bool destroy)
 {
 	if (m_script_attachments.size())
 	{
@@ -794,6 +794,29 @@ void CGameObject::remove_attachment(LPCSTR name, bool destroy)
 			
 		m_script_attachments.erase(name);
 	}
+}
+
+void CGameObject::remove_attachment(script_attachment* child)
+{
+	if (!child) return;
+	if (m_script_attachments.size())
+	{
+		script_attachment* attachment = get_attachment(child->GetName());
+		if (!attachment || attachment != child)
+			return;
+
+		remove_child(child->GetName(), true);
+	}
+}
+
+void CGameObject::iterate_attachments(::luabind::functor<bool> functor)
+{
+	if (!m_script_attachments.size())
+		return;
+
+	for (auto& pair : m_script_attachments)
+		if (functor(pair.first.c_str(), pair.second) == true)
+			return;
 }
 
 /*

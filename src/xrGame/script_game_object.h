@@ -1137,6 +1137,7 @@ public:
 	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
 	script_attachment* GetAttachment(LPCSTR name);
 	void RemoveAttachment(LPCSTR name);
+	void RemoveAttachment(script_attachment* child);
 	void IterateAttachments(::luabind::functor<bool> functor);
 
 	doors::door* m_door;

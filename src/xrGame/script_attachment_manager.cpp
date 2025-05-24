@@ -8,6 +8,10 @@
 script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 {
 	m_name = name;
+	m_model = nullptr;
+	m_kinematics = nullptr;
+	m_parent_attachment = nullptr;
+	m_parent_object = nullptr;
 	m_script_ui = nullptr;
 	m_script_ui_func = 0;
 	m_script_ui_mat = Fidentity;
@@ -25,7 +29,7 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_scale.set(1, 1, 1);
 	m_bStopAtEndAnimIsRunning = false;
 	m_anim_end = 0;
-	m_flags.assign(eSA_RenderWorld);
+	m_type = eSA_World;
 	m_last_upd_frame = 0;
 	m_current_motion = "idle";
 	m_model_name = "";
@@ -42,7 +46,13 @@ script_attachment* script_attachment::AddAttachment(LPCSTR name, LPCSTR model_na
 	return att;
 }
 
-void script_attachment::Render(IKinematics* model, Fmatrix* mat, bool hud_mode)
+void script_attachment::RemoveAttachment(script_attachment* child)
+{
+	if (!child || child->m_parent_attachment != this) return;
+	RemoveAttachment(child->GetName());
+}
+
+void script_attachment::Render(IKinematics* model, Fmatrix* mat)
 {
 	if (!model || (m_bone_callbacks[0] && m_bone_callbacks[0]->m_bone_id != BI_NONE))
 		m_transform = *mat;
@@ -51,23 +61,25 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat, bool hud_mode)
 
 	m_transform.mulB_43(m_offset);
 
-	if (m_script_light && (hud_mode != !!m_flags.test(eSA_RenderWorld)))
+	if (m_script_light)
 	{
 		Fmatrix LM;
 		Fmatrix light_bone;
-		if (m_model->dcast_PKinematics()->LL_BoneCount() > m_script_light_bone)
-			light_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_light_bone);
+		if (m_kinematics->LL_BoneCount() > m_script_light_bone)
+			light_bone = m_kinematics->LL_GetTransform(m_script_light_bone);
 		else
-			light_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_model->dcast_PKinematics()->LL_GetBoneRoot());
+			light_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
 		LM.mul(m_transform, light_bone);
 		m_script_light->SetXFORM(LM);
 	}
 
 	if (m_model->dcast_PKinematicsAnimated())
+	{
 		m_model->dcast_PKinematicsAnimated()->UpdateTracks();
-	m_model->dcast_PKinematics()->CalculateBones_Invalidate();
-	m_model->dcast_PKinematics()->CalculateBones(TRUE);
+		m_kinematics->CalculateBones_Invalidate();
+		m_kinematics->CalculateBones(TRUE);
+	}
 
 	::Render->set_Transform(&m_transform);
 	::Render->add_Visual(m_model);
@@ -76,7 +88,7 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat, bool hud_mode)
 	{
 		for (auto& pair : m_children)
 		{
-			pair.second->Render(m_model->dcast_PKinematics(), &m_transform);
+			pair.second->Render(m_kinematics, &m_transform);
 		}
 	}
 }
@@ -97,18 +109,16 @@ void script_attachment::Update()
 
 	if (m_bone_callbacks.size())
 	{
-		xr_map<u16, script_attachment_bone_cb*>::iterator it = m_bone_callbacks.begin();
-		xr_map<u16, script_attachment_bone_cb*>::iterator it_e = m_bone_callbacks.end();
-		for (; it != it_e; ++it)
+		for (auto& pair : m_bone_callbacks)
 		{
-			script_attachment_bone_cb* cb = (*it).second;
+			script_attachment_bone_cb* cb = pair.second;
 			if (!cb) continue;
 			
 			if (cb->m_func)
 			{
 				cb->m_mat.set((*(cb->m_func))(
-					m_model->dcast_PKinematics()->LL_GetBoneInstance(cb->m_attachment_bone_id).mTransformHidden, //Transform without bone callback modifier
-					m_model->dcast_PKinematics()->LL_BoneName_dbg((*it).first)));
+					m_kinematics->LL_GetBoneInstance(cb->m_attachment_bone_id).mTransformHidden, //Transform without bone callback modifier
+					m_kinematics->LL_BoneName_dbg(pair.first)));
 
 				continue;
 			}
@@ -118,7 +128,7 @@ void script_attachment::Update()
 
 			if (m_parent_object)
 			{
-				if (GetFFlags().test(eSA_RenderHUD))
+				if (GetType() == eSA_HUD)
 				{
 					CHudItem* itm = smart_cast<CHudItem*>(m_parent_object);
 					if (itm)
@@ -155,10 +165,10 @@ void script_attachment::Update()
 
 			if (m_parent_attachment)
 			{
-				if (bone >= m_parent_attachment->m_model->dcast_PKinematics()->LL_BoneCount())
+				if (bone >= m_parent_attachment->m_kinematics->LL_BoneCount())
 					target = Fidentity;
 				else
-					target = m_parent_attachment->m_model->dcast_PKinematics()->LL_GetTransform(bone);
+					target = m_parent_attachment->m_kinematics->LL_GetTransform(bone);
 			}
 		}
 	}
@@ -172,46 +182,37 @@ void script_attachment::Update()
 	}
 }
 
-void script_attachment::RenderUI(bool hud_mode)
+void script_attachment::RenderUI()
 {
-	if (hud_mode || (!hud_mode && (m_flags.test(eSA_RenderWorld) || m_flags.test(eSA_CamAttached))))
+	if (m_script_ui)
 	{
-		if (m_script_ui)
-		{
-			IUIRender::ePointType bk;
+		IUIRender::ePointType bk;
 
-			if (!hud_mode)
-			{
-				bk = UI().m_currentPointType;
-				UI().m_currentPointType = IUIRender::pttLIT;
-				UIRender->CacheSetCullMode(IUIRender::cmNONE);
-			}
+		bk = UI().m_currentPointType;
+		UI().m_currentPointType = IUIRender::pttLIT;
+		UIRender->CacheSetCullMode(IUIRender::cmNONE);
 
-			Fmatrix LM;
-			Fmatrix ui_bone;
-			if (m_model->dcast_PKinematics()->LL_BoneCount() > m_script_ui_bone)
-				ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_script_ui_bone);
-			else
-				ui_bone = m_model->dcast_PKinematics()->LL_GetTransform(m_model->dcast_PKinematics()->LL_GetBoneRoot());
+		Fmatrix LM;
+		Fmatrix ui_bone;
+		if (m_kinematics->LL_BoneCount() > m_script_ui_bone)
+			ui_bone = m_kinematics->LL_GetTransform(m_script_ui_bone);
+		else
+			ui_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
-			LM.mul(m_transform, ui_bone);
-			LM.mulB_43(m_script_ui_mat);
-			UIRender->CacheSetXformWorld(LM);
-			m_script_ui->Draw();
-
-			if (!hud_mode)
-			{
-				UIRender->CacheSetCullMode(IUIRender::cmCCW);
-				UI().m_currentPointType = bk;
-			}
-		}
+		LM.mul(m_transform, ui_bone);
+		LM.mulB_43(m_script_ui_mat);
+		UIRender->CacheSetXformWorld(LM);
+		m_script_ui->Draw();
+		
+		UIRender->CacheSetCullMode(IUIRender::cmCCW);
+		UI().m_currentPointType = bk;
 	}
 
 	if (m_children.size())
 	{
 		for (auto& pair : m_children)
 		{
-			pair.second->RenderUI(hud_mode);
+			pair.second->RenderUI();
 		}
 	}
 }
@@ -298,15 +299,15 @@ void script_attachment::SetParent(script_attachment* att)
 		if (m_parent_attachment == att)
 			return;
 
-		m_parent_attachment->RemoveChild(*m_name);
+		m_parent_attachment->RemoveChild(GetName());
 	}
 
 	if (m_parent_object)
-		m_parent_object->remove_attachment(*m_name);
+		m_parent_object->remove_child(GetName());
 
 	m_parent_object = nullptr;
 	m_parent_attachment = att;
-	m_parent_attachment->AddChild(*m_name, this);
+	m_parent_attachment->AddChild(GetName(), this);
 }
 
 void script_attachment::SetParent(CGameObject* obj)
@@ -315,20 +316,20 @@ void script_attachment::SetParent(CGameObject* obj)
 		return;
 
 	if (m_parent_attachment)
-		m_parent_attachment->RemoveChild(*m_name);
+		m_parent_attachment->RemoveChild(GetName());
 
 	if (m_parent_object)
 	{
 		if (m_parent_object == obj)
 			return;
 
-		m_parent_object->remove_attachment(*m_name);
+		m_parent_object->remove_child(GetName());
 	}
 		
 
 	m_parent_object = obj;
 	m_parent_attachment = nullptr;
-	m_parent_object->add_attachment(*m_name, this);
+	m_parent_object->add_attachment(GetName(), this);
 }
 
 void script_attachment::SetParent(CScriptGameObject* obj)
@@ -337,20 +338,20 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 		return;
 
 	if (m_parent_attachment)
-		m_parent_attachment->RemoveChild(*m_name);
+		m_parent_attachment->RemoveChild(GetName());
 
 	if (m_parent_object)
 	{
 		if (m_parent_object == &obj->object())
 			return;
 
-		m_parent_object->remove_attachment(*m_name);
+		m_parent_object->remove_child(GetName());
 	}
 
 
 	m_parent_object = &obj->object();
 	m_parent_attachment = nullptr;
-	m_parent_object->add_attachment(*m_name, this);
+	m_parent_object->add_attachment(GetName(), this);
 }
 
 luabind::object script_attachment::GetParent()
@@ -415,19 +416,21 @@ Fmatrix& script_attachment::BoneTransform(IKinematics* model)
 
 u32 script_attachment::PlayMotion(LPCSTR name, bool mixin, float speed)
 {
-	if (!m_model->dcast_PKinematicsAnimated())
+	IKinematicsAnimated* k = m_model->dcast_PKinematicsAnimated();
+
+	if (!k)
 		return 0;
 
-	MotionID M2 = m_model->dcast_PKinematicsAnimated()->ID_Cycle_Safe(name);
+	MotionID M2 = k->ID_Cycle_Safe(name);
 	if (!M2.valid())
-		M2 = m_model->dcast_PKinematicsAnimated()->ID_Cycle_Safe("idle");
+		M2 = k->ID_Cycle_Safe("idle");
 
 	if (!M2.valid())
 		return 0;
 
-	u16 pc = m_model->dcast_PKinematicsAnimated()->partitions().count();
+	u16 pc = k->partitions().count();
 	for (u16 pid = 0; pid < pc; ++pid)
-		CBlend* B = m_model->dcast_PKinematicsAnimated()->PlayCycle(pid, M2, mixin, 0, 0, 0, speed);
+		CBlend* B = k->PlayCycle(pid, M2, mixin, 0, 0, 0, speed);
 
 	const CMotionDef* md;
 	u32 length = motion_length(M2, md, speed);
@@ -442,44 +445,129 @@ u32 script_attachment::PlayMotion(LPCSTR name, bool mixin, float speed)
 
 	m_current_motion = name;
 
-	m_model->dcast_PKinematicsAnimated()->UpdateTracks();
-	m_model->dcast_PKinematics()->CalculateBones_Invalidate();
-	m_model->dcast_PKinematics()->CalculateBones(true);
+	k->UpdateTracks();
+	m_kinematics->CalculateBones_Invalidate();
+	m_kinematics->CalculateBones(true);
 
 	return length;
 }
 
 u32 script_attachment::motion_length(const MotionID& M, const CMotionDef*& md, float speed)
 {
-	if (!m_model->dcast_PKinematicsAnimated())
+	IKinematicsAnimated* k = m_model->dcast_PKinematicsAnimated();
+
+	if (!k)
 		return 0;
 
-	md = m_model->dcast_PKinematicsAnimated()->LL_GetMotionDef(M);
+	md = k->LL_GetMotionDef(M);
 	VERIFY(md);
 	if (md->flags & esmStopAtEnd)
 	{
-		CMotion* motion = m_model->dcast_PKinematicsAnimated()->LL_GetRootMotion(M);
+		CMotion* motion = k->LL_GetRootMotion(M);
 		return iFloor(0.5f + 1000.f * motion->GetLength() / (md->Dequantize(md->speed) * speed));
 	}
 	return 0;
 }
 
-void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility)
+void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecursive)
 {
-	if (m_model->dcast_PKinematics()->LL_BoneCount() > bone_id)
+	if (m_kinematics->LL_BoneCount() > bone_id)
 	{
-		bool bVisibleNow = m_model->dcast_PKinematics()->LL_GetBoneVisible(bone_id);
+		bool bVisibleNow = m_kinematics->LL_GetBoneVisible(bone_id);
 		if (bVisibleNow != bVisibility)
-			m_model->dcast_PKinematics()->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+			m_kinematics->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
 	}
 }
 
 bool script_attachment::GetBoneVisible(u16 bone_id)
 {
-	if (m_model->dcast_PKinematics()->LL_BoneCount() > bone_id)
-		return m_model->dcast_PKinematics()->LL_GetBoneVisible(bone_id);
+	if (m_kinematics->LL_BoneCount() > bone_id)
+		return m_kinematics->LL_GetBoneVisible(bone_id);
 
 	return false;
+}
+
+void script_attachment::SetParentBone(LPCSTR bone)
+{
+	if (m_parent_object)
+	{
+		m_parent_bone = m_parent_object->lua_game_object()->bone_id(bone, m_type == eSA_HUD);
+		return;
+	}
+
+	if (m_parent_attachment)
+	{
+		m_parent_bone = m_parent_attachment->bone_id(bone);
+		return;
+	}
+
+	m_parent_bone = 0;
+}
+
+u16 script_attachment::bone_id(LPCSTR bone_name)
+{
+	u16 bone_id = BI_NONE;
+	if (xr_strlen(bone_name))
+		bone_id = m_kinematics->LL_BoneID(bone_name);
+
+	return bone_id;
+}
+
+extern BOOL print_bone_warnings;
+
+Fmatrix script_attachment::bone_transform(u16 bone_id)
+{
+	if (bone_id == BI_NONE || bone_id >= m_kinematics->LL_BoneCount()) {
+		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
+			Msg("![bone_position] Incorrect bone_id provided for %s (%s), fallback to root bone", GetName(), GetModelScript());
+			ai().script_engine().print_stack();
+		}
+		bone_id = m_kinematics->LL_GetBoneRoot();
+	}
+
+	Fmatrix matrix;
+	matrix.mul_43(m_transform, m_kinematics->LL_GetTransform(bone_id));
+	return matrix;
+}
+
+Fvector script_attachment::bone_position(u16 bone_id)
+{
+	return bone_transform(bone_id).c;
+}
+
+Fvector script_attachment::bone_direction(u16 bone_id)
+{
+	Fmatrix matrix = bone_transform(bone_id);
+	Fvector res;
+	matrix.getHPB(res);
+	return res;
+}
+
+u16 script_attachment::bone_parent(u16 bone_id)
+{
+	if (bone_id == m_kinematics->LL_GetBoneRoot() || bone_id >= m_kinematics->LL_BoneCount()) return BI_NONE;
+
+	CBoneData* data = &m_kinematics->LL_GetData(bone_id);
+	u16 ParentID = data->GetParentID();
+	return ParentID;
+}
+
+LPCSTR script_attachment::bone_name(u16 bone_id)
+{
+	if (bone_id == BI_NONE) return "";
+	return (m_kinematics->LL_BoneName_dbg(bone_id));
+}
+
+// demonized: list all bones
+luabind::object script_attachment::list_bones()
+{
+	luabind::object result = luabind::newtable(ai().script_engine().lua());
+
+	auto bones = m_kinematics->list_bones();
+	for (const auto& bone : bones)
+		result[bone.first] = bone.second.c_str();
+
+	return result;
 }
 
 void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
@@ -489,29 +577,72 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 
 	m_model_name = model_name;
 
-	u16 count_prev;
+	u16 count_prev = 0;
 
 	if (m_model)
 	{
-		count_prev = m_model->dcast_PKinematics()->LL_BoneCount();
+		count_prev = m_kinematics->LL_BoneCount();
 		::Render->model_Delete(m_model);
 	}
 	
 	m_model = ::Render->model_Create(*m_model_name);
 	R_ASSERT(m_model);
+	m_kinematics = m_model->dcast_PKinematics();
+	R_ASSERT(m_kinematics);
 
 	//Bone Callbacks
-	if (keep_bc && m_bone_callbacks.size() && count_prev <= m_model->dcast_PKinematics()->LL_BoneCount())
+	if (keep_bc && m_bone_callbacks.size() && count_prev <= m_kinematics->LL_BoneCount())
 	{
-		xr_map<u16, script_attachment_bone_cb*>::const_iterator it = m_bone_callbacks.cbegin();
-		xr_map<u16, script_attachment_bone_cb*>::const_iterator it_e = m_bone_callbacks.cend();
-		for (; it != it_e; ++it)
+		for (auto& pair : m_bone_callbacks)
 		{
-			m_model->dcast_PKinematics()->LL_GetBoneInstance((*it).first).set_callback(bctCustom, ScriptAttachmentBoneCallback, (*it).second, (*it).second->m_overwrite);
+			m_kinematics->LL_GetBoneInstance(pair.first).set_callback(bctCustom, ScriptAttachmentBoneCallback, pair.second, pair.second->m_overwrite);
 		}
 
 		PlayMotion(*m_current_motion, false);
 	}
+}
+
+void script_attachment::SetName(LPCSTR name)
+{
+	if (m_parent_object)
+	{
+		// Remove old instance from parent (without destroying it)
+		m_parent_object->remove_child(GetName(), false);
+
+		auto& pair = m_parent_object->GetAttachments()->find(name);
+		if (pair != m_parent_object->GetAttachments()->end())
+		{
+			// Attachment with name exists, replace it
+			xr_delete(pair->second);
+			pair->second = this;
+		}
+		else
+		{
+			// Attachment with name does not exist, add it
+			m_parent_object->add_attachment(name, this);
+		}
+	}
+
+	else if (m_parent_attachment)
+	{
+		// Remove old instance from parent (without destroying it)
+		m_parent_attachment->RemoveChild(GetName(), false);
+
+		auto& pair = m_parent_attachment->m_children.find(name);
+		if (pair != m_parent_attachment->m_children.end())
+		{
+			// Attachment with name exists, replace it
+			xr_delete(pair->second);
+			pair->second = this;
+		}
+		else
+		{
+			// Attachment with name does not exist, add it
+			m_parent_attachment->AddChild(name, this);
+		}
+	}
+
+	m_name = name;
 }
 
 void script_attachment::SetScriptUI(LPCSTR ui_func)
@@ -558,38 +689,43 @@ void script_attachment::ScriptAttachmentBoneCallback(CBoneInstance* B)
 	target = params->m_mat;
 }
 
-void script_attachment::SetBoneCallback(u16 bone_id, u16 parent_bone, bool overwrite)
+void script_attachment::SetBoneCallback(u16 bone_id, LPCSTR parent_bone, bool overwrite)
 {
-	if (m_model && m_model->dcast_PKinematics())
+	if (m_parent_object)
 	{
-		if (bone_id >= m_model->dcast_PKinematics()->LL_BoneCount())
-		{
-			Msg("![SetBoneCallback]: Attachment has no bone with id %i", bone_id);
-			return;
-		}
-
-		if (m_bone_callbacks[bone_id])
-		{
-			m_model->dcast_PKinematics()->LL_GetBoneInstance(bone_id).reset_callback();
-			m_bone_callbacks.erase(bone_id);
-		}
-
-		m_bone_callbacks[bone_id] = xr_new<script_attachment_bone_cb>(parent_bone, this, bone_id, overwrite);
-		m_model->dcast_PKinematics()->LL_GetBoneInstance(bone_id).set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
-	}
-	else
-		Msg("![SetBoneCallback]: Attachment has no visual with bones");
-}
-
-void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmatrix>& func, bool overwrite)
-{
-	if (!(m_model && m_model->dcast_PKinematics()))
-	{
-		Msg("![SetBoneCallback]: Attachment has no visual with bones");
+		SetBoneCallback(bone_id, m_parent_object->lua_game_object()->bone_id(parent_bone, m_type == eSA_HUD), overwrite);
 		return;
 	}
 
-	if (bone_id >= m_model->dcast_PKinematics()->LL_BoneCount())
+	if (m_parent_attachment)
+	{
+		SetBoneCallback(bone_id, m_parent_attachment->bone_id(parent_bone), overwrite);
+		return;
+	}
+
+	Msg("![SetBoneCallback]: Parent has no bone with name %i", parent_bone);
+}
+
+void script_attachment::SetBoneCallback(LPCSTR bone, LPCSTR parent_bone, bool overwrite)
+{
+	if (m_parent_object)
+	{
+		SetBoneCallback(bone_id(bone), m_parent_object->lua_game_object()->bone_id(parent_bone, m_type == eSA_HUD), overwrite);
+		return;
+	}
+
+	if (m_parent_attachment)
+	{
+		SetBoneCallback(bone_id(bone), m_parent_attachment->bone_id(parent_bone), overwrite);
+		return;
+	}
+
+	Msg("![SetBoneCallback]: Parent has no bone with name %i", parent_bone);
+}
+
+void script_attachment::SetBoneCallback(u16 bone_id, u16 parent_bone, bool overwrite)
+{
+	if (bone_id >= m_kinematics->LL_BoneCount())
 	{
 		Msg("![SetBoneCallback]: Attachment has no bone with id %i", bone_id);
 		return;
@@ -597,37 +733,41 @@ void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmat
 
 	if (m_bone_callbacks[bone_id])
 	{
-		m_model->dcast_PKinematics()->LL_GetBoneInstance(bone_id).reset_callback();
+		m_kinematics->LL_GetBoneInstance(bone_id).reset_callback();
+		m_bone_callbacks.erase(bone_id);
+	}
+
+	m_bone_callbacks[bone_id] = xr_new<script_attachment_bone_cb>(parent_bone, this, bone_id, overwrite);
+	m_kinematics->LL_GetBoneInstance(bone_id).set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
+}
+
+void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmatrix>& func, bool overwrite)
+{
+	if (bone_id >= m_kinematics->LL_BoneCount())
+	{
+		Msg("![SetBoneCallback]: Attachment has no bone with id %i", bone_id);
+		return;
+	}
+
+	if (m_bone_callbacks[bone_id])
+	{
+		m_kinematics->LL_GetBoneInstance(bone_id).reset_callback();
 		m_bone_callbacks.erase(bone_id);
 	}
 
 	m_bone_callbacks[bone_id] = xr_new<script_attachment_bone_cb>(func, this, bone_id, overwrite);
-	CBoneInstance& bInst = m_model->dcast_PKinematics()->LL_GetBoneInstance(bone_id);
+	CBoneInstance& bInst = m_kinematics->LL_GetBoneInstance(bone_id);
 	bInst.set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
 	(m_bone_callbacks[bone_id]->m_mat).set(GetBoneVisible(bone_id) ? bInst.mTransformHidden : bInst.mTransform);
 }
 
 void script_attachment::RemoveBoneCallback(u16 bone_id)
 {
-	if (!(m_model && m_model->dcast_PKinematics()))
-		return;
-
 	if (m_bone_callbacks[bone_id])
 	{
-		m_model->dcast_PKinematics()->LL_GetBoneInstance(bone_id).reset_callback();
+		m_kinematics->LL_GetBoneInstance(bone_id).reset_callback();
 		m_bone_callbacks.erase(bone_id);
 	}
-}
-
-Fmatrix script_attachment::GetBoneMatrix(u16 bone_id)
-{
-	if (!(m_model && m_model->dcast_PKinematics()))
-		return Fidentity;
-
-	if (bone_id >= m_model->dcast_PKinematics()->LL_BoneCount())
-		return Fidentity;
-
-	return m_model->dcast_PKinematics()->LL_GetTransform(bone_id);
 }
 
 Fvector script_attachment::GetCenter()

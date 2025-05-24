@@ -1936,8 +1936,8 @@ void CActor::RenderCamAttached()
 			{
 				script_attachment* att = pair.second;
 
-				if (att->GetFFlags().test(eSA_CamAttached))
-					att->Render(nullptr, &cam, true);
+				if (att->GetType() == eSA_CamAttached)
+					att->Render(nullptr, &cam);
 			}
 
 			::Render->set_CamAttached(FALSE);

@@ -641,7 +641,8 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		// Lucy: Script Attachments
 		.def("add_attachment", &CScriptGameObject::AddAttachment)
 		.def("get_attachment", &CScriptGameObject::GetAttachment)
-		.def("remove_attachment", &CScriptGameObject::RemoveAttachment)
+		.def("remove_attachment", (void (CScriptGameObject::*)(LPCSTR)) &CScriptGameObject::RemoveAttachment)
+		.def("remove_attachment", (void (CScriptGameObject::*)(script_attachment*)) &CScriptGameObject::RemoveAttachment)
 		.def("iterate_attachments", &CScriptGameObject::IterateAttachments)
 
 		.def("get_shaders", &CScriptGameObject::GetShaders)

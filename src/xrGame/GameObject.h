@@ -183,7 +183,10 @@ public:
 
 	virtual script_attachment* add_attachment(LPCSTR name, script_attachment* att);
 	virtual script_attachment* get_attachment(LPCSTR name);
-	virtual void remove_attachment(LPCSTR name, bool destroy = false);
+	virtual void remove_child(LPCSTR name, bool destroy = false);
+	virtual void remove_attachment(LPCSTR name) { remove_child(name, true); }
+	virtual void remove_attachment(script_attachment* child);
+	virtual void iterate_attachments(::luabind::functor<bool> functor);
 
 private:
 	bool m_bCrPr_Activated;

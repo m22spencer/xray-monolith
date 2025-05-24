@@ -3,11 +3,12 @@
 #include "script_game_object.h"
 #include "script_light_inline.h"
 
-enum script_attachment_flags
+enum script_attachment_type
 {
-	eSA_RenderHUD = (1 << 0),
-	eSA_RenderWorld = (1 << 1),
+	eSA_HUD = (1 << 0),
+	eSA_World = (1 << 1),
 	eSA_CamAttached = (1 << 2),
+	eSA_undefined = (1 << 3)
 };
 
 struct script_attachment_bone_cb
@@ -20,8 +21,8 @@ struct script_attachment_bone_cb
 
 	script_attachment_bone_cb(const ::luabind::functor<Fmatrix>& func, script_attachment* att, u16 id, bool overwrite)
 	{
-		m_attachment = att;
 		m_attachment_bone_id = id;
+		m_attachment = att;
 		m_func = xr_new<::luabind::functor<Fmatrix>>(func);
 		m_mat = Fidentity;
 		m_bone_id = BI_NONE;
@@ -50,6 +51,7 @@ private:
 	Fvector m_position, m_rotation, m_scale, m_origin;
 
 	IRenderVisual* m_model;
+	IKinematics* m_kinematics;
 	shared_str m_model_name;
 	shared_str m_current_motion;
 	u16 m_parent_bone;
@@ -66,7 +68,7 @@ private:
 	bool m_bStopAtEndAnimIsRunning;
 	u32 m_anim_end;
 
-	Flags32 m_flags;
+	u16 m_type;
 	script_attachment* m_parent_attachment;
 	CGameObject* m_parent_object;
 	xr_map<shared_str, script_attachment*> m_children;
@@ -84,14 +86,15 @@ public:
 		delete_data(m_bone_callbacks);
 	}
 
-	void Render(IKinematics* model, Fmatrix* mat, bool hud_mode = false);
+	void Render(IKinematics* model, Fmatrix* mat);
 	void Update();
-	void RenderUI(bool hud_mode = false);
+	void RenderUI();
 
 	void AttachLight(AttachmentScriptLight* light);
 	AttachmentScriptLight* DetachLight();
 	AttachmentScriptLight* GetLight();
 	void SetScriptLightBone(u16 bone) { m_script_light_bone = bone; }
+	void SetScriptLightBone(LPCSTR bone) { m_script_light_bone = bone_id(bone); }
 	u16 GetScriptLightBone() { return m_script_light_bone; }
 
 	void RecalcOffset();
@@ -119,10 +122,14 @@ public:
 	::luabind::object GetParent();
 
 	void SetParentBone(u16 bone_id) { m_parent_bone = bone_id; }
+	void SetParentBone(LPCSTR bone);
 	u16 GetParentBone() { return m_parent_bone; }
 
 	void LoadModel(LPCSTR model_name, bool keep_bc = false);
 	LPCSTR GetModelScript() { return *m_model_name; }
+
+	void SetName(LPCSTR name);
+	LPCSTR GetName() { return *m_name; }
 
 	void SetScriptUI(LPCSTR ui_func);
 	LPCSTR GetScriptUI() { return m_script_ui_func; }
@@ -133,32 +140,58 @@ public:
 	void SetScriptUIRotation(float x, float y, float z) { SetScriptUIRotation(Fvector().set(x, y, z)); }
 	Fvector GetScriptUIRotation() { return m_script_ui_offset[1]; }
 	void SetScriptUIBone(u16 bone) { m_script_ui_bone = bone; }
+	void SetScriptUIBone(LPCSTR bone) { m_script_ui_bone = bone_id(bone); }
 	u16 GetScriptUIBone() { return m_script_ui_bone; }
 
 	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
 	void RemoveAttachment(LPCSTR name) { RemoveChild(name, true); }
+	void RemoveAttachment(script_attachment* child);
 	script_attachment* AddChild(LPCSTR name, script_attachment* att);
 	script_attachment* GetChild(LPCSTR name);
 	void RemoveChild(LPCSTR name, bool destroy = false);
 	void IterateAttachments(::luabind::functor<bool> functor);
 
-	void SetFlags(u32 flags) { m_flags.assign(flags); }
-	u32 GetFlags() { return m_flags.get(); }
-	const Flags32& GetFFlags() { return m_flags; }
+	void SetType(u16 type) { m_type = type < eSA_undefined ? type : eSA_World; }
+	u16 GetType() { return m_type; }
 
 	u32 PlayMotion(LPCSTR name, bool mixin = true, float speed = 1.f);
 	u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed);
+	
+	u16 bone_id(LPCSTR bone_name);
+	LPCSTR bone_name(u16 bone_id);
 
-	void SetBoneVisible(u16 bone_id, bool bVisibility);
 	bool GetBoneVisible(u16 bone_id);
+	bool GetBoneVisible(LPCSTR bone_name) { return GetBoneVisible(bone_id(bone_name)); }
+
+	void SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecursive = true);
+	void SetBoneVisible(LPCSTR bone_name, bool bVisibility, bool bRecursive = true) { SetBoneVisible(bone_id(bone_name), bVisibility, bRecursive); }
+
+	Fmatrix bone_transform(u16 bone_id);
+	Fmatrix bone_transform(LPCSTR bone_name) { return bone_transform(bone_id(bone_name)); }
+
+	Fvector bone_position(u16 bone_id);
+	Fvector bone_position(LPCSTR bone_name) { return bone_position(bone_id(bone_name)); }
+
+	Fvector bone_direction(u16 bone_id);
+	Fvector bone_direction(LPCSTR bone_name) { return bone_direction(bone_id(bone_name)); }
+
+	u16 bone_parent(u16 bone_id);
+	u16 bone_parent(LPCSTR bone_name) { return bone_parent(bone_id(bone_name)); }
+
+	::luabind::object list_bones();
+	
 	Fmatrix& BoneTransform(IKinematics* model);
 
 	static void _BCL ScriptAttachmentBoneCallback(CBoneInstance* B);
 	void SetBoneCallback(u16 bone_id, u16 parent_bone, bool overwrite = false);
+	void SetBoneCallback(LPCSTR bone, LPCSTR parent_bone, bool overwrite = false);
+	void SetBoneCallback(u16 bone, LPCSTR parent_bone, bool overwrite = false);
+	void SetBoneCallback(LPCSTR bone, u16 parent_bone, bool overwrite = false) { SetBoneCallback(bone_id(bone), parent_bone, overwrite); }
 	void SetBoneCallback(u16 bone_id, const ::luabind::functor<Fmatrix>& func, bool overwrite = false);
+	void SetBoneCallback(LPCSTR bone, const ::luabind::functor<Fmatrix>& func, bool overwrite = false) { SetBoneCallback(bone_id(bone), func, overwrite); }
 	void RemoveBoneCallback(u16 bone_id);
+	void RemoveBoneCallback(LPCSTR bone) { RemoveBoneCallback(bone_id(bone)); }
 
-	Fmatrix GetBoneMatrix(u16 bone_id);
 	Fmatrix GetTransform() { return m_transform; };
 	Fvector GetCenter();
 
