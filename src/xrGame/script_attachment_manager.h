@@ -5,10 +5,10 @@
 
 enum script_attachment_type
 {
-	eSA_HUD = (1 << 0),
-	eSA_World = (1 << 1),
-	eSA_CamAttached = (1 << 2),
-	eSA_undefined = (1 << 3)
+	eSA_HUD = 0,
+	eSA_World,
+	eSA_CamAttached,
+	eSA_undefined
 };
 
 struct script_attachment_bone_cb
