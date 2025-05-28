@@ -363,6 +363,12 @@ void CRenderDevice::on_idle()
 		else
 			rr = refresh_rate;
 
+		if (m_SecondViewport.IsSVPActive()) {
+			// When the second viewport is active, the event loop runs twice per present.
+			// This means the target frametime must be halved.
+			rr = rr * 0.5f;
+		}
+
 		time_span = std::chrono::duration_cast<std::chrono::duration<float>>(tcurrentf - tlastf);
 		while (time_span.count() < rr)
 		{
