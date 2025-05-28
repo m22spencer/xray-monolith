@@ -121,7 +121,6 @@ CWeapon::CWeapon()
 	m_zoom_params.m_fZoomRotationFactor = 0.f;
 	m_zoom_params.m_pVision = NULL;
 	m_zoom_params.m_pNight_vision = NULL;
-	m_zoom_params.m_fSecondVPFovFactor = 0.0f;
 
 	m_altAimPos = false;
 	m_zoomtype = 0;
@@ -826,7 +825,6 @@ void CWeapon::Load(LPCSTR section)
 	else
 		m_bAutoSpawnAmmo = TRUE;
 
-	m_zoom_params.m_fSecondVPFovFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov", 0.0f);
 	m_zoom_params.m_bHideCrosshairInZoom = true;
 
 	if (pSettings->line_exist(hud_sect, "zoom_hide_crosshair"))

@@ -380,7 +380,6 @@ protected:
 		float m_fBaseZoomFactor;
 		float m_fScopeZoomFactor;
 		float m_fZoomRotationFactor;
-		float m_fSecondVPFovFactor;
 		Fvector m_ZoomDof;
 		Fvector4 m_ReloadDof;
 		Fvector4 m_ReloadEmptyDof; //Swartz: reload when empty mag. DOF
