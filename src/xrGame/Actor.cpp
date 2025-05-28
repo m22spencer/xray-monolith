@@ -1100,7 +1100,7 @@ float CActor::currentFOV()
 	{
 		if (pWeapon->IsSecondVPZoomPresent() && pWeapon->GetZoomFactor() != 0)
 			return g_fov;
-		else if (pWeapon->GetZoomFactor() == 0)if (pWeapon->GetZoomFactor() == 0)
+		else if (pWeapon->GetZoomFactor() == 0)
 			return atan(tan(g_fov * (0.5 * PI / 180)) / g_ironsights_factor) / (0.5 * PI / 180);
 		else
 			return pWeapon->GetZoomFactor() * (0.75f);
