@@ -1098,7 +1098,9 @@ float CActor::currentFOV()
 		(!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture()))
 	)
 	{
-		if (pWeapon->GetZoomFactor() == 0)
+		if (pWeapon->IsSecondVPZoomPresent() && pWeapon->GetZoomFactor() != 0)
+			return g_fov;
+		else if (pWeapon->GetZoomFactor() == 0)if (pWeapon->GetZoomFactor() == 0)
 			return atan(tan(g_fov * (0.5 * PI / 180)) / g_ironsights_factor) / (0.5 * PI / 180);
 		else
 			return pWeapon->GetZoomFactor() * (0.75f);
@@ -1214,7 +1216,7 @@ void CActor::UpdateCL()
 
 			// Apply Weapon Data in Shaders
 			g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor();
-			g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPZoomFactor();
+			g_pGamePersistent->m_pGShaderConstants->hud_params.y = Device.m_SecondViewport.IsSVPActive() ? pWeapon->GetSecondVPZoomFactor() : 0.0;
 			g_pGamePersistent->m_pGShaderConstants->hud_params.z = pWeapon->GetHudFov();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
 

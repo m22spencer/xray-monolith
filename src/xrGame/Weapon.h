@@ -15,6 +15,7 @@
 #include "CameraRecoil.h"
 
 #include "NewZoomFlag.h"
+#include <Layers/xrRender/xrRender_console.h>
 
 class CEntity;
 class ENGINE_API CMotionDef;
@@ -85,8 +86,8 @@ public:
 
 	float CWeapon::GetSecondVPFov() const;
 	IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
-	IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
-	IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.005f; }
+	IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fCurrentZoomFactor; }
+	IC float IsSecondVPZoomPresent() const { return scope_svp_enabled == 1 && GetSecondVPZoomFactor() > 0.005f; }
 
 	// Up
 	// Magazine system & etc
