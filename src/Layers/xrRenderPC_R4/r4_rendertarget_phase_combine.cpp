@@ -532,7 +532,7 @@ void CRenderTarget::phase_combine()
 		phase_gasmask_drops();
 	}
 	
-	if(ps_r2_nightvision > 0)
+	if(ps_r2_nightvision > 0 && !Device.m_SecondViewport.IsSVPFrame())
 		phase_nightvision();
 
 	//--DSR-- HeatVision_start
