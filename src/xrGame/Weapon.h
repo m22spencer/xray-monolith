@@ -87,7 +87,7 @@ public:
 	float CWeapon::GetSecondVPFov() const;
 	IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
 	IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fCurrentZoomFactor; }
-	IC float IsSecondVPZoomPresent() const { return scope_svp_enabled == 1 && GetSecondVPZoomFactor() > 0.005f; }
+	IC float IsSecondVPZoomPresent() const { return cNameSect() != "wpn_binoc_inv" && scope_svp_enabled == 1 && GetSecondVPZoomFactor() > 0.005f; }
 
 	// Up
 	// Magazine system & etc
