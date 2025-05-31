@@ -503,8 +503,7 @@ void CRenderTarget::phase_combine()
 	}
 
 	//Compute blur textures
-	if (!Device.m_SecondViewport.IsSVPFrame()) // Temp fix for blur buffer and SVP
-		phase_blur();
+	phase_blur();
 
 	//Compute bloom (new)
 	if (RImplementation.o.ssfx_bloom)
