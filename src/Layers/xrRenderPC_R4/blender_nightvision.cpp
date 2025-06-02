@@ -100,6 +100,7 @@ void CBlender_fakescope::Compile(CBlender_Compile& C) //crookr
 	//C.r_dx10Texture("s_scope", "wpn\\wpn_crosshair_pso1");
 	//C.r_dx10Texture("s_scope", scope_fake_texture);
 	C.r_dx10Texture("s_scope", r2_RT_scopert);
+	C.r_dx10Texture("s_heat_map", r2_RT_heat);
 
 
 	C.r_dx10Sampler("smp_base");
