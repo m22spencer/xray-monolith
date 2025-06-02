@@ -86,7 +86,11 @@ public:
 
 	float CWeapon::GetSecondVPFov() const;
 	IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
-	IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fCurrentZoomFactor; }
+	IC float GetSecondVPZoomFactor() const { 
+		return m_zoom_params.m_bUseDynamicZoom
+			? m_zoom_params.m_fCurrentSVPZoomFactor
+			: m_zoom_params.m_fCurrentZoomFactor;
+	}
 	IC float IsSecondVPZoomPresent() const { return cNameSect() != "wpn_binoc_inv" && scope_svp_enabled == 1 && GetSecondVPZoomFactor() > 0.005f; }
 
 	// Up
@@ -376,6 +380,7 @@ protected:
 		bool m_bZoomDofEnabled;
 		bool m_bIsZoomModeNow;
 		float m_fCurrentZoomFactor;
+		float m_fCurrentSVPZoomFactor = 1.0;  // Used for smooth zoom when scope is dynamic_zoom enabled
 		float m_fZoomRotateTime;
 		float m_fBaseZoomFactor;
 		float m_fScopeZoomFactor;
