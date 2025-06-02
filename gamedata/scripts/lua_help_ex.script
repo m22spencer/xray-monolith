@@ -679,9 +679,9 @@
     }
     
     enum script_attachment_type {
-        Hud         = 1,
-        World       = 2,
-        CamAttached = 4,
+        Hud         = 0,
+        World       = 1,
+        CamAttached = 2,
     }
 
     class ScriptAttachment {
