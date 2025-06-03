@@ -5,8 +5,8 @@ class ShadersExternalData //--#SM+#--
 {
 public:
 	Fmatrix m_script_params; // Ìàòðèöà, çíà÷åíèÿ êîòîðîé äîñòóïíû èç Lua
-	Fvector4 hud_params;     // [zoom_rotate_factor, secondVP_zoom_factor, hud_fov, NULL] - Ïàðàìåòðû õóäà îðóæèÿ
-	Fvector4 hud_fov_params; // [current_scope_fov, min_scope_fov, digital_magnification, scope_camera_magnification]
+	Fvector4 hud_params;     // [zoom_rotate_factor, secondVP_zoom_factor, hud_fov, scope_camera_magnification] - Ïàðàìåòðû õóäà îðóæèÿ
+	Fvector4 hud_fov_params; // [min_magnification, max_magnification, digital_magnification, current_magnification]
 	Fvector4 m_blender_mode; // x\y = [0 - default, 1 - night vision, 2 - thermo vision, ... ñì. common.h] - Ðåæèìû ðåíäåðèíãà
 							 // x - îñíîâíîé âüþïîðò, y - âòîðîé âüþïîðò, z = ?, w = [0 - èä¸ò ðåíäåð îáû÷íîãî îáúåêòà, 1 - èä¸ò ðåíäåð äåòàëüíûõ îáúåêòîâ (òðàâà, ìóñîð)]
 

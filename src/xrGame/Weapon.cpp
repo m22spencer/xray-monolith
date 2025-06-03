@@ -1310,6 +1310,13 @@ bool CWeapon::AllowBore()
 
 void CWeapon::UpdateCL()
 {
+	// Apply the same smoothing method from Camera::Update function SVP scopes when in dynamic zoom.
+	float src = 10 * Device.fTimeDelta;
+	clamp(src, 0.f, 1.f);
+	float dst = 1 - src;
+	m_zoom_params.m_fCurrentSVPZoomFactor = m_zoom_params.m_fCurrentSVPZoomFactor * dst + m_zoom_params.m_fCurrentZoomFactor * src;
+
+
 	inherited::UpdateCL();
 	UpdateHUDAddonsVisibility();
 	//ïîäñâåòêà îò âûñòðåëà
@@ -3194,12 +3201,6 @@ void CWeapon::UpdateSecondVP()
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
 	Device.m_SecondViewport.SetSVPActive(m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && m_zoom_params.m_fZoomRotationFactor > 0.05f);
-
-	// Apply the same smoothing method from Camera::Update function SVP scopes when in dynamic zoom.
-	float src = 10 * Device.fTimeDelta;
-	clamp(src, 0.f, 1.f);
-	float dst = 1 - src;
-	m_zoom_params.m_fCurrentSVPZoomFactor = m_zoom_params.m_fCurrentSVPZoomFactor * dst + m_zoom_params.m_fCurrentZoomFactor * src;
 }
 
 Fmatrix CWeapon::RayTransform()

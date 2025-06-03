@@ -439,10 +439,27 @@ public:
 		return 60.0 / GetZoomFactor();
 	}
 
+	IC float GetAnimatedMagnification()
+	{
+		return 60.0 / m_zoom_params.m_fCurrentSVPZoomFactor;
+	}
+
+	IC float GetMinMagnification()
+	{
+		return 60.0 / m_zoom_params.m_fMinBaseZoomFactor;
+	}
+
+	IC float GetMaxMagnification()
+	{
+		return 60.0 / m_zoom_params.m_fBaseZoomFactor;
+	}
+
 	IC void SetMagnificationParameters(float min_mag, float max_mag)
 	{
-		m_zoom_params.m_fMinBaseZoomFactor = 60.0 / min_mag;
-		m_zoom_params.m_fBaseZoomFactor = 60.0 / max_mag;
+		m_zoom_params.m_fMinBaseZoomFactor = 60.0f / min_mag;
+		m_zoom_params.m_fBaseZoomFactor = 60.0f / max_mag;
+
+		m_zoom_params.m_fCurrentZoomFactor = clampr(m_zoom_params.m_fCurrentZoomFactor, m_zoom_params.m_fBaseZoomFactor, m_zoom_params.m_fMinBaseZoomFactor);
 	}
 
 	virtual float CurrentZoomFactor();

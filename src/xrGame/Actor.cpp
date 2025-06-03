@@ -1113,7 +1113,7 @@ float CActor::currentFOV()
 		else {
 			// Optic
 			bool isSVP = pWeapon->IsSecondVPZoomPresent();
-			float target_magnification = pWeapon->GetMagnification();
+			float target_magnification = pWeapon->GetAnimatedMagnification();
 
 			// The maximum amount of scaling the player will tolerate for fake pip effect
 			float max_digital_magnification = clampr(ps_s3ds_param_2.w, 1.0f, 100.0f);
@@ -1124,15 +1124,19 @@ float CActor::currentFOV()
 			//account for remaining by altering the camera
 			float camera_magnification = target_magnification / digital_magnification;
 
+
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.x = pWeapon->GetMinMagnification();
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.y = pWeapon->GetMaxMagnification();
+
 			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.z = digital_magnification;
-			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.x = magToFov(target_magnification);
-			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.w = magToFov(camera_magnification);
-			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.y = pWeapon->GetMinScopeZoomFactor() * 0.75;
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.w = target_magnification;
+
+			g_pGamePersistent->m_pGShaderConstants->hud_params.w = magToFov(camera_magnification);
 
 			if (isSVP)
 				return g_fov;
 			else
-				return g_pGamePersistent->m_pGShaderConstants->hud_fov_params.w;
+				return g_pGamePersistent->m_pGShaderConstants->hud_params.w;
 
 		}
 	}
