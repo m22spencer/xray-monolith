@@ -434,10 +434,15 @@ public:
 		m_zoom_params.m_fCurrentZoomFactor = f;
 	}
 
+	IC float GetMagnification()
+	{
+		return 60.0 / GetZoomFactor();
+	}
+
 	IC void SetMagnificationParameters(float min_mag, float max_mag)
 	{
-		m_zoom_params.m_fBaseZoomFactor    = 60 / max_mag;
-		m_zoom_params.m_fMinBaseZoomFactor = 60 / min_mag;
+		m_zoom_params.m_fMinBaseZoomFactor = 60.0 / min_mag;
+		m_zoom_params.m_fBaseZoomFactor = 60.0 / max_mag;
 	}
 
 	virtual float CurrentZoomFactor();

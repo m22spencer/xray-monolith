@@ -188,6 +188,8 @@ extern ECORE_API float ps_r2_ss_sunshafts_length;
 extern ECORE_API float ps_r2_ss_sunshafts_radius;
 extern u32 ps_sunshafts_mode;
 
+extern ECORE_API Fvector4 ps_s3ds_param_2;
+
 extern ECORE_API float hud_fov_aim_factor;
 
 //--DSR-- SilencerOverheat_start

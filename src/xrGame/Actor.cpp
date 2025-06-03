@@ -89,6 +89,7 @@ using namespace luabind;
 #include "xrEngine\x_ray.h"
 #include "ui/UIHudStatesWnd.h"
 #include "script_attachment_manager.h"
+#include <Layers/xrRender/xrRender_console.h>
 
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
@@ -1086,6 +1087,14 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 float g_fov = 55.0f;
 extern float g_ironsights_factor;
 
+// Scale fov by mag in screen space
+float CActor::magToFov(float mag)
+{
+	const float TO_RADIANS = PI / 180.0;
+	const float TO_DEGREES = 1.0 / TO_RADIANS;
+	return 2.0 * atan(tan((g_fov * 0.5 * TO_RADIANS) / mag)) * TO_DEGREES;
+}
+
 float CActor::currentFOV()
 {
 	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2))
@@ -1098,12 +1107,34 @@ float CActor::currentFOV()
 		(!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture()))
 	)
 	{
-		if (pWeapon->GetZoomFactor() == 0)
-			return atan(tan(g_fov * (0.5 * PI / 180)) / g_ironsights_factor) / (0.5 * PI / 180);
-		if (pWeapon->IsSecondVPZoomPresent())
-			return g_fov;
-		else 
-			return pWeapon->GetZoomFactor() * (0.75f);
+		if (pWeapon->GetZoomFactor() == 0) {
+			return magToFov(g_ironsights_factor);
+		}
+		else {
+			// Optic
+			bool isSVP = pWeapon->IsSecondVPZoomPresent();
+			float target_magnification = pWeapon->GetMagnification();
+
+			// The maximum amount of scaling the player will tolerate for fake pip effect
+			float max_digital_magnification = clampr(ps_s3ds_param_2.w, 1.0f, 100.0f);
+
+			// Prevent overzooming
+			float digital_magnification = isSVP ? 1.0 : min(target_magnification, max_digital_magnification);
+
+			//account for remaining by altering the camera
+			float camera_magnification = target_magnification / digital_magnification;
+
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.z = digital_magnification;
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.x = magToFov(target_magnification);
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.w = magToFov(camera_magnification);
+			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.y = pWeapon->GetMinScopeZoomFactor() * 0.75;
+
+			if (isSVP)
+				return g_fov;
+			else
+				return g_pGamePersistent->m_pGShaderConstants->hud_fov_params.w;
+
+		}
 	}
 	else
 	{
@@ -1219,9 +1250,6 @@ void CActor::UpdateCL()
 			g_pGamePersistent->m_pGShaderConstants->hud_params.y = Device.m_SecondViewport.IsSVPActive() ? pWeapon->GetSecondVPZoomFactor() : 0.0;
 			g_pGamePersistent->m_pGShaderConstants->hud_params.z = pWeapon->GetHudFov();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
-
-			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.x = pWeapon->CurrentZoomFactor();
-			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.y = pWeapon->GetMinScopeZoomFactor();
 		}
 	}
 	else
