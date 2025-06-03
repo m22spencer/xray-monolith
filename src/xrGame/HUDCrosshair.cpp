@@ -17,6 +17,8 @@ float crosshair_far_size = 1.f;
 float crosshair_depth_begin = 0.f;
 float crosshair_depth_end = 100.f;
 
+u32 C_CROSS D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0xff);
+
 CHUDCrosshair::CHUDCrosshair()
 {
 	crosshairShader = NULL;
@@ -26,7 +28,7 @@ CHUDCrosshair::CHUDCrosshair()
 	transform = Fmatrix().identity();
 	minRadius = 0.001f;
 	maxRadius = 0.004f;
-	crossColor = 0;
+	crossColor = C_CROSS;
 	dispersionRadius = 0.f;
 }
 
