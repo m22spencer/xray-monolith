@@ -134,6 +134,11 @@
         CUIStatic GetProgressStatic()
     }
 
+    class CUIStatic {
+    	void SetColorAnimation(string name, number flags, float delay)
+		void ResetColorAnimation()
+		void RemoveColorAnimation()
+
     // Debug shapes
     enum DebugRenderType {
         line,
