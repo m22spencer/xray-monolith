@@ -434,6 +434,12 @@ public:
 		m_zoom_params.m_fCurrentZoomFactor = f;
 	}
 
+	IC void SetMagnificationParameters(float min_mag, float max_mag)
+	{
+		m_zoom_params.m_fBaseZoomFactor    = 60 / max_mag;
+		m_zoom_params.m_fMinBaseZoomFactor = 60 / min_mag;
+	}
+
 	virtual float CurrentZoomFactor();
 	//ïîêàçûâàåò, ÷òî îðóæèå íàõîäèòñÿ â ñîîñòîÿíèè ïîâîðîòà äëÿ ïðèáëèæåííîãî ïðèöåëèâàíèÿ
 	bool IsRotatingToZoom() const

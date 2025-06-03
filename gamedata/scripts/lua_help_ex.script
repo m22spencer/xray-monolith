@@ -528,6 +528,7 @@
         function SetHitPowerCritical(float)
         function SetHitImpulse(float)
         function SetFireDistance(float)
+        function SetMagnificationParameters(float min_mag, float max_mag)
 
         // World model on stalkers adjustments
         function Set_mOffset(Fvector position, Fvector orientation)
