@@ -786,8 +786,8 @@ extern void render_reshade_effects();
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
 void FixMatrices() {
-	float fFov, fAspect, fNearPlane, fFarPlane;
-	Device.mProject.decompose_projection(fFov, fAspect, fNearPlane, fFarPlane);
+	float fFov, fAspect, _;
+	Device.mProject.decompose_projection(fFov, fAspect, _, _);
 	Device.fFOV = rad2deg(fFov);
 	Device.fASPECT = fAspect;
 
@@ -799,31 +799,42 @@ void FixMatrices() {
 	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
 }
 
-void CLevel::RenderSecondViewport()
+void EnsureDeviceState(std::function<void()> f)
 {
 	Device.dwViewport++;
 	Device.m_SecondViewport.isSVPFrame = true;
-	g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = true;
+	auto old_proj = Device.mProject;
+	auto old_proj_hud = Device.mProjectHud;
+	auto old_view = Device.mView;
 
-	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y;
-
-
-	float _, fNearPlane, fFarPlane;
-	Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
-
-	Fmatrix old = Device.mProject;
-	Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
-	FixMatrices();
-
-	inherited::OnRender();
-	Game().OnRender();
-	BulletManager().Render();
+	f();
 
 	Render->RenderToTarget(Render->rtSVP);
-	Device.m_SecondViewport.isSVPFrame = false;
 
-	Device.mProject = old;
+	Device.m_SecondViewport.isSVPFrame = false;
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
+	Device.mProject = old_proj;
+	Device.mProjectHud = old_proj_hud;
+	Device.mView = old_view;
 	FixMatrices();
+}
+
+void CLevel::RenderSecondViewport()
+{
+	EnsureDeviceState([this]() -> void {
+
+		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y;
+
+		float _, fNearPlane, fFarPlane;
+		Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
+		Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
+		FixMatrices();
+
+		inherited::OnRender();
+		Game().OnRender();
+		BulletManager().Render();
+	});
 }
 
 void CLevel::OnRender()
