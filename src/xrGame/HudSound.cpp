@@ -302,11 +302,11 @@ void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& positi
 				LPCSTR line = luabind::object_cast<LPCSTR>(output["line"]);
 				if (!section)
 				{
-					Msg("!HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s, no section specified", alias);
+					Msg("!_G.COnBeforePlayHudSound callback, HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s, no section specified", alias);
 				} 
 				else if (!line)
 				{
-					Msg("!HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s, no line specified", alias);
+					Msg("!_G.COnBeforePlayHudSound callback, HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s, no line specified", alias);
 				} 
 				else
 				{
@@ -318,16 +318,13 @@ void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& positi
 						{
 							alias_to_play = new_alias.c_str();
 							LoadSound(section, line, alias_to_play, old_sound->m_b_exclusive, old_sound->m_type);
-							if (!FindSoundItem(alias_to_play, false))
-							{
-								Msg("!HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s with %s, failed to load section %s line %s", alias, alias_to_play, section, line);
-							} else {
-								//Msg("HUD_SOUND_COLLECTION_LAYERED::PlaySound, overriding sound item %s with %s, section %s line %s", alias, alias_to_play, section, line);
-							}
+
+							// Crash if override sound was defined but wasn't loaded correctly
+							R_ASSERT2(FindSoundItem(alias_to_play, false), make_string("!_G.COnBeforePlayHudSound callback, HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s with %s, failed to load section %s line %s", alias, alias_to_play, section, line));
 						}
 						else
 						{
-							Msg("!HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s with %s, sound item by original alias %s not found", alias, new_alias.c_str(), alias);
+							Msg("!_G.COnBeforePlayHudSound callback, HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s with %s, sound item by original alias %s not found", alias, new_alias.c_str(), alias);
 						}
 					} 
 					else
