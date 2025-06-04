@@ -785,8 +785,24 @@ extern void render_reshade_effects();
 
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
+void CLevel::RenderSecondViewport()
+{
+	Device.m_SecondViewport.isSVPFrame = true;
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
+
+	inherited::OnRender();
+	Game().OnRender();
+	BulletManager().Render();
+
+	Render->RenderToTarget(Render->rtSVP);
+	Device.m_SecondViewport.isSVPFrame = false;
+}
+
 void CLevel::OnRender()
 {
+	if (game && Device.m_SecondViewport.IsSVPActive())
+		RenderSecondViewport();
+
 	// PDA
 	if (game && CurrentGameUI() && &CurrentGameUI()->GetPdaMenu() != nullptr)
 	{
@@ -850,9 +866,6 @@ void CLevel::OnRender()
 		return;
 	Game().OnRender();
 	BulletManager().Render();
-
-	if (Device.m_SecondViewport.IsSVPFrame())
-		Render->RenderToTarget(Render->rtSVP);
 
 	if (use_reshade)
 		render_reshade_effects();

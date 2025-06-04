@@ -124,22 +124,12 @@ public:
 	class ENGINE_API CSecondVPParams //--#SM+#-- +SecondVP+
 	{
 		bool isActive; // Oeaa aeoeaaoee ?aiaa?a ai aoi?ie au?ii?o
-		u8 frameDelay;  // Ia eaeii eaa?a n iiiaioa i?ioeiai ?aiaa?a ai aoi?ie au?ii?o iu ia?i?i iiaue
-						  //(ia ii?ao auou iaiuoa 2 - ea?aue aoi?ie eaa?, ?ai aieuoa oai aieaa ieceee FPS ai aoi?ii au?ii?oa)
 
 	public:
-		bool isCamReady; // Oeaa aioiaiinoe eaia?u (FOV, iiceoey, e o.i) e ?aiaa?o aoi?iai au?ii?oa
-
+		bool isSVPFrame = false;
 		IC bool IsSVPActive() { return isActive; }
 		void SetSVPActive(bool bState);
-		bool    IsSVPFrame();
-
-		IC u8 GetSVPFrameDelay() { return frameDelay; }
-		void  SetSVPFrameDelay(u8 iDelay)
-		{
-			frameDelay = iDelay;
-			clamp<u8>(frameDelay, 2, u8(-1));
-		}
+		bool IsSVPFrame() { return isSVPFrame; }
 	};	
 	
 private:
@@ -262,9 +252,7 @@ public:
 		Timer.Start();
 		m_bNearer = FALSE;
 		
-		m_SecondViewport.SetSVPActive(false);
-		m_SecondViewport.SetSVPFrameDelay(2);
-		m_SecondViewport.isCamReady = false;			
+		m_SecondViewport.SetSVPActive(false);		
 	};
 
 	void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);

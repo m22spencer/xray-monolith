@@ -217,6 +217,7 @@ public:
 	virtual void OnEvent(EVENT E, u64 P1, u64 P2);
 	virtual void _BCL OnFrame(void);
 	virtual void OnRender();
+	virtual void RenderSecondViewport();
 
 	enum DBG_RENDER_FLAGS
 	{
