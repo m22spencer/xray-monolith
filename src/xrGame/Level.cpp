@@ -785,11 +785,28 @@ extern void render_reshade_effects();
 
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
+void FixMatrices() {
+	Device.mInvProject.invert(Device.mProject);
+	Device.mProject_saved = Device.mProject;
+	Device.mFullTransform.mul(Device.mProject, Device.mView);
+	Device.mInvFullTransform.invert(Device.mInvFullTransform);
+	Device.mFullTransform_saved = Device.mFullTransform;
+	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
+}
+
 void CLevel::RenderSecondViewport()
 {
 	Device.dwViewport++;
 	Device.m_SecondViewport.isSVPFrame = true;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
+
+	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y;
+
+	Fmatrix old = Device.mProject;
+	float fov_old = Device.fFOV;
+	Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, VIEWPORT_NEAR, 1000.0f); // FIXME: Add projection matrix deconstruction to get these params
+	Device.fFOV = svp_fov;	
+	FixMatrices();
 
 	inherited::OnRender();
 	Game().OnRender();
@@ -797,6 +814,10 @@ void CLevel::RenderSecondViewport()
 
 	Render->RenderToTarget(Render->rtSVP);
 	Device.m_SecondViewport.isSVPFrame = false;
+
+	Device.mProject = old;
+	Device.fFOV = fov_old;
+	FixMatrices();
 }
 
 void CLevel::OnRender()
