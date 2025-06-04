@@ -664,11 +664,11 @@ public:
 		return *this;
 	}
 
-	IC void decompose_projection(SelfRef proj, T& fFov, T& fAspect, T& fNearPlane, T& fFarPlane) {
-		T Q = proj._33;
-		T w = proj._11;
-		T h = proj._22;
-		fNearPlane = proj._43 / -Q;
+	IC void decompose_projection(T& fFov, T& fAspect, T& fNearPlane, T& fFarPlane) {
+		T Q = _33;
+		T w = _11;
+		T h = _22;
+		fNearPlane = _43 / -Q;
 		fFarPlane = (fNearPlane * Q) / (Q - 1.0f);
 		fAspect = w / h;
 		fFov = 2.0 * atanf(1.0f / h);

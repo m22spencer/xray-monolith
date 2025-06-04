@@ -787,7 +787,7 @@ extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapp
 
 void FixMatrices() {
 	float fFov, fAspect, fNearPlane, fFarPlane;
-	Device.mProject.decompose_projection(Device.mProject, fFov, fAspect, fNearPlane, fFarPlane);
+	Device.mProject.decompose_projection(fFov, fAspect, fNearPlane, fFarPlane);
 	Device.fFOV = rad2deg(fFov);
 	Device.fASPECT = fAspect;
 
@@ -809,7 +809,7 @@ void CLevel::RenderSecondViewport()
 
 
 	float _, fNearPlane, fFarPlane;
-	Device.mProject.decompose_projection(Device.mProject, _, _, fNearPlane, fFarPlane);
+	Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
 
 	Fmatrix old = Device.mProject;
 	Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
