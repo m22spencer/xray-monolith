@@ -54,8 +54,11 @@ public:
 	BOOL b_hide_cursor;
 public:
 
-	// Engine flow-control
+	// Engine flow-control (Updates once per Present)
 	u32 dwFrame;
+	
+	// Used for cache clearing when in SVP mode.
+	u32 dwViewport = 0;
 
 	float fTimeDelta;
 	float fTimeGlobal;

@@ -787,6 +787,7 @@ extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapp
 
 void CLevel::RenderSecondViewport()
 {
+	Device.dwViewport++;
 	Device.m_SecondViewport.isSVPFrame = true;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
 
@@ -803,6 +804,7 @@ void CLevel::OnRender()
 	if (game && Device.m_SecondViewport.IsSVPActive())
 		RenderSecondViewport();
 
+	Device.dwViewport++;
 	// PDA
 	if (game && CurrentGameUI() && &CurrentGameUI()->GetPdaMenu() != nullptr)
 	{
