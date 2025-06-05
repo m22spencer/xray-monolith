@@ -47,6 +47,7 @@ public:
 	bool IsAutoRemove();
 	bool IsPlaying();
 	void SetAutoRemove(bool auto_remove);
+	void SetHudMode(bool bHudMode);
 
 	const shared_str Name();
 public:

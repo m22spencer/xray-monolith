@@ -8,7 +8,6 @@
 
 #include "ui_defs.h"
 
-
 class CHUDCrosshair
 {
 private:

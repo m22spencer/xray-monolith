@@ -138,6 +138,11 @@
     	void SetColorAnimation(string name, number flags, float delay)
 		void ResetColorAnimation()
 		void RemoveColorAnimation()
+    }
+
+    class particles_object {
+        void set_hud_mode(bool hud_mode)
+    }
 
     // Debug shapes
     enum DebugRenderType {

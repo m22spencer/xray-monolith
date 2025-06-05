@@ -72,7 +72,6 @@ void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 	mt_dt = 0;
 }
 
-//----------------------------------------------------
 CParticlesObject::~CParticlesObject()
 {
 	VERIFY(0==mt_dt);
@@ -123,7 +122,6 @@ const shared_str CParticlesObject::Name()
 	return (V) ? V->Name() : "";
 }
 
-//----------------------------------------------------
 void CParticlesObject::Play(bool bHudMode)
 {
 	if (g_dedicated_server) return;
@@ -288,6 +286,15 @@ void CParticlesObject::SetAutoRemove(bool auto_remove)
 {
 	VERIFY(m_bStopping || !IsLooped());
 	m_bAutoRemove = auto_remove;
+}
+
+void CParticlesObject::SetHudMode(bool bHudMode)
+{
+	if (g_dedicated_server) return;
+
+	IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
+	VERIFY(V);
+	V->SetHudMode(bHudMode);
 }
 
 //играются ли партиклы, отличается от PSI_Alive, тем что после

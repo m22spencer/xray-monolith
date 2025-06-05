@@ -562,7 +562,14 @@ private:
 
 public:
 	CCC_Color(LPCSTR N, u32* v) :
-		CCC_IVector4(N, &temp, Ivector4().set(0, 0, 0, 0), Ivector4().set(255, 255, 255, 255)) {
+		temp(Ivector4().set(
+			color_get_R(*v),
+			color_get_G(*v),
+			color_get_B(*v),
+			color_get_A(*v)
+		)),
+		CCC_IVector4(N, &temp, Ivector4().set(0, 0, 0, 0), Ivector4().set(255, 255, 255, 255))
+	{
 		color = v;
 	};
 

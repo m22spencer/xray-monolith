@@ -127,17 +127,6 @@ end
 function crosshair_color(args)
 	return
 		track {
-			id = args.id .. "_a",
-			hint = "modded_exes_color_a",
-			min = 0,
-			max = 255,
-			def = 255,
-			step = 1,
-			curr = {curr_crosshair_clr, args.id, "a"},
-			functor = {func_crosshair_clr, args.id, "a"},
-			cmd = false
-		},
-		track {
 			id = args.id .. "_r",
 			hint = "modded_exes_color_r",
 			min = 0,
@@ -168,6 +157,17 @@ function crosshair_color(args)
 			step = 1,
 			curr = {curr_crosshair_clr, args.id, "b"},
 			functor = {func_crosshair_clr, args.id, "b"},
+			cmd = false
+		},
+		track {
+			id = args.id .. "_a",
+			hint = "modded_exes_color_a",
+			min = 0,
+			max = 255,
+			def = 255,
+			step = 1,
+			curr = {curr_crosshair_clr, args.id, "a"},
+			functor = {func_crosshair_clr, args.id, "a"},
 			cmd = false
 		}
 end
