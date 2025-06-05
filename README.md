@@ -186,6 +186,11 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.05**
+* The engine will crash if override sound failed to be initialised in `_G.COnBeforePlayHudSound` callback
+* ProfLander: Fix black default crosshair (https://github.com/themrdemonized/xray-monolith/pull/242)
+* NLTP_ASHES: Implement SetHudMode on CScriptParticles and CParticlesObject (https://github.com/themrdemonized/xray-monolith/pull/243/files)
+
 **2025.06.03**
 * NLTP_ASHES: Export color animation functions & implemented RemoveColorAnimation (https://github.com/themrdemonized/xray-monolith/pull/241)
 
