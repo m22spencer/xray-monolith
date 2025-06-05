@@ -1098,6 +1098,8 @@ float CActor::currentFOV()
 		(!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture()))
 	)
 	{
+		if (Device.m_SecondViewport.IsSVPActive())
+			return g_fov;
 		if (pWeapon->GetZoomFactor() == 0)
 			return atan(tan(g_fov * (0.5 * PI / 180)) / g_ironsights_factor) / (0.5 * PI / 180);
 		else
