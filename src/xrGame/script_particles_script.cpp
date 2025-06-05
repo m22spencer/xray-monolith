@@ -30,6 +30,7 @@ void CScriptParticles::script_register(lua_State* L)
 		.def("set_position", &CScriptParticles::XFORMMoveTo)
 		.def("set_direction", &CScriptParticles::SetDirection)
 		.def("set_orientation", &CScriptParticles::SetOrientation)
+		.def("set_hud_mode", &CScriptParticles::SetHudMode)
 
 		.def("last_position", &CScriptParticles::LastPosition)
 		.def("load_path", &CScriptParticles::LoadPath)
