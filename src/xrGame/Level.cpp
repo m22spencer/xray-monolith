@@ -824,7 +824,7 @@ void CLevel::RenderSecondViewport()
 {
 	EnsureDeviceState([this]() -> void {
 
-		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y;
+		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
 
 		float _, fNearPlane, fFarPlane;
 		Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
