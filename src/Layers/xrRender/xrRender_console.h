@@ -201,6 +201,8 @@ extern ECORE_API Fvector dsr_test;
 extern ECORE_API Fvector dsr_test1;
 extern ECORE_API Fvector dsr_test2;
 
+extern ECORE_API Fvector4 ps_shader_scope_params;
+
 extern ECORE_API float ps_r2_tnmp_a; // r2-only
 extern ECORE_API float ps_r2_tnmp_b; // r2-only
 extern ECORE_API float ps_r2_tnmp_c; // r2-only
