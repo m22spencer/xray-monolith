@@ -220,8 +220,43 @@ void CRender::render_menu()
 
 extern u32 g_r;
 
+#define FLIP(RT) \
+static ref_rt RT##_vp[2]; \
+if (!RT##_vp[0]) RT##_vp[0].create(#RT "_main", Target->RT->dwWidth, Target->RT->dwHeight, Target->RT->fmt); \
+if (!RT##_vp[1]) RT##_vp[1].create(#RT "_svp", Target->RT->dwWidth, Target->RT->dwHeight, Target->RT->fmt); \
+HW.pContext->CopyResource(RT##_vp[last_viewport]->pSurface, Target->RT->pSurface); \
+HW.pContext->CopyResource(Target->RT->pSurface, RT##_vp[current_viewport]->pSurface);
+
+#pragma optimize("", off)
+void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
+{
+	static auto last_viewport = 0;
+
+	auto current_viewport = Device.m_SecondViewport.IsSVPFrame();
+
+	FLIP(rt_ssfx_accum)
+	FLIP(rt_ssfx_hud)
+	FLIP(rt_ssfx_ssr)
+	FLIP(rt_ssfx_water)
+
+	FLIP(rt_ssfx_ao)
+	FLIP(rt_ssfx_il)
+
+	FLIP(rt_ssfx_sss)
+	FLIP(rt_ssfx_sss_ext)
+	FLIP(rt_ssfx_sss_ext2)
+	FLIP(rt_ssfx_sss_tmp)
+
+	FLIP(rt_ssfx_prevPos)
+
+	last_viewport = current_viewport;
+}
+#pragma optimize("", on)
+
 void CRender::Render()
 {
+	FlipViewportTexturesIfNeeded(Target);
+
 	PIX_EVENT(CRender_Render);
 
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
