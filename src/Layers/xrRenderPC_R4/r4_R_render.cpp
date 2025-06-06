@@ -516,17 +516,14 @@ void CRender::Render()
 	{
 		// Save previus and current matrices
 		{
-			static Fmatrix mm_saved_viewproj;
+			static Fmatrix mm_saved_viewproj[2];
 
-			if (!Device.m_SecondViewport.IsSVPFrame())
-			{
-				Target->Matrix_previous.mul(mm_saved_viewproj, Device.mInvView);
-				Target->Matrix_current.set(Device.mProject);
-				mm_saved_viewproj.set(Device.mFullTransform);
-			}
+			Target->GetPrevious()->Matrix_previous.mul(mm_saved_viewproj[Device.m_SecondViewport.IsSVPFrame()], Device.mInvView);
+			Target->GetPrevious()->Matrix_current.set(Device.mProject);
+			mm_saved_viewproj[Device.m_SecondViewport.IsSVPFrame()].set(Device.mFullTransform);
 		}
 
-		if (RImplementation.o.ssfx_sss && !Device.m_SecondViewport.IsSVPFrame())
+		if (RImplementation.o.ssfx_sss)
 		{
 			static bool sss_rendered, sss_extended_rendered;
 

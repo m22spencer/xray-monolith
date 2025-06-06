@@ -216,10 +216,17 @@ public:
 	ref_shader s_ssfx_ao;
 	ref_shader s_ssfx_hud[5];
 
-	Fmatrix Matrix_previous, Matrix_current;
-	Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
-	Fvector3 Position_previous;
-	bool RVelocity;
+	struct PreviousData {
+		Fmatrix Matrix_previous, Matrix_current;
+		Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
+		Fvector3 Position_previous;
+		float RVelocity;
+	} Previous[2];	
+
+	PreviousData* GetPrevious() {
+		return &Previous[Device.m_SecondViewport.IsSVPFrame()];
+	}
+	
 
 	ref_rt rt_tempzb; // Redotix99: for 3D Shader Based Scopes
 
