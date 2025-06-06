@@ -234,6 +234,9 @@ void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
 
 	auto current_viewport = Device.m_SecondViewport.IsSVPFrame();
 
+	if (current_viewport == last_viewport)
+		return;
+
 	FLIP(rt_ssfx_accum)
 	FLIP(rt_ssfx_hud)
 	FLIP(rt_ssfx_ssr)
