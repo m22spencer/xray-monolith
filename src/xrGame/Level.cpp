@@ -810,8 +810,6 @@ void EnsureDeviceState(std::function<void()> f)
 
 	f();
 
-	Render->RenderToTarget(Render->rtSVP);
-
 	Device.m_SecondViewport.isSVPFrame = false;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
 	Device.mProject = old_proj;
