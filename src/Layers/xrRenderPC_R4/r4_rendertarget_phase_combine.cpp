@@ -539,6 +539,13 @@ void CRenderTarget::phase_combine()
 		phase_heatvision();
 	//--DSR-- HeatVision_end
 
+	if (Device.m_SecondViewport.IsSVPFrame()) {
+		// At this point, the scope view is done. 
+		//    we do not want to post process.
+		HW.pContext->CopyResource(rt_secondVP->pSurface, rt_Color->pSurface);
+		return;
+	}
+
 	if (scope_fake_enabled)
 	{
 		phase_fakescope(); //crookr
