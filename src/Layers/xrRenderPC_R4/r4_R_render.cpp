@@ -227,34 +227,21 @@ if (!RT##_vp[1]) RT##_vp[1].create(#RT "_svp", Target->RT->dwWidth, Target->RT->
 HW.pContext->CopyResource(RT##_vp[last_viewport]->pSurface, Target->RT->pSurface); \
 HW.pContext->CopyResource(Target->RT->pSurface, RT##_vp[current_viewport]->pSurface);
 
-#pragma optimize("", off)
 void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
 {
 	static auto last_viewport = 0;
-
 	auto current_viewport = Device.m_SecondViewport.IsSVPFrame();
-
 	if (current_viewport == last_viewport)
-		return;
+		return;    // Correct textures are already mapped
 
-	FLIP(rt_ssfx_accum)
-	FLIP(rt_ssfx_hud)
-	FLIP(rt_ssfx_ssr)
-	FLIP(rt_ssfx_water)
-
-	FLIP(rt_ssfx_ao)
-	FLIP(rt_ssfx_il)
-
-	FLIP(rt_ssfx_sss)
-	FLIP(rt_ssfx_sss_ext)
-	FLIP(rt_ssfx_sss_ext2)
-	FLIP(rt_ssfx_sss_tmp)
-
-	FLIP(rt_ssfx_prevPos)
+	auto last = last_viewport;
+	Target->map_viewport_render_targets([current_viewport, last](ref_rt original, ref_rt views[2]) -> void {
+		HW.pContext->CopyResource(views[last]->pSurface, original->pSurface);
+		HW.pContext->CopyResource(original->pSurface, views[current_viewport]->pSurface);
+	});
 
 	last_viewport = current_viewport;
 }
-#pragma optimize("", on)
 
 void CRender::Render()
 {

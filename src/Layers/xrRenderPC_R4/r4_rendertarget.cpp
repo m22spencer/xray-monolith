@@ -1381,6 +1381,40 @@ CRenderTarget::~CRenderTarget()
 	{
 		xr_delete(b_hdao_msaa_cs);
 	}
+
+	// Viewport render textures must be destroyed as they are static variables
+	//    this ensures that they are recreated properly after resolution/format changes.
+	map_viewport_render_targets([](ref_rt _, ref_rt views[2]) -> void {
+		views[0].destroy();
+		views[1].destroy();
+	});
+}
+
+// Trickery to create unique buffers for each viewport
+#define VIEWPORT_RT(RT) \
+static ref_rt RT##_vp[2]; \
+if (!RT##_vp[0]) RT##_vp[0].create(#RT "_main", RT->dwWidth, RT->dwHeight, RT->fmt); \
+if (!RT##_vp[1]) RT##_vp[1].create(#RT "_svp", RT->dwWidth, RT->dwHeight, RT->fmt); \
+f(RT, RT##_vp);
+
+void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt original, ref_rt views[2])> f) {
+
+	// Place any render targets which must persist between frames here.
+	//   it will ensure they are duplicated when SVP is active
+	VIEWPORT_RT(rt_ssfx_accum)
+	VIEWPORT_RT(rt_ssfx_hud)
+	VIEWPORT_RT(rt_ssfx_ssr)
+	VIEWPORT_RT(rt_ssfx_water)
+
+	VIEWPORT_RT(rt_ssfx_ao)
+	VIEWPORT_RT(rt_ssfx_il)
+
+	VIEWPORT_RT(rt_ssfx_sss)
+	VIEWPORT_RT(rt_ssfx_sss_ext)
+	VIEWPORT_RT(rt_ssfx_sss_ext2)
+	VIEWPORT_RT(rt_ssfx_sss_tmp)
+
+	VIEWPORT_RT(rt_ssfx_prevPos)
 }
 
 void CRenderTarget::reset_light_marker(bool bResetStencil)
