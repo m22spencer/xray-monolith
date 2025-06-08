@@ -186,6 +186,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.08**
+* NLTP_ASHES: Add `actor_on_death` callback (https://github.com/themrdemonized/xray-monolith/pull/244)
+
 **2025.06.05**
 * The engine will crash if override sound failed to be initialised in `_G.COnBeforePlayHudSound` callback
 * ProfLander: Fix black default crosshair (https://github.com/themrdemonized/xray-monolith/pull/242)
