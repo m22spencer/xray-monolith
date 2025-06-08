@@ -220,8 +220,27 @@ void CRender::render_menu()
 
 extern u32 g_r;
 
+
+void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
+{
+	static auto last_viewport = 0;
+	auto current_viewport = Device.m_SecondViewport.IsSVPFrame();
+	if (current_viewport == last_viewport)
+		return;    // Correct textures are already mapped
+
+	auto last = last_viewport;
+	Target->map_viewport_render_targets([current_viewport, last](ref_rt original, ref_rt views[2]) -> void {
+		HW.pContext->CopyResource(views[last]->pSurface, original->pSurface);
+		HW.pContext->CopyResource(original->pSurface, views[current_viewport]->pSurface);
+	});
+
+	last_viewport = current_viewport;
+}
+
 void CRender::Render()
 {
+	FlipViewportTexturesIfNeeded(Target);
+
 	PIX_EVENT(CRender_Render);
 
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
@@ -516,17 +535,14 @@ void CRender::Render()
 	{
 		// Save previus and current matrices
 		{
-			static Fmatrix mm_saved_viewproj;
+			static Fmatrix mm_saved_viewproj[2];
 
-			if (!Device.m_SecondViewport.IsSVPFrame())
-			{
-				Target->Matrix_previous.mul(mm_saved_viewproj, Device.mInvView);
-				Target->Matrix_current.set(Device.mProject);
-				mm_saved_viewproj.set(Device.mFullTransform);
-			}
+			Target->GetPrevious()->Matrix_previous.mul(mm_saved_viewproj[Device.m_SecondViewport.IsSVPFrame()], Device.mInvView);
+			Target->GetPrevious()->Matrix_current.set(Device.mProject);
+			mm_saved_viewproj[Device.m_SecondViewport.IsSVPFrame()].set(Device.mFullTransform);
 		}
 
-		if (RImplementation.o.ssfx_sss && !Device.m_SecondViewport.IsSVPFrame())
+		if (RImplementation.o.ssfx_sss)
 		{
 			static bool sss_rendered, sss_extended_rendered;
 

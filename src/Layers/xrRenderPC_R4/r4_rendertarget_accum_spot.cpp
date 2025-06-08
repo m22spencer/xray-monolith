@@ -167,10 +167,7 @@ void CRenderTarget::accum_spot(light* L)
 		RCache.set_ca("m_lmap", 0, m_Lmap._11, m_Lmap._21, m_Lmap._31, m_Lmap._41);
 		RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
 
-		if (!Device.m_SecondViewport.IsSVPFrame())
-			RCache.set_c("sss_id", L->sss_id);
-		else
-			RCache.set_c("sss_id", -1);
+		RCache.set_c("sss_id", L->sss_id);
 
 		// Fetch4 : enable
 		//		if (RImplementation.o.HW_smap_FETCH4)	{

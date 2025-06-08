@@ -62,12 +62,12 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 
 #ifdef USE_DX11
 
-	CalcVelocity = RImplementation.Target->RVelocity;
+	CalcVelocity = RImplementation.Target->GetPrevious()->RVelocity;
 
 	if (CalcVelocity)
 	{
 		// Previous WVP
-		RCache.set_c("m_WVP_prev", RImplementation.Target->Matrix_HUD_previous);
+		RCache.set_c("m_WVP_prev", RImplementation.Target->GetPrevious()->Matrix_HUD_previous);
 
 		if (RenderMode > 1 && Device.dwFrame > Parent->CurrentFrame)
 		{

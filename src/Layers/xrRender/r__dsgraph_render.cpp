@@ -95,11 +95,11 @@ void __fastcall water_node_ssr(mapSorted_Node* N)
 	RImplementation.apply_object(N->val.pObject);
 	RImplementation.apply_lmaterial();
 
-	RCache.set_c("cam_pos", RImplementation.Target->Position_previous.x, RImplementation.Target->Position_previous.y, RImplementation.Target->Position_previous.z, 0.0f);
+	RCache.set_c("cam_pos", RImplementation.Target->GetPrevious()->Position_previous.x, RImplementation.Target->GetPrevious()->Position_previous.y, RImplementation.Target->GetPrevious()->Position_previous.z, 0.0f);
 
 	// Previous matrix data
-	RCache.set_c("m_current", RImplementation.Target->Matrix_current);
-	RCache.set_c("m_previous", RImplementation.Target->Matrix_previous);
+	RCache.set_c("m_current", RImplementation.Target->GetPrevious()->Matrix_current);
+	RCache.set_c("m_previous", RImplementation.Target->GetPrevious()->Matrix_previous);
 
 	V->Render(calcLOD(N->key, V->vis.sphere.R));
 #endif
@@ -145,17 +145,17 @@ void __fastcall hud_node(mapSorted_Node* N)
 	int skinning = N->val.se->passes[0]->vs->skinning;
 	RCache.set_Shader(RImplementation.Target->s_ssfx_hud[skinning]);
 
-	RImplementation.Target->Matrix_HUD_previous.set(N->val.PrevMatrix);
+	RImplementation.Target->GetPrevious()->Matrix_HUD_previous.set(N->val.PrevMatrix);
 	N->val.PrevMatrix.set(RCache.xforms.m_wvp);
 
-	RImplementation.Target->RVelocity = true;
+	RImplementation.Target->GetPrevious()->RVelocity = true;
 
 #endif
 
 	V->Render(calcLOD(N->key, V->vis.sphere.R));
 
 #ifdef USE_DX11
-	RImplementation.Target->RVelocity = false;
+	RImplementation.Target->GetPrevious()->RVelocity = false;
 #endif
 }
 

@@ -1096,7 +1096,7 @@ static class ssfx_issvp : public R_constant_setup
 {
 	virtual void setup(R_constant* C)
 	{
-		RCache.set_c(C, Device.m_SecondViewport.IsSVPFrame(), 0, 0, 0);
+		RCache.set_c(C, 0, 0, 0, 0);
 	}
 }    ssfx_issvp;
 
