@@ -794,7 +794,7 @@ void FixMatrices() {
 	Device.mInvProject.invert(Device.mProject);
 	Device.mProject_saved = Device.mProject;
 	Device.mFullTransform.mul(Device.mProject, Device.mView);
-	Device.mInvFullTransform.invert(Device.mInvFullTransform);
+	Device.mInvFullTransform.mul(Device.mInvProject, Device.mInvView);
 	Device.mFullTransform_saved = Device.mFullTransform;
 	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
 }
