@@ -91,11 +91,23 @@ void CRenderTarget::phase_fakescope()
 	pv->set(float(w), 0, d_Z, d_W, C, p1.x, p0.y); pv++;
 	RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
-	//Set pass
-	RCache.set_Element(s_fakescope->E[ps_r2_nightvision]);
-
 	//Set geometry
 	RCache.set_Geometry(g_combine);
+
+	if (Device.m_SecondViewport.IsSVPFrame()) {
+		// For effects like heatvision within scope
+		static ref_shader shader_3dss;
+		shader_3dss.create("scope_preprocess");
+		RCache.set_Element(shader_3dss->E[1]);
+
+		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), dest_rt->pTexture->surface_get());
+		return;
+	}
+
+	//Set pass
+	RCache.set_Element(s_fakescope->E[ps_r2_nightvision]);
 	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
 	HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());

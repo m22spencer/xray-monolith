@@ -481,7 +481,7 @@ void CRenderTarget::phase_combine()
 		if (ps_sunshafts_mode == R2SS_SCREEN_SPACE || ps_sunshafts_mode == R2SS_COMBINE_SUNSHAFTS)
 			phase_sunshafts();
 	}
-	
+		
 	if (scope_3D_fake_enabled)
 	{
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
@@ -523,16 +523,15 @@ void CRenderTarget::phase_combine()
 		phase_heatvision();
 	//--DSR-- HeatVision_end
 
+	if (scope_fake_enabled || Device.m_SecondViewport.IsSVPFrame())
+	{
+		phase_fakescope(); //crookr
+	}
+
 	if (Device.m_SecondViewport.IsSVPFrame()) {
 		// At this point, the scope view is done. 
 		//    we do not want to post process.
-		HW.pContext->CopyResource(rt_secondVP->pSurface, rt_Color->pSurface);
 		return;
-	}
-
-	if (scope_fake_enabled)
-	{
-		phase_fakescope(); //crookr
 	}
 
     //SMAA
