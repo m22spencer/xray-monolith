@@ -283,6 +283,8 @@ Fvector4 heat_vision_args_2 = { .0f, .0f, .0f, .0f };
 //crookr
 int scope_fake_enabled = 1;
 int scope_3D_fake_enabled = 0; // Redotix99: for 3D Shader Based Scopes
+int scope_svp_enabled = 0;
+
 //string32 scope_fake_texture = "wpn\\wpn_crosshair_pso1";
 
 float ps_r2_ss_sunshafts_length = 1.f;
@@ -380,6 +382,8 @@ Fvector4 ps_s3ds_param_1 = { 0, 0, 0, 0 };
 Fvector4 ps_s3ds_param_2 = { 0, 0, 0, 0 };
 Fvector4 ps_s3ds_param_3 = { 0, 0, 0, 0 };
 Fvector4 ps_s3ds_param_4 = { 0, 0, 0, 0 };
+
+Fvector4 ps_shader_scope_params = { 0, 0, 0, 0 };
 
 float hud_fov_aim_factor = 0;
 
@@ -1291,6 +1295,7 @@ void xrRender_initconsole()
 
 	CMD4(CCC_Integer, "r__fakescope", &scope_fake_enabled, 0, 1); //crookr for fake scope
 	CMD4(CCC_Integer, "r__3Dfakescope", &scope_3D_fake_enabled, 0, 1); // Redotix99: for 3D Shader Based Scopes
+	CMD4(CCC_Integer, "r__svpscope", &scope_svp_enabled, 0, 1); 
 
 	CMD4(CCC_Integer, "r__heatvision", &ps_r2_heatvision, 0, 1); //--DSR-- HeatVision
 	CMD3(CCC_Mask, "r2_terrain_z_prepass", &ps_r2_ls_flags, R2FLAG_TERRAIN_PREPASS); //Terrain Z Prepass @Zagolski
@@ -1328,6 +1333,8 @@ void xrRender_initconsole()
 	CMD4(CCC_Vector4, "s3ds_param_2", &ps_s3ds_param_2, tw2_min, tw2_max);
 	CMD4(CCC_Vector4, "s3ds_param_3", &ps_s3ds_param_3, tw2_min, tw2_max);
 	CMD4(CCC_Vector4, "s3ds_param_4", &ps_s3ds_param_4, tw2_min, tw2_max);
+
+	CMD4(CCC_Vector4, "shader_scope_params", &ps_shader_scope_params, tw2_min, tw2_max);
 
 	CMD4(CCC_Float, "hud_fov_aim_factor", &hud_fov_aim_factor, 0.0f, 1.0f);
 	

@@ -785,8 +785,62 @@ extern void render_reshade_effects();
 
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
+void FixMatrices() {
+	float fFov, fAspect, _;
+	Device.mProject.decompose_projection(fFov, fAspect, _, _);
+	Device.fFOV = rad2deg(fFov);
+	Device.fASPECT = fAspect;
+
+	Device.mInvProject.invert(Device.mProject);
+	Device.mProject_saved = Device.mProject;
+	Device.mFullTransform.mul(Device.mProject, Device.mView);
+	Device.mInvFullTransform.mul(Device.mInvProject, Device.mInvView);
+	Device.mFullTransform_saved = Device.mFullTransform;
+	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
+}
+
+void EnsureDeviceState(std::function<void()> f)
+{
+	Device.dwViewport++;
+	Device.m_SecondViewport.isSVPFrame = true;
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = true;
+	auto old_proj = Device.mProject;
+	auto old_proj_hud = Device.mProjectHud;
+	auto old_view = Device.mView;
+
+	f();
+
+	Device.m_SecondViewport.isSVPFrame = false;
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
+	Device.mProject = old_proj;
+	Device.mProjectHud = old_proj_hud;
+	Device.mView = old_view;
+	FixMatrices();
+}
+
+void CLevel::RenderSecondViewport()
+{
+	EnsureDeviceState([this]() -> void {
+
+		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
+
+		float _, fNearPlane, fFarPlane;
+		Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
+		Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
+		FixMatrices();
+
+		inherited::OnRender();
+		Game().OnRender();
+		BulletManager().Render();
+	});
+}
+
 void CLevel::OnRender()
 {
+	if (game && Device.m_SecondViewport.IsSVPActive())
+		RenderSecondViewport();
+
+	Device.dwViewport++;
 	// PDA
 	if (game && CurrentGameUI() && &CurrentGameUI()->GetPdaMenu() != nullptr)
 	{
@@ -850,9 +904,6 @@ void CLevel::OnRender()
 		return;
 	Game().OnRender();
 	BulletManager().Render();
-
-	if (Device.m_SecondViewport.IsSVPFrame())
-		Render->RenderToTarget(Render->rtSVP);
 
 	if (use_reshade)
 		render_reshade_effects();

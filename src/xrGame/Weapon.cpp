@@ -2074,6 +2074,8 @@ void CWeapon::OnZoomIn()
 	}
 
 	g_player_hud->updateMovementLayerState();
+
+	UpdateSecondVP();
 }
 
 void CWeapon::OnZoomOut()
@@ -3229,7 +3231,7 @@ void CWeapon::UpdateSecondVP()
 		return;
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
-	Device.m_SecondViewport.SetSVPActive(m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && m_zoom_params.m_fZoomRotationFactor > 0.05f);
+	Device.m_SecondViewport.SetSVPActive(m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed());
 }
 
 Fmatrix CWeapon::RayTransform()

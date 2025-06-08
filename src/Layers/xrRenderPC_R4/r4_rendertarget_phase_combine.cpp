@@ -503,8 +503,7 @@ void CRenderTarget::phase_combine()
 	}
 
 	//Compute blur textures
-	if (!Device.m_SecondViewport.IsSVPFrame()) // Temp fix for blur buffer and SVP
-		phase_blur();
+	phase_blur();
 
 	//Compute bloom (new)
 	if (RImplementation.o.ssfx_bloom)
@@ -532,13 +531,20 @@ void CRenderTarget::phase_combine()
 		phase_gasmask_drops();
 	}
 	
-	if(ps_r2_nightvision > 0)
+	if(ps_r2_nightvision > 0 && !Device.m_SecondViewport.IsSVPFrame())
 		phase_nightvision();
 
 	//--DSR-- HeatVision_start
 	if (ps_r2_heatvision > 0)
 		phase_heatvision();
 	//--DSR-- HeatVision_end
+
+	if (Device.m_SecondViewport.IsSVPFrame()) {
+		// At this point, the scope view is done. 
+		//    we do not want to post process.
+		HW.pContext->CopyResource(rt_secondVP->pSurface, rt_Color->pSurface);
+		return;
+	}
 
 	if (scope_fake_enabled)
 	{

@@ -1086,7 +1086,7 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 float g_fov = 55.0f;
 extern float g_ironsights_factor;
 
-float CActor::currentFOV()
+float CActor::currentFOV(bool wantSVPFov = false)
 {
 	if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2))
 		return g_fov;
@@ -1100,6 +1100,8 @@ float CActor::currentFOV()
 	{
 		if (pWeapon->GetZoomFactor() == 0)
 			return atan(tan(g_fov * (0.5 * PI / 180)) / g_ironsights_factor) / (0.5 * PI / 180);
+		else if (Device.m_SecondViewport.IsSVPActive() && !wantSVPFov)
+			return g_fov;
 		else
 			return pWeapon->GetZoomFactor() * (0.75f);
 	}
@@ -1216,7 +1218,6 @@ void CActor::UpdateCL()
 			g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPZoomFactor();
 			g_pGamePersistent->m_pGShaderConstants->hud_params.z = pWeapon->GetHudFov();
-			g_pGamePersistent->m_pGShaderConstants->hud_params.w = Device.m_SecondViewport.IsSVPFrame();
 
 			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.x = pWeapon->CurrentZoomFactor();
 			g_pGamePersistent->m_pGShaderConstants->hud_fov_params.y = pWeapon->GetMinScopeZoomFactor();
