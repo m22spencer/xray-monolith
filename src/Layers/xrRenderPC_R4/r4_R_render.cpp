@@ -220,12 +220,6 @@ void CRender::render_menu()
 
 extern u32 g_r;
 
-#define FLIP(RT) \
-static ref_rt RT##_vp[2]; \
-if (!RT##_vp[0]) RT##_vp[0].create(#RT "_main", Target->RT->dwWidth, Target->RT->dwHeight, Target->RT->fmt); \
-if (!RT##_vp[1]) RT##_vp[1].create(#RT "_svp", Target->RT->dwWidth, Target->RT->dwHeight, Target->RT->fmt); \
-HW.pContext->CopyResource(RT##_vp[last_viewport]->pSurface, Target->RT->pSurface); \
-HW.pContext->CopyResource(Target->RT->pSurface, RT##_vp[current_viewport]->pSurface);
 
 void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
 {
