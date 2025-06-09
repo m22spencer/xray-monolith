@@ -4,6 +4,7 @@ function on_xml_read()
 	RegisterUBGLKeybindSeparationInjector()
 	
 	-- Lucy: add ImGui keybind
+	RegisterImGuiKeybindSeparationInjector()
 end
 
 function RegisterUBGLKeybindSeparationInjector()
@@ -68,7 +69,7 @@ function RegisterUBGLKeybindSeparationInjector()
     end)
 end
 
-function RegisterUBGLKeybindSeparationInjector()
+function RegisterImGuiKeybindSeparationInjector()
 	RegisterScriptCallback("on_xml_read", function(xml_file_name, xml_obj)
         if xml_file_name == [[ui\ui_keybinding.xml]] then
             local group_nodes = xml_obj:query("group[name=kb_grp_common]")
