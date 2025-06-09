@@ -2,6 +2,8 @@ function on_xml_read()
 
 	-- Serious: add new keybinds for separated UBGL/Canted switching
 	RegisterUBGLKeybindSeparationInjector()
+	
+	-- Lucy: add ImGui keybind
 end
 
 function RegisterUBGLKeybindSeparationInjector()
@@ -15,6 +17,7 @@ function RegisterUBGLKeybindSeparationInjector()
 
                 xml_obj:insertFromXMLString(new_command, group_node, #group_node.kids)
             end
+			
         end
 
 		if xml_file_name == [[text\eng\ui_st_keybinding.xml]] then
@@ -57,6 +60,44 @@ function RegisterUBGLKeybindSeparationInjector()
 			[[
             <string id="kb_switch_ubgl">
             <text>Подствольник</text>
+            </string>
+			]]
+
+			xml_obj:insertFromXMLString(new_node)
+		end
+    end)
+end
+
+function RegisterUBGLKeybindSeparationInjector()
+	RegisterScriptCallback("on_xml_read", function(xml_file_name, xml_obj)
+        if xml_file_name == [[ui\ui_keybinding.xml]] then
+            local group_nodes = xml_obj:query("group[name=kb_grp_common]")
+            
+            if group_nodes[1] then
+                local group_node = group_nodes[1]
+                local new_command = [[<command id="kb_editor"					exe="editor"/>]]
+
+                xml_obj:insertFromXMLString(new_command, group_node, #group_node.kids)
+            end
+
+        end
+
+		if xml_file_name == [[text\eng\ui_st_keybinding.xml]] then
+			local new_node = 
+			[[
+			<string id="kb_editor">
+				<text>ImGui Editor</text>
+			</string>
+			]]
+
+			xml_obj:insertFromXMLString(new_node)
+		end
+
+		if xml_file_name == [[text\rus\ui_st_keybinding.xml]] then
+			local new_node = 
+			[[
+            <string id="kb_editor">
+            <text>ImGui редактор</text>
             </string>
 			]]
 

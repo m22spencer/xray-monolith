@@ -887,6 +887,16 @@ public:
 	}
 };
 
+class CCC_Editor : public IConsole_Command
+{
+public:
+	CCC_Editor(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+	void Execute(pcstr args) override
+	{
+		Device.imgui().Show(true);
+	}
+};
+
 ENGINE_API float psHUD_FOV_def = 0.45f;
 ENGINE_API float psHUD_FOV = psHUD_FOV_def;
 
@@ -1120,7 +1130,7 @@ void CCC_Register()
 	CMD4(CCC_Float, "scope_fog_radius", &scope_fog_radius, 0, 1000);
 	CMD4(CCC_Float, "scope_fog_sharp", &scope_fog_sharp, 0, 1000);
 	CMD2(CCC_Integer, "scope_2dtexactive", &scope_2dtexactive);
-
+	CMD1(CCC_Editor, "rs_editor");
 #ifdef DEBUG
     extern BOOL debug_destroy;
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, FALSE, TRUE);

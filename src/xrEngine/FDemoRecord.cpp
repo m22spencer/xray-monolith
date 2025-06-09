@@ -548,12 +548,9 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 				return;
 			}
 		}
+
 		if (dik == DIK_GRAVE)
 			Console->Show();
-		if (dik == DIK_SPACE) RecordKey();
-		if (dik == DIK_BACK) MakeCubemap();
-		if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
-		if (dik == DIK_F12) MakeScreenshot();
 		if (dik == DIK_ESCAPE) {
 			StopDemo();
 			// if we launched demo_record_return_ctrl_inputs we return the event ESCAPE key press also to the launcher entity
@@ -583,8 +580,13 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 
 		if (dik == DIK_PAUSE)
 			Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
-	}
 
+		if (Device.imgui_shown()) return;
+		if (dik == DIK_SPACE) RecordKey();
+		if (dik == DIK_BACK) MakeCubemap();
+		if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
+		if (dik == DIK_F12) MakeScreenshot();
+	}
 }
 
 void CDemoRecord::IR_OnKeyboardRelease(int dik)

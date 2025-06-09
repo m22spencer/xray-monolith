@@ -110,6 +110,7 @@ enum EGameActions
 	kFREELOOK,
 
 	kCAM_AUTOAIM,
+	kEDITOR,
 
 	kLASTACTION,
 	kNOTBINDED,

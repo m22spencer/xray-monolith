@@ -184,6 +184,9 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{8d6caf5d-f49d-40f7-b1ae-f1fd5c4f0d58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfase implementations\ImGuiRender">
+      <UniqueIdentifier>{f1fd0858-3f28-421e-aacd-5bd66732b3c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\xrRenderDX10\DXCommonTypes.h">
@@ -782,6 +785,12 @@
     </ClInclude>
     <ClInclude Include="..\blender_hdr10_lens_flare.h">
       <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrRender\dxImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1456,6 +1465,9 @@
     </ClCompile>
     <ClCompile Include="..\r4_rendertarget_phase_hdr10_lens_flare.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

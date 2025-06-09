@@ -157,4 +157,5 @@
 #	include "script_wallmarks_manager.h"
 #	include "script_attachment_manager.h"
 #	include "player_hud.h"
+#	include "script_imgui.h"
 #endif

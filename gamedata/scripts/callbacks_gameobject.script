@@ -411,6 +411,12 @@ function actor_on_first_update()
 	end)
 end
 
+-- ImGui callback (can be used to inject your own tabs into the menu bar and for drawing your UIs)
+AddScriptCallback("imgui_on_render")
+function on_imgui_render(name)
+	SendScriptCallback("imgui_on_render", name)
+end
+
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius
 -- Works only when npc:get_enable_anomalies_pathfinding() == true or ai_die_in_anomalies cvar is 1
 function is_outside_damage_radius(zone, obj)

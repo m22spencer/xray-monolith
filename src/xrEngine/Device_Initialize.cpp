@@ -90,4 +90,7 @@ PROTECT_API void CRenderDevice::Initialize()
 	if (strstr(lpCmdLine,"-gpu_ref")!=NULL) HW.Caps.bForceGPU_REF = TRUE;
 	else HW.Caps.bForceGPU_REF = FALSE;
 	*/
+
+	Device.seqAppStart.Add(&m_imgui);
+	Device.seqAppEnd.Add(&m_imgui);
 }
