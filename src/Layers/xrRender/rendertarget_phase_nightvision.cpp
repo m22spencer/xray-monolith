@@ -97,7 +97,8 @@ void CRenderTarget::phase_fakescope()
 	if (Device.m_SecondViewport.IsSVPFrame()) {
 		// For effects like heatvision within scope
 		static ref_shader shader_3dss;
-		shader_3dss.create("scope_preprocess");
+		if (!shader_3dss)
+			shader_3dss.create("scope_preprocess");
 		RCache.set_Element(shader_3dss->E[1]);
 
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
