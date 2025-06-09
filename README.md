@@ -187,6 +187,9 @@ How to compile exes:
 
 ## Changelog
 **2025.06.08**
+* NLTP_ASHES: Exported `_keyboard`'s `key_name` and `key_local_name` to Lua (https://github.com/themrdemonized/xray-monolith/pull/248)
+
+**2025.06.08**
 * NLTP_ASHES: Add `actor_on_death` callback (https://github.com/themrdemonized/xray-monolith/pull/244)
 
 **2025.06.05**
