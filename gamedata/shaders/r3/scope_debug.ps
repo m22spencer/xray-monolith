@@ -1,0 +1,17 @@
+#include "night_vision.h"
+#include "common.h"
+
+Texture2D vp2;
+
+float4 main(p_screen I,  float4 pos2d : SV_POSITION) : SV_Target
+{
+	float2 tc = pos2d.xy * screen_res.zw;
+
+
+	if (tc.x > 0.25 || tc.y > 0.25)
+		discard;
+
+	tc /= 0.25;
+
+	return float4(vp2.Sample(smp_base, tc).rgb, 1.0);
+} 
