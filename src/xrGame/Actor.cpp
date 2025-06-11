@@ -90,6 +90,7 @@ using namespace luabind;
 #include "ui/UIHudStatesWnd.h"
 #include "script_attachment_manager.h"
 #include "debug_renderer.h"
+#include <Layers/xrRender/xrRender_console.h>
 
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
@@ -1136,14 +1137,23 @@ bool CActor::scopeCameraMatrix(Fmatrix& camera)
 					m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
 					m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
 					cached.set(m);
+
+					
+
+
 					camera = Fmatrix(hi->m_item_transform).mulB_43(m);
-					CDebugRenderer().draw_obb(camera, Fvector().set(dvis.sphere.R, dvis.sphere.R, dvis.sphere.R), 0xff0000ff, true);
+					CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(dvis.sphere.R, dvis.sphere.R, 0.0)), 0xff0000ff, true);
 					return true;
 				}
 			}
 
 			camera = Fmatrix(hi->m_item_transform).mulB_43(cached);
-			CDebugRenderer().draw_obb(camera, Fvector().set(0.01, 0.01, 0.01), 0xff0000ff, true);
+			auto cm = 0.01f;
+			auto mm = cm * .1;
+			camera.mulB_43(Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm }));
+			auto r = scope_objective_lens_offset.w * mm * 0.5;
+
+			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
 			return true;
 		}
 	}

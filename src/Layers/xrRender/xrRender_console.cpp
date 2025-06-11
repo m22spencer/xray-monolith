@@ -284,6 +284,7 @@ Fvector4 heat_vision_args_2 = { .0f, .0f, .0f, .0f };
 int scope_fake_enabled = 1;
 int scope_3D_fake_enabled = 0; // Redotix99: for 3D Shader Based Scopes
 int scope_svp_enabled = 0;
+Fvector4 scope_objective_lens_offset = { .0f, .0f, .0f, .0f };
 int scope_debug = 0;
 
 //string32 scope_fake_texture = "wpn\\wpn_crosshair_pso1";
@@ -1324,6 +1325,8 @@ void xrRender_initconsole()
 	CMD4(CCC_Vector4, "shader_param_6", &ps_dev_param_6, tw2_min, tw2_max);
 	CMD4(CCC_Vector4, "shader_param_7", &ps_dev_param_7, tw2_min, tw2_max);
 	CMD4(CCC_Vector4, "shader_param_8", &ps_dev_param_8, tw2_min, tw2_max);
+
+	CMD4(CCC_Vector4, "scope_objective_lens_offset", &scope_objective_lens_offset, tw2_min, tw2_max);
 	
 	// Mark Switch
 	CMD4(CCC_Integer, "markswitch_current", &ps_markswitch_current, 0, 32);
