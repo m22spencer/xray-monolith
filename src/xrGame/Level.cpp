@@ -833,22 +833,50 @@ void EnsureDeviceState(std::function<void()> f)
 	SetMatrices(old_cam, old_proj, old_proj_hud);
 }
 
+#pragma optimize("", off)
 void CLevel::RenderSecondViewport()
 {
-	EnsureDeviceState([this]() -> void {
-		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
+	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
+	float _, fov, fNearPlane, fFarPlane;
+	Device.mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
-		float _, fNearPlane, fFarPlane;
-		Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
+	Fmatrix scope_camera = Device.mInvView;
+	if (Actor()->scopeCameraMatrix(scope_camera)) {
+		auto cm = 0.01f;
+		auto r = fov / deg2rad(svp_fov) * 2.0 * cm;
+
+		Fvector cam_P; cam_P.set(0, 0, 0); scope_camera.transform(cam_P);
+		Fvector cam_N; cam_N.set(0, 0, 1); scope_camera.transform_dir(cam_N);
+		Fvector cam_U; cam_U.set(0, 1, 0); scope_camera.transform_dir(cam_U);
+
+		Fvector front_P = Fvector(cam_P).add(Fvector(cam_N).mul(r));
+
+		scope_camera.build_camera_dir(front_P, cam_N, cam_U);
+		scope_camera.invert();
+	}
+
+	Fvector cam_P; cam_P.set(0, 0, 0); scope_camera.transform(cam_P);
+	Fvector cam_N; cam_N.set(0, 0, 1); scope_camera.transform_dir(cam_N);
+
+	auto d = debug_renderer();
+	d.draw_aabb(cam_P, 0.01, 0.01, 0.01, 0xffffffff, true);
+	d.draw_line(Fmatrix(), cam_P, Fvector(cam_P).add(cam_N), 0xff00ff00, true);
+
+	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
 		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
 		
-		SetMatrices(Device.mInvView, svp_proj, Device.mProjectHud);
+		
+
+
+
+		SetMatrices(scope_camera, svp_proj, Device.mProjectHud);
 
 		inherited::OnRender();
 		Game().OnRender();
 		BulletManager().Render();
 	});
 }
+#pragma optimize("", on)
 
 void CLevel::OnRender()
 {

@@ -89,6 +89,7 @@ using namespace luabind;
 #include "xrEngine\x_ray.h"
 #include "ui/UIHudStatesWnd.h"
 #include "script_attachment_manager.h"
+#include "debug_renderer.h"
 
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
@@ -1110,6 +1111,45 @@ float CActor::currentFOV(bool wantSVPFov = false)
 		return g_fov;
 	}
 }
+
+#pragma optimize("", off)
+bool CActor::scopeCameraMatrix(Fmatrix& camera)
+{
+	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
+	if (pWeapon) {
+		auto hi = pWeapon->HudItemData();
+		if (hi) {
+			camera = hi->m_item_transform;
+
+			auto model = hi->m_model;
+			auto lens = model ? model->LL_BoneID("lens") : 0;
+			if (lens) {
+				Fmatrix m;
+				auto vis = model->GetVisualByBone("lens");
+				if (vis) {
+					auto lens_t = model->LL_GetTransform(lens);
+					{
+						Fmatrix m = hi->m_item_transform;
+						m.mulB_43(lens_t);
+						CDebugRenderer().draw_obb(m, Fvector().set(0.01, 0.01, 0.01), 0xff00ff00, true);
+					}
+
+					{
+						Fmatrix m = hi->m_item_transform;
+						auto dvis = vis->getVisData();
+						m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
+						m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
+						CDebugRenderer().draw_obb(m, Fvector().set(dvis.sphere.R, dvis.sphere.R, dvis.sphere.R), 0xff0000ff, true);
+						camera = m;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+#pragma optimize("", on)
 
 #include "UI\UIInventoryUtilities.h"
 
