@@ -1115,10 +1115,13 @@ float CActor::currentFOV(bool wantSVPFov = false)
 #pragma optimize("", off)
 bool CActor::scopeCameraMatrix(Fmatrix& camera)
 {
+	static Fmatrix cached = Fmatrix().identity();
+
 	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
 	if (pWeapon) {
 		auto hi = pWeapon->HudItemData();
 		if (hi) {
+
 			camera = hi->m_item_transform;
 
 			auto model = hi->m_model;
@@ -1126,25 +1129,22 @@ bool CActor::scopeCameraMatrix(Fmatrix& camera)
 			if (lens) {
 				Fmatrix m;
 				auto vis = model->GetVisualByBone("lens");
-				if (vis) {
-					auto lens_t = model->LL_GetTransform(lens);
-					{
-						Fmatrix m = hi->m_item_transform;
-						m.mulB_43(lens_t);
-						CDebugRenderer().draw_obb(m, Fvector().set(0.01, 0.01, 0.01), 0xff00ff00, true);
-					}
-
-					{
-						Fmatrix m = hi->m_item_transform;
-						auto dvis = vis->getVisData();
-						m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
-						m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
-						CDebugRenderer().draw_obb(m, Fvector().set(dvis.sphere.R, dvis.sphere.R, dvis.sphere.R), 0xff0000ff, true);
-						camera = m;
-						return true;
-					}
+				if (vis && model->LL_GetBoneVisible(lens)) {  
+					// The render matrices should be valid
+					Fmatrix m = Fmatrix().identity();
+					auto dvis = vis->getVisData();
+					m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
+					m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
+					cached.set(m);
+					camera = Fmatrix(hi->m_item_transform).mulB_43(m);
+					CDebugRenderer().draw_obb(camera, Fvector().set(dvis.sphere.R, dvis.sphere.R, dvis.sphere.R), 0xff0000ff, true);
+					return true;
 				}
 			}
+
+			camera = Fmatrix(hi->m_item_transform).mulB_43(cached);
+			CDebugRenderer().draw_obb(camera, Fvector().set(0.01, 0.01, 0.01), 0xff0000ff, true);
+			return true;
 		}
 	}
 	return false;
