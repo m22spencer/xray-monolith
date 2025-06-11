@@ -785,17 +785,34 @@ extern void render_reshade_effects();
 
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
-void FixMatrices() {
+void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud)
+{
+	worldCamera.transform(Device.vCameraPosition.set(0, 0, 0));
+	worldCamera.transform_dir(Device.vCameraDirection.set(0, 0, 1));
+	worldCamera.transform_dir(Device.vCameraTop.set(0, 1, 0));
+	worldCamera.transform_dir(Device.vCameraRight.set(1, 0, 0));
+
+	Device.mView.invert(worldCamera);
+	Device.mProject.set(projection);
+	Device.mProjectHud.set(projection_hud);
+	Device.mFullTransform.mul(Device.mProject, Device.mView);
+	Device.mFullTransformHud.mul(Device.mProjectHud, Device.mView);
+
+	Device.mInvView.set(worldCamera);
+	Device.mInvProject.invert(projection);
+	Device.mInvProjectHud.invert(projection_hud);
+	Device.mInvFullTransform.mul(Device.mInvProject, Device.mInvView);
+
+	Device.vCameraPosition_saved.set(Device.vCameraPosition);
+	Device.mView_saved.set(Device.mView);
+	Device.mProject_saved.set(Device.mProject);
+	Device.mFullTransform_saved.set(Device.mFullTransform_saved);
+
 	float fFov, fAspect, _;
-	Device.mProject.decompose_projection(fFov, fAspect, _, _);
+	projection.decompose_projection(fFov, fAspect, _, _);
 	Device.fFOV = rad2deg(fFov);
 	Device.fASPECT = fAspect;
 
-	Device.mInvProject.invert(Device.mProject);
-	Device.mProject_saved = Device.mProject;
-	Device.mFullTransform.mul(Device.mProject, Device.mView);
-	Device.mInvFullTransform.mul(Device.mInvProject, Device.mInvView);
-	Device.mFullTransform_saved = Device.mFullTransform;
 	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
 }
 
@@ -804,30 +821,28 @@ void EnsureDeviceState(std::function<void()> f)
 	Device.dwViewport++;
 	Device.m_SecondViewport.isSVPFrame = true;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = true;
-	auto old_proj = Device.mProject;
-	auto old_proj_hud = Device.mProjectHud;
-	auto old_view = Device.mView;
+	Fmatrix old_cam = Device.mInvView;
+	Fmatrix old_proj = Device.mProject;
+	Fmatrix old_proj_hud = Device.mProjectHud;
 
 	f();
 
 	Device.m_SecondViewport.isSVPFrame = false;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
-	Device.mProject = old_proj;
-	Device.mProjectHud = old_proj_hud;
-	Device.mView = old_view;
-	FixMatrices();
+
+	SetMatrices(old_cam, old_proj, old_proj_hud);
 }
 
 void CLevel::RenderSecondViewport()
 {
 	EnsureDeviceState([this]() -> void {
-
 		float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
 
 		float _, fNearPlane, fFarPlane;
 		Device.mProject.decompose_projection(_, _, fNearPlane, fFarPlane);
-		Device.mProject.build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
-		FixMatrices();
+		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
+		
+		SetMatrices(Device.mInvView, svp_proj, Device.mProjectHud);
 
 		inherited::OnRender();
 		Game().OnRender();
