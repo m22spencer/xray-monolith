@@ -99,6 +99,7 @@ public:
 	struct Lens { 
 		Fmatrix transform = Fmatrix().identity();
 		float radius = 0.0;
+		u16 bone_id = BI_NONE;
 	};
 
 	Lens eyepieceLens;

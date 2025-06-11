@@ -1298,7 +1298,7 @@ void xrRender_initconsole()
 	CMD4(CCC_Integer, "r__fakescope", &scope_fake_enabled, 0, 1); //crookr for fake scope
 	CMD4(CCC_Integer, "r__3Dfakescope", &scope_3D_fake_enabled, 0, 1); // Redotix99: for 3D Shader Based Scopes
 	CMD4(CCC_Integer, "r__svpscope", &scope_svp_enabled, 0, 2);
-	CMD4(CCC_Integer, "r__scope_debug", &scope_debug, 0, 1);
+	CMD4(CCC_Integer, "r__scope_debug", &scope_debug, 0, 2);
 
 	CMD4(CCC_Integer, "r__heatvision", &ps_r2_heatvision, 0, 1); //--DSR-- HeatVision
 	CMD3(CCC_Mask, "r2_terrain_z_prepass", &ps_r2_ls_flags, R2FLAG_TERRAIN_PREPASS); //Terrain Z Prepass @Zagolski

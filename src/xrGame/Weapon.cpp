@@ -3237,43 +3237,53 @@ void CWeapon::UpdateSecondVP()
 
 bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 {
-	static Fmatrix cached = Fmatrix().identity();
-	
 	auto hi = HudItemData();
-	if (hi) {
+	auto model = hi ? hi->m_model : NULL;
+	if (hi && model) {
+		camera.set(hi->m_item_transform);
 
-		camera = hi->m_item_transform;
+		eyepieceLens.bone_id = model->LL_BoneID("lens");
+		objectiveLens.bone_id = model->LL_BoneID("objective_lens");
 
-		auto model = hi->m_model;
-		auto lens = model ? model->LL_BoneID("lens") : 0;
-		if (lens) {
-			Fmatrix m;
-			auto vis = model->GetVisualByBone("lens");
-			if (vis && model->LL_GetBoneVisible(lens)) {
+		auto draw_lens = [camera](Lens lens, u32 color) -> void {
+			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(lens.transform).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
+		};
+
+		auto update_lens = [model, hi](Lens& lens) -> void {
+			if (lens.bone_id && model->LL_GetBoneVisible(lens.bone_id)) {
 				// The render matrices should be valid
-				Fmatrix m = Fmatrix().identity();
+				auto vis = model->GetVisualByBone(lens.bone_id);
+				lens.transform.identity();
 				auto dvis = vis->getVisData();
-				m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
-				m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
-
-				eyepieceLens.transform.set(m);
-				eyepieceLens.radius = dvis.sphere.R;
-
-				camera = Fmatrix(hi->m_item_transform).mulB_43(m);
-				if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(eyepieceLens.radius, eyepieceLens.radius, 0.0)), 0xff0000ff, true);
-				return true;
+				lens.transform.mulB_43(hi->m_model->LL_GetTransform_R(lens.bone_id));
+				lens.transform.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
+				lens.radius = dvis.sphere.R;
 			}
-		}
+		};
 
-		camera = Fmatrix(hi->m_item_transform).mulB_43(eyepieceLens.transform);
-		auto cm = 0.01f;
-		auto mm = cm * .1;
-		camera.mulB_43(Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm }));
-		auto r = scope_objective_lens_offset.w * mm * 0.5;
+		auto objective_lens_from_offset = [this, model, hi]() -> void {
+			auto cm = 0.01f;
+			auto offset = Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm });
+			auto r = scope_objective_lens_offset.w * cm * 0.5;
 
-		if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
+			objectiveLens.transform.mul(eyepieceLens.transform, offset);
+			objectiveLens.radius = r;
+		};
+
+		update_lens(eyepieceLens);
+		if (objectiveLens.bone_id == BI_NONE) objective_lens_from_offset();
+		else update_lens(objectiveLens);		
+
+		if (scope_debug >= 2) {
+			draw_lens(eyepieceLens, 0xff0000ff);
+			draw_lens(objectiveLens, objectiveLens.bone_id == BI_NONE ? 0xffff0000 : 0xff00ff00);
+		}	
+
+		camera.mulB_43(objectiveLens.transform);
 		return true;
 	}
+
+	return false;
 }
 
 Fmatrix CWeapon::RayTransform()
