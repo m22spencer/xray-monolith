@@ -1142,7 +1142,7 @@ bool CActor::scopeCameraMatrix(Fmatrix& camera)
 
 
 					camera = Fmatrix(hi->m_item_transform).mulB_43(m);
-					CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(dvis.sphere.R, dvis.sphere.R, 0.0)), 0xff0000ff, true);
+					if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(dvis.sphere.R, dvis.sphere.R, 0.0)), 0xff0000ff, true);
 					return true;
 				}
 			}
@@ -1153,7 +1153,7 @@ bool CActor::scopeCameraMatrix(Fmatrix& camera)
 			camera.mulB_43(Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm }));
 			auto r = scope_objective_lens_offset.w * mm * 0.5;
 
-			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
+			if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
 			return true;
 		}
 	}
