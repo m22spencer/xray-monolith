@@ -162,14 +162,27 @@ void CLevel::IR_OnKeyboardPress(int key)
 	if (Device.dwPrecacheFrame)
 		return;
 
-#ifdef INGAME_EDITOR
-    if (Device.editor() && (pInput->iGetAsyncKeyState(DIK_LALT) || pInput->iGetAsyncKeyState(DIK_RALT)))
-        return;
-#endif // #ifdef INGAME_EDITOR
-
 	bool b_ui_exist = (!!CurrentGameUI());
 
 	EGameActions _curr = get_binded_action(key);
+
+    if (_curr == kEDITOR)
+    {
+        if (!Device.imgui_shown())
+        {
+            Device.imgui().Show();
+            return;
+        }
+
+        if (!Device.imgui().is_input())
+        {
+            Device.imgui().EnableInput();
+            return;
+        }
+
+        Device.imgui().Show(false);
+        return;
+    }
 
     luabind::functor<bool> funct;
     if (ai().script_engine().functor("level_input.on_key_press", funct))

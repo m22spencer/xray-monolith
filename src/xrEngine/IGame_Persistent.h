@@ -137,6 +137,7 @@ public:
 	virtual void OnAppActivate();
 	virtual void OnAppDeactivate();
 	virtual void _BCL OnFrame();
+	virtual void ImGui_OnRender(LPCSTR name) {};
 
 	// вызывается только когда изменяется тип игры
 	virtual void OnGameStart();

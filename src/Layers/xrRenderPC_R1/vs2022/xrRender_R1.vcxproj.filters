@@ -154,6 +154,9 @@
     <Filter Include="Models\Visuals">
       <UniqueIdentifier>{b4233fe2-78dd-48d9-94ff-620753340597}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfase implementations\ImGuiRender">
+      <UniqueIdentifier>{f8521162-1e1f-4664-b40f-63d88376389a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\xrRender\cl_intersect.h">
@@ -612,6 +615,12 @@
     <ClInclude Include="..\..\..\Include\R_light.h">
       <Filter>Lights</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\xrRender\dxImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\stdafx.cpp">
@@ -1015,6 +1024,9 @@
     </ClCompile>
     <ClCompile Include="..\..\xrRender\ParticleEffectActions.cpp">
       <Filter>Models\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

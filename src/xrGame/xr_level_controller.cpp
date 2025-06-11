@@ -117,6 +117,7 @@ _action actions[] = {
 	{"safemode", kSAFEMODE, _both},
 	{"freelook", kFREELOOK, _both},
 	{"cam_autoaim", kCAM_AUTOAIM, _sp},
+	{"editor", kEDITOR, _both},
 	{NULL, kLASTACTION, _both}
 };
 
@@ -564,6 +565,7 @@ public:
 		string_path cmd;
 		FS.update_path(_cfg, "$game_config$", "default_controls.ltx");
 		strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+		Console->Execute("bind editor kF11"); //Lucy : ImGui default key
 		Console->Execute(cmd);
 	}
 };

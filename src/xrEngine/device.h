@@ -25,6 +25,7 @@
 
 #include "../Include/xrRender/FactoryPtr.h"
 #include "../Include/xrRender/RenderDeviceRender.h"
+#include "imgui_base.h"
 
 #ifdef INGAME_EDITOR
 # include "../Include/editor/interfaces.hpp"
@@ -438,6 +439,13 @@ private:
 	virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
 	virtual void _BCL RemoveSeqFrame(pureFrame* f);
 	virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
+
+private:
+	xr_imgui::ide m_imgui;
+
+public:
+	xr_imgui::ide& imgui() { return m_imgui; }
+	bool imgui_shown() const { return m_imgui.is_shown(); }
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }

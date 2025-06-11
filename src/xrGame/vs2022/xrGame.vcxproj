@@ -1441,6 +1441,8 @@
     <ClInclude Include="..\screenshot_manager.h" />
     <ClInclude Include="..\screenshot_server.h" />
     <ClInclude Include="..\script_attachment_manager.h" />
+    <ClInclude Include="..\script_imgui.h" />
+    <ClInclude Include="..\script_imgui_inline.h" />
     <ClInclude Include="..\script_light_inline.h" />
     <ClInclude Include="..\ScriptXMLInit.h" />
     <ClInclude Include="..\script_abstract_action.h" />
@@ -2906,6 +2908,10 @@
     <ClCompile Include="..\ik_foot_collider.cpp" />
     <ClCompile Include="..\ik_limb_state.cpp" />
     <ClCompile Include="..\ik_object_shift.cpp" />
+    <ClCompile Include="..\script_imgui_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="..\imotion_position.cpp" />
     <ClCompile Include="..\imotion_velocity.cpp" />
     <ClCompile Include="..\InfoDocument.cpp" />

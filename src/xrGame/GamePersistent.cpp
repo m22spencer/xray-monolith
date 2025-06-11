@@ -775,6 +775,17 @@ void CGamePersistent::OnFrame()
 	UpdateDof();
 }
 
+void CGamePersistent::ImGui_OnRender(LPCSTR name)
+{
+	if (!g_pGameLevel || !g_pGameLevel->bReady) return;
+
+	luabind::functor<void> imgui_render;
+	if (ai().script_engine().functor("callbacks_gameobject.on_imgui_render", imgui_render))
+	{
+		imgui_render(name);
+	}
+}
+
 #include "game_sv_single.h"
 #include "xrServer.h"
 #include "UIGameCustom.h"
