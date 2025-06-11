@@ -1116,47 +1116,11 @@ float CActor::currentFOV(bool wantSVPFov = false)
 #pragma optimize("", off)
 bool CActor::scopeCameraMatrix(Fmatrix& camera)
 {
-	static Fmatrix cached = Fmatrix().identity();
-
 	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
 	if (pWeapon) {
-		auto hi = pWeapon->HudItemData();
-		if (hi) {
-
-			camera = hi->m_item_transform;
-
-			auto model = hi->m_model;
-			auto lens = model ? model->LL_BoneID("lens") : 0;
-			if (lens) {
-				Fmatrix m;
-				auto vis = model->GetVisualByBone("lens");
-				if (vis && model->LL_GetBoneVisible(lens)) {  
-					// The render matrices should be valid
-					Fmatrix m = Fmatrix().identity();
-					auto dvis = vis->getVisData();
-					m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
-					m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
-					cached.set(m);
-
-					
-
-
-					camera = Fmatrix(hi->m_item_transform).mulB_43(m);
-					if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(dvis.sphere.R, dvis.sphere.R, 0.0)), 0xff0000ff, true);
-					return true;
-				}
-			}
-
-			camera = Fmatrix(hi->m_item_transform).mulB_43(cached);
-			auto cm = 0.01f;
-			auto mm = cm * .1;
-			camera.mulB_43(Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm }));
-			auto r = scope_objective_lens_offset.w * mm * 0.5;
-
-			if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
-			return true;
-		}
+		return pWeapon->GetSVPCameraMatrix(camera);
 	}
+	camera = Device.mInvView;
 	return false;
 }
 #pragma optimize("", on)

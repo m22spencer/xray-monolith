@@ -3235,6 +3235,47 @@ void CWeapon::UpdateSecondVP()
 		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
+bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
+{
+	static Fmatrix cached = Fmatrix().identity();
+	
+	auto hi = HudItemData();
+	if (hi) {
+
+		camera = hi->m_item_transform;
+
+		auto model = hi->m_model;
+		auto lens = model ? model->LL_BoneID("lens") : 0;
+		if (lens) {
+			Fmatrix m;
+			auto vis = model->GetVisualByBone("lens");
+			if (vis && model->LL_GetBoneVisible(lens)) {
+				// The render matrices should be valid
+				Fmatrix m = Fmatrix().identity();
+				auto dvis = vis->getVisData();
+				m.mulB_43(hi->m_model->LL_GetTransform_R(lens));
+				m.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
+
+				eyepieceLens.transform.set(m);
+				eyepieceLens.radius = dvis.sphere.R;
+
+				camera = Fmatrix(hi->m_item_transform).mulB_43(m);
+				if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(eyepieceLens.radius, eyepieceLens.radius, 0.0)), 0xff0000ff, true);
+				return true;
+			}
+		}
+
+		camera = Fmatrix(hi->m_item_transform).mulB_43(eyepieceLens.transform);
+		auto cm = 0.01f;
+		auto mm = cm * .1;
+		camera.mulB_43(Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm }));
+		auto r = scope_objective_lens_offset.w * mm * 0.5;
+
+		if (scope_debug) CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(Fmatrix().scale(r, r, 0.0)), 0xff0000ff, true);
+		return true;
+	}
+}
+
 Fmatrix CWeapon::RayTransform()
 {
 	attachable_hud_item* hi = HudItemData();
