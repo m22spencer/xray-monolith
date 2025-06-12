@@ -122,6 +122,7 @@ public:
 	virtual void HUD_VisualBulletUpdate(bool force = false, int force_idx = -1);
 
 	void UpdateSecondVP();
+	void SetLensBones(LPCSTR eyepiece, LPCSTR objective);
 	bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera);
 
 	virtual void UpdateCL();

@@ -3238,6 +3238,15 @@ void CWeapon::UpdateSecondVP()
 		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
+void CWeapon::SetLensBones(LPCSTR eyepiece, LPCSTR objective) {
+	auto hi = HudItemData();
+	auto model = hi ? hi->m_model : NULL;
+	if (hi && model) {
+		eyepieceLens.bone_id = eyepiece ? model->LL_BoneID(eyepiece) : BI_NONE;
+		objectiveLens.bone_id = objective ? model->LL_BoneID(objective) : BI_NONE;
+	}
+}
+
 #pragma optimize("", off)
 bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 {
@@ -3245,9 +3254,6 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 	auto model = hi ? hi->m_model : NULL;
 	if (hi && model) {
 		camera.set(hi->m_item_transform);
-
-		eyepieceLens.bone_id = model->LL_BoneID("lens");
-		objectiveLens.bone_id = model->LL_BoneID("objective_lens");
 
 		auto draw_lens = [camera](Lens lens, u32 color) -> void {
 			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(lens.transform).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
