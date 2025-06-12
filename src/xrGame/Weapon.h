@@ -99,7 +99,7 @@ public:
 	struct Lens { 
 		Fmatrix transform = Fmatrix().identity();
 		float radius = 0.0;
-		u16 bone_id = BI_NONE;
+		IRenderVisual* visual = NULL;
 	};
 
 	Lens eyepieceLens;
@@ -122,7 +122,7 @@ public:
 	virtual void HUD_VisualBulletUpdate(bool force = false, int force_idx = -1);
 
 	void UpdateSecondVP();
-	void SetLensBones(LPCSTR eyepiece, LPCSTR objective);
+	void SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective);
 	bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera);
 
 	virtual void UpdateCL();

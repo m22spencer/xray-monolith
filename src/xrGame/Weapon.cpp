@@ -3238,12 +3238,33 @@ void CWeapon::UpdateSecondVP()
 		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
-void CWeapon::SetLensBones(LPCSTR eyepiece, LPCSTR objective) {
+void CWeapon::SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective) {
 	auto hi = HudItemData();
 	auto model = hi ? hi->m_model : NULL;
 	if (hi && model) {
-		eyepieceLens.bone_id = eyepiece ? model->LL_BoneID(eyepiece) : BI_NONE;
-		objectiveLens.bone_id = objective ? model->LL_BoneID(objective) : BI_NONE;
+		auto find_shader = [model, hi](LPCSTR name) -> IRenderVisual* {
+			if (!name)
+				return NULL;
+
+			auto r = model->dcast_RenderVisual();
+
+			if (r) {
+				auto children = r->get_children();
+
+				for (auto* child : *children)
+				{
+					auto shader = child->getDebugShaderDef();
+					if (xr_strcmp(shader, name) == 0) {
+						return child;
+					}
+				}
+			}
+
+			return NULL;
+		};
+
+		eyepieceLens.visual = find_shader(eyepiece);
+		objectiveLens.visual = find_shader(objective);
 	}
 }
 
@@ -3254,19 +3275,20 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 	if (hi && model) {
 		camera.set(hi->m_item_transform);
 
+		SetLensShaderNames("models\\scope_reticle", NULL);
+		
 		auto draw_lens = [camera](Lens lens, u32 color) -> void {
 			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(lens.transform).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
 		};
 
 		auto update_lens = [model, hi](Lens& lens) -> void {
-			if (lens.bone_id != BI_NONE && model->LL_GetBoneVisible(lens.bone_id)) {
+			if (lens.visual) {
 				// We bypass all the offsets, and animations and everything else.
 				//   pull the occlusion culling bounds directly from the render data.
-				auto vis = model->GetVisualByBone(lens.bone_id);
+				auto vis = lens.visual;
 				if (vis) {
 					auto dvis = vis->getVisData();
-					lens.transform.mul(hi->m_model->LL_GetTransform_R(lens.bone_id)
-						, Fmatrix().translate(dvis.sphere.P));
+					lens.transform.mul(hi->m_model->LL_GetTransform_R(0), Fmatrix().translate(dvis.sphere.P));
 					lens.radius = dvis.sphere.R;
 				}
 			}
@@ -3274,7 +3296,7 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 
 		// No ogf files contain an objective lens bone, so we need an alternative
 		auto objective_lens_from_offset = [this, model, hi]() -> void {
-			if (eyepieceLens.bone_id == BI_NONE)
+			if (!eyepieceLens.visual)
 				return;
 
 			// Many guns have had their mesh directly scaled, so the only reliable unit of
@@ -3289,12 +3311,12 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		};
 
 		update_lens(eyepieceLens);
-		if (objectiveLens.bone_id == BI_NONE) objective_lens_from_offset();
+		if (!objectiveLens.visual) objective_lens_from_offset();
 		else update_lens(objectiveLens);		
 
 		if (scope_debug >= 2) {
-			draw_lens(eyepieceLens, eyepieceLens.bone_id == BI_NONE ? 0xffff0000 : 0xff0000ff);
-			draw_lens(objectiveLens, objectiveLens.bone_id == BI_NONE ? 0xffffff00 : 0xff00ff00);
+			draw_lens(eyepieceLens, eyepieceLens.visual  ? 0xff0000ff : 0xffff0000);
+			draw_lens(objectiveLens, objectiveLens.visual ? 0xff00ff00 : 0xffffff00);
 		}	
 
 		// If we could not find the eyepiece lens, we have to disable SVP camera.
