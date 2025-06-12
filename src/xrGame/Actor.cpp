@@ -1113,7 +1113,6 @@ float CActor::currentFOV(bool wantSVPFov = false)
 	}
 }
 
-#pragma optimize("", off)
 bool CActor::scopeCameraMatrix(Fmatrix& camera)
 {
 	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
@@ -1123,7 +1122,6 @@ bool CActor::scopeCameraMatrix(Fmatrix& camera)
 	camera = Device.mInvView;
 	return false;
 }
-#pragma optimize("", on)
 
 #include "UI\UIInventoryUtilities.h"
 

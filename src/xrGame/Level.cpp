@@ -833,7 +833,6 @@ void EnsureDeviceState(std::function<void()> f)
 	SetMatrices(old_cam, old_proj, old_proj_hud);
 }
 
-#pragma optimize("", off)
 void CLevel::RenderSecondViewport()
 {
 	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
@@ -859,7 +858,6 @@ void CLevel::RenderSecondViewport()
 		BulletManager().Render();
 	});
 }
-#pragma optimize("", on)
 
 void CLevel::OnRender()
 {
