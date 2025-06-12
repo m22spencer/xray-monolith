@@ -1383,7 +1383,7 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
 bool CWeapon::need_renderable()
 {
-	return scope_svp_enabled > 1 || !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+	return (scope_svp_enabled > 1 && objectiveLens.radius > EPS) || !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
 }
 
 void CWeapon::renderable_Render()
@@ -3235,6 +3235,7 @@ void CWeapon::UpdateSecondVP()
 		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
+#pragma optimize("", off)
 bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 {
 	auto hi = HudItemData();
@@ -3256,15 +3257,18 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 				lens.transform.identity();
 				auto dvis = vis->getVisData();
 				lens.transform.mulB_43(hi->m_model->LL_GetTransform_R(lens.bone_id));
-				lens.transform.mulB_43(Fmatrix().identity().translate(dvis.sphere.P));
+				lens.transform.mulB_43(Fmatrix().translate(dvis.sphere.P));
 				lens.radius = dvis.sphere.R;
 			}
 		};
 
 		auto objective_lens_from_offset = [this, model, hi]() -> void {
 			auto cm = 0.01f;
-			auto offset = Fmatrix().translate({ scope_objective_lens_offset.x * cm, scope_objective_lens_offset.y * cm, scope_objective_lens_offset.z * cm });
-			auto r = scope_objective_lens_offset.w * cm * 0.5;
+
+			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(cm);
+
+			auto offset = Fmatrix().translate({ o.x, o.y, o.z });
+			auto r = o.w * cm * 0.5;
 
 			objectiveLens.transform.mul(eyepieceLens.transform, offset);
 			objectiveLens.radius = r;
@@ -3275,8 +3279,8 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		else update_lens(objectiveLens);		
 
 		if (scope_debug >= 2) {
-			draw_lens(eyepieceLens, 0xff0000ff);
-			draw_lens(objectiveLens, objectiveLens.bone_id == BI_NONE ? 0xffff0000 : 0xff00ff00);
+			draw_lens(eyepieceLens, eyepieceLens.bone_id == BI_NONE ? 0xffff0000 : 0xff0000ff);
+			draw_lens(objectiveLens, objectiveLens.bone_id == BI_NONE ? 0xffffff00 : 0xff00ff00);
 		}	
 
 		camera.mulB_43(objectiveLens.transform);
@@ -3285,6 +3289,7 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 
 	return false;
 }
+#pragma optimize("", on)
 
 Fmatrix CWeapon::RayTransform()
 {

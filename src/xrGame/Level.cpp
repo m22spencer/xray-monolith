@@ -840,7 +840,7 @@ void CLevel::RenderSecondViewport()
 	float _, fov, fNearPlane, fFarPlane;
 	Device.mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
-	Fmatrix scope_camera = Device.mInvView;
+	Fmatrix scope_camera = Fmatrix(Device.mInvView);
 	if (Actor()->scopeCameraMatrix(scope_camera)) {
 		auto cm = 0.01f;
 		auto r = fov / deg2rad(svp_fov) * 2.0 * cm;
