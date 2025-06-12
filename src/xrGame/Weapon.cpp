@@ -1383,7 +1383,10 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
 bool CWeapon::need_renderable()
 {
-	return (scope_svp_enabled > 1 && objectiveLens.radius > EPS) || !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+	bool svp_has_objective_lens = (scope_svp_enabled > 1 && objectiveLens.radius > EPS);
+	bool not_in_scope = !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+
+	return svp_has_objective_lens || not_in_scope;
 }
 
 void CWeapon::renderable_Render()
@@ -3251,24 +3254,27 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		};
 
 		auto update_lens = [model, hi](Lens& lens) -> void {
-			if (lens.bone_id && model->LL_GetBoneVisible(lens.bone_id)) {
+			if (lens.bone_id != BI_NONE && model->LL_GetBoneVisible(lens.bone_id)) {
 				// The render matrices should be valid
 				auto vis = model->GetVisualByBone(lens.bone_id);
-				lens.transform.identity();
-				auto dvis = vis->getVisData();
-				lens.transform.mulB_43(hi->m_model->LL_GetTransform_R(lens.bone_id));
-				lens.transform.mulB_43(Fmatrix().translate(dvis.sphere.P));
-				lens.radius = dvis.sphere.R;
+				if (vis) {
+					auto dvis = vis->getVisData();
+					lens.transform.mul(hi->m_model->LL_GetTransform_R(lens.bone_id)
+						, Fmatrix().translate(dvis.sphere.P));
+					lens.radius = dvis.sphere.R;
+				}
 			}
 		};
 
 		auto objective_lens_from_offset = [this, model, hi]() -> void {
+			if (eyepieceLens.bone_id == BI_NONE)
+				return;
 			auto cm = 0.01f;
 
 			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(cm);
 
 			auto offset = Fmatrix().translate({ o.x, o.y, o.z });
-			auto r = o.w * cm * 0.5;
+			auto r = o.w * 0.5;
 
 			objectiveLens.transform.mul(eyepieceLens.transform, offset);
 			objectiveLens.radius = r;
