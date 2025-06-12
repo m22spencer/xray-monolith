@@ -3234,7 +3234,7 @@ void CWeapon::UpdateSecondVP()
 		return;
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
-	Device.m_SecondViewport.SetSVPActive( (scope_debug && scope_svp_enabled) 
+	Device.m_SecondViewport.SetSVPActive( (scope_debug && scope_svp_enabled && IsSecondVPZoomPresent()) 
 		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
@@ -3297,7 +3297,13 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 			draw_lens(objectiveLens, objectiveLens.bone_id == BI_NONE ? 0xffffff00 : 0xff00ff00);
 		}	
 
-		camera.mulB_43(objectiveLens.transform);
+		// If we could not find the eyepiece lens, we have to disable SVP camera.
+		if (eyepieceLens.radius < EPS)
+			return false;
+
+		// Prefer the objective lens, but if not found use the eyepiece, without weapon in scope
+		auto attachToLens = objectiveLens.radius < EPS ? eyepieceLens : objectiveLens;
+		camera.mulB_43(attachToLens.transform);
 		return true;
 	}
 

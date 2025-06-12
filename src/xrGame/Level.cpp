@@ -841,7 +841,8 @@ void CLevel::RenderSecondViewport()
 	Device.mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
 	Fmatrix scope_camera = Fmatrix(Device.mInvView);
-	if (Actor()->scopeCameraMatrix(scope_camera)) {
+	if (!Actor()->scopeCameraMatrix(scope_camera)) {
+		scope_camera = Fmatrix(Device.mInvView);
 	}
 
 	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
