@@ -180,7 +180,12 @@ extern ECORE_API int ps_r2_nightvision;
 extern ECORE_API int scope_fake_enabled; //crookr
 extern ECORE_API int scope_3D_fake_enabled; // Redotix99: for 3D Shader Based Scopes
 extern ECORE_API int scope_svp_enabled;		// Second Viewport scopes
-extern ECORE_API Fvector4 scope_objective_lens_offset;  // Offset of objective lens from eyepiece lens in cm with w representing radius
+
+// Offset of objective lens from eyepiece lens with w representing radius
+//   the units are based off the eyepiece dimensions from HOM
+//   which allows us to support scaling
+extern ECORE_API Fvector4 scope_objective_lens_offset;  
+
 extern ECORE_API int scope_debug;		    
 extern ECORE_API int ps_r2_heatvision;			//--DSR-- HeatVision
 extern ECORE_API int heat_vision_cooldown;		//--DSR-- HeatVision

@@ -3247,7 +3247,6 @@ void CWeapon::SetLensBones(LPCSTR eyepiece, LPCSTR objective) {
 	}
 }
 
-#pragma optimize("", off)
 bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 {
 	auto hi = HudItemData();
@@ -3261,7 +3260,8 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 
 		auto update_lens = [model, hi](Lens& lens) -> void {
 			if (lens.bone_id != BI_NONE && model->LL_GetBoneVisible(lens.bone_id)) {
-				// The render matrices should be valid
+				// We bypass all the offsets, and animations and everything else.
+				//   pull the occlusion culling bounds directly from the render data.
 				auto vis = model->GetVisualByBone(lens.bone_id);
 				if (vis) {
 					auto dvis = vis->getVisData();
@@ -3272,15 +3272,17 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 			}
 		};
 
+		// No ogf files contain an objective lens bone, so we need an alternative
 		auto objective_lens_from_offset = [this, model, hi]() -> void {
 			if (eyepieceLens.bone_id == BI_NONE)
 				return;
-			auto cm = 0.01f;
 
-			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(cm);
+			// Many guns have had their mesh directly scaled, so the only reliable unit of
+			//    measurement is based off the only reliable mesh in the file. The lens.
+			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(eyepieceLens.radius);
 
 			auto offset = Fmatrix().translate({ o.x, o.y, o.z });
-			auto r = o.w * 0.5;
+			auto r = o.w;
 
 			objectiveLens.transform.mul(eyepieceLens.transform, offset);
 			objectiveLens.radius = r;
@@ -3301,7 +3303,6 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 
 	return false;
 }
-#pragma optimize("", on)
 
 Fmatrix CWeapon::RayTransform()
 {
