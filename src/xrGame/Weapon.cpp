@@ -3190,7 +3190,7 @@ void CWeapon::ZoomDec()
 
 	clamp(f, m_zoom_params.m_fScopeZoomFactor * power, min_zoom_factor);
 	SetZoomFactor(f / power);
-	
+
 	m_fRTZoomFactor = GetZoomFactor() * power;
 }
 
@@ -3234,8 +3234,8 @@ void CWeapon::UpdateSecondVP()
 		return;
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
-	Device.m_SecondViewport.SetSVPActive( (scope_debug && scope_svp_enabled && IsSecondVPZoomPresent()) 
-		                               || (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
+	Device.m_SecondViewport.SetSVPActive((scope_debug && scope_svp_enabled && IsSecondVPZoomPresent())
+		|| (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
 }
 
 void CWeapon::SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective) {
@@ -3261,7 +3261,7 @@ void CWeapon::SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective) {
 			}
 
 			return NULL;
-		};
+			};
 
 		eyepieceLens.visual = find_shader(eyepiece);
 		objectiveLens.visual = find_shader(objective);
@@ -3275,10 +3275,64 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 	if (hi && model) {
 		camera.set(hi->m_item_transform);
 
-		SetLensShaderNames("models\\scope_reticle", NULL);
-		
-		auto draw_lens = [camera](Lens lens, u32 color) -> void {
-			CDebugRenderer().draw_ellipse(Fmatrix(camera).mulB_43(lens.transform).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
+		auto m_measures = hi->m_measures;
+
+		SetLensShaderNames("models\\scope_reticle", "models\\scope_objective_lens");
+
+		auto draw_circle = [](Fmatrix m, u32 color, bool bHud) -> void {
+			int n = 100;
+			Fvector v0, s;
+			for (int i = 0; i < n+1; i++) {
+				float angle = float(i) / float(n) * PI * 2.0;
+
+				Fvector v1 = { cos(angle), sin(angle), .0f };
+				m.transform(v1);
+				if (i > 0) CDebugRenderer().draw_line({}, v0, v1, color, bHud);
+				v0 = v1;
+			}
+		};
+
+		auto draw_lens = [camera, draw_circle](Lens lens, u32 color) -> void {
+			auto lens_t = Fmatrix(camera).mulB_43(lens.transform);
+			draw_circle(Fmatrix(lens_t).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector v1 = { 0, 0, 100 };
+			lens_t.transform(v0);
+			lens_t.transform(v1);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v0, v1, color, true);
+		};
+
+		auto draw_scope_ray = [camera, m_measures, this](u32 color) -> void {
+			auto lens_eye = Fmatrix(camera).mulB_43(eyepieceLens.transform);
+			auto lens_obj = Fmatrix(camera).mulB_43(objectiveLens.transform);
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector v1 = Fvector(v0);
+			
+			lens_eye.transform(v0);
+			lens_obj.transform(v1);
+
+			Fvector d = Fvector(v1).sub(v0).normalize().mul(100);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v1, Fvector(v1).add(d), color, true);
+		};
+
+		auto draw_fire_direction = [hi](u32 color) -> void {
+			hud_item_measures& measures = hi->m_measures;
+
+			Fmatrix matrix = Fmatrix(hi->m_item_transform);
+			matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
+			matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector f = { 0, 0, 1 };
+
+			matrix.transform(v0);
+			hi->m_item_transform.transform_dir(f);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v0, f.mul(100).add(v0), color, true);
 		};
 
 		auto update_lens = [model, hi](Lens& lens) -> void {
@@ -3306,7 +3360,8 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 			auto offset = Fmatrix().translate({ o.x, o.y, o.z });
 			auto r = o.w;
 
-			objectiveLens.transform.mul(eyepieceLens.transform, offset);
+			// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
+			objectiveLens.transform.mul(offset, eyepieceLens.transform);
 			objectiveLens.radius = r;
 		};
 
@@ -3317,6 +3372,8 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		if (scope_debug >= 2) {
 			draw_lens(eyepieceLens, eyepieceLens.visual  ? 0xff0000ff : 0xffff0000);
 			draw_lens(objectiveLens, objectiveLens.visual ? 0xff00ff00 : 0xffffff00);
+			draw_fire_direction(0xffff0000);
+			draw_scope_ray(0xff00ffff);
 		}	
 
 		// If we could not find the eyepiece lens, we have to disable SVP camera.
