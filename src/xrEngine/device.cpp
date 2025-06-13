@@ -181,7 +181,8 @@ void mt_Thread(void* ptr)
 		for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
 			device.seqParallel[pit]();
 		device.seqParallel.clear_not_free();
-		device.seqFrameMT.Process(rp_Frame);
+		if (!Device.m_SecondViewport.IsSVPActive())
+			device.seqFrameMT.Process(rp_Frame);
 
 		// now we give control to device - signals that we are ended our work
 		device.mt_csEnter.Leave();
@@ -418,7 +419,9 @@ void CRenderDevice::on_idle()
 		for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
 			Device.seqParallel[pit]();
 		Device.seqParallel.clear_not_free();
-		seqFrameMT.Process(rp_Frame);
+
+		if (!Device.m_SecondViewport.IsSVPActive())
+			seqFrameMT.Process(rp_Frame);
 	}
 
 #ifdef DEDICATED_SERVER
@@ -552,6 +555,8 @@ void CRenderDevice::FrameMove()
 	// TODO: HACK to test loading screen.
 	//if(!g_bLoaded)
 	Device.seqFrame.Process(rp_Frame);
+	if (Device.m_SecondViewport.IsSVPActive())
+		seqFrameMT.Process(rp_Frame);
 	g_bLoaded = TRUE;
 	//else
 	// seqFrame.Process(rp_Frame);
