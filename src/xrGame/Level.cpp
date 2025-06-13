@@ -854,8 +854,6 @@ void CLevel::RenderSecondViewport()
 		SetMatrices(scope_camera, svp_proj, svp_proj_hud);
 
 		inherited::OnRender();
-		Game().OnRender();
-		BulletManager().Render();
 	});
 }
 
