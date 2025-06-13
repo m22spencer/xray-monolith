@@ -143,6 +143,8 @@ namespace xr_imgui
 
     void ide::OnFrame()
     {
+        if (!!!Device.b_is_Active) return;
+
         const float frametime = m_timer.GetElapsed_sec();
         m_timer.Start();
 
@@ -249,9 +251,7 @@ namespace xr_imgui
             ImGui::DockSpace(ImGui::GetID("DockSpace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         }
         ImGui::End();
-        ImGui::PopStyleVar();
-        ImGui::PopStyleVar();
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(3);
     }
 
     void ide::Show(bool bShow)

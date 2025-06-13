@@ -19,6 +19,13 @@
 //#define IM_ASSERT(_EXPR)  MyAssert(_EXPR)
 //#define IM_ASSERT(_EXPR)  ((void)(_EXPR))     // Disable asserts
 
+// Print ImGui errors to console on verified build
+#ifdef USE_VERIFY_IN_RELEASE
+#pragma comment(lib, "xrCore.lib")
+extern void Msg(const char* format, ...);
+#define IM_ASSERT(_EXPR) do {if (!(_EXPR)) Msg("![ImGui Error] %s", #_EXPR);} while(0)
+#endif
+
 //---- Define attributes of all API symbols declarations, e.g. for DLL under Windows
 // Using Dear ImGui via a shared library is not recommended, because of function call overhead and because we don't guarantee backward nor forward ABI compatibility.
 // - Windows DLL users: heaps and globals are not shared across DLL boundaries! You will need to call SetCurrentContext() + SetAllocatorFunctions()
@@ -56,8 +63,8 @@
 
 //---- Include imgui_user.h at the end of imgui.h as a convenience
 // May be convenient for some users to only explicitly include vanilla imgui.h and have extra stuff included.
-//#define IMGUI_INCLUDE_IMGUI_USER_H
-//#define IMGUI_USER_H_FILENAME         "my_folder/my_imgui_user.h"
+#define IMGUI_INCLUDE_IMGUI_USER_H
+#define IMGUI_USER_H_FILENAME         "imgui_custom.h"
 
 //---- Pack vertex colors as BGRA8 instead of RGBA8 (to avoid converting from one to another). Need dedicated backend support.
 //#define IMGUI_USE_BGRA_PACKED_COLOR

@@ -64,22 +64,25 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;USE_VERIFY_IN_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)3rd party\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
