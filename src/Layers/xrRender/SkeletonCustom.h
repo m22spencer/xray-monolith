@@ -140,6 +140,7 @@ protected:
 	BOOL Update_Visibility;
 	u32 UCalc_Time;
 	s32 UCalc_Visibox;
+	bool UCalc_ThisFrame;
 
 	Flags64 visimask;
 	Flags64 hidden_bones;
@@ -290,6 +291,8 @@ public:
 
 	virtual UpdateCallback GetUpdateCallback() { return Update_Callback; }
 	virtual void* GetUpdateCallbackParam() { return Update_Callback_Param; }
+
+	virtual bool NeedUCalc() { return UCalc_ThisFrame; }
 
 	// debug
 #ifdef DEBUG

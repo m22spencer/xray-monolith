@@ -100,6 +100,9 @@ void script_attachment::script_register(lua_State* L)
 		.def("set_ui_rotation", (void (script_attachment::*)(Fvector)) &script_attachment::SetScriptUIRotation)
 		.def("set_ui_rotation", (void (script_attachment::*)(float, float, float)) &script_attachment::SetScriptUIRotation)
 		.def("get_ui_rotation", &script_attachment::GetScriptUIRotation)
+		.def("set_ui_scale", (void (script_attachment::*)(Fvector2)) &script_attachment::SetScriptUIScale)
+		.def("set_ui_scale", (void (script_attachment::*)(float, float)) &script_attachment::SetScriptUIScale)
+		.def("get_ui_scale", &script_attachment::GetScriptUIScale)
 
 		//Script Light
 		.def("attach_light", &script_attachment::AttachLight)
@@ -114,5 +117,8 @@ void script_attachment::script_register(lua_State* L)
 		.def("get_default_shaders", &script_attachment::GetDefaultShaders)
 		.def("set_shader", &script_attachment::SetShaderTexture)
 		.def("reset_shader", &script_attachment::ResetShaderTexture)
+
+		//Userdata
+		.property("userdata", &script_attachment::GetUserdata, &script_attachment::SetUserdata)
 	];
 }
