@@ -14,8 +14,8 @@ u16 CPartition::part_id(const shared_str& name) const
 {
 	for (u16 i = 0; i < MAX_PARTS; ++i)
 	{
-		const CPartDef& pd = part(i);
-		if (pd.Name == name)
+		const CPartDef* pd = part(i);
+		if (pd && pd->Name == name)
 			return i;
 	}
 	Msg("!there is no part named [%s]", name.c_str());
@@ -44,21 +44,23 @@ void CPartition::load(IKinematics* V, LPCSTR model_name)
 		CInifile::Sect S = ini.r_section(buff);
 		CInifile::SectCIt it = S.Data.begin();
 		CInifile::SectCIt it_e = S.Data.end();
-		if (S.Data.size())
-		{
-			P[i].bones.clear_not_free();
-		}
+
+		if (!S.Data.size()) continue;
+
+		while (!P[i]) create();
+		P[i]->bones.clear_not_free();
+
 		for (; it != it_e; ++it)
 		{
 			const CInifile::Item& I = *it;
 			if (I.first == part_name)
 			{
-				P[i].Name = I.second;
+				P[i]->Name = I.second;
 			}
 			else
 			{
 				u32 bid = V->LL_BoneID(I.first.c_str());
-				P[i].bones.push_back(bid);
+				P[i]->bones.push_back(bid);
 			}
 		}
 	}
@@ -89,17 +91,17 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 		R_ASSERT3(vers <= xrOGF_SMParamsVersion, "Invalid OGF/OMF version:", N);
 
 		// partitions
-		u16 part_count;
-		part_count = MP->r_u16();
+		u16 part_count = MP->r_u16();
 
 		for (u16 part_i = 0; part_i < part_count; part_i++)
 		{
-			CPartDef& PART = m_partition[part_i];
+			CPartDef* PART = m_partition[part_i];
+			while (!PART) PART = m_partition.create();
 			MP->r_stringZ(buf, sizeof(buf));
-			PART.Name = _strlwr(buf);
-			PART.bones.resize(MP->r_u16());
+			PART->Name = _strlwr(buf);
+			PART->bones.resize(MP->r_u16());
 
-			for (xr_vector<u32>::iterator b_it = PART.bones.begin(); b_it < PART.bones.end(); b_it++)
+			for (xr_vector<u32>::iterator b_it = PART->bones.begin(); b_it < PART->bones.end(); b_it++)
 			{
 				MP->r_stringZ(buf, sizeof(buf));
 				u16 m_idx = u16(MP->r_u32());
@@ -121,7 +123,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 #endif
 				if (bRes) rm_bones[m_idx] = u16(*b_it);
 			}
-			part_bone_cnt = u16(part_bone_cnt + (u16)PART.bones.size());
+			part_bone_cnt = u16(part_bone_cnt + (u16)PART->bones.size());
 		}
 
 #ifdef _EDITOR
