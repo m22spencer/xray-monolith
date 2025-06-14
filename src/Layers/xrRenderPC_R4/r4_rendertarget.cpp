@@ -619,6 +619,7 @@ CRenderTarget::CRenderTarget()
 
 	s_fakescope.create(b_fakescope, "r2\\fakescope"); //crookr
 	s_scope_preprocess.create("scope_preprocess");
+	s_scope_debug.create("scope_debug");
 
 	s_heatvision.create(b_heatvision, "r2\\heatvision"); //--DSR-- HeatVision
 	s_lut.create(b_lut, "r2\\lut");

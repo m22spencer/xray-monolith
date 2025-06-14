@@ -843,10 +843,7 @@ void CRenderTarget::phase_scope_debug()
 
 		RCache.set_Geometry(g_combine);
 
-		static ref_shader scope_debug;
-		if (!scope_debug)
-			scope_debug.create("scope_debug");
-		RCache.set_Element(scope_debug->E[1]);
+		RCache.set_Element(s_scope_debug->E[1]);
 
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, triangles * 3, 0, triangles);
 	}
