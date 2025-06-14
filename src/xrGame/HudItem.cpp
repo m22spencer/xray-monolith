@@ -997,22 +997,26 @@ void CHudItem::g_fireParams(SPickParam& pp)
 {
 	// If we're in free-look mode, apply rotation offsets
 	const CActor* pActor = Actor();
-	if (pActor && pActor->cam_freelook != eflDisabled)
+	CWeapon* pWeapon = pActor ? smart_cast<CWeapon*>(pActor->inventory().ActiveItem()) : NULL;
+
+	Fmatrix svp_cam;
+	if (pWeapon && Device.m_SecondViewport.IsSVPActive() && Actor()->scopeCameraMatrix(svp_cam))
 	{
-		CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
-		if (pWeapon)
-		{
-			Fvector d = Fvector();
-			const Fmatrix& fire_mat = pWeapon->get_ParticlesXFORM();
-			float pitch = fire_mat.k.getP();
-			d.setHP(
-				-angle_normalize_signed(pActor->old_torso_yaw),
-				pitch > 0.f ? (
-					(pWeapon->GetState() == CWeapon::eFire || pActor->cam_freelook == eflDisabling)
-					? pitch : pitch * .6f
+		pp.defs.start = { 0, 0, 0 }; svp_cam.transform(pp.defs.start);
+		pp.defs.dir = { 0, 0, 1 }; svp_cam.transform_dir(pp.defs.dir);
+	}
+	if (pWeapon && pActor->cam_freelook != eflDisabled)
+	{
+		Fvector d = Fvector();
+		const Fmatrix& fire_mat = pWeapon->get_ParticlesXFORM();
+		float pitch = fire_mat.k.getP();
+		d.setHP(
+			-angle_normalize_signed(pActor->old_torso_yaw),
+			pitch > 0.f ? (
+				(pWeapon->GetState() == CWeapon::eFire || pActor->cam_freelook == eflDisabling)
+				? pitch : pitch * .6f
 				) : pitch * .8f);
-			pp.defs.dir = d;
-		}
+		pp.defs.dir = d;
 	}
 }
 
