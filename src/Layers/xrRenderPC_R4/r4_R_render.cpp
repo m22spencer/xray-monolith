@@ -280,7 +280,10 @@ void CRender::Render()
 	// Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
 	// HOM
-	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	// Always use the frustum from the main view
+	//    to prevent culling of some items.
+	if (!Device.m_SecondViewport.IsSVPFrame())
+		ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 	View = 0;
 	if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
 	{
