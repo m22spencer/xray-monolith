@@ -113,6 +113,7 @@ CKinematics::CKinematics()
 #endif
 
 	m_is_original_lod = false;
+	UCalc_ThisFrame = false;
 }
 
 CKinematics::~CKinematics()

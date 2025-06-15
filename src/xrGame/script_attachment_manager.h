@@ -60,6 +60,7 @@ private:
 	CUIWindow* m_script_ui;
 	Fmatrix m_script_ui_mat;
 	Fvector m_script_ui_offset[2];
+	Fvector2 m_script_ui_scale;
 	u16 m_script_ui_bone;
 
 	AttachmentScriptLight* m_script_light;
@@ -74,6 +75,8 @@ private:
 	xr_map<shared_str, script_attachment*> m_children;
 	xr_map<u16, script_attachment_bone_cb*> m_bone_callbacks;
 
+	::luabind::object* m_userdata;
+
 	u32 m_last_upd_frame;
 
 public:
@@ -84,6 +87,7 @@ public:
 		m_model = nullptr;
 		delete_data(m_children);
 		delete_data(m_bone_callbacks);
+		xr_delete(m_userdata);
 	}
 
 	void Render(IKinematics* model, Fmatrix* mat);
@@ -99,21 +103,21 @@ public:
 
 	void RecalcOffset();
 
-	void SetPosition(Fvector pos);
-	void SetPosition(float x, float y, float z) { SetPosition(Fvector().set(x, y, z)); }
+	void SetPosition(Fvector pos) { SetPosition(pos.x, pos.y, pos.z); }
+	void SetPosition(float x, float y, float z);
 	Fvector GetPosition() { return m_position; }
 
-	void SetRotation(Fvector rot);
-	void SetRotation(float x, float y, float z) { SetRotation(Fvector().set(x, y, z)); }
+	void SetRotation(Fvector rot) { SetRotation(rot.x, rot.y, rot.z); }
+	void SetRotation(float x, float y, float z);
 	Fvector GetRotation() { return m_rotation; }
 
-	void SetScale(Fvector scale);
-	void SetScale(float x, float y, float z) { SetScale(Fvector().set(x, y, z)); }
+	void SetScale(Fvector scale) { SetScale(scale.x, scale.y, scale.z); }
+	void SetScale(float x, float y, float z);
 	void SetScale(float scale) { SetScale(Fvector().set(scale, scale, scale)); }
 	Fvector GetScale() { return m_scale; }
 
-	void SetOrigin(Fvector org);
-	void SetOrigin(float x, float y, float z) { SetOrigin(Fvector().set(x, y, z)); }
+	void SetOrigin(Fvector org) { SetOrigin(org.x, org.y, org.z); }
+	void SetOrigin(float x, float y, float z);
 	Fvector GetOrigin() { return m_origin; }
 
 	void SetParent(script_attachment* att);
@@ -131,6 +135,9 @@ public:
 	void SetName(LPCSTR name);
 	LPCSTR GetName() { return *m_name; }
 
+	const ::luabind::object& GetUserdata() const;
+	void SetUserdata(::luabind::object obj);
+
 	void SetScriptUI(LPCSTR ui_func);
 	LPCSTR GetScriptUI() { return m_script_ui_func; }
 	void SetScriptUIPosition(Fvector pos);
@@ -142,6 +149,9 @@ public:
 	void SetScriptUIBone(u16 bone) { m_script_ui_bone = bone; }
 	void SetScriptUIBone(LPCSTR bone) { m_script_ui_bone = bone_id(bone); }
 	u16 GetScriptUIBone() { return m_script_ui_bone; }
+	void SetScriptUIScale(Fvector2 scale) { SetScriptUIScale(scale.x, scale.y); }
+	void SetScriptUIScale(float x, float y) { m_script_ui_scale.set(x, y); }
+	Fvector2 GetScriptUIScale() { return m_script_ui_scale; }
 
 	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
 	void RemoveAttachment(LPCSTR name) { RemoveChild(name, true); }
@@ -192,8 +202,11 @@ public:
 	void RemoveBoneCallback(u16 bone_id);
 	void RemoveBoneCallback(LPCSTR bone) { RemoveBoneCallback(bone_id(bone)); }
 
-	Fmatrix GetTransform() { return m_transform; };
+	Fmatrix GetTransform() { return m_transform; }
+	Fmatrix GetOffset() { return m_offset; }
 	Fvector GetCenter();
+	const Fbox& Box();
+	xr_map<shared_str, script_attachment*>* GetAttachments() { return &m_children; }
 
 	::luabind::object GetShaders();
 	::luabind::object GetDefaultShaders();

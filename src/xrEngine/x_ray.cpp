@@ -73,6 +73,9 @@ bool use_reshade = false;
 extern bool init_reshade();
 extern void unregister_reshade();
 
+//ImGui
+#pragma comment(lib, "imgui.lib")
+
 static LPSTR month_id[12] =
 {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

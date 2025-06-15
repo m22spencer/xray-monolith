@@ -117,6 +117,7 @@ _action actions[] = {
 	{"safemode", kSAFEMODE, _both},
 	{"freelook", kFREELOOK, _both},
 	{"cam_autoaim", kCAM_AUTOAIM, _sp},
+	{"editor", kEDITOR, _both},
 	{NULL, kLASTACTION, _both}
 };
 
@@ -269,11 +270,14 @@ _action* action_name_to_ptr(LPCSTR _name)
 	return NULL;
 }
 
-LPCSTR dik_to_keyname(int _dik)
+LPCSTR dik_to_keyname(int _dik, bool bLocalize)
 {
 	_keyboard* kb = dik_to_ptr(_dik, true);
 	if (kb)
-		return kb->key_name;
+		if (bLocalize)
+			return kb->key_local_name.c_str();
+		else
+			return kb->key_name;
 	else
 		return NULL;
 }
@@ -561,6 +565,7 @@ public:
 		string_path cmd;
 		FS.update_path(_cfg, "$game_config$", "default_controls.ltx");
 		strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+		Console->Execute("bind editor kF11"); //Lucy : ImGui default key
 		Console->Execute(cmd);
 	}
 };
@@ -668,7 +673,7 @@ void ConsoleBindCmds::save(IWriter* F)
 
 	for (; it != m_bindConsoleCmds.end(); ++it)
 	{
-		LPCSTR keyname = dik_to_keyname(it->first);
+		LPCSTR keyname = dik_to_keyname(it->first, false);
 		F->w_printf("bind_console %s %s\n", *it->second.cmd, keyname);
 	}
 }

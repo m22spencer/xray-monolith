@@ -25,7 +25,7 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
   * Install modded exes following the instructions above
 
 * Q: The game crashes on DX11 Fullscreen on Linux
-* A: You need to add `--dxgi-old` parameter into `commandline.txt` file or via making a shotcut to exe and adding argument there
+* A: You need to add `--dxgi-old` parameter into `commandline.txt` file or via making a shortcut to exe and adding argument there
 
 * Q: I have conflicts, crashes and bugs with shaders when i use Beef NVG, SSS, or Enhanced Shaders
 * A: If you are using those mods, install this package via MO2, and put it higher priority than those mods: https://github.com/deggua/xray-hdr10-shaders/releases/latest
@@ -46,7 +46,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
   * Attempting to override sections no longer crash the game, but prints the message into the log. All sections that triggers that error will be printed
   * Duplicate section errors now prints the root file where the error happened for easier checking mod_... ltxes
   * DLTX received possibility to create section if it doesn't exists and override section if it does with the same symbol `@`.
-  Below is the example for `newsection` that wasn't defined. Firstly its created with one param `override = false`, then its overriden with `override = true`
+  Below is the example for `newsection` that wasn't defined. Firstly its created with one param `override = false`, then its overridden with `override = true`
 
   ```
   @[newsection]
@@ -186,6 +186,18 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.15**
+* Lucy: Some more changes (https://github.com/themrdemonized/xray-monolith/pull/254)
+
+**2025.06.11**
+* Lucy: ImGui implementation with script support (https://github.com/themrdemonized/xray-monolith/pull/250)
+
+**2025.06.09**
+* NLTP_ASHES: Exported `_keyboard`'s `key_name` and `key_local_name` to Lua (https://github.com/themrdemonized/xray-monolith/pull/248)
+
+**2025.06.08**
+* NLTP_ASHES: Add `actor_on_death` callback (https://github.com/themrdemonized/xray-monolith/pull/244)
+
 **2025.06.05**
 * The engine will crash if override sound failed to be initialised in `_G.COnBeforePlayHudSound` callback
 * ProfLander: Fix black default crosshair (https://github.com/themrdemonized/xray-monolith/pull/242)

@@ -85,6 +85,7 @@ public:
 	//	Callback: data manipulation
 	virtual void SetUpdateCallback(UpdateCallback pCallback) = 0;
 	virtual void SetUpdateCallbackParam(void* pCallbackParam) = 0;
+	virtual bool NeedUCalc() = 0;
 
 	virtual UpdateCallback GetUpdateCallback() = 0;
 	virtual void* GetUpdateCallbackParam() = 0;

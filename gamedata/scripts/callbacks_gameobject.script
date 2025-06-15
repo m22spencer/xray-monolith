@@ -402,6 +402,21 @@ _G.COnBeforePlayHudSound = function(alias, parent)
 	end
 end
 
+-- NLTP_ASHES & demonized : Actor on death callback
+AddScriptCallback("actor_on_death")
+
+function actor_on_first_update()
+	db.actor:set_callback(callback.death, function()
+		SendScriptCallback("actor_on_death")
+	end)
+end
+
+-- ImGui callback (can be used to inject your own tabs into the menu bar and for drawing your UIs)
+AddScriptCallback("imgui_on_render")
+function on_imgui_render(name)
+	SendScriptCallback("imgui_on_render", name)
+end
+
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius
 -- Works only when npc:get_enable_anomalies_pathfinding() == true or ai_die_in_anomalies cvar is 1
 function is_outside_damage_radius(zone, obj)
@@ -442,6 +457,7 @@ function ActorMenu_on_item_after_move(npc_id, obj, mode, bag_from)
 end
 
 function on_game_start()
+	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 	RegisterScriptCallback("ActorMenu_on_item_after_move", ActorMenu_on_item_after_move)
 	RegisterScriptCallback("anomaly_on_before_activate", anomaly_on_before_activate)
 	RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)

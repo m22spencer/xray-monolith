@@ -120,7 +120,7 @@ void CRenderDevice::_Create(LPCSTR shName)
 	_SetupStates();
 
 	m_pRender->OnDeviceCreate(shName);
-
+	m_imgui.OnDeviceCreate();
 	dwFrame = 0;
 }
 

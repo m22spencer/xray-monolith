@@ -2,15 +2,13 @@
 #include "dxRenderFactory.h"
 
 #include "dxStatGraphRender.h"
-#ifndef _EDITOR
-#include "dxLensFlareRender.h"
-#endif
 #include "dxConsoleRender.h"
 #ifndef _EDITOR
 #include "dxThunderboltRender.h"
 #include "dxThunderboltDescRender.h"
 #include "dxRainRender.h"
 #include "dxLensFlareRender.h"
+#include "dxImGuiRender.h"
 #include "dxEnvironmentRender.h"
 
 #include "dxRenderDeviceRender.h"
@@ -56,6 +54,7 @@ RENDER_FACTORY_IMPLEMENT(ThunderboltRender)
 RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 RENDER_FACTORY_IMPLEMENT(RainRender)
 RENDER_FACTORY_IMPLEMENT(LensFlareRender)
+RENDER_FACTORY_IMPLEMENT(ImGuiRender)
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorMixerRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)

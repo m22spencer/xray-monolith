@@ -12,6 +12,7 @@ void CRenderDevice::_Destroy(BOOL bKeepTextures)
 	// before destroy
 	b_is_Ready = FALSE;
 	Statistic->OnDeviceDestroy();
+	m_imgui.OnDeviceDestroy();
 	::Render->destroy();
 	m_pRender->OnDeviceDestroy(bKeepTextures);
 	//Resources->OnDeviceDestroy (bKeepTextures);
@@ -68,24 +69,19 @@ void CRenderDevice::Reset(bool precache)
 
 	use_reshade = false;
 
+	m_imgui.OnDeviceResetBegin();
+
 	u32 dwWidth_before = dwWidth;
 	u32 dwHeight_before = dwHeight;
 
 	ShowCursor(TRUE);
 	u32 tm_start = TimerAsync();
-	if (g_pGamePersistent)
-	{
-		//. g_pGamePersistent->Environment().OnDeviceDestroy();
-	}
 
 	m_pRender->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
 	if (g_pGamePersistent)
-	{
-		//. g_pGamePersistent->Environment().OnDeviceCreate();
-		//bNeed_re_create_env = TRUE;
 		g_pGamePersistent->Environment().bNeed_re_create_env = TRUE;
-	}
+
 	_SetupStates();
 	if (precache)
 		PreCache(20, true, false);
@@ -118,5 +114,6 @@ void CRenderDevice::Reset(bool precache)
 	ClipCursor(&winRect);
 #endif
 
+	m_imgui.OnDeviceResetEnd();
 	use_reshade = init_reshade();
 }

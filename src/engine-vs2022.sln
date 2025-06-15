@@ -10,6 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\vs2022
 		{893887A1-3ABF-40A0-B931-CD0867010785} = {893887A1-3ABF-40A0-B931-CD0867010785}
 		{9646DBF8-1A5E-41F0-9328-F65910706666} = {9646DBF8-1A5E-41F0-9328-F65910706666}
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC} = {CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}
+		{D0843040-7706-4FBF-A931-582748BAFBB1} = {D0843040-7706-4FBF-A931-582748BAFBB1}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party", "3rd party", "{2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}"
@@ -102,8 +103,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReShadeCompat", "ReShadeCom
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
-		..\gamedata\scripts\aaa_sound_object_patch.script = ..\gamedata\scripts\aaa_sound_object_patch.script
 		..\gamedata\scripts\aaaa_script_fixes_mp.script = ..\gamedata\scripts\aaaa_script_fixes_mp.script
+		..\gamedata\scripts\aaa_sound_object_patch.script = ..\gamedata\scripts\aaa_sound_object_patch.script
 		..\gamedata\scripts\axr_beh_patches.script = ..\gamedata\scripts\axr_beh_patches.script
 		..\gamedata\scripts\callbacks_gameobject.script = ..\gamedata\scripts\callbacks_gameobject.script
 		..\gamedata\scripts\class_registrator_modded_exes.script = ..\gamedata\scripts\class_registrator_modded_exes.script
@@ -243,6 +244,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ui", "ui", "{91413BC1-731E-
 		..\gamedata\textures\ui\cursor_cross.dds = ..\gamedata\textures\ui\cursor_cross.dds
 		..\gamedata\textures\ui\cursor_dot.dds = ..\gamedata\textures\ui\cursor_dot.dds
 		..\gamedata\textures\ui\cursor_plus.dds = ..\gamedata\textures\ui\cursor_plus.dds
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "3rd party\imgui\imgui.vcxproj", "{D0843040-7706-4FBF-A931-582748BAFBB1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E} = {A0F7D1FB-59A7-4717-A7E4-96F37E91998E}
 	EndProjectSection
 EndProject
 Global
@@ -989,6 +995,30 @@ Global
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.Verified|x64.Build.0 = Verified|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.VerifiedDX11|x64.ActiveCfg = Verified|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.VerifiedDX11|x64.Build.0 = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Verified|x64.ActiveCfg = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Verified|x64.Build.0 = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.VerifiedDX11|x64.ActiveCfg = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.VerifiedDX11|x64.Build.0 = Verified|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1022,6 +1052,7 @@ Global
 		{5768CC9B-FEF6-4F20-B5D6-2E22E8A6D962} = {8537520E-5391-4DA0-A369-D7B22852C696}
 		{44A08F7F-E393-4E0B-B9E6-94AF30774CE7} = {8537520E-5391-4DA0-A369-D7B22852C696}
 		{91413BC1-731E-470B-AA8C-8C1F6290D8D7} = {44A08F7F-E393-4E0B-B9E6-94AF30774CE7}
+		{D0843040-7706-4FBF-A931-582748BAFBB1} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76CF157A-A169-443B-AE3A-F17AD29325C6}
