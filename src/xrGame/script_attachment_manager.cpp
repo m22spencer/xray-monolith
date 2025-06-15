@@ -5,6 +5,53 @@
 #include "actor.h"
 #include "ui\UIScriptWnd.h"
 
+//#define DEBUG_VISBOX
+
+#ifdef DEBUG_VISBOX
+#include "debug_renderer.h"
+#endif
+
+static void update_visbox_attachment(IKinematics* k)
+{
+	script_attachment* att = static_cast<script_attachment*>(k->GetUpdateCallbackParam());
+	if (!att) return;
+
+	if (k->NeedUCalc())
+	{
+		for (auto& pair : *att->GetAttachments())
+		{
+			script_attachment* child_att = pair.second;
+			if (child_att->GetType() != att->GetType()) continue;
+
+			Fbox Box = child_att->Box();
+
+			Fmatrix offset;
+			offset.mul(child_att->BoneTransform(k), child_att->GetOffset());
+			Box.xform(offset);
+
+			// Update Box
+			Fbox& kbox = const_cast<Fbox&>(k->GetBox());
+			kbox.merge(Box);
+
+			// Update Sphere
+			Fsphere& kshere = k->dcast_RenderVisual()->getVisData().sphere;
+			kbox.getsphere(kshere.P, kshere.R);
+		}
+	}
+
+#ifdef DEBUG_VISBOX
+	Fmatrix box, cent;
+	cent.translate(k->dcast_RenderVisual()->getVisData().sphere.P);
+	box.mul(att->GetTransform(), cent);
+
+	const Fbox& kbox = k->GetBox();
+	Fvector radius;
+	kbox.getradius(radius);
+	CDebugRenderer& render = Level().debug_renderer();
+	render.draw_obb(box, radius, D3DCOLOR_XRGB(150, 0, 150), att->GetType() == eSA_HUD);
+#endif
+}
+
 script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 {
 	m_name = name;
@@ -17,6 +64,7 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_script_ui_mat = Fidentity;
 	m_script_ui_offset[0].set(0, 0, 0);
 	m_script_ui_offset[1].set(0, 0, 0);
+	m_script_ui_scale.set(1, 1);
 	m_script_ui_bone = 0;
 	m_script_light = nullptr;
 	m_script_light_bone = 0;
@@ -33,6 +81,7 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_last_upd_frame = 0;
 	m_current_motion = "idle";
 	m_model_name = "";
+	m_userdata = nullptr;
 	LoadModel(model_name);
 	PlayMotion("idle", false);
 }
@@ -199,6 +248,9 @@ void script_attachment::RenderUI()
 		else
 			ui_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
+		ui_bone.m[1][1] = m_script_ui_scale.x;
+		ui_bone.m[2][2] = m_script_ui_scale.y;
+
 		LM.mul(m_transform, ui_bone);
 		LM.mulB_43(m_script_ui_mat);
 		UIRender->CacheSetXformWorld(LM);
@@ -243,7 +295,7 @@ void script_attachment::RecalcOffset()
 	{
 		Fmatrix rotation_matrix;
 		
-		m_offset.translate(m_origin);
+		m_offset.translate(-m_origin.x, -m_origin.y, -m_origin.z);
 
 		Fvector rotation = m_rotation;
 		rotation.mul(PI / 180.f);
@@ -265,27 +317,27 @@ void script_attachment::RecalcOffset()
 	}
 }
 
-void script_attachment::SetPosition(Fvector pos)
+void script_attachment::SetPosition(float x, float y, float z)
 {
-	m_position = pos;
+	m_position.set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetRotation(Fvector rot)
+void script_attachment::SetRotation(float x, float y, float z)
 {
-	m_rotation = rot;
+	m_rotation.set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetScale(Fvector scale)
+void script_attachment::SetScale(float x, float y, float z)
 {
-	m_scale = scale;
+	m_scale.set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetOrigin(Fvector org)
+void script_attachment::SetOrigin(float x, float y, float z)
 {
-	m_origin = org.invert();
+	m_origin.set(x, y, z);
 	RecalcOffset();
 }
 
@@ -590,7 +642,7 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 	m_kinematics = m_model->dcast_PKinematics();
 	R_ASSERT(m_kinematics);
 
-	//Bone Callbacks
+	// Bone Callbacks
 	if (keep_bc && m_bone_callbacks.size() && count_prev <= m_kinematics->LL_BoneCount())
 	{
 		for (auto& pair : m_bone_callbacks)
@@ -600,6 +652,10 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 
 		PlayMotion(*m_current_motion, false);
 	}
+
+	// Visibility Box Update
+	m_kinematics->SetUpdateCallback(update_visbox_attachment);
+	m_kinematics->SetUpdateCallbackParam(this);
 }
 
 void script_attachment::SetName(LPCSTR name)
@@ -643,6 +699,36 @@ void script_attachment::SetName(LPCSTR name)
 	}
 
 	m_name = name;
+}
+
+const luabind::object& script_attachment::GetUserdata() const
+{
+	if (!m_userdata)
+	{
+		const_cast<::luabind::object*>(m_userdata) = xr_new<::luabind::object>();
+		*m_userdata = ::luabind::newtable(ai().script_engine().lua());
+	}
+	return *m_userdata;
+}
+
+void script_attachment::SetUserdata(::luabind::object obj)
+{
+	if (!obj || obj.type() == LUA_TNIL)
+	{
+		xr_delete(m_userdata);
+		m_userdata = nullptr;
+		return;
+	}
+
+	if (obj.type() != LUA_TTABLE)
+	{
+		Msg("![Script Attachment]: Trying to set userdata to wrong type! (Allowed types: table, nil)");
+		return;
+	}
+
+	if (!m_userdata) m_userdata = xr_new<::luabind::object>();
+
+	*m_userdata = obj;
 }
 
 void script_attachment::SetScriptUI(LPCSTR ui_func)
@@ -768,6 +854,11 @@ void script_attachment::RemoveBoneCallback(u16 bone_id)
 		m_kinematics->LL_GetBoneInstance(bone_id).reset_callback();
 		m_bone_callbacks.erase(bone_id);
 	}
+}
+
+const Fbox& script_attachment::Box()
+{
+	return m_model->dcast_PKinematics()->GetBox();
 }
 
 Fvector script_attachment::GetCenter()

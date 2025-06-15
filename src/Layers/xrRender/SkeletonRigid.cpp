@@ -45,6 +45,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 	{
 		// mark
 		UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
+		UCalc_ThisFrame = true;
 
 		// the update itself
 		Fbox Box;
@@ -109,7 +110,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 		VERIFY3	(vis.sphere.R<1000.f,						"Invalid bones-xform in model", dbg_name.c_str());
 #endif
 	}
-
+	else
+		UCalc_ThisFrame = false;
 	//
 	if (Update_Callback) Update_Callback(this);
 }

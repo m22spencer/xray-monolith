@@ -33,6 +33,7 @@
 #include "animation_movement_controller.h"
 #include "../xrengine/xr_collide_form.h"
 #include "script_attachment_manager.h"
+#include "player_hud.h"
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
 #pragma warning(push)
@@ -761,11 +762,118 @@ void CGameObject::RenderAttachments()
 	}
 }
 
+//#define DEBUG_VISBOX
+
+#ifdef DEBUG_VISBOX
+#include "debug_renderer.h"
+#endif
+
+static void update_visbox(IKinematics* k)
+{
+	CGameObject* obj = static_cast<CGameObject*>(k->GetUpdateCallbackParam());
+	if (!obj) return;
+
+	if (k->NeedUCalc())
+	{
+		for (auto& pair : *obj->GetAttachments())
+		{
+			script_attachment* att = pair.second;
+			if (att->GetType() != eSA_World) continue;
+
+			Fbox Box = att->Box();
+
+			Fmatrix offset;
+			offset.mul(att->BoneTransform(k), att->GetOffset());
+			Box.xform(offset);
+
+			// Update Box
+			Fbox& kbox = const_cast<Fbox&>(k->GetBox());
+			kbox.merge(Box);
+
+			// Update Sphere
+			Fsphere& kshere = k->dcast_RenderVisual()->getVisData().sphere;
+			kbox.getsphere(kshere.P, kshere.R);
+		}
+	}
+	
+#ifdef DEBUG_VISBOX
+	Fmatrix box, cent;
+	cent.translate(k->dcast_RenderVisual()->getVisData().sphere.P);
+	box.mul(obj->XFORM(), cent);
+
+	const Fbox& kbox = k->GetBox();
+	Fvector radius;
+	kbox.getradius(radius);
+	CDebugRenderer& render = Level().debug_renderer();
+	render.draw_obb(box, radius, D3DCOLOR_XRGB(0, 255, 0), false);
+#endif
+}
+
+static void update_visbox_hud(IKinematics* k)
+{
+	CHudItem* obj = static_cast<CHudItem*>(k->GetUpdateCallbackParam());
+	if (!obj) return;
+
+	if (k->NeedUCalc())
+	{
+		for (auto& pair : *obj->object().GetAttachments())
+		{
+			script_attachment* att = pair.second;
+			if (att->GetType() != eSA_HUD) continue;
+
+			Fbox Box = att->Box();
+
+			Fmatrix offset;
+			offset.mul(att->BoneTransform(k), att->GetOffset());
+			Box.xform(offset);
+
+			// Update Box
+			Fbox& kbox = const_cast<Fbox&>(k->GetBox());
+			kbox.merge(Box);
+
+			// Update Sphere
+			Fsphere& kshere = k->dcast_RenderVisual()->getVisData().sphere;
+			kbox.getsphere(kshere.P, kshere.R);
+		}
+	}
+	
+#ifdef DEBUG_VISBOX
+	Fmatrix box, cent;
+	cent.translate(k->dcast_RenderVisual()->getVisData().sphere.P);
+	box.mul(obj->HudItemData()->m_item_transform, cent);
+
+	const Fbox& kbox = k->GetBox();
+	Fvector radius;
+	kbox.getradius(radius);
+	CDebugRenderer& render = Level().debug_renderer();
+	render.draw_obb(box, radius, D3DCOLOR_XRGB(100, 100, 0), true);
+#endif
+}
+
 script_attachment* CGameObject::add_attachment(LPCSTR name, script_attachment* att)
 {
 	R_ASSERT(att);
 	remove_child(name, true);
 	m_script_attachments.emplace(mk_pair(name, att));
+
+	if (!Visual()->dcast_PKinematics()->GetUpdateCallback())
+	{
+		Visual()->dcast_PKinematics()->SetUpdateCallback(update_visbox);
+		Visual()->dcast_PKinematics()->SetUpdateCallbackParam(this);
+	}
+
+	CHudItem* obj = smart_cast<CHudItem*>(this);
+	if (obj)
+	{
+		IKinematics* k = obj->HudItemData()->m_model;
+
+		if (!k->GetUpdateCallback())
+		{
+			k->SetUpdateCallback(update_visbox_hud);
+			k->SetUpdateCallbackParam(obj);
+		}
+	}
+
 	return att;
 }
 
@@ -783,16 +891,34 @@ script_attachment* CGameObject::get_attachment(LPCSTR name)
 
 void CGameObject::remove_child(LPCSTR name, bool destroy)
 {
-	if (m_script_attachments.size())
-	{
-		script_attachment* attachment = get_attachment(name);
-		if (!attachment)
-			return;
+	script_attachment* attachment = get_attachment(name);
+	if (!attachment)
+		return;
 
-		if (destroy)
-			xr_delete(attachment);
-			
-		m_script_attachments.erase(name);
+	if (destroy)
+		xr_delete(attachment);
+
+	m_script_attachments.erase(name);
+
+	if (!m_script_attachments.size())
+	{
+		if (Visual()->dcast_PKinematics()->GetUpdateCallbackParam() == this)
+		{
+			Visual()->dcast_PKinematics()->SetUpdateCallback(nullptr);
+			Visual()->dcast_PKinematics()->SetUpdateCallbackParam(nullptr);
+		}
+
+		CHudItem* obj = smart_cast<CHudItem*>(this);
+		if (obj)
+		{
+			IKinematics* k = obj->HudItemData()->m_model;
+
+			if (k->GetUpdateCallbackParam() == obj)
+			{
+				k->SetUpdateCallback(nullptr);
+				k->SetUpdateCallbackParam(nullptr);
+			}
+		}
 	}
 }
 
