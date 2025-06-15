@@ -186,6 +186,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.15**
+* Lucy: Some more changes (https://github.com/themrdemonized/xray-monolith/pull/254)
+
 **2025.06.11**
 * Lucy: ImGui implementation with script support (https://github.com/themrdemonized/xray-monolith/pull/250)
 
