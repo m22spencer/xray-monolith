@@ -806,7 +806,7 @@ void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud
 	Device.vCameraPosition_saved.set(Device.vCameraPosition);
 	Device.mView_saved.set(Device.mView);
 	Device.mProject_saved.set(Device.mProject);
-	Device.mFullTransform_saved.set(Device.mFullTransform_saved);
+	Device.mFullTransform_saved.set(Device.mFullTransform);
 
 	float fFov, fAspect, _;
 	projection.decompose_projection(fFov, fAspect, _, _);
