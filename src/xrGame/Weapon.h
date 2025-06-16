@@ -87,7 +87,11 @@ public:
 	float CWeapon::GetSecondVPFov() const;
 	IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
 	IC float GetSecondVPZoomFactor() const { return GetZoomFactor(); }
-	IC float IsSecondVPZoomPresent() const { return scope_svp_enabled && GetSecondVPZoomFactor() > 0.005f; }
+	float IsSecondVPZoomPresent() { 
+		return scope_svp_enabled
+			&& GetSecondVPZoomFactor() > 0.005f
+			&& GetSVPCameraMatrix(Fmatrix());
+	}
 
 	// Up
 	// Magazine system & etc

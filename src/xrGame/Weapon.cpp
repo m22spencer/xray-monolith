@@ -3220,14 +3220,6 @@ u32 CWeapon::Cost() const
 	return res;
 }
 
-float CWeapon::GetSecondVPFov() const
-{
-	if (m_zoom_params.m_bUseDynamicZoom && IsSecondVPZoomPresent())
-		return (m_fRTZoomFactor / 100.f) * g_fov;
-
-	return GetSecondVPZoomFactor() * g_fov;
-}
-
 void CWeapon::UpdateSecondVP()
 {
 	if (!(ParentIsActor() && (m_pInventory != NULL) && (m_pInventory->ActiveItem() == this)))
