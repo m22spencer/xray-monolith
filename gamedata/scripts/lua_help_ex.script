@@ -775,9 +775,12 @@
         function set_ui_rotation(vector);
         function set_ui_rotation(number, number, number);
         function get_ui_rotation();
-        function set_ui_scale(vector2);
-        function set_ui_scale(number, number);
+        function set_ui_scale(vector);
+        function set_ui_scale(number, number, number);
         function get_ui_scale();
+        function set_ui_origin(vector);
+        function set_ui_origin(number, number, number);
+        function get_ui_origin();
 
         -- Script Light
         function attach_light(attachment_script_light*);
