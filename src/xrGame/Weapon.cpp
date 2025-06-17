@@ -899,6 +899,7 @@ void CWeapon::Load(LPCSTR section)
 
 	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", 0.04f);
 
+	m_firepos = READ_IF_EXISTS(pSettings, r_bool, section, "firepos", true);
 	m_aimpos = READ_IF_EXISTS(pSettings, r_bool, section, "aimpos", true);
 }
 
@@ -3247,14 +3248,23 @@ Fmatrix CWeapon::RayTransform()
 		matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
 		matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
 
+		const SPickParam& hud_pick = HUD().GetPick();
+
+		bool firepos = m_firepos && HUD().FireposActive();
+		if (!firepos)
+			matrix.c = hud_pick.defs.start;
+
 		// If aim position is not enabled
 		bool aimpos = m_aimpos && HUD().AimposActive();
 		if (!aimpos)
 		{
 			// Aim toward camera look position
 			Fvector pos = matrix.c;
-			auto pick = HUD().GetPick();
-			Fvector target = Fvector().add(pick.defs.start, Fvector().mul(pick.defs.dir, pick.defs.range));
+			Fvector target = Fvector().mad(
+				hud_pick.defs.start,
+				hud_pick.defs.dir,
+				hud_pick.defs.range
+			);
 			Fvector delta = Fvector().sub(target, pos).normalize();
 
 			float h, p, b;

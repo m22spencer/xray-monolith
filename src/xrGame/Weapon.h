@@ -532,6 +532,7 @@ public:
 
 private:
 	float m_nearwall_zoomed_range;
+	float m_firepos;
 	float m_aimpos;
 
 public:

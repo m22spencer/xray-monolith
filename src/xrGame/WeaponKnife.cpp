@@ -85,20 +85,6 @@ bool CWeaponKnife::MovingAnimAllowedNow()
 	return true;
 }
 
-Fmatrix CWeaponKnife::RayTransform()
-{
-	Fmatrix matrix = CHudItem::RayTransform();
-	matrix.i = Device.vCameraTop;
-	matrix.j = Device.vCameraRight;
-	matrix.k = Device.vCameraDirection;
-	Fvector pos = matrix.c;
-	float h, p, b;
-	matrix.getHPB(h, p, b);
-	matrix.setHPB(h, p, -b);
-	matrix.c = pos;
-	return matrix;
-}
-
 void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
 {
 	inherited::OnStateSwitch(S, oldState);
