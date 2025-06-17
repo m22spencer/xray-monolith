@@ -102,20 +102,11 @@ float CActor::GetWeaponAccuracy() const
 
 SPickParam& CActor::GetPick()
 {
-	if (HUD().FireposActive())
-	{
-		auto item_0 = g_player_hud->attached_item(0);
-		if (item_0)
-		{
-			return item_0->m_parent_hud_item->GetPick();
-		}
-
-		auto item_1 = g_player_hud->attached_item(1);
-		if (item_1)
-		{
-			return item_1->m_parent_hud_item->GetPick();
-		}
-	}
+	// Find a HUD item, if one exists
+	if (g_player_hud->attached_item(0))
+		return g_player_hud->attached_item(0)->m_parent_hud_item->GetPick();
+	else if (g_player_hud->attached_item(1))
+		return g_player_hud->attached_item(1)->m_parent_hud_item->GetPick();
 
 	return HUD().GetPick();
 }
