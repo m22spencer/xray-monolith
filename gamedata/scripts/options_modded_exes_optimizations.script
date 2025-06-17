@@ -1,11 +1,18 @@
---- Metrics options tree
+--- Optimizations options tree
 
 -- Import smart constructors
 options_builder.import_into(this)
 
 -- Shader scopes
 PAGE = page {
-	{ id = "metrics" },
+	{ id = "optimizations" },
+	list_bool { id = "spawn_antifreeze" },
+	track {
+		id = "spawn_antifreeze_batch",
+		def = 2,
+		step = 1,
+		max = 50,
+	},
 	track {
 		id = "lua_gcstep",
 		def = 400,

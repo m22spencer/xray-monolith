@@ -65,32 +65,41 @@
 #include "debug_text_tree.h"
 #endif
 extern ENGINE_API bool g_dedicated_server;
-//AVO: used by SPAWN_ANTIFREEZE (by alpet)
-#ifdef SPAWN_ANTIFREEZE
-ENGINE_API BOOL	g_bootComplete;
-#endif
-//-AVO
+extern ENGINE_API BOOL	g_bootComplete;
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
 
 float g_cl_lvInterp = 0.1;
 u32 lvInterpSteps = 0;
+BOOL spawn_antifreeze = FALSE;
+int spawn_antifreeze_batch = 2;
+BOOL spawn_antifreeze_verbose = FALSE;
 
-//AVO: get object ID from spawn data (used by SPAWN_ANTIFREEZE by alpet)
+//AVO: get object ID from spawn data (used by SPAWN_ANTIFREEZE by alpet, edited by demonized)
 #ifdef SPAWN_ANTIFREEZE
-u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id)
+u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id, shared_str& section)
 {
     u16 dummy16, id;
     P.r_begin(dummy16);
+
     shared_str	s_name;
     P.r_stringZ(s_name);
-    CSE_Abstract*	E = F_entity_Create(*s_name);
-    E->Spawn_Read(P);
-    if (E->s_flags.is(M_SPAWN_UPDATE))
-        E->UPDATE_Read(P);
-    id = E->ID;
-    parent_id = E->ID_Parent;
-    F_entity_Destroy(E);
+	section = s_name;
+
+	string256 temp;
+	P.r_stringZ(temp);
+
+	u8 temp_gt, s_RP;
+	Fvector o_Position, o_Angle;
+	u16 RespawnTime;
+	P.r_u8(temp_gt/*s_gameid*/);
+	P.r_u8(s_RP);
+	P.r_vec3(o_Position);
+	P.r_vec3(o_Angle);
+	P.r_u16(RespawnTime);
+	P.r_u16(id);
+	P.r_u16(parent_id);
+
     P.r_pos = 0;
     return id;
 }
@@ -174,11 +183,13 @@ CLevel::CLevel() :
 {
 	g_bDebugEvents = strstr(Core.Params, "-debug_ge") != nullptr;
 	game_events = xr_new<NET_Queue_Event>();
+
 	//AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
 #ifdef SPAWN_ANTIFREEZE
     spawn_events = xr_new<NET_Queue_Event>();
 #endif
 	//-AVO
+
 	eChangeRP = Engine.Event.Handler_Attach("LEVEL:ChangeRP", this);
 	eDemoPlay = Engine.Event.Handler_Attach("LEVEL:PlayDEMO", this);
 	eChangeTrack = Engine.Event.Handler_Attach("LEVEL:PlayMusic", this);
@@ -209,6 +220,12 @@ CLevel::CLevel() :
 	pActors4CrPr.clear();
 	g_player_hud = xr_new<player_hud>();
 	g_player_hud->load_default();
+
+#ifdef SPAWN_ANTIFREEZE
+	ProcessSpawnEventsDelegate = fastdelegate::FastDelegate0<>(this, &CLevel::ProcessSpawnEvents);
+	Msg("CLevel::CLevel() ProcessSpawnEventsDelegate created");
+#endif
+
 	Msg("%s", Core.Params);
 	//crash_saving::save_impl = crash_saving::_save_impl; // CLevel ready, we can save now
 }
@@ -409,7 +426,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 	}
 }
 
-//AVO: used by SPAWN_ANTIFREEZE (by alpet)
+//AVO: used by SPAWN_ANTIFREEZE (by alpet, edited by demonized)
 #ifdef SPAWN_ANTIFREEZE
 bool CLevel::PostponedSpawn(u16 id)
 {
@@ -420,14 +437,82 @@ bool CLevel::PostponedSpawn(u16 id)
         if (M_SPAWN != E.ID) continue;
         E.implication(P);
         u16 parent_id;
-        if (id == GetSpawnInfo(P, parent_id))
+		shared_str section;
+        if (id == GetSpawnInfo(P, parent_id, section))
             return true;
     }
 
     return false;
 }
+
+void CLevel::SortSpawnEventsQueue()
+{
+	auto& queue = spawn_events->queue;
+	std::sort(queue.begin(), queue.end(), [this](const NET_Event& a, const NET_Event& b) {
+		// Helper to get priority
+		static auto get_priority = [this](const NET_Event& e) -> int {
+			if (e.ID == M_EVENT)
+				return 0;
+
+			if (e.ID == M_SPAWN) {
+				NET_Packet P;
+				e.implication(P);
+
+				u16 parent_id = 0xFFFF;
+				shared_str section;
+				GetSpawnInfo(P, parent_id, section);
+				if (parent_id < 0xFFFF)
+					return 1;
+			}
+
+			return 2;
+		};
+
+		int pa = get_priority(a);
+		int pb = get_priority(b);
+		return pa > pb;
+	});
+}
+
+void CLevel::ProcessSpawnEvents()
+{
+	currentEventNum = 0;
+	maxEventsPerBatch = spawn_antifreeze_batch;
+	for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); /* no ++it here */)
+	{
+		const NET_Event& E = *it;
+		u16 ID, dest, type;
+		NET_Packet P;
+		ID = E.ID;
+		dest = E.destination;
+		type = E.type;
+		E.implication(P);
+		if (M_SPAWN == ID)
+		{
+			u16 dummy16;
+			P.r_begin(dummy16);
+			cl_Process_Spawn(P);
+			it = spawn_events->queue.erase(it); // use returned iterator
+			currentEventNum++;
+		}
+		else if (M_EVENT == ID && !PostponedSpawn(dest))
+		{
+			cl_Process_Event(dest, type, P);
+			it = spawn_events->queue.erase(it); // use returned iterator
+			currentEventNum++;
+		}
+		else
+		{
+			++it;
+		}
+
+		if (currentEventNum >= maxEventsPerBatch)
+		{
+			break;
+		}
+	}
+}
 #endif
-//-AVO
 
 void CLevel::ProcessGameEvents()
 {
@@ -436,9 +521,9 @@ void CLevel::ProcessGameEvents()
 		NET_Packet P;
 		u32 svT = timeServer() - NET_Latency;
 
-		//AVO: spawn antifreeze implementation by alpet
+//AVO: spawn antifreeze implementation by alpet, edited by demonized
 #ifdef SPAWN_ANTIFREEZE
-        while (spawn_events->available(svT))
+        /*while (spawn_events->available(svT))
         {
             u16 ID, dest, type;
             spawn_events->get(ID, dest, type, P);
@@ -447,38 +532,42 @@ void CLevel::ProcessGameEvents()
         u32 avail_time = 5;
         u32 elps = Device.frame_elapsed();
         if (elps < 30) avail_time = 33 - elps;
-        u32 work_limit = elps + avail_time;
+        u32 work_limit = elps + avail_time;*/
 #endif
-		//-AVO
 
 		while (game_events->available(svT))
 		{
 			u16 ID, dest, type;
 			game_events->get(ID, dest, type, P);
-			//AVO: spawn antifreeze implementation by alpet
+
+//AVO: spawn antifreeze implementation by alpet, edited by demonized
 #ifdef SPAWN_ANTIFREEZE
-			// не отправлять события не заспавненным объектам
-			if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
-			{
-				spawn_events->insert(P);
-				continue;
-			}
-			if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
+			if (spawn_antifreeze)
 			{
 				u16 parent_id;
-				GetSpawnInfo(P, parent_id);
-				//-------------------------------------------------				
-				if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
-				{
-					if (!spawn_events->available(svT))
-						Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());
+				shared_str section;
+				u16 obj_id = GetSpawnInfo(P, parent_id, section);
 
+				// add to spawn_events queue if its an event to an object not yet spawned
+				if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
+				{
 					spawn_events->insert(P);
+					Msg("[ProcessGameEvents] added M_EVENT to spawn_events (postponed spawn): section %s, obj_id %d parent_id %d event_id %d", section.c_str(), obj_id, parent_id, dest);
+					continue;
+				}
+
+				// add to spawn_events queue for postponed spawn
+				if (g_bootComplete && M_SPAWN == ID)
+				{
+					spawn_events->insert(P);
+					if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] added M_SPAWN to spawn_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
 					continue;
 				}
 			}
+			
 #endif
-			//-AVO
+//-AVO
+
 			switch (ID)
 			{
 			case M_SPAWN:
@@ -619,7 +708,25 @@ void CLevel::OnFrame()
 		ClientReceive();
 		Device.Statistic->netClient1.End();
 	}
+	
 	ProcessGameEvents();
+#ifdef SPAWN_ANTIFREEZE
+	if (!spawn_events->queue.empty())
+	{
+		if (spawn_antifreeze_verbose) Msg("[CLevel::OnFrame()] spawn_queue has new spawn event");
+		if (std::find(Device.seqParallel.begin(), Device.seqParallel.end(), ProcessSpawnEventsDelegate) != Device.seqParallel.end())
+		{
+			Msg("[CLevel::OnFrame()] ProcessSpawnEventsDelegate is in seqParallel already, do nothing");
+		}
+		else
+		{
+			SortSpawnEventsQueue();
+			Device.seqParallel.push_back(ProcessSpawnEventsDelegate);
+			if (spawn_antifreeze_verbose) Msg("[CLevel::OnFrame()] ProcessSpawnEventsDelegate added to seqParallel");
+		}
+	}
+#endif
+
 	if (m_bNeed_CrPr)
 		make_NetCorrectionPrediction();
 	if (!g_dedicated_server)
