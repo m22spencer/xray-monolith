@@ -3240,43 +3240,16 @@ Fmatrix CWeapon::RayTransform()
 
 	Fmatrix matrix;
 
-	// If we're in first-person...
 	if (GetHUDmode())
 	{
-		// Compose barrel matrix
+		// If we're in first-person, use the HUD item transform
 		matrix = hi->m_item_transform;
 		matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
 		matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
-
-		const SPickParam& hud_pick = HUD().GetPick();
-
-		bool firepos = m_firepos && HUD().FireposActive();
-		if (!firepos)
-			matrix.c = hud_pick.defs.start;
-
-		// If aim position is not enabled
-		bool aimpos = m_aimpos && HUD().AimposActive();
-		if (!aimpos)
-		{
-			// Aim toward camera look position
-			Fvector pos = matrix.c;
-			Fvector target = Fvector().mad(
-				hud_pick.defs.start,
-				hud_pick.defs.dir,
-				hud_pick.defs.range
-			);
-			Fvector delta = Fvector().sub(target, pos).normalize();
-
-			float h, p, b;
-			delta.getHP(h, p);
-			float _h, _p;
-			Device.mInvView.getHPB(_h, _p, b);
-			matrix.setHPB(h, p, b);
-			matrix.c = pos;
-		}
 	}
 	else
 	{
+		// If we're in third-person, use the world item transform
 		matrix = XFORM();
 
 		if (psActorFlags.test(AF_FIREDIR_THIRD_PERSON))
@@ -3303,19 +3276,58 @@ Fmatrix CWeapon::RayTransform()
 			matrix.mulB_43(hud_rot);
 		}
 
+		// Offset by the world-space fire point
 		matrix.mulB_43(Fmatrix().translate(vLoadedFirePoint));
 	}
 
-	return matrix;
-}
+	// Fetch HUD pick
+	const SPickParam& hud_pick = HUD().GetPick();
 
-void CWeapon::g_fireParams(SPickParam& pp)
-{
-	// Block base implementation if aimpos is enabled
-	if (HUD().AimposActive())
+	// If firepos is disabled, use the hud pick's start position
+	bool firepos = HUD().FireposActive();
+	if (!firepos)
+		matrix.c = hud_pick.defs.start;
+
+	// If aim position is disabled...
+	bool aimpos = HUD().AimposActive();
+	if (!aimpos)
 	{
-		return;
+		// Cache position
+		Fvector pos = matrix.c;
+
+		// Aim toward the hud pick's endpoint
+		Fvector target = Fvector().mad(
+			hud_pick.defs.start,
+			hud_pick.defs.dir,
+			hud_pick.defs.range
+		);
+		Fvector delta = Fvector().sub(target, pos).normalize();
+
+		float h, p, b;
+		delta.getHP(h, p);
+		float _h, _p;
+		Device.mInvView.getHPB(_h, _p, b);
+
+		// Account for freelook offset
+		const CActor* pActor = Actor();
+		if (pActor && pActor->cam_freelook != eflDisabled)
+		{
+			float cam_h, cam_p, cam_b;
+			Device.mView.getHPB(cam_h, cam_p, cam_b);
+
+			float pc = p;
+			clamp(pc, 0.f, pc);
+
+			h -= angle_normalize_signed(pActor->old_torso_yaw) - cam_h;
+			p -= pc;
+		}
+
+		// Apply rotation
+		matrix.setHPB(h, p, b);
+
+		// Restore position
+		matrix.c = pos;
 	}
 
-	CHudItem::g_fireParams(pp);
+	return matrix;
 }

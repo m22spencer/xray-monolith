@@ -519,7 +519,6 @@ void CHudItem::UpdateNearWall()
 {
 	if (g_nearwall && ParentIsActor() && Level().CurrentViewEntity() == object().H_Parent())
 	{
-		// If firepos is active
 		if (g_nearwall_trace == NT_CAM)
 		{
 			// Use the HUD trace, and lerp between min and max distances
@@ -993,29 +992,6 @@ Fmatrix CHudItem::RayTransform()
 	return matrix;
 }
 
-void CHudItem::g_fireParams(SPickParam& pp)
-{
-	// If we're in free-look mode, apply rotation offsets
-	const CActor* pActor = Actor();
-	if (pActor && pActor->cam_freelook != eflDisabled)
-	{
-		CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
-		if (pWeapon)
-		{
-			Fvector d = Fvector();
-			const Fmatrix& fire_mat = pWeapon->get_ParticlesXFORM();
-			float pitch = fire_mat.k.getP();
-			d.setHP(
-				-angle_normalize_signed(pActor->old_torso_yaw),
-				pitch > 0.f ? (
-					(pWeapon->GetState() == CWeapon::eFire || pActor->cam_freelook == eflDisabling)
-					? pitch : pitch * .6f
-				) : pitch * .8f);
-			pp.defs.dir = d;
-		}
-	}
-}
-
 void CHudItem::Ray(SPickParam& pp)
 {
 	const CActor* pActor = Actor();
@@ -1054,7 +1030,7 @@ void CHudItem::Ray(SPickParam& pp)
 	}
 	else
 	{
-		// In third-person, use the actor's head bone
+		// If we're in third-person and firepos is active, use the actor's head bone
 		eye_pos = pActor->XFORM().c;
 		auto model = pActor->Visual()->dcast_PKinematics();
 		eye_pos.add(model->LL_GetTransform(model->LL_BoneID("bip01_head")).c);

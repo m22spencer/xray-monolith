@@ -320,6 +320,9 @@ bool CHUDManager::FireposActive()
 	if (!pWeapon)
 		return psActorFlags.test(AF_FIREPOS);
 
+	if (!pWeapon->GetFirepos())
+		return false;
+
 	// Firepos is active if a setting matches its respective zoom state
 	float zFac = pWeapon->GetZRotatingFactor();
 	return (psActorFlags.test(AF_FIREPOS) && zFac < 1.f)
@@ -337,6 +340,9 @@ bool CHUDManager::AimposActive()
 	CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
 	if (!pWeapon)
 		return psActorFlags.test(AF_AIMPOS);
+
+	if (!pWeapon->GetAimpos())
+		return false;
 
 	// Firepos is active if a setting matches its respective zoom state
 	float zFac = pWeapon->GetZRotatingFactor();
