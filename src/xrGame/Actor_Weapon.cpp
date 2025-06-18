@@ -116,11 +116,11 @@ void CActor::g_fireParams(const CHudItem* pHudItem, Fvector& fire_pos, Fvector& 
 	SPickParam& pp = GetPick();
 
 	attachable_hud_item* item_0 = g_player_hud->attached_item(0);
+	attachable_hud_item* item_1 = g_player_hud->attached_item(1);
+
 	if (item_0)
 		item_0->m_parent_hud_item->g_fireParams(pp);
-
-	attachable_hud_item* item_1 = g_player_hud->attached_item(1);
-	if (item_1)
+	else if (item_1)
 		item_1->m_parent_hud_item->g_fireParams(pp);
 
 	fire_pos = pp.defs.start;
