@@ -638,9 +638,9 @@ void CLevel::ProcessGameEvents()
 					shared_str section;
 					u16 obj_id = GetSpawnInfo(P, parent_id, section);
 
-					LPCSTR model = pSettings->line_exist(section, "visual") ? pSettings->r_string(section, "visual") : nullptr;
+					LPCSTR model = !pSettings->line_exist("spawn_antifreeze_ignore", section) && pSettings->line_exist(section, "visual") ? pSettings->r_string(section, "visual") : nullptr;
 
-					if (model)
+					if (model && !pSettings->line_exist("spawn_antifreeze_ignore", model))
 					{
 						//prefetched_models.insert(model);
 
