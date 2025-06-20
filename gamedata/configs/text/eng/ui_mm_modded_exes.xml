@@ -537,7 +537,10 @@
 		<text>Change weapons with mouse wheel (mouse_wheel_change_weapon)</text>
 	</string>
 	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_zoom">
-		<text>Invert mouse wheel (mouse_wheel_invert_zoom)</text>
+		<text>Invert mouse wheel zoom (mouse_wheel_invert_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_change_weapon">
+		<text>Invert mouse wheel change weapons (mouse_wheel_invert_change_weapon)</text>
 	</string>
 
 	<!-- Camera -->

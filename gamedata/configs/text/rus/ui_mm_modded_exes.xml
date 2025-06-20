@@ -515,7 +515,10 @@
 		<text>Менять оружие колесом мыши (mouse_wheel_change_weapon)</text>
 	</string>
 	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_zoom">
-		<text>Инвертировать колесо мыши (mouse_wheel_invert_zoom)</text>
+		<text>Инвертировать колесо мыши зуме (mouse_wheel_invert_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_change_weapon">
+		<text>Инвертировать колесо мыши при смене оружия (mouse_wheel_invert_change_weapon)</text>
 	</string>
 
 	<!-- Camera -->
