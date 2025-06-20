@@ -154,6 +154,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
@@ -164,10 +166,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -239,6 +245,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
+      <Optimization>MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -261,6 +269,8 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <UndefinePreprocessorDefinitions>USE_LUAJIT_ONE</UndefinePreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -284,6 +294,8 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <Optimization>MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -303,6 +315,8 @@
       <OmitFramePointers>false</OmitFramePointers>
       <PreprocessorDefinitions>OPTICK_ENABLE_GPU_VULKAN=0;DEBUG;_LIB;USE_VERIFY_IN_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <UndefinePreprocessorDefinitions>USE_LUAJIT_ONE</UndefinePreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
