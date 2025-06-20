@@ -227,6 +227,7 @@ CLevel::CLevel() :
 	spawn_events = xr_new<NET_Queue_Event>();
 	prefetch_events = xr_new<NET_Queue_Event>();
 	prefetched_models = xr_new<xr_unordered_set<xr_string>>();
+	Msg("CLevel::CLevel() Spawn Antifreeze initialized");
 #endif
 
 	Msg("%s", Core.Params);
@@ -610,9 +611,6 @@ void CLevel::ProcessGameEvents()
 {
 	// Game events
 	{
-		NET_Packet P;
-		u32 svT = timeServer() - NET_Latency;
-
 		for (auto it = game_events->queue.begin(); it != game_events->queue.end(); )
 		{
 			u16 ID = it->ID;
