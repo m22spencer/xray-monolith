@@ -899,6 +899,7 @@ void CWeapon::Load(LPCSTR section)
 
 	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", 0.04f);
 
+	m_firepos = READ_IF_EXISTS(pSettings, r_bool, section, "firepos", true);
 	m_aimpos = READ_IF_EXISTS(pSettings, r_bool, section, "aimpos", true);
 }
 
@@ -3239,34 +3240,16 @@ Fmatrix CWeapon::RayTransform()
 
 	Fmatrix matrix;
 
-	// If we're in first-person...
 	if (GetHUDmode())
 	{
-		// Compose barrel matrix
+		// If we're in first-person, use the HUD item transform
 		matrix = hi->m_item_transform;
 		matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
 		matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
-
-		// If aim position is not enabled
-		bool aimpos = m_aimpos && HUD().AimposActive();
-		if (!aimpos)
-		{
-			// Aim toward camera look position
-			Fvector pos = matrix.c;
-			auto pick = HUD().GetPick();
-			Fvector target = Fvector().add(pick.defs.start, Fvector().mul(pick.defs.dir, pick.defs.range));
-			Fvector delta = Fvector().sub(target, pos).normalize();
-
-			float h, p, b;
-			delta.getHP(h, p);
-			float _h, _p;
-			Device.mInvView.getHPB(_h, _p, b);
-			matrix.setHPB(h, p, b);
-			matrix.c = pos;
-		}
 	}
 	else
 	{
+		// If we're in third-person, use the world item transform
 		matrix = XFORM();
 
 		if (psActorFlags.test(AF_FIREDIR_THIRD_PERSON))
@@ -3293,19 +3276,11 @@ Fmatrix CWeapon::RayTransform()
 			matrix.mulB_43(hud_rot);
 		}
 
+		// Offset by the world-space fire point
 		matrix.mulB_43(Fmatrix().translate(vLoadedFirePoint));
 	}
 
+	ApplyAimModifiers(matrix);
+
 	return matrix;
-}
-
-void CWeapon::g_fireParams(SPickParam& pp)
-{
-	// Block base implementation if aimpos is enabled
-	if (HUD().AimposActive())
-	{
-		return;
-	}
-
-	CHudItem::g_fireParams(pp);
 }
