@@ -659,7 +659,13 @@ void CLevel::ProcessGameEvents()
 					u16 obj_id = GetSpawnInfo(P, parent_id, section);
 
 					static auto isValidToPrefetch = [](u16 parent_id, shared_str& section, u16 obj_id, NET_Packet& P) {
+						if (pSettings->line_exist("spawn_antifreeze_ignore", section))
+						{
+							return false;
+						}
+
 						bool valid = true;
+
 						if (pSettings->line_exist(section.c_str(), "class"))
 						{
 							auto c = pSettings->r_string(section.c_str(), "class");
@@ -671,6 +677,7 @@ void CLevel::ProcessGameEvents()
 							// Do not prefetch helicopters
 							valid &= strstr(c, "C_HLCP") == nullptr;
 						}
+
 						return valid;
 					};
 
