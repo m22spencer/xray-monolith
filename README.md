@@ -186,6 +186,12 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.20**
+* Updated Github Action to use `softprops/action-gh-release`
+* [Feature Request] Added an option to invert Mouse Wheel when changing weapons (https://github.com/themrdemonized/xray-monolith/issues/261)
+* ProfLander: 3D Ballistics Fixes (https://github.com/themrdemonized/xray-monolith/pull/259)
+* Kutez: Update v3 Indoor Gunsound Framework (https://github.com/themrdemonized/xray-monolith/pull/260)
+
 **2025.06.18**
 * Lucy: Script Attachment 3D UI Scale/Origin (https://github.com/themrdemonized/xray-monolith/pull/258)
 
