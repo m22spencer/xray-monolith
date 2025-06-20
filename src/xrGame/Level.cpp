@@ -81,6 +81,7 @@ struct spawn_and_prefetch_events
 {
 	NET_Queue_Event* spawn_events = nullptr;
 	NET_Queue_Event* prefetch_events = nullptr;
+	xr_unordered_set<xr_string>* prefetched_models = nullptr;
 	bool* prefetchInProcess = nullptr;
 };
 
@@ -225,6 +226,7 @@ CLevel::CLevel() :
 #ifdef SPAWN_ANTIFREEZE
 	spawn_events = xr_new<NET_Queue_Event>();
 	prefetch_events = xr_new<NET_Queue_Event>();
+	prefetched_models = xr_new<xr_unordered_set<xr_string>>();
 #endif
 
 	Msg("%s", Core.Params);
@@ -279,6 +281,7 @@ CLevel::~CLevel()
 #ifdef SPAWN_ANTIFREEZE
 	xr_delete(spawn_events);
 	xr_delete(prefetch_events);
+	xr_delete(prefetched_models);
 #endif
 
 	xr_delete(m_pBulletManager);
@@ -502,6 +505,7 @@ void CLevel::ProcessPrefetchEvents(void* args)
 
 	auto spawn_events = events->spawn_events;
 	auto prefetch_events = events->prefetch_events;
+	auto prefetched_models = events->prefetched_models;
 	auto prefetchInProcess = events->prefetchInProcess;
 	*prefetchInProcess = true;
 
@@ -527,7 +531,6 @@ void CLevel::ProcessPrefetchEvents(void* args)
 	}
 	prefetch_cs.Leave();
 
-	xr_unordered_set<xr_string> prefetched_models;
 	for (const auto& E : saved_prefetch_events.queue)
 	{
 		u16 ID, dest, type;
@@ -543,7 +546,7 @@ void CLevel::ProcessPrefetchEvents(void* args)
 
 		LPCSTR model = pSettings->r_string(section, "visual");
 
-		if (prefetched_models.find(model) != prefetched_models.end())
+		if (prefetched_models->find(model) != prefetched_models->end())
 		{
 			if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event: section %s, obj_id %d, parent_id %d, event_id %d (already prefetched)", model, section.c_str(), obj_id, parent_id, dest);
 			temp_events.insert(P);
@@ -552,7 +555,7 @@ void CLevel::ProcessPrefetchEvents(void* args)
 
 		if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event: section %s, obj_id %d, parent_id %d, event_id %d", model, section.c_str(), obj_id, parent_id, dest);
 		::Render->models_PrefetchOne(model);
-		prefetched_models.insert(model); // add model to prefetched models set to avoid double prefetching
+		prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
 
 		temp_events.insert(P);
 	}
@@ -640,10 +643,8 @@ void CLevel::ProcessGameEvents()
 
 					LPCSTR model = !pSettings->line_exist("spawn_antifreeze_ignore", section) && pSettings->line_exist(section, "visual") ? pSettings->r_string(section, "visual") : nullptr;
 
-					if (model && !pSettings->line_exist("spawn_antifreeze_ignore", model))
+					if (model && !pSettings->line_exist("spawn_antifreeze_ignore", model) && prefetched_models->find(model) == prefetched_models->end())
 					{
-						//prefetched_models.insert(model);
-
 						prefetch_cs.Enter();
 						prefetch_events->insert(P);
 						prefetch_cs.Leave();
@@ -719,7 +720,7 @@ void CLevel::ProcessGameEvents()
 #ifdef SPAWN_ANTIFREEZE
 	if (!prefetchInProcess && !prefetch_events->queue.empty())
 	{
-		auto events = new spawn_and_prefetch_events({ spawn_events, prefetch_events, &prefetchInProcess });
+		auto events = new spawn_and_prefetch_events({ spawn_events, prefetch_events, prefetched_models, &prefetchInProcess });
 		thread_spawn(ProcessPrefetchEvents, "Pre-Spawn Prefetcher Thread", 0, events);
 		if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] thread_spawn ProcessPrefetchEvents");
 	}
