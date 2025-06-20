@@ -236,7 +236,7 @@ public:
 public:
 	NET_Queue_Event* spawn_events = nullptr;
 	NET_Queue_Event* prefetch_events = nullptr;
-	xr_unordered_set<xr_string>* prefetched_models = nullptr;
+	xr_unordered_set<xr_string> prefetched_models;
     bool PostponedSpawn(u16 id);
 	void ProcessSpawnEvents();
 	static void ProcessPrefetchEvents(void* args);
