@@ -57,6 +57,9 @@
 #include "debug_renderer.h"
 #include "LevelDebugScript.h"
 
+#include "alife_simulator.h"
+#include "alife_object_registry.h"
+
 #ifdef DEBUG
 #include "level_debug.h"
 #include "ai/stalker/ai_stalker.h"
@@ -76,13 +79,13 @@ u32 lvInterpSteps = 0;
 BOOL spawn_antifreeze = FALSE;
 BOOL spawn_antifreeze_verbose = FALSE;
 static xrCriticalSection prefetch_cs;
-static HANDLE prefetch_queue_event;
+static HANDLE prefetch_queue_signal;
 
 struct spawn_and_prefetch_events
 {
 	NET_Queue_Event* spawn_events = nullptr;
-	NET_Queue_Event* prefetch_events = nullptr;
-	xr_unordered_set<xr_string>* prefetched_models = nullptr;
+	prefetch_event_queue* prefetch_events = nullptr;
+	models_set* prefetched_models = nullptr;
 	bool* closeSignal = nullptr;
 };
 
@@ -226,11 +229,11 @@ CLevel::CLevel() :
 
 #ifdef SPAWN_ANTIFREEZE
 	spawn_events = xr_new<NET_Queue_Event>();
-	prefetch_events = xr_new<NET_Queue_Event>();
-	prefetched_models = xr_new<xr_unordered_set<xr_string>>();
+	prefetch_events = xr_new<prefetch_event_queue>();
+	prefetched_models = xr_new<models_set>();
 	auto events = new spawn_and_prefetch_events({ spawn_events, prefetch_events, prefetched_models, &closeSignal });
-	prefetch_queue_event = CreateEvent(nullptr, TRUE, FALSE, nullptr); // create prefetch queue event
-	ResetEvent(prefetch_queue_event); // reset prefetch queue event
+	prefetch_queue_signal = CreateEvent(nullptr, TRUE, FALSE, nullptr); // create prefetch queue event
+	ResetEvent(prefetch_queue_signal); // reset prefetch queue event
 	thread_spawn(ProcessPrefetchEvents, "Pre-Spawn Prefetcher Thread", 0, events);
 	Msg("CLevel::CLevel() Spawn Antifreeze initialized");
 #endif
@@ -289,7 +292,7 @@ CLevel::~CLevel()
 	xr_delete(prefetch_events);
 	xr_delete(prefetched_models);
 	closeSignal = true; // signal ProcessPrefetchEvents thread to exit
-	SetEvent(prefetch_queue_event);
+	SetEvent(prefetch_queue_signal);
 #endif
 
 	xr_delete(m_pBulletManager);
@@ -450,6 +453,11 @@ bool CLevel::PostponedSpawnFind(u16 id, const NET_Event& E) const
 {
 	NET_Packet P;
 	E.implication(P);
+	return PostponedSpawnFind(id, P);
+}
+
+bool CLevel::PostponedSpawnFind(u16 id, NET_Packet& P) const
+{
 	u16 parent_id;
 	shared_str section;
 	return id == GetSpawnInfo(P, parent_id, section);
@@ -459,13 +467,13 @@ bool CLevel::PostponedSpawn(u16 id)
 {
 	PROF_EVENT("ProcessGameEvents PostponedSpawn");
 	prefetch_cs.Enter();
-	auto& queue = prefetch_events->queue;
-	auto it = std::find_if(queue.begin(), queue.end(), [id, this](const NET_Event& E) { return PostponedSpawnFind(id, E); });
+	auto queue = prefetch_events;
+	auto it = std::find_if(queue->begin(), queue->end(), [id, this](prefetch_event& E) { return PostponedSpawnFind(id, E.p); });
 
 	auto& queue2 = spawn_events->queue;
 	auto it2 = std::find_if(queue2.begin(), queue2.end(), [id, this](const NET_Event& E) { return PostponedSpawnFind(id, E); });
 	prefetch_cs.Leave();
-	return it != queue.end() || it2 != queue2.end();
+	return it != queue->end() || it2 != queue2.end();
 }
 
 int CLevel::GetSpawnEventPriority(const NET_Event& e) const
@@ -511,80 +519,51 @@ void CLevel::ProcessPrefetchEvents(void* args)
 
 	while (true)
 	{
-		WaitForSingleObject(prefetch_queue_event, INFINITE); // wait for prefetch queue event to be signaled
+		WaitForSingleObject(prefetch_queue_signal, INFINITE); // wait for prefetch queue event to be signaled
 
 		if (*closeSignal == true)
 		{
 			if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] closeSignal received, destroying thread");
-			CloseHandle(prefetch_queue_event);
+			CloseHandle(prefetch_queue_signal);
 			delete events;
 			return;
 		}
 
-		if (prefetch_events->queue.empty())
+		if (prefetch_events->empty())
 		{
 			if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] called, but prefetch_events queue is empty");
-			ResetEvent(prefetch_queue_event); // reset prefetch queue event
+			ResetEvent(prefetch_queue_signal); // reset prefetch queue event
 			continue;
 		}
 
 		PROF_EVENT("ProcessPrefetchEvents");
 
-		if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] started, queue size %d", prefetch_events->queue.size());
+		if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] started, queue size %d", prefetch_events->size());
 
-		NET_Queue_Event saved_prefetch_events, temp_events;
+		prefetch_event_queue saved_prefetch_events;
 
 		prefetch_cs.Enter();
-		while (!prefetch_events->queue.empty())
-		{
-			u16 ID, dest, type;
-			NET_Packet P;
-			prefetch_events->get(ID, dest, type, P);
-			saved_prefetch_events.insert(P); // save the event to temp queue, for prefetch_events to continue to be populated in the main thread
-		}
-		ResetEvent(prefetch_queue_event); // reset prefetch queue event
+		saved_prefetch_events = std::move(*prefetch_events); // move the events to temp queue, so we can continue processing prefetch_events in the main thread
+		ResetEvent(prefetch_queue_signal); // reset prefetch queue event
 		prefetch_cs.Leave();
 
-		for (const auto& E : saved_prefetch_events.queue)
+		for (const auto& E : saved_prefetch_events)
 		{
-			u16 ID, dest, type;
-			NET_Packet P;
-			ID = E.ID;
-			dest = E.destination;
-			type = E.type;
-			E.implication(P);
-
-			u16 parent_id;
-			shared_str section;
-			u16 obj_id = GetSpawnInfo(P, parent_id, section);
-
-			LPCSTR model = pSettings->r_string(section, "visual");
-
-			if (prefetched_models->find(model) != prefetched_models->end())
+			for (const auto& model : E.models)
 			{
-				if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event: section %s, obj_id %d, parent_id %d, event_id %d (already prefetched)", model, section.c_str(), obj_id, parent_id, dest);
-				temp_events.insert(P);
-				continue; // already prefetched
+				if (prefetched_models->find(model) == prefetched_models->end())
+				{
+					if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event", model);
+					::Render->models_PrefetchOne(model.c_str());
+					prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
+				}
 			}
-
-			if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event: section %s, obj_id %d, parent_id %d, event_id %d", model, section.c_str(), obj_id, parent_id, dest);
-			::Render->models_PrefetchOne(model);
-			prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
-
-			temp_events.insert(P);
 		}
 
 		prefetch_cs.Enter();
-		for (const auto& E : temp_events.queue)
+		for (auto& E : saved_prefetch_events)
 		{
-			u16 ID, dest, type;
-			NET_Packet P;
-			ID = E.ID;
-			dest = E.destination;
-			type = E.type;
-			E.implication(P);
-
-			spawn_events->insert(P); // reinsert the event to spawn_events queue for further processing
+			spawn_events->insert(E.p); // reinsert the event to spawn_events queue for further processing
 		}
 		prefetch_cs.Leave();
 
@@ -637,7 +616,7 @@ void CLevel::ProcessGameEvents()
 			u16 dest = it->destination;
 			u16 type = it->type;
 			NET_Packet P;
-			it->implication(P); // Move into thread
+			it->implication(P);
 
 //AVO: spawn antifreeze implementation, originally by alpet, reritten by demonized
 #ifdef SPAWN_ANTIFREEZE
@@ -656,16 +635,28 @@ void CLevel::ProcessGameEvents()
 				if (M_SPAWN == ID)
 				{
 					PROF_EVENT("ProcessGameEvents M_SPAWN");
+
 					u16 parent_id;
 					shared_str section;
 					u16 obj_id = GetSpawnInfo(P, parent_id, section);
+
+					models_set models;
 
 					LPCSTR model = !pSettings->line_exist("spawn_antifreeze_ignore", section) && pSettings->line_exist(section, "visual") ? pSettings->r_string(section, "visual") : nullptr;
 
 					if (model && !pSettings->line_exist("spawn_antifreeze_ignore", model) && prefetched_models->find(model) == prefetched_models->end())
 					{
+						models.insert(model);
+					}
+
+					if (!models.empty())
+					{
+						prefetch_event E;
+						E.p = std::move(P);
+						E.models = std::move(models);
+
 						prefetch_cs.Enter();
-						prefetch_events->insert(P);
+						prefetch_events->push_back(E);
 						prefetch_cs.Leave();
 
 						if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
@@ -681,6 +672,13 @@ void CLevel::ProcessGameEvents()
 			{
 			case M_SPAWN:
 				{
+					PROF_EVENT("ProcessGameEvents M_SPAWN ordinary");
+					u16 parent_id;
+					shared_str section;
+					u16 obj_id = GetSpawnInfo(P, parent_id, section);
+
+					if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] M_SPAWN ordinary: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+
 					u16 dummy16;
 					P.r_begin(dummy16);
 					cl_Process_Spawn(P);
@@ -688,11 +686,13 @@ void CLevel::ProcessGameEvents()
 				}
 			case M_EVENT:
 				{
+					PROF_EVENT("ProcessGameEvents M_EVENT ordinary");
 					cl_Process_Event(dest, type, P);
 					break;
 				}
 			case M_MOVE_PLAYERS:
 				{
+					PROF_EVENT("ProcessGameEvents M_MOVE_PLAYERS ordinary");
 					u8 Count = P.r_u8();
 					for (u8 i = 0; i < Count; i++)
 					{
@@ -712,18 +712,21 @@ void CLevel::ProcessGameEvents()
 				}
 			case M_STATISTIC_UPDATE:
 				{
+					PROF_EVENT("ProcessGameEvents M_STATISTIC_UPDATE ordinary");
 					if (GameID() != eGameIDSingle)
 						Game().m_WeaponUsageStatistic->OnUpdateRequest(&P);
 					break;
 				}
 			case M_FILE_TRANSFER:
 				{
+					PROF_EVENT("ProcessGameEvents M_FILE_TRANSFER ordinary");
 					if (m_file_transfer) // in case of net_Stop
 						m_file_transfer->on_message(&P);
 					break;
 				}
 			case M_GAMEMESSAGE:
 				{
+					PROF_EVENT("ProcessGameEvents M_GAMEMESSAGE ordinary");
 					Game().OnGameMessage(P);
 					break;
 				}
@@ -737,9 +740,9 @@ void CLevel::ProcessGameEvents()
 	}
 
 #ifdef SPAWN_ANTIFREEZE
-	if (!prefetch_events->queue.empty())
+	if (!prefetch_events->empty())
 	{
-		SetEvent(prefetch_queue_event); // signal prefetch queue event to wake up ProcessPrefetchEvents thread
+		SetEvent(prefetch_queue_signal); // signal prefetch queue event to wake up ProcessPrefetchEvents thread
 	}
 #endif
 

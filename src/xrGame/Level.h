@@ -51,6 +51,14 @@ namespace file_transfer
 	class client_site;
 }
 
+using models_set = xr_unordered_set<xr_string>;
+struct prefetch_event  
+{  
+    NET_Packet p;  
+	models_set models;
+};
+using prefetch_event_queue = xr_vector<prefetch_event>;
+
 class CLevel :
 	public IGame_Level,
 	public IPureClient
@@ -235,8 +243,8 @@ public:
 #ifdef SPAWN_ANTIFREEZE
 public:
 	NET_Queue_Event* spawn_events = nullptr;
-	NET_Queue_Event* prefetch_events = nullptr;
-	xr_unordered_set<xr_string>* prefetched_models = nullptr;
+	prefetch_event_queue* prefetch_events = nullptr;
+	models_set* prefetched_models = nullptr;
     bool PostponedSpawn(u16 id);
 	void ProcessSpawnEvents();
 	static void ProcessPrefetchEvents(void* args);
@@ -245,6 +253,7 @@ private:
 	bool closeSignal = false;
 	int GetSpawnEventPriority(const NET_Event& e) const;
 	bool PostponedSpawnFind(u16 id, const NET_Event& E) const;
+	bool PostponedSpawnFind(u16 id, NET_Packet& P) const;
 	bool SpawnEventCompare(const NET_Event& a, const NET_Event& b) const;
 #endif	
 
