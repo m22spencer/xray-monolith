@@ -553,7 +553,7 @@ void CLevel::ProcessPrefetchEvents(void* args)
 			{
 				if (prefetched_models->find(model) == prefetched_models->end())
 				{
-					if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event", model);
+					if (spawn_antifreeze_verbose) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event", model.c_str());
 					::Render->models_PrefetchOne(model.c_str());
 					prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
 				}
@@ -605,10 +605,6 @@ void CLevel::ProcessGameEvents()
 
 	// Game events
 	{
-		if (!game_events->queue.empty())
-		{
-			Msg("game_events size %d", game_events->queue.size());
-		}
 		for (auto it = game_events->queue.begin(); it != game_events->queue.end(); )
 		{
 			PROF_EVENT("ProcessGameEvents game_events queue");
@@ -642,22 +638,35 @@ void CLevel::ProcessGameEvents()
 
 					models_set models;
 
-					// Insert visual
+					static auto safe_insert = [](models_set& models, LPCSTR model) {
+						if (model) {
+							models.insert(model);
+						}
+					};
+
+					// Insert visual from ltx
 					if (pSettings->line_exist(section, "visual"))
 					{
-						models.insert(pSettings->r_string(section, "visual"));
+						safe_insert(models, pSettings->r_string(section, "visual"));
 					}
 
 					// Corpse visual
-					if (pSettings->line_exist(section, "corpse_visual"))
+					/*if (pSettings->line_exist(section, "corpse_visual"))
 					{
-						models.insert(pSettings->r_string(section, "corpse_visual"));
-					}
+						safe_insert(models, pSettings->r_string(section, "corpse_visual"));
+					}*/
 
 					// Bloodsucker visual
-					if (pSettings->line_exist(section, "Predator_Visual"))
+					/*if (pSettings->line_exist(section, "Predator_Visual"))
 					{
-						models.insert(pSettings->r_string(section, "Predator_Visual"));
+						safe_insert(models, pSettings->r_string(section, "Predator_Visual"));
+					}*/
+
+					// Actual visual from alife object
+					auto obj = ai().alife().objects().object(obj_id);
+					if (obj && obj->visual())
+					{
+						safe_insert(models, obj->visual()->get_visual());
 					}
 
 					if (!models.empty())
