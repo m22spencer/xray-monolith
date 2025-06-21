@@ -748,25 +748,25 @@
 		<text>Optimizations</text>
 	</string>
 	
-	<string id="ui_mm_modded_exes_debug_optimizations_spawn_antifreeze">
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze">
 		<text>Spawn antifreeze (spawn_antifreeze)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_spawn_antifreeze_desc">
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_desc">
 		<text>Puts spawning of entities procedure into separate thread, doesn't completely eliminate freezes but tries to minimize them</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_spawn_antifreeze_batch">
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch">
 		<text>Spawn antifreeze batch size (spawn_antifreeze_batch)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_spawn_antifreeze_batch_desc">
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch_desc">
 		<text>Amount of spawn events to process each frame</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_lua_gcstep">
+	<string id="ui_mm_modded_exes_optimizations_lua_gcstep">
 		<text>Lua Garbage Collection Step (lua_gcstep)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_mouse_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_mouse_buffer_size">
 		<text>Mouse Input Buffer Size (mouse_buffer_size)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_optimizations_keyboard_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_keyboard_buffer_size">
 		<text>Keyboard Input Buffer Size (keyboard_buffer_size)</text>
 	</string>
 </string_table>
