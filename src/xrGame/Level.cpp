@@ -529,7 +529,7 @@ bool CLevel::SpawnEventCompare(const NET_Event& a, const NET_Event& b) const
 void CLevel::SortSpawnEventsQueue()
 {
 	auto& queue = spawn_events->queue;
-	std::sort(queue.begin(), queue.end(), [this](const NET_Event& a, const NET_Event& b) { return SpawnEventCompare(a, b); });
+	std::stable_sort(queue.begin(), queue.end(), [this](const NET_Event& a, const NET_Event& b) { return SpawnEventCompare(a, b); });
 }
 
 void CLevel::ProcessPrefetchEvents(void* args)
