@@ -717,12 +717,17 @@ void CLevel::ProcessGameEvents()
 			{
 			case M_SPAWN:
 				{
-					PROF_EVENT("ProcessGameEvents M_SPAWN ordinary");
-					u16 parent_id;
-					shared_str section;
-					u16 obj_id = GetSpawnInfo(P, parent_id, section);
+					PROF_EVENT("ProcessGameEvents M_SPAWN");
 
-					if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] M_SPAWN ordinary: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+#ifdef SPAWN_ANTIFREEZE
+					if (spawn_antifreeze_verbose)
+					{
+						u16 parent_id;
+						shared_str section;
+						u16 obj_id = GetSpawnInfo(P, parent_id, section);
+						Msg("[ProcessGameEvents] M_SPAWN: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+					}
+#endif
 
 					u16 dummy16;
 					P.r_begin(dummy16);
@@ -731,13 +736,13 @@ void CLevel::ProcessGameEvents()
 				}
 			case M_EVENT:
 				{
-					PROF_EVENT("ProcessGameEvents M_EVENT ordinary");
+					PROF_EVENT("ProcessGameEvents M_EVENT");
 					cl_Process_Event(dest, type, P);
 					break;
 				}
 			case M_MOVE_PLAYERS:
 				{
-					PROF_EVENT("ProcessGameEvents M_MOVE_PLAYERS ordinary");
+					PROF_EVENT("ProcessGameEvents M_MOVE_PLAYERS");
 					u8 Count = P.r_u8();
 					for (u8 i = 0; i < Count; i++)
 					{
@@ -757,21 +762,21 @@ void CLevel::ProcessGameEvents()
 				}
 			case M_STATISTIC_UPDATE:
 				{
-					PROF_EVENT("ProcessGameEvents M_STATISTIC_UPDATE ordinary");
+					PROF_EVENT("ProcessGameEvents M_STATISTIC_UPDATE");
 					if (GameID() != eGameIDSingle)
 						Game().m_WeaponUsageStatistic->OnUpdateRequest(&P);
 					break;
 				}
 			case M_FILE_TRANSFER:
 				{
-					PROF_EVENT("ProcessGameEvents M_FILE_TRANSFER ordinary");
+					PROF_EVENT("ProcessGameEvents M_FILE_TRANSFER");
 					if (m_file_transfer) // in case of net_Stop
 						m_file_transfer->on_message(&P);
 					break;
 				}
 			case M_GAMEMESSAGE:
 				{
-					PROF_EVENT("ProcessGameEvents M_GAMEMESSAGE ordinary");
+					PROF_EVENT("ProcessGameEvents M_GAMEMESSAGE");
 					Game().OnGameMessage(P);
 					break;
 				}
