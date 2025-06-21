@@ -414,25 +414,6 @@ void CRenderDevice::on_idle()
 	}
 #endif // ECO_RENDER END
 
-	//Discord
-	if (use_discord && psDeviceFlags2.test(rsDiscord))
-	{
-		PROF_EVENT("Discord");
-		discord_core->RunCallbacks();
-
-		static float last_update;
-		if (!last_update)
-		{
-			updateDiscordPresence();
-			last_update = Device.fTimeGlobal;
-		}
-		else if ((Device.fTimeGlobal - last_update) > discord_update_rate)
-		{
-			updateDiscordPresence();
-			last_update = Device.fTimeGlobal;
-		}
-	}
-
 #ifndef DEDICATED_SERVER
 	Statistic->RenderTOTAL_Real.FrameStart();
 	Statistic->RenderTOTAL_Real.Begin();
@@ -522,6 +503,31 @@ void CRenderDevice::message_loop()
 	}
 }
 
+void mt_DiscordThread(void*)
+{
+	while (true)
+	{
+		if (!pApp)
+		{
+			return;
+		}
+
+		//Discord
+		if (use_discord && psDeviceFlags2.test(rsDiscord))
+		{
+			START_PROFILE("Discord");
+			discord_core->RunCallbacks();
+			updateDiscordPresence();
+			STOP_PROFILE;
+			Sleep(int(discord_update_rate * 1000));
+		}
+		else
+		{
+			Sleep(1000); // Sleep for 1 second if Discord is not used or disabled
+		}
+	}
+}
+
 void CRenderDevice::Run()
 {
 	// DUMP_PHASE;
@@ -545,6 +551,7 @@ void CRenderDevice::Run()
 	mt_bMustExit = FALSE;
 	thread_spawn(mt_FreezeThread, "Freeze detecting thread", 0, 0);
 	thread_spawn(mt_Thread, "X-RAY Secondary thread", 0, this);
+	thread_spawn(mt_DiscordThread, "X-RAY Discord thread", 0, 0);
 	// Message cycle
 	seqAppStart.Process(rp_AppStart);
 
