@@ -140,7 +140,7 @@
       <ProxyFileName>default_p.c</ProxyFileName>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;dSINGLE;MSVC;dNODEBUG;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>4100;4505;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -161,7 +161,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>../../../config/msvcdefs.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>../../config/msvcdefs.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -189,7 +189,7 @@
       <ProxyFileName>default_p.c</ProxyFileName>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XRCORE_PROFILER;WIN32;_WINDOWS;NDEBUG;dSINGLE;MSVC;dNODEBUG;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>4100;4505;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -209,7 +209,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>../../../config/msvcdefs.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>../../config/msvcdefs.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -242,7 +242,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_VERIFY_IN_RELEASE;WIN32;_WINDOWS;NDEBUG;dSINGLE;MSVC;dNODEBUG;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -258,7 +258,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>../../../config/msvcdefs.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>../../config/msvcdefs.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -291,7 +291,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_VERIFY_IN_RELEASE;WIN32;_WINDOWS;NDEBUG;dSINGLE;MSVC;dNODEBUG;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -307,7 +307,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>../../../config/msvcdefs.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>../../config/msvcdefs.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -335,7 +335,7 @@
       <ProxyFileName>default_p.c</ProxyFileName>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;dSINGLE;MSVC;dNODEBUG;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>4100;4505;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -356,7 +356,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>../../../config/msvcdefs.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>../../config/msvcdefs.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
