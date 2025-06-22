@@ -217,10 +217,10 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dxerr.cpp" />
+    <ClCompile Include="dxerr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dxerr.h" />
+    <ClInclude Include="dxerr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

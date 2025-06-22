@@ -348,31 +348,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\PLC.cpp" />
-    <ClCompile Include="..\StdAfx.cpp">
+    <ClCompile Include="PLC.cpp" />
+    <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\ttapi.cpp" />
-    <ClCompile Include="..\xrCPU_Pipe.cpp" />
-    <ClCompile Include="..\xrSkin2W.cpp" />
-    <ClCompile Include="..\xrSkin2W_SSE.cpp" />
-    <ClCompile Include="..\xrSkin2W_thread.cpp" />
+    <ClCompile Include="ttapi.cpp" />
+    <ClCompile Include="xrCPU_Pipe.cpp" />
+    <ClCompile Include="xrSkin2W.cpp" />
+    <ClCompile Include="xrSkin2W_SSE.cpp" />
+    <ClCompile Include="xrSkin2W_thread.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\resource.h" />
-    <ClInclude Include="..\StdAfx.h" />
-    <ClInclude Include="..\ttapi.h" />
-    <ClInclude Include="..\xrCPU_Pipe.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="ttapi.h" />
+    <ClInclude Include="xrCPU_Pipe.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\xrCPU_Pipe.rc" />
+    <ResourceCompile Include="xrCPU_Pipe.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
   </ItemGroup>

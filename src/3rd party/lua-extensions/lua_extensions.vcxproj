@@ -268,15 +268,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\base.cpp" />
-    <ClCompile Include="..\lfs.c" />
-    <ClCompile Include="..\lmarshal.c" />
-    <ClCompile Include="..\script_additional_libs.cpp" />
+    <ClCompile Include="base.cpp" />
+    <ClCompile Include="lfs.c" />
+    <ClCompile Include="lmarshal.c" />
+    <ClCompile Include="script_additional_libs.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\lfs.h" />
-    <ClInclude Include="..\lmarshal.h" />
-    <ClInclude Include="..\script_additional_libs.h" />
+    <ClInclude Include="lfs.h" />
+    <ClInclude Include="lmarshal.h" />
+    <ClInclude Include="script_additional_libs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

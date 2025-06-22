@@ -7,18 +7,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\stdafx.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrAPI.cpp">
+    <ClCompile Include="xrAPI.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\stdafx.h">
+    <ClInclude Include="stdafx.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\xrAPI\xrAPI.h">
+    <ClInclude Include="..\..\Include\xrAPI\xrAPI.h">
       <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>

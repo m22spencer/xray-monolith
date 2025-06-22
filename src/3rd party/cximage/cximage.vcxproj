@@ -309,33 +309,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ximacfg.cpp" />
-    <ClCompile Include="..\ximaenc.cpp" />
-    <ClCompile Include="..\ximaexif.cpp" />
-    <ClCompile Include="..\xImage.cpp" />
-    <ClCompile Include="..\ximainfo.cpp" />
-    <ClCompile Include="..\ximaint.cpp" />
-    <ClCompile Include="..\ximajpg.cpp" />
-    <ClCompile Include="..\ximalpha.cpp" />
-    <ClCompile Include="..\ximalyr.cpp" />
-    <ClCompile Include="..\ximapal.cpp" />
-    <ClCompile Include="..\ximasel.cpp" />
-    <ClCompile Include="..\ximath.cpp" />
-    <ClCompile Include="..\xmemfile.cpp" />
+    <ClCompile Include="ximacfg.cpp" />
+    <ClCompile Include="ximaenc.cpp" />
+    <ClCompile Include="ximaexif.cpp" />
+    <ClCompile Include="xImage.cpp" />
+    <ClCompile Include="ximainfo.cpp" />
+    <ClCompile Include="ximaint.cpp" />
+    <ClCompile Include="ximajpg.cpp" />
+    <ClCompile Include="ximalpha.cpp" />
+    <ClCompile Include="ximalyr.cpp" />
+    <ClCompile Include="ximapal.cpp" />
+    <ClCompile Include="ximasel.cpp" />
+    <ClCompile Include="ximath.cpp" />
+    <ClCompile Include="xmemfile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\xfile.h" />
-    <ClInclude Include="..\ximacfg.h" />
-    <ClInclude Include="..\ximadef.h" />
-    <ClInclude Include="..\ximage.h" />
-    <ClInclude Include="..\ximaiter.h" />
-    <ClInclude Include="..\ximajpg.h" />
-    <ClInclude Include="..\ximath.h" />
-    <ClInclude Include="..\xiofile.h" />
-    <ClInclude Include="..\xmemfile.h" />
+    <ClInclude Include="xfile.h" />
+    <ClInclude Include="ximacfg.h" />
+    <ClInclude Include="ximadef.h" />
+    <ClInclude Include="ximage.h" />
+    <ClInclude Include="ximaiter.h" />
+    <ClInclude Include="ximajpg.h" />
+    <ClInclude Include="ximath.h" />
+    <ClInclude Include="xiofile.h" />
+    <ClInclude Include="xmemfile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
   </ItemGroup>

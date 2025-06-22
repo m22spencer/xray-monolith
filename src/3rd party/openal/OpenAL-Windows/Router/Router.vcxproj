@@ -328,7 +328,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\al.cpp">
+    <ClCompile Include="al.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
@@ -345,7 +345,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
       </BrowseInformation>
     </ClCompile>
-    <ClCompile Include="..\alc.cpp">
+    <ClCompile Include="alc.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
@@ -362,7 +362,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
       </BrowseInformation>
     </ClCompile>
-    <ClCompile Include="..\alList.cpp">
+    <ClCompile Include="alList.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
@@ -379,7 +379,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
       </BrowseInformation>
     </ClCompile>
-    <ClCompile Include="..\OpenAL32.cpp">
+    <ClCompile Include="OpenAL32.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ROUTER_EXPORTS</PreprocessorDefinitions>
@@ -398,12 +398,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\OpenAL32.rc" />
+    <ResourceCompile Include="OpenAL32.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\alList.h" />
-    <ClInclude Include="..\OpenAL32.h" />
-    <ClInclude Include="..\resource.h" />
+    <ClInclude Include="alList.h" />
+    <ClInclude Include="OpenAL32.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

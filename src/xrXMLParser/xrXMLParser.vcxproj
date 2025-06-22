@@ -331,22 +331,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\StdAfx.cpp">
+    <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\tinyxml.cpp" />
-    <ClCompile Include="..\tinyxmlerror.cpp" />
-    <ClCompile Include="..\tinyxmlparser.cpp" />
-    <ClCompile Include="..\xrXMLParser.cpp" />
+    <ClCompile Include="tinyxml.cpp" />
+    <ClCompile Include="tinyxmlerror.cpp" />
+    <ClCompile Include="tinyxmlparser.cpp" />
+    <ClCompile Include="xrXMLParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\stdafx.h" />
-    <ClInclude Include="..\tinyxml.h" />
-    <ClInclude Include="..\xrXMLParser.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="tinyxml.h" />
+    <ClInclude Include="xrXMLParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)3rd party\openal\OpenAL-Windows\Router\Router.vcxproj">

@@ -159,655 +159,655 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\_d3d_extensions.h">
+    <ClInclude Include="_d3d_extensions.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\dedicated_server_only.h">
+    <ClInclude Include="dedicated_server_only.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\defines.h">
+    <ClInclude Include="defines.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\mp_logging.h">
+    <ClInclude Include="mp_logging.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\no_single.h">
+    <ClInclude Include="no_single.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\stdafx.h">
+    <ClInclude Include="stdafx.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\trivial_encryptor.h">
+    <ClInclude Include="trivial_encryptor.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\x_ray.h">
+    <ClInclude Include="x_ray.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="..\resource.h">
+    <ClInclude Include="resource.h">
       <Filter>General\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\psystem.h">
+    <ClInclude Include="psystem.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="..\IInputReceiver.h">
+    <ClInclude Include="IInputReceiver.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_input.h">
+    <ClInclude Include="xr_input.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_input_xinput.h">
+    <ClInclude Include="xr_input_xinput.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\ISheduled.h">
+    <ClInclude Include="ISheduled.h">
       <Filter>Interfaces\Sheduler</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrSheduler.h">
+    <ClInclude Include="xrSheduler.h">
       <Filter>Interfaces\Sheduler</Filter>
     </ClInclude>
-    <ClInclude Include="..\IRenderable.h">
+    <ClInclude Include="IRenderable.h">
       <Filter>Interfaces\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\Render.h">
+    <ClInclude Include="Render.h">
       <Filter>Interfaces\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\ICollidable.h">
+    <ClInclude Include="ICollidable.h">
       <Filter>Interfaces\Collidable</Filter>
     </ClInclude>
-    <ClInclude Include="..\IObjectPhysicsCollision.h">
+    <ClInclude Include="IObjectPhysicsCollision.h">
       <Filter>Interfaces\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\IPHdebug.h">
+    <ClInclude Include="IPHdebug.h">
       <Filter>Interfaces\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\IPhysicsGeometry.h">
+    <ClInclude Include="IPhysicsGeometry.h">
       <Filter>Interfaces\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\IPhysicsShell.h">
+    <ClInclude Include="IPhysicsShell.h">
       <Filter>Interfaces\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\IGame_Level.h">
+    <ClInclude Include="IGame_Level.h">
       <Filter>Game API</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrLevel.h">
+    <ClInclude Include="xrLevel.h">
       <Filter>Game API</Filter>
     </ClInclude>
-    <ClInclude Include="..\IGame_ObjectPool.h">
+    <ClInclude Include="IGame_ObjectPool.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\IGame_Persistent.h">
+    <ClInclude Include="IGame_Persistent.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\pure_relcase.h">
+    <ClInclude Include="pure_relcase.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_object.h">
+    <ClInclude Include="xr_object.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_object_list.h">
+    <ClInclude Include="xr_object_list.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\CustomHUD.h">
+    <ClInclude Include="CustomHUD.h">
       <Filter>Game API\HUD</Filter>
     </ClInclude>
-    <ClInclude Include="..\Environment.h">
+    <ClInclude Include="Environment.h">
       <Filter>Game API\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrHemisphere.h">
+    <ClInclude Include="xrHemisphere.h">
       <Filter>Game API\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\Rain.h">
+    <ClInclude Include="Rain.h">
       <Filter>Game API\Environment\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\thunderbolt.h">
+    <ClInclude Include="thunderbolt.h">
       <Filter>Game API\Environment\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_efflensflare.h">
+    <ClInclude Include="xr_efflensflare.h">
       <Filter>Game API\Environment\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\CameraBase.h">
+    <ClInclude Include="CameraBase.h">
       <Filter>Game API\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="..\CameraDefs.h">
+    <ClInclude Include="CameraDefs.h">
       <Filter>Game API\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="..\CameraManager.h">
+    <ClInclude Include="CameraManager.h">
       <Filter>Game API\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="..\Effector.h">
+    <ClInclude Include="Effector.h">
       <Filter>Game API\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="..\EffectorPP.h">
+    <ClInclude Include="EffectorPP.h">
       <Filter>Game API\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="..\cf_dynamic_mesh.h">
+    <ClInclude Include="cf_dynamic_mesh.h">
       <Filter>Game API\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_collide_form.h">
+    <ClInclude Include="xr_collide_form.h">
       <Filter>Game API\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\bone.h">
+    <ClInclude Include="bone.h">
       <Filter>Game API\Animator</Filter>
     </ClInclude>
-    <ClInclude Include="..\envelope.h">
+    <ClInclude Include="envelope.h">
       <Filter>Game API\Animator</Filter>
     </ClInclude>
-    <ClInclude Include="..\motion.h">
+    <ClInclude Include="motion.h">
       <Filter>Game API\Animator</Filter>
     </ClInclude>
-    <ClInclude Include="..\ObjectAnimator.h">
+    <ClInclude Include="ObjectAnimator.h">
       <Filter>Game API\Animator</Filter>
     </ClInclude>
-    <ClInclude Include="..\Feel_Sound.h">
+    <ClInclude Include="Feel_Sound.h">
       <Filter>Game API\Feelers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Feel_Touch.h">
+    <ClInclude Include="Feel_Touch.h">
       <Filter>Game API\Feelers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Feel_Vision.h">
+    <ClInclude Include="Feel_Vision.h">
       <Filter>Game API\Feelers</Filter>
     </ClInclude>
-    <ClInclude Include="..\FDemoPlay.h">
+    <ClInclude Include="FDemoPlay.h">
       <Filter>Game API\Demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\FDemoRecord.h">
+    <ClInclude Include="FDemoRecord.h">
       <Filter>Game API\Demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\GameMtlLib.h">
+    <ClInclude Include="GameMtlLib.h">
       <Filter>Game API\GameMaterials</Filter>
     </ClInclude>
-    <ClInclude Include="..\ObjectDump.h">
+    <ClInclude Include="ObjectDump.h">
       <Filter>Game API\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="..\EnnumerateVertices.h">
+    <ClInclude Include="EnnumerateVertices.h">
       <Filter>Render\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\vis_common.h">
+    <ClInclude Include="vis_common.h">
       <Filter>Render\Visibility</Filter>
     </ClInclude>
-    <ClInclude Include="..\PS_instance.h">
+    <ClInclude Include="PS_instance.h">
       <Filter>Render\Particle system</Filter>
     </ClInclude>
-    <ClInclude Include="..\LightAnimLibrary.h">
+    <ClInclude Include="LightAnimLibrary.h">
       <Filter>Render\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="..\GameFont.h">
+    <ClInclude Include="GameFont.h">
       <Filter>Render\Font output</Filter>
     </ClInclude>
-    <ClInclude Include="..\MbHelpers.h">
+    <ClInclude Include="MbHelpers.h">
       <Filter>Render\Font output</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shader_xrLC.h">
+    <ClInclude Include="Shader_xrLC.h">
       <Filter>Render\Execution &amp; 3D\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="..\WaveForm.h">
+    <ClInclude Include="WaveForm.h">
       <Filter>Render\Execution &amp; 3D\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="..\tntQAVI.h">
+    <ClInclude Include="tntQAVI.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrImage_Resampler.h">
+    <ClInclude Include="xrImage_Resampler.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrTheora_Stream.h">
+    <ClInclude Include="xrTheora_Stream.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrTheora_Surface.h">
+    <ClInclude Include="xrTheora_Surface.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrTheora_Surface_mmx.h">
+    <ClInclude Include="xrTheora_Surface_mmx.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\Text_Console.h">
+    <ClInclude Include="Text_Console.h">
       <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
     </ClInclude>
-    <ClInclude Include="..\Properties.h">
+    <ClInclude Include="Properties.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\pure.h">
+    <ClInclude Include="pure.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\std_classes.h">
+    <ClInclude Include="std_classes.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\cl_intersect.h">
+    <ClInclude Include="cl_intersect.h">
       <Filter>Engine\Collision Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\XR_IOConsole.h">
+    <ClInclude Include="XR_IOConsole.h">
       <Filter>Engine\Console</Filter>
     </ClInclude>
-    <ClInclude Include="..\xr_ioc_cmd.h">
+    <ClInclude Include="xr_ioc_cmd.h">
       <Filter>Engine\Console\commands</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine.h">
+    <ClInclude Include="Engine.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\EngineAPI.h">
+    <ClInclude Include="EngineAPI.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\EventAPI.h">
+    <ClInclude Include="EventAPI.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\ai_script_lua_extension.h">
+    <ClInclude Include="ai_script_lua_extension.h">
       <Filter>Engine\Core\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\ai_script_lua_space.h">
+    <ClInclude Include="ai_script_lua_space.h">
       <Filter>Engine\Core\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\ai_script_space.h">
+    <ClInclude Include="ai_script_space.h">
       <Filter>Engine\Core\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\perlin.h">
+    <ClInclude Include="perlin.h">
       <Filter>Engine\Noise</Filter>
     </ClInclude>
-    <ClInclude Include="..\line_editor.h">
+    <ClInclude Include="line_editor.h">
       <Filter>Engine\text_editor\line_editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\line_edit_control.h">
+    <ClInclude Include="line_edit_control.h">
       <Filter>Engine\text_editor\line_editor_control</Filter>
     </ClInclude>
-    <ClInclude Include="..\edit_actions.h">
+    <ClInclude Include="edit_actions.h">
       <Filter>Engine\text_editor\edit_actions</Filter>
     </ClInclude>
-    <ClInclude Include="..\device.h">
+    <ClInclude Include="device.h">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClInclude>
-    <ClInclude Include="..\StatGraph.h">
+    <ClInclude Include="StatGraph.h">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClInclude>
-    <ClInclude Include="..\Stats.h">
+    <ClInclude Include="Stats.h">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClInclude>
-    <ClInclude Include="..\Fmesh.h">
+    <ClInclude Include="Fmesh.h">
       <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
     </ClInclude>
-    <ClInclude Include="..\SkeletonMotionDefs.h">
+    <ClInclude Include="SkeletonMotionDefs.h">
       <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\SkeletonMotions.h">
+    <ClInclude Include="SkeletonMotions.h">
       <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrSASH.h">
+    <ClInclude Include="xrSASH.h">
       <Filter>OpenAutomate</Filter>
     </ClInclude>
-    <ClInclude Include="..\ShadersExternalData.h">
+    <ClInclude Include="ShadersExternalData.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\achievement_manager.h">
+    <ClInclude Include="..\3rd party\discord\achievement_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\activity_manager.h">
+    <ClInclude Include="..\3rd party\discord\activity_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\application_manager.h">
+    <ClInclude Include="..\3rd party\discord\application_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\core.h">
+    <ClInclude Include="..\3rd party\discord\core.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\discord.h">
+    <ClInclude Include="..\3rd party\discord\discord.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\event.h">
+    <ClInclude Include="..\3rd party\discord\event.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\ffi.h">
+    <ClInclude Include="..\3rd party\discord\ffi.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\image_manager.h">
+    <ClInclude Include="..\3rd party\discord\image_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\lobby_manager.h">
+    <ClInclude Include="..\3rd party\discord\lobby_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\network_manager.h">
+    <ClInclude Include="..\3rd party\discord\network_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\overlay_manager.h">
+    <ClInclude Include="..\3rd party\discord\overlay_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\relationship_manager.h">
+    <ClInclude Include="..\3rd party\discord\relationship_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\storage_manager.h">
+    <ClInclude Include="..\3rd party\discord\storage_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\store_manager.h">
+    <ClInclude Include="..\3rd party\discord\store_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\types.h">
+    <ClInclude Include="..\3rd party\discord\types.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\user_manager.h">
+    <ClInclude Include="..\3rd party\discord\user_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\3rd party\discord\voice_manager.h">
+    <ClInclude Include="..\3rd party\discord\voice_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui_base.h">
+    <ClInclude Include="imgui_base.h">
       <Filter>Interfaces\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui_helper.h">
+    <ClInclude Include="imgui_helper.h">
       <Filter>Interfaces\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\defines.cpp">
+    <ClCompile Include="defines.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="..\stdafx.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="..\x_ray.cpp">
+    <ClCompile Include="x_ray.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="..\IInputReceiver.cpp">
+    <ClCompile Include="IInputReceiver.cpp">
       <Filter>Interfaces\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\Xr_input.cpp">
+    <ClCompile Include="Xr_input.cpp">
       <Filter>Interfaces\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_input_xinput.cpp">
+    <ClCompile Include="xr_input_xinput.cpp">
       <Filter>Interfaces\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\ISheduled.cpp">
+    <ClCompile Include="ISheduled.cpp">
       <Filter>Interfaces\Sheduler</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrSheduler.cpp">
+    <ClCompile Include="xrSheduler.cpp">
       <Filter>Interfaces\Sheduler</Filter>
     </ClCompile>
-    <ClCompile Include="..\IRenderable.cpp">
+    <ClCompile Include="IRenderable.cpp">
       <Filter>Interfaces\Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\Render.cpp">
+    <ClCompile Include="Render.cpp">
       <Filter>Interfaces\Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\ICollidable.cpp">
+    <ClCompile Include="ICollidable.cpp">
       <Filter>Interfaces\Collidable</Filter>
     </ClCompile>
-    <ClCompile Include="..\phdebug.cpp">
+    <ClCompile Include="phdebug.cpp">
       <Filter>Interfaces\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\IGame_Level.cpp">
+    <ClCompile Include="IGame_Level.cpp">
       <Filter>Game API</Filter>
     </ClCompile>
-    <ClCompile Include="..\IGame_Level_check_textures.cpp">
+    <ClCompile Include="IGame_Level_check_textures.cpp">
       <Filter>Game API</Filter>
     </ClCompile>
-    <ClCompile Include="..\IGame_Persistent.cpp">
+    <ClCompile Include="IGame_Persistent.cpp">
       <Filter>Game API</Filter>
     </ClCompile>
-    <ClCompile Include="..\IGame_ObjectPool.cpp">
+    <ClCompile Include="IGame_ObjectPool.cpp">
       <Filter>Game API\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\pure_relcase.cpp">
+    <ClCompile Include="pure_relcase.cpp">
       <Filter>Game API\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_object.cpp">
+    <ClCompile Include="xr_object.cpp">
       <Filter>Game API\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_object_list.cpp">
+    <ClCompile Include="xr_object_list.cpp">
       <Filter>Game API\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\CustomHUD.cpp">
+    <ClCompile Include="CustomHUD.cpp">
       <Filter>Game API\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="..\Environment.cpp">
+    <ClCompile Include="Environment.cpp">
       <Filter>Game API\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\Environment_misc.cpp">
+    <ClCompile Include="Environment_misc.cpp">
       <Filter>Game API\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\Environment_render.cpp">
+    <ClCompile Include="Environment_render.cpp">
       <Filter>Game API\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrHemisphere.cpp">
+    <ClCompile Include="xrHemisphere.cpp">
       <Filter>Game API\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\Rain.cpp">
+    <ClCompile Include="Rain.cpp">
       <Filter>Game API\Environment\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\thunderbolt.cpp">
+    <ClCompile Include="thunderbolt.cpp">
       <Filter>Game API\Environment\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_efflensflare.cpp">
+    <ClCompile Include="xr_efflensflare.cpp">
       <Filter>Game API\Environment\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\CameraBase.cpp">
+    <ClCompile Include="CameraBase.cpp">
       <Filter>Game API\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="..\CameraManager.cpp">
+    <ClCompile Include="CameraManager.cpp">
       <Filter>Game API\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="..\Effector.cpp">
+    <ClCompile Include="Effector.cpp">
       <Filter>Game API\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="..\EffectorPP.cpp">
+    <ClCompile Include="EffectorPP.cpp">
       <Filter>Game API\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="..\cf_dynamic_mesh.cpp">
+    <ClCompile Include="cf_dynamic_mesh.cpp">
       <Filter>Game API\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_collide_form.cpp">
+    <ClCompile Include="xr_collide_form.cpp">
       <Filter>Game API\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\bone.cpp">
+    <ClCompile Include="bone.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="..\Envelope.cpp">
+    <ClCompile Include="Envelope.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="..\interp.cpp">
+    <ClCompile Include="interp.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="..\motion.cpp">
+    <ClCompile Include="motion.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="..\ObjectAnimator.cpp">
+    <ClCompile Include="ObjectAnimator.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="..\Feel_Touch.cpp">
+    <ClCompile Include="Feel_Touch.cpp">
       <Filter>Game API\Feelers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Feel_Vision.cpp">
+    <ClCompile Include="Feel_Vision.cpp">
       <Filter>Game API\Feelers</Filter>
     </ClCompile>
-    <ClCompile Include="..\FDemoPlay.cpp">
+    <ClCompile Include="FDemoPlay.cpp">
       <Filter>Game API\Demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\FDemoRecord.cpp">
+    <ClCompile Include="FDemoRecord.cpp">
       <Filter>Game API\Demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\GameMtlLib.cpp">
+    <ClCompile Include="GameMtlLib.cpp">
       <Filter>Game API\GameMaterials</Filter>
     </ClCompile>
-    <ClCompile Include="..\GameMtlLib_Engine.cpp">
+    <ClCompile Include="GameMtlLib_Engine.cpp">
       <Filter>Game API\GameMaterials</Filter>
     </ClCompile>
-    <ClCompile Include="..\ObjectDump.cpp">
+    <ClCompile Include="ObjectDump.cpp">
       <Filter>Game API\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="..\PS_instance.cpp">
+    <ClCompile Include="PS_instance.cpp">
       <Filter>Render\Particle system</Filter>
     </ClCompile>
-    <ClCompile Include="..\LightAnimLibrary.cpp">
+    <ClCompile Include="LightAnimLibrary.cpp">
       <Filter>Render\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\GameFont.cpp">
+    <ClCompile Include="GameFont.cpp">
       <Filter>Render\Font output</Filter>
     </ClCompile>
-    <ClCompile Include="..\MbHelpers.cpp">
+    <ClCompile Include="MbHelpers.cpp">
       <Filter>Render\Font output</Filter>
     </ClCompile>
-    <ClCompile Include="..\tntQAVI.cpp">
+    <ClCompile Include="tntQAVI.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrImage_Resampler.cpp">
+    <ClCompile Include="xrImage_Resampler.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrTheora_Stream.cpp">
+    <ClCompile Include="xrTheora_Stream.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrTheora_Surface.cpp">
+    <ClCompile Include="xrTheora_Surface.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrTheora_Surface_mmx.cpp">
+    <ClCompile Include="xrTheora_Surface_mmx.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="..\Text_Console.cpp">
+    <ClCompile Include="Text_Console.cpp">
       <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
     </ClCompile>
-    <ClCompile Include="..\Text_Console_WndProc.cpp">
+    <ClCompile Include="Text_Console_WndProc.cpp">
       <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
     </ClCompile>
-    <ClCompile Include="..\pure.cpp">
+    <ClCompile Include="pure.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="..\XR_IOConsole.cpp">
+    <ClCompile Include="XR_IOConsole.cpp">
       <Filter>Engine\Console</Filter>
     </ClCompile>
-    <ClCompile Include="..\XR_IOConsole_callback.cpp">
+    <ClCompile Include="XR_IOConsole_callback.cpp">
       <Filter>Engine\Console</Filter>
     </ClCompile>
-    <ClCompile Include="..\XR_IOConsole_control.cpp">
+    <ClCompile Include="XR_IOConsole_control.cpp">
       <Filter>Engine\Console</Filter>
     </ClCompile>
-    <ClCompile Include="..\XR_IOConsole_get.cpp">
+    <ClCompile Include="XR_IOConsole_get.cpp">
       <Filter>Engine\Console</Filter>
     </ClCompile>
-    <ClCompile Include="..\xr_ioc_cmd.cpp">
+    <ClCompile Include="xr_ioc_cmd.cpp">
       <Filter>Engine\Console\commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine.cpp">
+    <ClCompile Include="Engine.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\EngineAPI.cpp">
+    <ClCompile Include="EngineAPI.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\EventAPI.cpp">
+    <ClCompile Include="EventAPI.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\mailSlot.cpp">
+    <ClCompile Include="mailSlot.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\_scripting.cpp">
+    <ClCompile Include="_scripting.cpp">
       <Filter>Engine\Core\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\ai_script_lua_debug.cpp">
+    <ClCompile Include="ai_script_lua_debug.cpp">
       <Filter>Engine\Core\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\ai_script_lua_extension.cpp">
+    <ClCompile Include="ai_script_lua_extension.cpp">
       <Filter>Engine\Core\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\perlin.cpp">
+    <ClCompile Include="perlin.cpp">
       <Filter>Engine\Noise</Filter>
     </ClCompile>
-    <ClCompile Include="..\line_editor.cpp">
+    <ClCompile Include="line_editor.cpp">
       <Filter>Engine\text_editor\line_editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\line_edit_control.cpp">
+    <ClCompile Include="line_edit_control.cpp">
       <Filter>Engine\text_editor\line_editor_control</Filter>
     </ClCompile>
-    <ClCompile Include="..\edit_actions.cpp">
+    <ClCompile Include="edit_actions.cpp">
       <Filter>Engine\text_editor\edit_actions</Filter>
     </ClCompile>
-    <ClCompile Include="..\device.cpp">
+    <ClCompile Include="device.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_create.cpp">
+    <ClCompile Include="Device_create.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_destroy.cpp">
+    <ClCompile Include="Device_destroy.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_Initialize.cpp">
+    <ClCompile Include="Device_Initialize.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_Misc.cpp">
+    <ClCompile Include="Device_Misc.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_overdraw.cpp">
+    <ClCompile Include="Device_overdraw.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Device_wndproc.cpp">
+    <ClCompile Include="Device_wndproc.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\StatGraph.cpp">
+    <ClCompile Include="StatGraph.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\Stats.cpp">
+    <ClCompile Include="Stats.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="..\fmesh.cpp">
+    <ClCompile Include="fmesh.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
     </ClCompile>
-    <ClCompile Include="..\SkeletonMotions.cpp">
+    <ClCompile Include="SkeletonMotions.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrSASH.cpp">
+    <ClCompile Include="xrSASH.cpp">
       <Filter>OpenAutomate</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\achievement_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\achievement_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\activity_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\activity_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\application_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\application_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\core.cpp">
+    <ClCompile Include="..\3rd party\discord\core.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\image_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\image_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\lobby_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\lobby_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\network_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\network_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\overlay_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\overlay_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\relationship_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\relationship_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\storage_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\storage_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\store_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\store_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\types.cpp">
+    <ClCompile Include="..\3rd party\discord\types.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\user_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\user_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rd party\discord\voice_manager.cpp">
+    <ClCompile Include="..\3rd party\discord\voice_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui_base.cpp">
+    <ClCompile Include="imgui_base.cpp">
       <Filter>Interfaces\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui_base_input.cpp">
+    <ClCompile Include="imgui_base_input.cpp">
       <Filter>Interfaces\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui_helper.cpp">
+    <ClCompile Include="imgui_helper.cpp">
       <Filter>Interfaces\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\splash_xrcs_en.bmp">
+    <Image Include="splash_xrcs_en.bmp">
       <Filter>General\Resources</Filter>
     </Image>
-    <Image Include="..\stalker_cs.ico">
+    <Image Include="stalker_cs.ico">
       <Filter>General\Resources</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\resource.rc">
+    <ResourceCompile Include="resource.rc">
       <Filter>General\Resources</Filter>
     </ResourceCompile>
   </ItemGroup>

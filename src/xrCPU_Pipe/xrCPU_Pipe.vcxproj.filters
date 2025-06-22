@@ -21,43 +21,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\StdAfx.cpp">
+    <ClCompile Include="StdAfx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrCPU_Pipe.cpp">
+    <ClCompile Include="xrCPU_Pipe.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrSkin2W.cpp">
+    <ClCompile Include="xrSkin2W.cpp">
       <Filter>Skinning</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrSkin2W_SSE.cpp">
+    <ClCompile Include="xrSkin2W_SSE.cpp">
       <Filter>Skinning</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrSkin2W_thread.cpp">
+    <ClCompile Include="xrSkin2W_thread.cpp">
       <Filter>Skinning</Filter>
     </ClCompile>
-    <ClCompile Include="..\ttapi.cpp">
+    <ClCompile Include="ttapi.cpp">
       <Filter>TTAPI</Filter>
     </ClCompile>
-    <ClCompile Include="..\PLC.cpp">
+    <ClCompile Include="PLC.cpp">
       <Filter>PLC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\StdAfx.h">
+    <ClInclude Include="StdAfx.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrCPU_Pipe.h">
+    <ClInclude Include="xrCPU_Pipe.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\resource.h">
+    <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\ttapi.h">
+    <ClInclude Include="ttapi.h">
       <Filter>TTAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\xrCPU_Pipe.rc" />
+    <ResourceCompile Include="xrCPU_Pipe.rc" />
   </ItemGroup>
 </Project>

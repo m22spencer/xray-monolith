@@ -326,24 +326,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\noise.h" />
-    <ClInclude Include="..\particle_actions.h" />
-    <ClInclude Include="..\particle_actions_collection.h" />
-    <ClInclude Include="..\particle_core.h" />
-    <ClInclude Include="..\particle_effect.h" />
-    <ClInclude Include="..\particle_manager.h" />
-    <ClInclude Include="..\psystem.h" />
-    <ClInclude Include="..\stdafx.h" />
+    <ClInclude Include="noise.h" />
+    <ClInclude Include="particle_actions.h" />
+    <ClInclude Include="particle_actions_collection.h" />
+    <ClInclude Include="particle_core.h" />
+    <ClInclude Include="particle_effect.h" />
+    <ClInclude Include="particle_manager.h" />
+    <ClInclude Include="psystem.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\noise.cpp" />
-    <ClCompile Include="..\particle_actions.cpp" />
-    <ClCompile Include="..\particle_actions_collection.cpp" />
-    <ClCompile Include="..\particle_actions_collection_io.cpp" />
-    <ClCompile Include="..\particle_core.cpp" />
-    <ClCompile Include="..\particle_effect.cpp" />
-    <ClCompile Include="..\particle_manager.cpp" />
-    <ClCompile Include="..\stdafx.cpp">
+    <ClCompile Include="noise.cpp" />
+    <ClCompile Include="particle_actions.cpp" />
+    <ClCompile Include="particle_actions_collection.cpp" />
+    <ClCompile Include="particle_actions_collection_io.cpp" />
+    <ClCompile Include="particle_core.cpp" />
+    <ClCompile Include="particle_effect.cpp" />
+    <ClCompile Include="particle_manager.cpp" />
+    <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'">Create</PrecompiledHeader>
