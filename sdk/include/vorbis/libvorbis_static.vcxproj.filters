@@ -11,67 +11,67 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\lib\analysis.c">
+    <ClCompile Include="lib\analysis.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\bitrate.c">
+    <ClCompile Include="lib\bitrate.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\block.c">
+    <ClCompile Include="lib\block.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\codebook.c">
+    <ClCompile Include="lib\codebook.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\envelope.c">
+    <ClCompile Include="lib\envelope.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\floor0.c">
+    <ClCompile Include="lib\floor0.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\floor1.c">
+    <ClCompile Include="lib\floor1.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\info.c">
+    <ClCompile Include="lib\info.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\lookup.c">
+    <ClCompile Include="lib\lookup.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\lpc.c">
+    <ClCompile Include="lib\lpc.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\lsp.c">
+    <ClCompile Include="lib\lsp.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\mapping0.c">
+    <ClCompile Include="lib\mapping0.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\mdct.c">
+    <ClCompile Include="lib\mdct.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\psy.c">
+    <ClCompile Include="lib\psy.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\registry.c">
+    <ClCompile Include="lib\registry.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\res0.c">
+    <ClCompile Include="lib\res0.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\sharedbook.c">
+    <ClCompile Include="lib\sharedbook.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\smallft.c">
+    <ClCompile Include="lib\smallft.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\synthesis.c">
+    <ClCompile Include="lib\synthesis.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\vorbisenc.c">
+    <ClCompile Include="lib\vorbisenc.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\window.c">
+    <ClCompile Include="lib\window.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -81,130 +81,130 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\codec.h">
+    <ClInclude Include="codec.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\vorbisenc.h">
+    <ClInclude Include="vorbisenc.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\vorbisfile.h">
+    <ClInclude Include="vorbisfile.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\backends.h">
+    <ClInclude Include="lib\backends.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\bitrate.h">
+    <ClInclude Include="lib\bitrate.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\books\coupled\res_books_stereo.h">
+    <ClInclude Include="lib\books\coupled\res_books_stereo.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\books\floor\floor_books.h">
+    <ClInclude Include="lib\books\floor\floor_books.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\books\uncoupled\res_books_uncoupled.h">
+    <ClInclude Include="lib\books\uncoupled\res_books_uncoupled.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\codebook.h">
+    <ClInclude Include="lib\codebook.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\codec_internal.h">
+    <ClInclude Include="lib\codec_internal.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\envelope.h">
+    <ClInclude Include="lib\envelope.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\highlevel.h">
+    <ClInclude Include="lib\highlevel.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\lookup.h">
+    <ClInclude Include="lib\lookup.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\lookup_data.h">
+    <ClInclude Include="lib\lookup_data.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\lpc.h">
+    <ClInclude Include="lib\lpc.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\lsp.h">
+    <ClInclude Include="lib\lsp.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\masking.h">
+    <ClInclude Include="lib\masking.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\mdct.h">
+    <ClInclude Include="lib\mdct.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\misc.h">
+    <ClInclude Include="lib\misc.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\floor_all.h">
+    <ClInclude Include="lib\modes\floor_all.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\psych_11.h">
+    <ClInclude Include="lib\modes\psych_11.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\psych_16.h">
+    <ClInclude Include="lib\modes\psych_16.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\psych_44.h">
+    <ClInclude Include="lib\modes\psych_44.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\psych_8.h">
+    <ClInclude Include="lib\modes\psych_8.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\residue_16.h">
+    <ClInclude Include="lib\modes\residue_16.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\residue_44.h">
+    <ClInclude Include="lib\modes\residue_44.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\residue_44u.h">
+    <ClInclude Include="lib\modes\residue_44u.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\residue_8.h">
+    <ClInclude Include="lib\modes\residue_8.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_11.h">
+    <ClInclude Include="lib\modes\setup_11.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_16.h">
+    <ClInclude Include="lib\modes\setup_16.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_22.h">
+    <ClInclude Include="lib\modes\setup_22.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_32.h">
+    <ClInclude Include="lib\modes\setup_32.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_44.h">
+    <ClInclude Include="lib\modes\setup_44.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_44u.h">
+    <ClInclude Include="lib\modes\setup_44u.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_8.h">
+    <ClInclude Include="lib\modes\setup_8.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\modes\setup_X.h">
+    <ClInclude Include="lib\modes\setup_X.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\os.h">
+    <ClInclude Include="lib\os.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\psy.h">
+    <ClInclude Include="lib\psy.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\registry.h">
+    <ClInclude Include="lib\registry.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\scales.h">
+    <ClInclude Include="lib\scales.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\smallft.h">
+    <ClInclude Include="lib\smallft.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\window.h">
+    <ClInclude Include="lib\window.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
