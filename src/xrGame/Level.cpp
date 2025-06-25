@@ -694,16 +694,19 @@ void CLevel::ProcessGameEvents()
 						safe_insert(models, obj->visual()->get_visual());
 					}
 
-					prefetch_event E;
-					E.p = std::move(P);
-					E.models = std::move(models);
+					if (!models.empty())
+					{
+						prefetch_event E;
+						E.p = std::move(P);
+						E.models = std::move(models);
 
-					xrCriticalSectionGuard g(prefetch_cs);
-					prefetch_events->push_back(E);
+						xrCriticalSectionGuard g(prefetch_cs);
+						prefetch_events->push_back(E);
 
-					if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
-					it = game_events->queue.erase(it); // remove current event
-					continue;
+						if (spawn_antifreeze_verbose) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+						it = game_events->queue.erase(it); // remove current event
+						continue;
+					}
 				}
 			}
 #endif
