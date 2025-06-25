@@ -83,13 +83,13 @@ static HANDLE prefetch_thread_signal;
 
 static void unpausePrefetchThreadSignal()
 {
-	if (spawn_antifreeze_verbose) Msg("prefetch_thread_signal Set");
+	//if (spawn_antifreeze_verbose) Msg("prefetch_thread_signal Set");
 	SetEvent(prefetch_thread_signal);
 }
 
 static void pausePrefetchThreadSignal()
 {
-	if (spawn_antifreeze_verbose) Msg("prefetch_thread_signal Reset");
+	//if (spawn_antifreeze_verbose) Msg("prefetch_thread_signal Reset");
 	ResetEvent(prefetch_thread_signal);
 }
 
