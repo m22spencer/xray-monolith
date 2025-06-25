@@ -189,6 +189,7 @@ How to compile exes:
 ## Changelog
 **2025.06.26**
 * Spawn antifreeze: Fixed some random crashes to desktop due to race condition in shader creation
+* LVutner: [Render] PIXEVENTs. Thanks to forserx and frowik
 
 **2025.06.24**
 * Hotfixes:
