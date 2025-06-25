@@ -187,6 +187,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.26**
+* Spawn antifreeze: Fixed some random crashes to desktop due to race condition in shader creation
+
 **2025.06.24**
 * Hotfixes:
   * Spawn antifreeze: Fixed crashing to desktop if model hasn't been found for prefetching
