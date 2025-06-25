@@ -47,17 +47,24 @@ Shader::~Shader()
 	DEV->Delete(this);
 }
 
+// demonized: Possible race condition with spawn antifreeze, add guard
+#ifdef SPAWN_ANTIFREEZE
 xrCriticalSection shaderCreate_cs;
+#endif
 //////////////////////////////////////////////////////////////////////////					 
 void resptrcode_shader::create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
+#ifdef SPAWN_ANTIFREEZE
 	xrCriticalSectionGuard g(shaderCreate_cs);
+#endif
 	_set(DEV->Create(s_shader, s_textures, s_constants, s_matrices));
 }
 
 void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
+#ifdef SPAWN_ANTIFREEZE
 	xrCriticalSectionGuard g(shaderCreate_cs);
+#endif
 	_set(DEV->Create(B, s_shader, s_textures, s_constants, s_matrices));
 }
 
