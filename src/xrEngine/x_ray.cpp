@@ -141,7 +141,16 @@ struct _SoundProcessor : public pureFrame
 	{
 		//Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
 		Device.Statistic->Sound.Begin();
-		::Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
+
+		// Sound information must be played from main view, not active render view
+		Fvector p, d, t;
+		Fmatrix c;
+		c.invert(Device.matrices[0].mView);
+		c.transform(p.set(0,0,0));
+		c.transform_dir(d.set(0,0,1));
+		c.transform_dir(t.set(0,1,0));
+
+		::Sound->update(p, d, t);
 		Device.Statistic->Sound.End();
 	}
 } SoundProcessor;

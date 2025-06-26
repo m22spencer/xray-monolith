@@ -859,9 +859,13 @@ void CLevel::RenderSecondViewport()
 
 void CLevel::OnRender()
 {
+	Device.matrices[0].mView = Device.mView;
+	Device.matrices[0].mProject = Device.mProject;
+	Device.matrices[0].mProjectHud = Device.mProjectHud;
+
 	if (game && Device.m_SecondViewport.IsSVPActive())
 		RenderSecondViewport();
-
+	
 	Device.dwViewport++;
 	// PDA
 	if (game && CurrentGameUI() && &CurrentGameUI()->GetPdaMenu() != nullptr)

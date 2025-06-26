@@ -88,6 +88,13 @@ public:
 	float fFOV;
 	float fASPECT;
 	float ViewportNear = 0.2f;
+
+	// Data for the main camera (1)
+	struct Matrices {
+		Fmatrix mView;
+		Fmatrix mProject;
+		Fmatrix mProjectHud;
+	} matrices[1];
 protected:
 
 	u32 Timer_MM_Delta;
