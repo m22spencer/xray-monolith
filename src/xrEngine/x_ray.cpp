@@ -385,8 +385,8 @@ void DiscordLog(discord::LogLevel level, std::string message)
 xrCriticalSection discordPresence_cs;
 void updateDiscordPresence()
 {
-	PROF_EVENT();
 	xrCriticalSectionGuard g(discordPresence_cs);
+	PROF_EVENT();
 
 	if (!use_discord)
 		return;
