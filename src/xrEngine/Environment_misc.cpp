@@ -14,6 +14,7 @@
 
 extern float ps_r2_sun_shafts_min;
 extern float ps_r2_sun_shafts_value;
+extern Fvector3 ssfx_wetness_multiplier;
 
 void CEnvModifier::load(IReader* fs, u32 version)
 {
@@ -248,6 +249,10 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) :
 	m_fTreeAmplitudeIntensity = 0.01f;
 #endif
 
+	bloom_threshold = 3.5f;
+	bloom_exposure = 3.f;
+	bloom_sky_intensity = 0.6f;
+
 	lens_flare_id = "";
 	tb_id = "";
 
@@ -333,6 +338,13 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
 	if (config.line_exist(m_identifier.c_str(), "tree_amplitude_intensity"))
 		m_fTreeAmplitudeIntensity = config.r_float(m_identifier.c_str(), "tree_amplitude_intensity");
 #endif
+
+	bloom_threshold = config.line_exist(m_identifier.c_str(), "bloom_threshold") ?
+		config.r_float(m_identifier.c_str(), "bloom_threshold") : 3.5f;
+	bloom_exposure = config.line_exist(m_identifier.c_str(), "bloom_exposure") ?
+		config.r_float(m_identifier.c_str(), "bloom_exposure") : 3.0f;
+	bloom_sky_intensity = config.line_exist(m_identifier.c_str(), "bloom_sky_intensity") ?
+		config.r_float(m_identifier.c_str(), "bloom_sky_intensity") : 0.6f;
 
 	C_CHECK(clouds_color);
 	C_CHECK(sky_color);
@@ -481,6 +493,10 @@ void CEnvDescriptorMixer::lerp(CEnvironment* env, CEnvDescriptor& A, CEnvDescrip
 	m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
 #endif
 
+	bloom_threshold = fi * A.bloom_threshold + f * B.bloom_threshold;
+	bloom_exposure = fi * A.bloom_exposure + f * B.bloom_exposure;
+	bloom_sky_intensity = fi * A.bloom_sky_intensity + f * B.bloom_sky_intensity;
+
 	// colors
 	sky_color.lerp(A.sky_color, B.sky_color, f);
 	if (Mdf.use_flags.test(eSkyColor))
@@ -505,9 +521,9 @@ void CEnvDescriptorMixer::lerp(CEnvironment* env, CEnvDescriptor& A, CEnvDescrip
 	sun_color.lerp(A.sun_color, B.sun_color, f);
 
 	if (rain_density > 0.f)
-		env->wetness_factor += rain_density / 10000.f;
+		env->wetness_factor += ( rain_density * ssfx_wetness_multiplier.x) / 10000.f;
 	else
-		env->wetness_factor -= 0.00001f;
+		env->wetness_factor -= 0.0001f * ssfx_wetness_multiplier.y;
 
 	clamp(env->wetness_factor, 0.f, 1.f);
 

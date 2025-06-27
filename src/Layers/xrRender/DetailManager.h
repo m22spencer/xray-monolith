@@ -64,6 +64,12 @@ const float		dm_fade = float(2 * dm_size) - .5f;
 class ECORE_API CDetailManager
 {
 public:
+
+	float fade_distance = 99999;
+	Fvector light_position;
+
+	void details_clear();
+
 	struct SlotItem
 	{
 		// один кустик
@@ -73,6 +79,11 @@ public:
 		u32 vis_ID; // индекс в visibility списке он же тип [не качается, качается1, качается2]
 		float c_hemi;
 		float c_sun;
+		float distance;
+		Fvector position;
+		Fvector normal;
+		float alpha;
+		float alpha_target;
 #if RENDER==R_R1
 		Fvector c_rgb;
 #endif
@@ -111,6 +122,7 @@ public:
 		int sx, sz; // координаты слота X x Y
 		vis_data vis; // 
 		SlotPart G[dm_obj_in_slot]; // 
+		bool hidden;
 
 		Slot()
 		{
@@ -228,7 +240,7 @@ public:
 	void hw_Unload();
 	void hw_Render();
 #if defined(USE_DX10) || defined(USE_DX11)
-	void							hw_Render_dump	(const Fvector4 &consts, const Fvector4 &wave, const Fvector4 &wind, u32 var_id, u32 lod_id);
+	void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, const Fvector4& prev_wave, const Fvector4& prev_wind, u32 var_id, u32 lod_id);
 #else	//	USE_DX10
 	void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
 #endif	//	USE_DX10

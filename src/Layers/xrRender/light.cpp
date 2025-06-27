@@ -27,6 +27,9 @@ light::light(void) : ISpatial(g_SpatialSpace)
 
 	frame_render = 0;
 	virtual_size = 0.1f;
+	omnipart_num = 0;
+	sss_id = -1;
+	sss_refresh = 0;
 
 
 #if (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
@@ -339,6 +342,7 @@ void light::export_(light_Package& package)
 					L->set_shadow(true);
 					L->set_position(position);
 					L->set_rotation(cmDir[f], R);
+					//L->set_cone(PI_DIV_2 + 0.5f); // SSS : Deprecated
 					L->set_cone(PI_DIV_2);
 					L->set_range(range);
 					L->set_color(color);
@@ -346,6 +350,9 @@ void light::export_(light_Package& package)
 					L->s_spot = s_spot;
 					L->s_point = s_point;
 					L->set_virtual_size(virtual_size); //Set virtual size
+					L->omnipart_num = f;
+					L->omipart_parent = omnipart[0];
+					L->flags.bActive = true;
 
 					// Holger - do we need to export msaa stuff as well ?
 #if	(RENDER==R_R3) || (RENDER==R_R4)
@@ -366,7 +373,9 @@ void light::export_(light_Package& package)
 #endif	//	(RENDER==R_R3) || (RENDER==R_R4)
 
 					//	Igor: add volumetric support
-					L->set_volumetric(flags.bVolumetric);
+					if (ps_ssfx_volumetric.x <= 0)
+						L->set_volumetric(flags.bVolumetric);
+
 					L->set_volumetric_quality(m_volumetric_quality);
 					L->set_volumetric_intensity(m_volumetric_intensity);
 					L->set_volumetric_distance(m_volumetric_distance);
@@ -376,6 +385,7 @@ void light::export_(light_Package& package)
 			}
 			break;
 		case IRender_Light::SPOT:
+			this->set_volumetric_intensity(m_volumetric_intensity);
 			package.v_shadowed.push_back(this);
 			break;
 		}
@@ -409,6 +419,7 @@ float light::get_LOD()
 {
 	if (!flags.bShadow) return 1;
 	float distSQ = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
+	distance = distSQ;
 	float ssa = ps_r2_slight_fade * spatial.sphere.R / distSQ;
 	float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
 	return lod;

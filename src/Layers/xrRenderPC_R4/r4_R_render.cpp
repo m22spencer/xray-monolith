@@ -321,6 +321,35 @@ void CRender::Render()
 	set_Recorder(NULL);
 	r_pmask(true, false); // disable priority "1"
 	Device.Statistic->RenderCALC.End();
+	
+	/*if (RImplementation.o.ssfx_core) // SSS23: DEPRECATED
+	{
+		// HUD Masking rendering
+		FLOAT ColorRGBA[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_hud->pRT, ColorRGBA);
+
+		Target->u_setrt(Target->rt_ssfx_hud, NULL, NULL, HW.pBaseZB);
+		r_dsgraph_render_hud(true);
+
+		// Reset Depth
+		HW.pContext->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH, 1.0f, 0);
+	}*/
+
+	if (RImplementation.o.ssfx_motionvectors)
+	{
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, 0, 0, Target->rt_ssfx_motion_vectors->pRT, 0);
+
+		FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_motion_vectors->pRT, ColorRGBA);
+
+		RCache.set_Stencil(FALSE);
+		g_pGamePersistent->Environment().RenderSky(true);
+
+		RCache.Index.Flush();
+		RCache.Vertex.Flush();
+
+		RCache.set_xform_world(Fidentity);
+	}
 
 	if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS))
 	{
@@ -483,6 +512,59 @@ void CRender::Render()
 		render_rain();
 	}
 
+	{
+		// Save previus and current matrices
+		{
+			static Fmatrix mm_saved_viewproj;
+
+			if (!Device.m_SecondViewport.IsSVPFrame())
+			{
+				Fmatrix m_invview;
+				m_invview.invert(Device.mView);
+				Target->Matrix_previous.mul(mm_saved_viewproj, m_invview);
+				Target->Matrix_current.set(Device.mProject);
+				mm_saved_viewproj.set(Device.mFullTransform);
+			}
+		}
+
+		if (RImplementation.o.ssfx_sss && !Device.m_SecondViewport.IsSVPFrame())
+		{
+			static bool sss_rendered, sss_extended_rendered;
+
+			// SSS Shadows
+			if (ps_ssfx_sss_quality.z > 0)
+			{
+				Target->phase_ssfx_sss();
+				sss_rendered = true;
+			}
+			else
+			{
+				if (sss_rendered) // Clear buffer
+				{
+					sss_rendered = false;
+					FLOAT ColorRGBA[4] = { 1,1,1,1 };
+					HW.pContext->ClearRenderTargetView(Target->rt_ssfx_sss->pRT, ColorRGBA);
+				}
+			}
+
+			if (ps_ssfx_sss_quality.w > 0)
+			{
+				// Extra lights
+				Target->phase_ssfx_sss_ext(Lights.package);
+				sss_extended_rendered = true;
+			}
+			else
+			{
+				if (sss_extended_rendered) // Clear buffer
+				{
+					sss_extended_rendered = false;
+					FLOAT ColorRGBA[4] = { 1,1,1,1 };
+					HW.pContext->ClearRenderTargetView(Target->rt_ssfx_sss_tmp->pRT, ColorRGBA);
+				}
+			}
+		}
+	}
+
 	// Directional light - fucking sun
 	if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
 	{
@@ -515,7 +597,16 @@ void CRender::Render()
 		//RCache.set_Stencil				(TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
 		RCache.set_CullMode(CULL_CCW);
 		RCache.set_ColorWriteEnable();
-		RImplementation.r_dsgraph_render_emissive();
+		RImplementation.r_dsgraph_render_emissive(RImplementation.o.ssfx_bloom ? false : true);
+	}
+
+	if (RImplementation.o.ssfx_bloom)
+	{
+		// Render Emissive on `rt_ssfx_bloom_emissive`
+		FLOAT ColorRGBA[4] = { 0,0,0,0 };
+		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_bloom_emissive->pRT, ColorRGBA);
+		Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? HW.pBaseZB : Target->rt_MSAADepth->pZRT);
+		RImplementation.r_dsgraph_render_emissive(true, true);
 	}
 
 	// Lighting, non dependant on OCCQ
@@ -532,11 +623,19 @@ void CRender::Render()
 		render_lights(LP_pending);
 	}
 
+	{
+		if (RImplementation.o.ssfx_volumetric)
+			Target->phase_ssfx_volumetric_blur();
+	}
+
 	// Postprocess
 	{
 		PIX_EVENT(DEFER_LIGHT_COMBINE);
 		Target->phase_combine();
 	}
+
+	if (Details)
+		Details->details_clear();
 
 	VERIFY(0==mapDistort.size());
 }
@@ -558,7 +657,7 @@ void CRender::render_forward()
 		r_dsgraph_render_graph(1); // normal level, secondary priority
 		PortalTraverser.fade_render(); // faded-portals
 		r_dsgraph_render_sorted(); // strict-sorted geoms
-		g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
+		//g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
 	}
 
 	RImplementation.o.distortion = FALSE; // disable distorion

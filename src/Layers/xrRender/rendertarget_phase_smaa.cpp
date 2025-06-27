@@ -99,3 +99,84 @@ void CRenderTarget::phase_smaa()
 	HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());
 #endif
 }
+
+#if defined(USE_DX11)
+
+void CRenderTarget::phase_ssfx_taa()
+{
+	u32 Offset = 0;
+	Fvector2 p0, p1;
+
+	u32 C = color_rgba(255, 255, 255, 255);
+	float w = float(Device.dwWidth);
+	float h = float(Device.dwHeight);
+	float d_Z = EPS_S;
+	float d_W = 1.f;
+
+	p0.set(0.0f, 0.0f);
+	p1.set(1.0f, 1.0f);
+
+	// Temp motion vectors
+	u_setrt(rt_ssfx_accum, nullptr, nullptr, nullptr);
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+	pv->set(0, float(h), d_Z, d_W, C, p0.x, p1.y); pv++;
+	pv->set(0, 0, d_Z, d_W, C, p0.x, p0.y); pv++;
+	pv->set(float(w), float(h), d_Z, d_W, C, p1.x, p1.y); pv++;
+	pv->set(float(w), 0, d_Z, d_W, C, p1.x, p0.y); pv++;
+	RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+	// Draw COLOR
+	RCache.set_Element(s_ssfx_taa->E[0]);
+
+	RCache.set_Geometry(g_combine);
+	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+	HW.pContext->CopyResource(rt_ssfx_taa->pTexture->surface_get(), rt_ssfx_accum->pTexture->surface_get());
+
+	// TAA
+	ref_rt& dest_rt = RImplementation.o.dx10_msaa ? rt_Generic : rt_Color;
+
+	u_setrt(dest_rt, nullptr, nullptr, nullptr); // rt_ssfx_taa
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+	pv->set(0, float(h), d_Z, d_W, C, p0.x, p1.y); pv++;
+	pv->set(0, 0, d_Z, d_W, C, p0.x, p0.y); pv++;
+	pv->set(float(w), float(h), d_Z, d_W, C, p1.x, p1.y); pv++;
+	pv->set(float(w), 0, d_Z, d_W, C, p1.x, p0.y); pv++;
+	RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+	// Draw COLOR
+	RCache.set_Element(s_ssfx_taa->E[1]);
+	RCache.set_Geometry(g_combine);
+	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+	// Accumulate
+	HW.pContext->CopyResource(rt_ssfx_prev_frame->pTexture->surface_get(), dest_rt->pTexture->surface_get());
+
+	// Sharpening phase
+	u_setrt(rt_Generic_0, nullptr, nullptr, nullptr);
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+	pv->set(0, float(h), d_Z, d_W, C, p0.x, p1.y); pv++;
+	pv->set(0, 0, d_Z, d_W, C, p0.x, p0.y); pv++;
+	pv->set(float(w), float(h), d_Z, d_W, C, p1.x, p1.y); pv++;
+	pv->set(float(w), 0, d_Z, d_W, C, p1.x, p0.y); pv++;
+	RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+	// Draw COLOR
+	RCache.set_Element(s_ssfx_taa->E[2]);
+
+	RCache.set_c("taa_setup", ps_ssfx_taa);
+
+	RCache.set_Geometry(g_combine);
+	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+}
+
+#endif

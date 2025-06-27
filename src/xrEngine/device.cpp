@@ -46,6 +46,8 @@ ref_light precache_light = 0;
 extern discord::Core* discord_core;
 extern bool use_discord;
 
+extern Fvector4 ps_ssfx_grass_interactive;
+
 #ifdef ECO_RENDER
 std::chrono::high_resolution_clock::time_point tlastf = std::chrono::high_resolution_clock::now(), tcurrentf = std::
 	                                               chrono::high_resolution_clock::now();
@@ -334,6 +336,30 @@ void CRenderDevice::on_idle()
 	// Matrices
 	mFullTransform.mul(mProject, mView);
 	m_pRender->SetCacheXform(mView, mProject);
+
+	// Previous frame data -- 
+	mView_prev = mView_saved;
+	mProject_prev = mProject_saved;
+	//mFullTransform_prev = mFullTransform_saved; // Unused?
+
+	m_pRender->SetCacheXform_prev(mView_prev, mProject_prev);
+
+	// Save previous frame grass benders data
+	IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+
+	GData.prev_pos[0].set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
+	GData.prev_dir[0].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+	for (int pBend = 1; pBend < _min(16, ps_ssfx_grass_interactive.y + 1); pBend++)
+	{
+		GData.prev_pos[pBend].set(GData.pos[pBend].x, GData.pos[pBend].y, GData.pos[pBend].z, GData.radius_curr[pBend]);
+		GData.prev_dir[pBend].set(GData.dir[pBend].x, GData.dir[pBend].y, GData.dir[pBend].z, GData.str[pBend]);
+	}
+
+	// Save wind animation position
+	wind_anim_prev = wind_anim_saved;
+	wind_anim_saved = g_pGamePersistent->Environment().wind_anim;
+
 	//RCache.set_xform_view ( mView );
 	//RCache.set_xform_project ( mProject );
 	D3DXMatrixInverse((D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);

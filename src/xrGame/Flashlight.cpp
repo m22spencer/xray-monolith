@@ -85,6 +85,8 @@ BOOL CFlashlight::net_Spawn(CSE_Abstract* DC)
 	light_render->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "type", 2)));
 	light_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type", 1)));
 
+	light_render->set_is_playerlight(true); // SSS23: Is a player light
+
 	return TRUE;
 }
 

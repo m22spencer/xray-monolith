@@ -9,6 +9,8 @@
 #	include "light_GI.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 
+extern Fvector4 ps_ssfx_volumetric;
+
 class light : public IRender_Light, public ISpatial
 {
 public:
@@ -31,6 +33,16 @@ public:
 
 	vis_data hom;
 	u32 frame_render;
+
+	int omnipart_num;
+	int sss_id;
+	int sss_refresh;
+	s8 sss_priority;
+	bool sss_is_playerlight;
+
+	light* omipart_parent;
+	float distance;
+	float distance_lpos;
 
 	float m_volumetric_quality;
 	float m_volumetric_intensity;
@@ -70,6 +82,7 @@ public:
 		bool		visible;		// visible/invisible
 		bool		pending;		// test is still pending
 		u16			smap_ID;
+		float		distance;
 	}				vis;
 
 	union			_xform	{
@@ -109,12 +122,15 @@ public:
 
 	virtual void set_volumetric(bool b)
 	{
+		if (ps_ssfx_volumetric.x > 0)
+			b = true;
+
 		flags.bVolumetric = b;
 	}
 
 	virtual void set_volumetric_quality(float fValue) { m_volumetric_quality = fValue; }
-	virtual void set_volumetric_intensity(float fValue) { m_volumetric_intensity = fValue; }
-	virtual void set_volumetric_distance(float fValue) { m_volumetric_distance = fValue; }
+	virtual void set_volumetric_intensity(float fValue) { m_volumetric_intensity = ps_ssfx_volumetric.y; }
+	virtual void set_volumetric_distance(float fValue) { m_volumetric_distance = 1.0f; }
 
 	virtual void set_position(const Fvector& P);
 	virtual void set_rotation(const Fvector& D, const Fvector& R);
@@ -131,6 +147,8 @@ public:
 	virtual void set_texture(LPCSTR name);
 	virtual void set_hud_mode(bool b) { flags.bHudMode = b; }
 	virtual bool get_hud_mode() { return flags.bHudMode; };
+
+	virtual void set_is_playerlight(bool b) { sss_is_playerlight = b; };
 
 	virtual void spatial_move();
 	virtual Fvector spatial_sector_point();

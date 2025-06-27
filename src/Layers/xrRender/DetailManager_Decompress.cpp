@@ -192,6 +192,7 @@ void CDetailManager::cache_Decompress(Slot* S)
 			float y = D.vis.box.min.y - 5;
 			Fvector dir;
 			dir.set(0, -1, 0);
+			Fvector3 terrain_normal;
 
 			float r_u, r_v, r_range;
 			for (u32 tid = 0; tid < triCount; tid++)
@@ -225,12 +226,19 @@ RDEVICE.Statistic->TEST0.End		();
 					{
 						float y_test = Item_P.y - r_range;
 						if (y_test > y) y = y_test;
+						terrain_normal.mknormal(Tv[0], Tv[1], Tv[2]);
 					}
 				}
 #endif
 			}
+
+			// Slope Limit
+			float DotP = terrain_normal.dotproduct(dir);
+			if (DotP > -(1.0f - r_scale.randF(ps_ssfx_terrain_grass_slope * 0.8f, ps_ssfx_terrain_grass_slope))) continue;
+
 			if (y < D.vis.box.min.y) continue;
 			Item_P.y = y;
+			Item.normal = terrain_normal; // Save terrain normal here to feed the grass shader later.
 
 			// Angles and scale
 #ifndef		DBG_SWITCHOFF_RANDOMIZE
@@ -249,6 +257,20 @@ RDEVICE.Statistic->TEST0.End		();
 #else
 			Item.mRotY.rotateY				(0);
 #endif
+
+			// Terrain Alignment
+			if (ps_ssfx_terrain_grass_align > 0)
+			{
+				// Current matrix
+				Fmatrix CurrMatrix = Item.mRotY;
+
+				// Align to terrain
+				Item.mRotY.j.set(terrain_normal);
+				Fvector::generate_orthonormal_basis(Item.mRotY.j, Item.mRotY.i, Item.mRotY.k);
+
+				// Apply random rotation from old matrix
+				Item.mRotY.mulB_43(CurrMatrix);
+			}
 
 			Item.mRotY.translate_over(Item_P);
 			mScale.scale(Item.scale, Item.scale, Item.scale);

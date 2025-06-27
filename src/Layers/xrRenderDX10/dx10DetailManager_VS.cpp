@@ -6,6 +6,11 @@
 
 #include "../xrRenderDX10/dx10BufferUtils.h"
 
+// Vars to store wind prev frame data ( Motion vectors )
+static u32 prev_frame = -1;
+static float prev_time = 0;
+static Fvector4	prev_dir1 = { 0, 0, 0 }, prev_dir2 = { 0, 0, 0 };
+
 const int quant = 16384;
 const int c_hdr = 10;
 const int c_size = 4;
@@ -30,6 +35,21 @@ short QC(float v);
 //	int t=iFloor(v*float(quant)); clamp(t,-32768,32767);
 //	return short(t&0xffff);
 //}
+
+float GoToValue(float& current, float go_to)
+{
+	float diff = abs(current - go_to);
+
+	float r_value = Device.fTimeDelta;
+
+	if (diff - r_value <= 0)
+	{
+		current = go_to;
+		return 0;
+	}
+
+	return current < go_to ? r_value : -r_value;
+}
 
 void CDetailManager::hw_Load_Shaders()
 {
@@ -74,41 +94,76 @@ void CDetailManager::hw_Render()
 
 	// Wave0
 	float scale = 1.f / float(quant);
-	Fvector4 wave;
+	Fvector4 wave, prev_wave;
 	Fvector4 consts;
 	consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
 	//wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
+	prev_wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, prev_time);
 	//RCache.set_c			(&*hwc_consts,	scale,		scale,		ps_r__Detail_l_aniso,	ps_r__Detail_l_ambient);				// consts
 	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
 	//RCache.set_c			(&*hwc_wind,	dir1);																					// wind-dir
 	//hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, 1, 0);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, prev_wave.div(PI_MUL_2), prev_dir1, 1, 0);
 
 	// Wave1
 	//wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
+	prev_wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, prev_time);
 	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
 	//RCache.set_c			(&*hwc_wind,	dir2);																					// wind-dir
 	//hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 2, 0);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, prev_wave.div(PI_MUL_2), prev_dir2, 2, 0);
 
 	// Still
 	consts.set(scale, scale, scale, 1.f);
 	//RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
 	//RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
 	//hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 0, 1);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, prev_wave.div(PI_MUL_2), prev_dir2, 0, 1);
+
+	if (prev_frame != Device.dwFrame)
+	{
+		prev_frame = Device.dwFrame;
+
+		// Prev Frame swing time
+		prev_time = m_time_pos;
+
+		// Prev frame dir
+		prev_dir1.set(dir1);
+		prev_dir2.set(dir2);
+	}
 }
 
-void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
-                                    u32 lod_id)
+void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind,
+									const Fvector4& prev_wave, const Fvector4& prev_wind, u32 var_id, u32 lod_id)
 {
 	static shared_str strConsts("consts");
 	static shared_str strWave("wave");
 	static shared_str strDir2D("dir2D");
 	static shared_str strArray("array");
 	static shared_str strXForm("xform");
+
+	// Vanilla grass/trees wind
+	static shared_str strWavePrev("wave_prev");
+	static shared_str strDir2DPrev("dir2D_prev");
+
+	// Grass Benders
+	static shared_str strPrevPos("benders_prevpos");
+	static shared_str strPos("benders_pos");
+	static shared_str strGrassSetup("benders_setup");
+
+	static shared_str strExData("exdata");
+	static shared_str strGrassAlign("grass_align");
+
+	// Grass benders data
+	IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+	Fvector4 player_pos = { 0, 0, 0, 0 };
+	int BendersQty = _min(16, ps_ssfx_grass_interactive.y + 1);
+
+	// Add Player?
+	if (ps_ssfx_grass_interactive.x > 0)
+		player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
 
 	Device.Statistic->RenderDUMP_DT_Count = 0;
 
@@ -145,6 +200,60 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 				RCache.set_c(strWave, wave);
 				RCache.set_c(strDir2D, wind);
 				RCache.set_c(strXForm, Device.mFullTransform);
+				RCache.set_c(strGrassAlign, ps_ssfx_terrain_grass_align);
+
+				RCache.set_c(strWavePrev, prev_wave);
+				RCache.set_c(strDir2DPrev, prev_wind);
+
+				if (ps_ssfx_grass_interactive.y > 0)
+				{
+					RCache.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
+
+					Fvector4* c_grass;
+					{
+						void* GrassData;
+						RCache.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4) * 2, &GrassData, 0, 0);
+						c_grass = (Fvector4*)GrassData;
+					}
+					VERIFY(c_grass);
+
+					if (c_grass)
+					{
+						c_grass[0].set(player_pos);
+						c_grass[16].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+						for (int Bend = 1; Bend < BendersQty; Bend++)
+						{
+							c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
+							c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+						}
+					}
+
+					Fvector4* c_prev_grass;
+					{
+						void* prev_GrassData;
+						RCache.get_ConstantDirect(strPrevPos, BendersQty * sizeof(Fvector4) * 2, &prev_GrassData, 0, 0);
+						c_prev_grass = (Fvector4*)prev_GrassData;
+					}
+					VERIFY(c_prev_grass);
+
+					if (c_prev_grass)
+					{
+						for (int Bend = 0; Bend < BendersQty; Bend++)
+						{
+							c_prev_grass[Bend].set(GData.prev_pos[Bend]);
+							c_prev_grass[Bend + 16].set(GData.prev_dir[Bend]);
+						}
+					}
+				}
+
+				Fvector4* c_ExData = 0;
+				{
+					void* pExtraData;
+					RCache.get_ConstantDirect(strExData, hw_BatchSize * sizeof(Fvector4), &pExtraData, 0, 0);
+					c_ExData = (Fvector4*)pExtraData;
+				}
+				VERIFY(c_ExData);
 
 				//ref_constant constArray = RCache.get_c(strArray);
 				//VERIFY(constArray);
@@ -176,8 +285,22 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 						SlotItem& Instance = **_iI;
 						u32 base = dwBatch * 4;
 
-						// Build matrix ( 3x4 matrix, last row - color )
+						Instance.alpha += GoToValue(Instance.alpha, Instance.alpha_target);
+
 						float scale = Instance.scale_calculated;
+
+						// Sort of fade using the scale
+						// fade_distance == -1 use light_position to define "fade", anything else uses fade_distance
+						if (fade_distance <= -1)
+							scale *= 1.0f - Instance.position.distance_to_xz_sqr(light_position) * 0.005f;
+						else if (Instance.distance > fade_distance)
+							scale *= 1.0f - abs(Instance.distance - fade_distance) * 0.005f;
+
+						if (scale <= 0 || Instance.alpha <= 0)
+							break;
+
+						// Build matrix ( 3x4 matrix, last row - color )
+						//float scale = Instance.scale_calculated;
 						Fmatrix& M = Instance.mRotY;
 						c_storage[base + 0].set(M._11 * scale, M._21 * scale, M._31 * scale, M._41);
 						c_storage[base + 1].set(M._12 * scale, M._22 * scale, M._32 * scale, M._42);
@@ -191,6 +314,10 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 						float h = Instance.c_hemi;
 						float s = Instance.c_sun;
 						c_storage[base + 3].set(s, s, s, h);
+
+						if (c_ExData)
+							c_ExData[dwBatch].set(Instance.normal.x, Instance.normal.y, Instance.normal.z, Instance.alpha);
+
 						//RCache.set_ca(&*constArray, base+3, s,				s,				s,				h		);
 						dwBatch ++;
 						if (dwBatch == hw_BatchSize)
@@ -233,13 +360,16 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 			}
 			// Clean up
 			// KD: we must not clear vis on r2 since we want details shadows
-			if (!psDeviceFlags2.test(rsGrassShadow) || ((ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_SMAP ==
+			if (ps_ssfx_grass_shadows.x <= 0)
+			{
+				if (!psDeviceFlags2.test(rsGrassShadow) || ((ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_SMAP ==
 					RImplementation.phase)) // phase smap with shadows
-				|| (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase)
-					&& (!RImplementation.is_sun())) // phase normal with shadows without sun
-				|| (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase))
-			)) // phase normal without shadows
-				vis.clear_not_free();
+					|| (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase)
+						&& (!RImplementation.is_sun())) // phase normal with shadows without sun
+					|| (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase))
+					)) // phase normal without shadows
+					vis.clear_not_free();
+			}
 		}
 		vOffset += hw_BatchSize * Object.number_vertices;
 		iOffset += hw_BatchSize * Object.number_indices;

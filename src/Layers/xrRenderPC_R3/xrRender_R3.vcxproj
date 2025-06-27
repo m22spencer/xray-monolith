@@ -185,7 +185,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>-Zm110 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm151 %(AdditionalOptions)</AdditionalOptions>
       <UndefinePreprocessorDefinitions>USE_LUAJIT_ONE</UndefinePreprocessorDefinitions>
       <DisableSpecificWarnings>4005;4099</DisableSpecificWarnings>
     </ClCompile>

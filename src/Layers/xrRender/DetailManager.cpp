@@ -292,7 +292,7 @@ void CDetailManager::UpdateVisibleM()
 				continue;
 			}
 			u32 mask = 0xff;
-			u32 res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
+			u32 res = View.testSphere(MS.vis.sphere.P, MS.vis.sphere.R, mask);
 			if (fcvNone == res)
 			{
 				continue; // invisible-view frustum
@@ -319,7 +319,7 @@ void CDetailManager::UpdateVisibleM()
 				if (fcvPartial == res)
 				{
 					u32 _mask = mask;
-					u32 _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
+					u32 _res = View.testSphere(S.vis.sphere.P, S.vis.sphere.R, _mask);
 					if (fcvNone == _res)
 					{
 						continue; // invisible-view frustum
@@ -336,6 +336,11 @@ void CDetailManager::UpdateVisibleM()
 				{
 					// Calc fade factor	(per slot)
 					float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
+					if (dist_sq > fade_limit)
+					{
+						S.hidden = true;
+						continue;
+					}
 					if (dist_sq > fade_limit) continue;
 					float alpha = (dist_sq < fade_start) ? 0.f : (dist_sq - fade_start) / fade_range;
 					float alpha_i = 1.f - alpha;
@@ -364,13 +369,22 @@ void CDetailManager::UpdateVisibleM()
 							float ssa = psDeviceFlags2.test(rsNoScale) ? scale : scale * scale * Rq_drcp;
 							if (ssa < r_ssaDISCARD)
 							{
+								Item.alpha_target = 0;
 								continue;
 							}
 							u32 vis_id = 0;
 							if (ssa > r_ssaCHEAP) vis_id = Item.vis_ID;
 
 							sp.r_items[vis_id].push_back(*siIT);
-
+							
+							if (S.hidden)
+							{
+								Item.alpha = 0;
+								S.hidden = false;
+							}
+							Item.alpha_target = 1;
+							Item.distance = dist_sq;
+							Item.position = S.vis.sphere.P;
 							//2							visible[vis_id][sp.id].push_back(&Item);
 						}
 					}
@@ -457,4 +471,28 @@ void __stdcall CDetailManager::MT_CALC()
 			m_frame_calc = RDEVICE.dwFrame;
 		}
 	MT.Leave();
+}
+
+void CDetailManager::details_clear()
+{
+	// Disable fade, next render will be scene
+	fade_distance = 99999;
+
+	if (ps_ssfx_grass_shadows.x <= 0)
+		return;
+
+	for (u32 x = 0; x < 3; x++)
+	{
+		vis_list& list = m_visibles[x];
+
+		for (u32 O = 0; O < objects.size(); O++)
+		{
+			CDetail& Object = *objects[O];
+			xr_vector<SlotItemVec*>& vis = list[O];
+			if (!vis.empty())
+			{
+				vis.clear_not_free();
+			}
+		}
+	}
 }

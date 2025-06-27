@@ -3,6 +3,47 @@
 #pragma once
 
 // Common
+extern ECORE_API float ps_ssfx_fog_scattering;
+extern ECORE_API Fvector4 ps_ssfx_motionblur;
+extern ECORE_API Fvector4 ps_ssfx_taa;
+
+extern ECORE_API Fvector4 ps_ssfx_rain_drops_setup;
+extern ECORE_API int ps_ssfx_terrain_grass_align;
+extern ECORE_API int ps_ssfx_terrain_pom_refine;
+extern ECORE_API int ps_ssfx_pom_refine;
+extern ECORE_API int ps_ssfx_terrain_grass_align;
+extern ECORE_API float ps_ssfx_terrain_grass_slope;
+extern ECORE_API int ps_ssfx_bloom_use_presets;
+extern ECORE_API Fvector4 ps_ssfx_bloom_2;
+extern ECORE_API Fvector4 ps_ssfx_sss_quality;
+extern ECORE_API Fvector4 ps_ssfx_sss;
+
+extern ECORE_API int ps_ssfx_il_quality;
+extern ECORE_API int ps_ssfx_ao_quality;
+extern ECORE_API Fvector3 ps_ssfx_water_quality;
+extern ECORE_API Fvector4 ps_ssfx_il;
+extern ECORE_API Fvector4 ps_ssfx_ao;
+extern ECORE_API Fvector4 ps_ssfx_water;
+
+extern ECORE_API int ps_ssfx_ssr_quality;
+extern ECORE_API Fvector4 ps_ssfx_ssr;
+extern ECORE_API Fvector4 ps_ssfx_ssr_2;
+extern ECORE_API Fvector4 ps_ssfx_terrain_quality;
+extern ECORE_API Fvector3 ps_ssfx_shadows;
+extern ECORE_API Fvector4 ps_ssfx_volumetric;
+
+extern ECORE_API Fvector4 ps_ssfx_wind_grass;
+extern ECORE_API Fvector4 ps_ssfx_wind_trees;
+
+extern ECORE_API Fvector4 ps_ssfx_rain_1;
+extern ECORE_API Fvector4 ps_ssfx_rain_2;
+extern ECORE_API Fvector4 ps_ssfx_rain_3;
+extern ECORE_API Fvector4 ps_ssfx_grass_shadows;
+extern ECORE_API Fvector3 ps_ssfx_shadow_cascades;
+extern ECORE_API Fvector4 ps_ssfx_grass_interactive;
+extern ECORE_API Fvector4 ps_ssfx_int_grass_params_1;
+extern ECORE_API Fvector4 ps_ssfx_int_grass_params_2;
+
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
 extern ECORE_API xr_token qsun_shafts_token[];
 

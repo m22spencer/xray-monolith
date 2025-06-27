@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../xrRender/ColorMapManager.h"
-
+#include "../xrRender/light_db.h"
 class light;
 
 //#define DU_SPHERE_NUMVERTEX 92
@@ -63,6 +63,22 @@ public:
 	// compute shader for hdao
 	IBlender* b_hdao_cs;
 	IBlender* b_hdao_msaa_cs;
+
+	// [SSS Stuff]
+	IBlender* b_ssfx_fog_scattering;
+	IBlender* b_ssfx_motion_blur;
+	IBlender* b_ssfx_taa;
+	IBlender* b_ssfx_rain;
+	IBlender* b_ssfx_water_blur;
+	IBlender* b_ssfx_bloom_downsample;
+	IBlender* b_ssfx_bloom_upsample;
+	IBlender* b_ssfx_bloom;
+	IBlender* b_ssfx_bloom_lens;
+	IBlender* b_ssfx_sss_ext;
+	IBlender* b_ssfx_sss;
+	IBlender* b_ssfx_ssr;
+	IBlender* b_ssfx_volumetric_blur;
+	IBlender* b_ssfx_ao;
 
 #ifdef DEBUG
 	struct		dbg_line_t		{
@@ -134,6 +150,60 @@ public:
 	//	TODO: DX10: CHeck if we need old-style SMAP
 	//	IDirect3DSurface9*			rt_smap_ZB;		//
 
+	// Screen Space Shaders Stuff
+	ref_rt rt_ssfx;
+	ref_rt rt_ssfx_temp;
+	ref_rt rt_ssfx_temp2;
+	ref_rt rt_ssfx_temp3;
+
+	ref_rt rt_ssfx_accum;
+	//ref_rt rt_ssfx_hud; // SSS23: DEPRECATED
+	ref_rt rt_ssfx_ssr;
+	ref_rt rt_ssfx_water;
+	ref_rt rt_ssfx_water_waves;
+	ref_rt rt_ssfx_ao;
+	ref_rt rt_ssfx_il;
+
+	ref_rt rt_ssfx_sss;
+	ref_rt rt_ssfx_sss_ext;
+	ref_rt rt_ssfx_sss_ext2;
+	ref_rt rt_ssfx_sss_tmp;
+	ref_rt rt_ssfx_bloom1;
+	ref_rt rt_ssfx_bloom_emissive;
+	ref_rt rt_ssfx_bloom_lens;
+	ref_rt rt_ssfx_rain;
+	ref_rt rt_ssfx_volumetric;
+	ref_rt rt_ssfx_volumetric_tmp;
+
+	ref_rt rt_ssfx_bloom_tmp2;
+	ref_rt rt_ssfx_bloom_tmp4;
+	ref_rt rt_ssfx_bloom_tmp8;
+	ref_rt rt_ssfx_bloom_tmp16;
+	ref_rt rt_ssfx_bloom_tmp32;
+	ref_rt rt_ssfx_bloom_tmp64;
+
+	ref_rt rt_ssfx_bloom_tmp32_2;
+	ref_rt rt_ssfx_bloom_tmp16_2;
+	ref_rt rt_ssfx_bloom_tmp8_2;
+	ref_rt rt_ssfx_bloom_tmp4_2;
+
+	ref_rt rt_ssfx_taa;
+	ref_rt rt_ssfx_prev_frame;
+	ref_rt rt_ssfx_motion_vectors;
+
+	ref_rt rt_ssfx_prevPos;
+
+	ref_shader s_ssfx_water;
+	ref_shader s_ssfx_water_blur;
+	ref_shader s_ssfx_water_ssr;
+	ref_shader s_ssfx_ao;
+	//ref_shader s_ssfx_hud[5]; // SSS23: DEPRECATED
+
+	Fmatrix Matrix_previous, Matrix_current;
+	//Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
+	Fvector3 Position_previous;
+	//bool RVelocity;
+
 	//	Igor: for async screenshots
 	ID3DTexture2D* t_ss_async; //32bit		(r,g,b,a) is situated in the system memory
 
@@ -193,6 +263,21 @@ private:
 	ref_shader s_accum_spot_msaa[8];
 	ref_shader s_accum_reflected_msaa[8];
 	ref_shader s_accum_volume_msaa[8];
+
+	// Screen Space Shaders Stuff
+	ref_shader s_ssfx_fog_scattering;
+	ref_shader s_ssfx_motion_blur;
+	ref_shader s_ssfx_taa;
+	ref_shader s_ssfx_rain;
+	ref_shader s_ssfx_bloom;
+	ref_shader s_ssfx_bloom_lens;
+	ref_shader s_ssfx_bloom_upsample;
+	ref_shader s_ssfx_bloom_downsample;
+	ref_shader s_ssfx_sss_ext;
+	ref_shader s_ssfx_sss;
+
+	ref_shader s_ssfx_ssr;
+	ref_shader s_ssfx_volumetric_blur;
 
 	ref_geom g_accum_point;
 	ref_geom g_accum_spot;
@@ -267,6 +352,7 @@ private:
 
 	//	Igor: used for volumetric lights
 	bool m_bHasActiveVolumetric;
+	bool m_bHasActiveVolumetric_spot;
 public:
 	CRenderTarget();
 	~CRenderTarget();
@@ -283,6 +369,7 @@ public:
 	void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
 	void u_compute_texgen_screen(Fmatrix& dest);
 	void u_compute_texgen_jitter(Fmatrix& dest);
+	void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb);
 	void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
 	void u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
 	void u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -318,6 +405,23 @@ public:
 	void phase_accumulator();
 	void phase_vol_accumulator();
 	void shadow_direct(light* L, u32 dls_phase);
+
+	// SSS Stuff
+	void phase_ssfx_taa();
+	void phase_ssfx_motion_blur();
+	void phase_ssfx_fog_scattering();
+	void phase_ssfx_rain(); // Bloom PP
+	void phase_ssfx_bloom(); // Bloom PP
+	void phase_ssfx_sss(); // SSS
+	void phase_ssfx_sss_ext(light_Package& LP); // SSS Spot lights
+
+	void phase_ssfx_ssr(); // SSR Phase
+	void phase_ssfx_volumetric_blur(); // Volumetric Blur
+	void phase_ssfx_water_blur(); // Water Blur
+	void phase_ssfx_water_waves(); // Water Waves
+	void phase_ssfx_ao(); // AO
+	void phase_ssfx_il(); // IL
+	void set_viewport_size(ID3DDeviceContext* dev, float w, float h);
 
 	//	Generates min/max sm
 	void create_minmax_SM();

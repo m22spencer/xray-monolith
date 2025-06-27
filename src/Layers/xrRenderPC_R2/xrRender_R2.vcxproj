@@ -182,6 +182,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <UndefinePreprocessorDefinitions>USE_LUAJIT_ONE</UndefinePreprocessorDefinitions>
+      <AdditionalOptions>-Zm138</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

@@ -19,6 +19,13 @@ shared_str c_c_bias;
 shared_str c_c_scale;
 shared_str c_c_sun;
 
+shared_str c_prev_wave;
+shared_str c_prev_wind;
+
+shared_str c_c_PrevBendersPos;
+shared_str c_c_BendersPos;
+shared_str c_c_BendersSetup;
+
 FTreeVisual::FTreeVisual(void)
 {
 }
@@ -91,6 +98,13 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 	c_c_bias = "c_bias";
 	c_c_scale = "c_scale";
 	c_c_sun = "c_sun";
+
+	c_prev_wave = "prev_wave";
+	c_prev_wind = "prev_wind";
+
+	c_c_PrevBendersPos = "benders_prevpos";
+	c_c_BendersPos = "benders_pos";
+	c_c_BendersSetup = "benders_setup";
 }
 
 struct FTreeVisual_setup
@@ -136,8 +150,12 @@ struct FTreeVisual_setup
 
 void FTreeVisual::Render(float LOD)
 {
-	static FTreeVisual_setup tvs;
-	if (tvs.dwFrame != Device.dwFrame) tvs.calculate();
+	static FTreeVisual_setup tvs, prev_tvs;
+	if (tvs.dwFrame != Device.dwFrame)
+	{
+		prev_tvs = tvs; // Save previous frame calculations
+		tvs.calculate();
+	}
 	// setup constants
 #if RENDER!=R_R1
 	Fmatrix xform_v;
@@ -149,6 +167,10 @@ void FTreeVisual::Render(float LOD)
 	RCache.tree.set_consts(tvs.scale, tvs.scale, 0, 0); // consts/scale
 	RCache.tree.set_wave(tvs.wave); // wave
 	RCache.tree.set_wind(tvs.wind); // wind
+
+	RCache.set_c(c_prev_wave, prev_tvs.wave);
+	RCache.set_c(c_prev_wind, prev_tvs.wind);
+
 #if RENDER!=R_R1
 	s *= 1.3333f;
 	RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
@@ -160,6 +182,65 @@ void FTreeVisual::Render(float LOD)
 	                       s * c_bias.rgb.z + desc.ambient.z, s * c_bias.hemi); // bias
 #endif
 	RCache.tree.set_c_sun(s * c_scale.sun, s * c_bias.sun, 0, 0); // sun
+
+#if RENDER==R_R4 || RENDER==R_R3
+
+	if (ps_ssfx_grass_interactive.y > 0)
+	{
+		// Inter grass Settings
+		RCache.set_c(c_c_BendersSetup, ps_ssfx_int_grass_params_1);
+
+		// Grass benders data ( Player + Characters )
+		IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+		Fvector4 player_pos = { 0, 0, 0, 0 };
+		int BendersQty = _min(16, ps_ssfx_grass_interactive.y + 1);
+
+		// Add Player?
+		if (ps_ssfx_grass_interactive.x > 0)
+		{
+			player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
+		}
+
+		Fvector4* c_grass;
+		{
+			void* GrassData;
+			RCache.get_ConstantDirect(c_c_BendersPos, BendersQty * sizeof(Fvector4) * 2, &GrassData, 0, 0);
+
+			c_grass = (Fvector4*)GrassData;
+		}
+		VERIFY(c_grass);
+
+		if (c_grass)
+		{
+			c_grass[0].set(player_pos);
+			c_grass[16].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+			for (int Bend = 1; Bend < BendersQty; Bend++)
+			{
+				c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
+				c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+			}
+		}
+
+		Fvector4* c_prevgrass;
+		{
+			void* prevGrassData;
+			RCache.get_ConstantDirect(c_c_PrevBendersPos, BendersQty * sizeof(Fvector4) * 2, &prevGrassData, 0, 0);
+
+			c_prevgrass = (Fvector4*)prevGrassData;
+		}
+		VERIFY(c_prevgrass);
+
+		if (c_prevgrass)
+		{
+			for (int Bend = 0; Bend < BendersQty; Bend++)
+			{
+				c_prevgrass[Bend].set(GData.prev_pos[Bend]);
+				c_prevgrass[Bend + 16].set(GData.prev_dir[Bend]);
+			}
+		}
+	}
+#endif
 }
 
 #define PCOPY(a)	a = pFrom->a

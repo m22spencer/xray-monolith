@@ -129,14 +129,14 @@ void CRenderTarget::accum_spot(light* L)
 	}
 
 	// Common constants
-	Fvector L_dir, L_clr, L_pos;
+	Fvector L_clr, L_pos; // L_dir
 	float L_spec;
 	L_clr.set(L->color.r, L->color.g, L->color.b);
 	L_clr.mul(L->get_LOD());
 	L_spec = u_diffuse2s(L_clr);
 	Device.mView.transform_tiny(L_pos, L->position);
-	Device.mView.transform_dir(L_dir, L->direction);
-	L_dir.normalize();
+	//Device.mView.transform_dir(L_dir, L->direction);
+	//L_dir.normalize();
 
 	// Draw volume with projective texgen
 	{
@@ -168,6 +168,11 @@ void CRenderTarget::accum_spot(light* L)
 		RCache.set_c("m_shadow", m_Shadow);
 		RCache.set_ca("m_lmap", 0, m_Lmap._11, m_Lmap._21, m_Lmap._31, m_Lmap._41);
 		RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
+
+		if (!Device.m_SecondViewport.IsSVPFrame())
+			RCache.set_c("sss_id", L->sss_id);
+		else
+			RCache.set_c("sss_id", -1);
 
 		// Fetch4 : enable
 		//		if (RImplementation.o.HW_smap_FETCH4)	{
@@ -272,11 +277,38 @@ void CRenderTarget::accum_spot(light* L)
 
 void CRenderTarget::accum_volumetric(light* L)
 {
+	// [ SSS ] Fade through distance volumetric lights.
+	if (ps_ssfx_volumetric.x > 0)
+	{
+		float Falloff = ps_ssfx_volumetric.y - std::min(std::max((L->vis.distance - 20) * 0.01f, 0.0f), 1.0f) * ps_ssfx_volumetric.y;
+		L->m_volumetric_intensity = Falloff;
+		L->flags.bVolumetric = Falloff <= 0 ? false : true;
+	}
+
 	//if (L->flags.type != IRender_Light::SPOT) return;
 	if (!L->flags.bVolumetric) return;
+	
+	if (!RImplementation.o.ssfx_volumetric)
+	{
+		phase_vol_accumulator();
+	}
+	else
+	{
+		if (!m_bHasActiveVolumetric_spot)
+		{
+			m_bHasActiveVolumetric_spot = true;
 
-	phase_vol_accumulator();
+			FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			HW.pContext->ClearRenderTargetView(rt_ssfx_volumetric->pRT, ColorRGBA);
+		}
 
+		u_setrt(rt_ssfx_volumetric, NULL, NULL, NULL);
+
+		RCache.set_Stencil(FALSE);
+		RCache.set_CullMode(CULL_NONE);
+		RCache.set_ColorWriteEnable();
+	}
+	/*
 	ref_shader shader;
 	ref_shader* shader_msaa;
 
@@ -287,7 +319,7 @@ void CRenderTarget::accum_volumetric(light* L)
 		shader = s_accum_volume;
 		shader_msaa = s_accum_volume_msaa;
 	}
-
+	*/
 	// *** assume accumulator setted up ***
 	// *****************************	Mask by stencil		*************************************
 	BOOL bIntersect = FALSE; //enable_scissor(L);
@@ -306,10 +338,10 @@ void CRenderTarget::accum_volumetric(light* L)
 	RCache.set_CullMode(CULL_NONE); // back
 
 	// 2D texgens 
-	Fmatrix m_Texgen;
+	/*Fmatrix m_Texgen;
 	u_compute_texgen_screen(m_Texgen);
 	Fmatrix m_Texgen_J;
-	u_compute_texgen_jitter(m_Texgen_J);
+	u_compute_texgen_jitter(m_Texgen_J);*/
 
 	// Shadow xform (+texture adjustment matrix)
 	Fmatrix m_Shadow, m_Lmap;
@@ -414,24 +446,53 @@ void CRenderTarget::accum_volumetric(light* L)
 			
 		}
 	*/
-	// Common constants
-	float fQuality = L->m_volumetric_quality;
-	int iNumSlises = (int)(VOLUMETRIC_SLICES * fQuality);
-	//			min 10 surfaces
-	iNumSlises = _max(10, iNumSlises);
-	//	Adjust slice intensity
-	fQuality = ((float)iNumSlises) / VOLUMETRIC_SLICES;
-	Fvector L_dir, L_clr, L_pos;
+	// Common vars
+	float fQuality = 0;
+	int iNumSlices = 0;
+
+	// Color and intensity vars
+	Fvector L_clr, L_pos;
 	float L_spec;
+	float IntensityMod = 1.0f;
 	L_clr.set(L->color.r, L->color.g, L->color.b);
-	L_clr.mul(L->m_volumetric_intensity);
 	L_clr.mul(L->m_volumetric_distance);
-	L_clr.mul(1 / fQuality);
-	L_clr.mul(L->get_LOD());
+
+	if (ps_ssfx_volumetric.x <= 0)
+	{
+		// Vanilla Method
+		fQuality = L->m_volumetric_quality;
+		iNumSlices = (int)(VOLUMETRIC_SLICES * fQuality);
+		//			min 10 surfaces
+		iNumSlices = _max(10, iNumSlices);
+
+		// Set Intensity
+		fQuality = ((float)iNumSlices) / VOLUMETRIC_SLICES;
+		L_clr.mul(L->m_volumetric_intensity);
+		L_clr.mul(1 / fQuality);
+		L_clr.mul(L->get_LOD());
+	}
+	else
+	{
+		// SSS Method
+		fQuality = ps_ssfx_volumetric.z;
+		iNumSlices = (int)(24 * fQuality);
+
+		// Intensity mod to OMNIPART && Player Light
+		if (L->flags.type == IRender_Light::OMNIPART || L->sss_is_playerlight)
+			IntensityMod = 0.2f;
+
+		// Set Intensity
+		L_clr.mul(L->m_volumetric_intensity * IntensityMod);
+		L_clr.mul(1.0f / fQuality);
+		L_clr.mul(L->get_LOD());
+		fQuality = ((float)iNumSlices) / 120; // Max setting ( 24 * 5 )
+	}
+
 	L_spec = u_diffuse2s(L_clr);
 	Device.mView.transform_tiny(L_pos, L->position);
-	Device.mView.transform_dir(L_dir, L->direction);
-	L_dir.normalize();
+	//Device.mView.transform_dir(L_dir, L->direction);
+	//L_dir.normalize();
+
 
 	// Draw volume with projective texgen
 	{
@@ -481,15 +542,15 @@ void CRenderTarget::accum_volumetric(light* L)
 		}
 
 
-		RCache.set_Element(shader->E[0]);
+		RCache.set_Element(s_accum_volume->E[0]);
 
 		// Constants
 		float att_R = L->m_volumetric_distance * L->range * .95f;
 		float att_factor = 1.f / (att_R * att_R);
 		RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, att_factor);
 		RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-		RCache.set_c("m_texgen", m_Texgen);
-		RCache.set_c("m_texgen_J", m_Texgen_J);
+		//RCache.set_c("m_texgen", m_Texgen);
+		//RCache.set_c("m_texgen_J", m_Texgen_J);
 		RCache.set_c("m_shadow", m_Shadow);
 		RCache.set_ca("m_lmap", 0, m_Lmap._11, m_Lmap._21, m_Lmap._31, m_Lmap._41);
 		RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
@@ -566,7 +627,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
 		RCache.set_Geometry(g_accum_volumetric);
 		//	Igor: no need to do it per sub-sample. Plain AA will go just fine.
-		RCache.Render(D3DPT_TRIANGLELIST, 0, 0,VOLUMETRIC_SLICES * 4, 0,VOLUMETRIC_SLICES * 2);
+		RCache.Render(D3DPT_TRIANGLELIST, 0, 0, iNumSlices * 4, 0, iNumSlices * 2);
 
 		/*
 		if( !RImplementation.o.dx10_msaa )
@@ -624,4 +685,8 @@ void CRenderTarget::accum_volumetric(light* L)
 	*/
 	//CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
 	RCache.set_Scissor(0);
+
+	/*if (RImplementation.o.ssfx_volumetric)
+		set_viewport_size(HW.pContext, w, h);*/
+
 }
