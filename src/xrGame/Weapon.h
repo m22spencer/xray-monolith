@@ -47,6 +47,12 @@ struct SafemodeAnm
 	float power, speed;
 };
 
+struct Lens {
+	Fmatrix transform = Fmatrix().identity();
+	float radius = 0.0;
+	IRenderVisual* visual = NULL;
+};
+
 class CWeapon : public CHudItemObject,
                 public CShootingObject
 {
@@ -100,12 +106,6 @@ public:
 	int last_hide_bullet;
 	bool bHasBulletsToHide;
 
-	struct Lens { 
-		Fmatrix transform = Fmatrix().identity();
-		float radius = 0.0;
-		IRenderVisual* visual = NULL;
-	};
-
 	Lens eyepieceLens;
 	Lens objectiveLens;
 
@@ -128,6 +128,7 @@ public:
 	void UpdateSecondVP();
 	void SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective);
 	bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera);
+
 
 	virtual void UpdateCL();
 	virtual void shedule_Update(u32 dt);
@@ -576,6 +577,7 @@ protected:
 	};
 
 	virtual void LoadFireParams(LPCSTR section);
+	void DebugDrawWeapon();
 public:
 	IC const Fvector& get_LastFP()
 	{
