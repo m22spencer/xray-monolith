@@ -509,6 +509,7 @@ void mt_DiscordThread(void*)
 	{
 		if (!pApp)
 		{
+			Msg("[Discord] pApp destroyed, killing thread");
 			return;
 		}
 
