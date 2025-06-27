@@ -382,10 +382,8 @@ void DiscordLog(discord::LogLevel level, std::string message)
 	Msg("[Discord RPC]: %s", message.c_str());
 }
 
-xrCriticalSection discordPresence_cs;
 void updateDiscordPresence()
 {
-	xrCriticalSectionGuard g(discordPresence_cs);
 	PROF_EVENT();
 
 	if (!use_discord)
