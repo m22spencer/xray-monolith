@@ -658,55 +658,71 @@ void CLevel::ProcessGameEvents()
 					shared_str section;
 					u16 obj_id = GetSpawnInfo(P, parent_id, section);
 
-					models_set models;
-
-					static auto safe_insert = [](models_set& models, LPCSTR model) {
-						if (model) {
-							LPCSTR modelWithoutExtension = model;
-							if (strext(modelWithoutExtension)) *strext(modelWithoutExtension) = 0;
-							if (xr_strcmp(modelWithoutExtension, "") != 0 && xr_strcmp(modelWithoutExtension, ".ogf") != 0)
-								models.insert(modelWithoutExtension);
+					static auto isValidToPrefetch = [](u16 parent_id, shared_str& section, u16 obj_id, NET_Packet& P) {
+						bool valid = true;
+						if (pSettings->line_exist(section.c_str(), "class"))
+						{
+							// Do not prefetch fake missiles of a weapon
+							auto c = pSettings->r_string(section.c_str(), "class");
+							valid = (strstr(c, "G_RPG7") == nullptr) && (strstr(c, "G_FAKE") == nullptr);
 						}
+						return valid;
 					};
 
-					// Insert visual from ltx
-					if (pSettings->line_exist(section, "visual"))
+					if (isValidToPrefetch(parent_id, section, obj_id, P))
 					{
-						safe_insert(models, pSettings->r_string(section, "visual"));
-					}
+						models_set models;
 
-					// Corpse visual
-					/*if (pSettings->line_exist(section, "corpse_visual"))
-					{
-						safe_insert(models, pSettings->r_string(section, "corpse_visual"));
-					}*/
+						static auto safe_insert = [](models_set& models, LPCSTR model) {
+							if (model)
+							{
+								LPCSTR modelWithoutExtension = model;
+								if (strext(modelWithoutExtension)) *strext(modelWithoutExtension) = 0;
+								if (xr_strcmp(modelWithoutExtension, "") != 0 && xr_strcmp(modelWithoutExtension, ".ogf") != 0)
+									models.insert(modelWithoutExtension);
+							}
+						};
 
-					// Bloodsucker visual
-					/*if (pSettings->line_exist(section, "Predator_Visual"))
-					{
-						safe_insert(models, pSettings->r_string(section, "Predator_Visual"));
-					}*/
+						// Insert visual from ltx
+						if (pSettings->line_exist(section, "visual"))
+						{
+							safe_insert(models, pSettings->r_string(section, "visual"));
+						}
 
-					// Actual visual from alife object
-					auto obj = ai().alife().objects().object(obj_id);
-					if (obj && obj->visual())
-					{
-						safe_insert(models, obj->visual()->get_visual());
-					}
+						// Corpse visual
+						/*if (pSettings->line_exist(section, "corpse_visual"))
+						{
+							safe_insert(models, pSettings->r_string(section, "corpse_visual"));
+						}*/
 
-					if (!models.empty())
-					{
-						prefetch_event E;
-						E.p = std::move(P);
-						E.models = std::move(models);
+						// Bloodsucker visual
+						/*if (pSettings->line_exist(section, "Predator_Visual"))
+						{
+							safe_insert(models, pSettings->r_string(section, "Predator_Visual"));
+						}*/
 
-						xrCriticalSectionGuard g(prefetch_cs);
-						prefetch_events->push_back(E);
+						auto obj = ai().alife().objects().object(obj_id);
 
-						if (spawn_antifreeze_debug) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
-						it = game_events->queue.erase(it); // remove current event
-						continue;
-					}
+						// Actual visual from alife object
+						if (obj && obj->visual())
+						{
+							safe_insert(models, obj->visual()->get_visual());
+						}
+
+						if (!models.empty())
+						{
+							prefetch_event E;
+							E.p = std::move(P);
+							E.models = std::move(models);
+
+							xrCriticalSectionGuard g(prefetch_cs);
+							prefetch_events->push_back(E);
+
+							if (spawn_antifreeze_debug) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+							it = game_events->queue.erase(it); // remove current event
+							continue;
+						}
+					}					
 				}
 			}
 #endif
