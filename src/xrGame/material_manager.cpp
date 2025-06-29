@@ -11,6 +11,7 @@
 #include "alife_space.h"
 #include "phmovementcontrol.h"
 #include "entity_alive.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "CharacterPhysicsSupport.h"
 #include "../Include/xrRender/Kinematics.h"
 
@@ -27,31 +28,30 @@ CMaterialManager::CMaterialManager(CObject* object, CPHMovementControl* movement
 }
 
 CMaterialManager::~CMaterialManager()
-{
-}
+{}
+
 #ifdef	DEBUG
 BOOL debug_character_material_load = FALSE;
 #endif
 
 void CMaterialManager::Load(LPCSTR section)
 {
-	R_ASSERT3(pSettings->line_exist(section,"material"), "Material not found in the section ",
-	          *(m_object->cNameSect()));
+	R_ASSERT3(pSettings->line_exist(section,"material"), "Material not found in the section ", *(m_object->cNameSect()));
 	m_my_material_idx = GMLib.GetMaterialIdx(pSettings->r_string(section, "material"));
 
 #ifdef	DEBUG
-		if( debug_character_material_load )
-		{
-			CEntityAlive			*entity_alive = smart_cast<CEntityAlive*>(m_object);
-			if( entity_alive )
-				{	
-				VERIFY( GAMEMTL_NONE_IDX != m_my_material_idx );
-				SGameMtl *m = GMLib.GetMaterialByIdx( m_my_material_idx );
+	if (debug_character_material_load)
+	{
+		CEntityAlive *entity_alive = smart_cast<CEntityAlive*>(m_object);
+		if (entity_alive)
+		{	
+			VERIFY(GAMEMTL_NONE_IDX != m_my_material_idx);
+			SGameMtl *m = GMLib.GetMaterialByIdx(m_my_material_idx);
 
-				VERIFY( m );
-				Msg( "(CMaterialManager::Load(LPCSTR section)) material: %s loaded for %s, from section: %s ", m->m_Name.c_str(), entity_alive->cName().c_str(), section ); 
-			}
+			VERIFY(m);
+			Msg("(CMaterialManager::Load(LPCSTR section)) material: %s loaded for %s, from section: %s ", m->m_Name.c_str(), entity_alive->cName().c_str(), section); 
 		}
+	}
 #endif
 }
 
@@ -64,30 +64,23 @@ void CMaterialManager::reinit()
 	CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(m_object);
 	if (entity_alive)
 	{
-		//VERIFY( entity_alive->character_physics_support()->movement()->CharacterExist() );
-		entity_alive->character_physics_support()->movement()->SetPLastMaterialIDX(&m_last_material_idx);
-
-		//		if (entity_alive->use_simplified_visual()) {
-		//			IKinematics			*kinematics = smart_cast<IKinematics*>(entity_alive->Visual());
-		//			m_my_material_idx	= kinematics->LL_GetData(kinematics->LL_GetBoneRoot()).game_mtl_idx;
-		//		}
-
+		if (!smart_cast<CBaseMonster*>(entity_alive)) // для мобов не нужно устанавливть реальный материал, у них нет эти настроек материалов
+			entity_alive->character_physics_support()->movement()->SetPLastMaterialIDX(&m_last_material_idx);
 		entity_alive->character_physics_support()->movement()->SetMaterial(m_my_material_idx);
 #ifdef	DEBUG
-		if( debug_character_material_load )
+		if (debug_character_material_load)
 		{
-			VERIFY( GAMEMTL_NONE_IDX != m_my_material_idx );
-			SGameMtl *m = GMLib.GetMaterialByIdx( m_my_material_idx );
-			VERIFY( m );
-			Msg( "(CMaterialManager::reinit) material: %s loaded for %s ", m->m_Name.c_str(), entity_alive->cName().c_str() ); 
+			VERIFY(GAMEMTL_NONE_IDX != m_my_material_idx);
+			SGameMtl *m = GMLib.GetMaterialByIdx(m_my_material_idx);
+			VERIFY(m);
+			Msg("(CMaterialManager::reinit) material: %s loaded for %s ", m->m_Name.c_str(), entity_alive->cName().c_str()); 
 		}
 #endif
 	}
 }
 
 void CMaterialManager::reload(LPCSTR section)
-{
-}
+{}
 
 void CMaterialManager::update(float time_delta, float volume, float step_time, bool standing)
 {
@@ -127,11 +120,13 @@ void CMaterialManager::update(float time_delta, float volume, float step_time, b
 
 
 	for (int i = 0; i < 4; i++)
+	{
 		if (m_step_sound[i]._feedback())
 		{
 			m_step_sound[i].set_position(position);
 			m_step_sound[i].set_volume(1.f * volume);
 		}
+	}
 }
 
 void CMaterialManager::set_run_mode(bool run_mode)
