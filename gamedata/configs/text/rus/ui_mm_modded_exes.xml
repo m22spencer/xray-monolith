@@ -715,6 +715,9 @@
 	<string id="ui_mm_modded_exes_debug_logging_print_bone_warnings">
 		<text>Предупреждения invalid bone в логе (print_bone_warnings)</text>
 	</string>
+	<string id="ui_mm_modded_exes_debug_logging_print_dltx_warnings">
+		<text>Предупреждения DLTX в логе (print_dltx_warnings)</text>
+	</string>
 
 	<!-- optimizations -->
 	<string id="ui_mm_menu_optimizations">

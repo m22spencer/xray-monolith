@@ -739,6 +739,9 @@
 	<string id="ui_mm_modded_exes_debug_logging_print_bone_warnings">
 		<text>Print invalid bone warnings (print_bone_warnings)</text>
 	</string>
+	<string id="ui_mm_modded_exes_debug_logging_print_dltx_warnings">
+		<text>Print DLTX failed override warnings (print_dltx_warnings)</text>
+	</string>
 
 	<!-- Optimizations -->
 	<string id="ui_mm_menu_optimizations">
