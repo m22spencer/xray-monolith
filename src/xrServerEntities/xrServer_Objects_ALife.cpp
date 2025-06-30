@@ -1591,17 +1591,34 @@ bool CSE_ALifeObjectHangingLamp::validate()
 	return (false);
 }
 
+BOOL alifeObjectHangingLampIgnoreMatchConfiguration = FALSE;
 bool CSE_ALifeObjectHangingLamp::match_configuration() const
 {
-	R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
+	if (alifeObjectHangingLampIgnoreMatchConfiguration)
+	{
+		auto gen = ::Render->get_generation();
+
+		if (flags.test(flR2) && gen >= IRender_interface::GENERATION_R2)
+			return true;
+
+		if (flags.test(flR1) && gen == IRender_interface::GENERATION_R1)
+			return true;
+
+		Msg("![CSE_ALifeObjectHangingLamp::match_configuration] Hanging lamp '%s' has no valid render flag (R1/R2/TypeSpot). Allowing anyway.", name_replace());
+		return true;
+	}
+	else
+	{
+		R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
 #ifdef XRGAME_EXPORTS
-	return (
-		(flags.test(flR1) && (::Render->get_generation() == IRender_interface::GENERATION_R1)) ||
-		(flags.test(flR2) && (::Render->get_generation() == IRender_interface::GENERATION_R2))
-	);
+		return (
+			(flags.test(flR1) && (::Render->get_generation() == IRender_interface::GENERATION_R1)) ||
+			(flags.test(flR2) && (::Render->get_generation() == IRender_interface::GENERATION_R2))
+			);
 #else
-	return						(true);
+		return						(true);
 #endif
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////

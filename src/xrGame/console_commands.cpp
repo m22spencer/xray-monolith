@@ -155,6 +155,8 @@ extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
 extern BOOL fun_allowed;
 
+extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
+
 extern BOOL spawn_antifreeze;
 extern BOOL spawn_antifreeze_debug;
 
@@ -2920,6 +2922,9 @@ void CCC_RegisterCommands()
 
 	// Print DLTX warnings when "override section which doesn't exist"
 	CMD4(CCC_Integer, "print_dltx_warnings", &print_dltx_warnings, 0, 1);
+
+	// Ignore "no renderer type set for hanging-lamp" error
+	CMD4(CCC_Integer, "hanging_lamp_ignore_match_configuration", &alifeObjectHangingLampIgnoreMatchConfiguration, 0, 1);
 
 	// Poltergeists spawn corpses on death
 	CMD4(CCC_Integer, "poltergeist_spawn_corpse_on_death", &poltergeist_spawn_corpse_on_death, 0, 1);
