@@ -188,8 +188,10 @@ void CMainMenu::Activate(bool bActivate)
 
 	//Discord
 	discord_gameinfo.mainmenu = bActivate;
-	if (bActivate && psDeviceFlags2.test(rsDiscord))
-		updateDiscordPresence();
+
+	// demonized: handled in separate thread
+	/*if (bActivate && psDeviceFlags2.test(rsDiscord))
+		updateDiscordPresence();*/
 
 	if (bActivate)
 	{

@@ -537,7 +537,10 @@
 		<text>Change weapons with mouse wheel (mouse_wheel_change_weapon)</text>
 	</string>
 	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_zoom">
-		<text>Invert mouse wheel (mouse_wheel_invert_zoom)</text>
+		<text>Invert mouse wheel zoom (mouse_wheel_invert_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_change_weapon">
+		<text>Invert mouse wheel change weapons (mouse_wheel_invert_change_weapon)</text>
 	</string>
 
 	<!-- Camera -->
@@ -736,22 +739,37 @@
 	<string id="ui_mm_modded_exes_debug_logging_print_bone_warnings">
 		<text>Print invalid bone warnings (print_bone_warnings)</text>
 	</string>
-
-	<!-- Metrics -->
-	<string id="ui_mm_menu_metrics">
-		<text>Metrics</text>
+	<string id="ui_mm_modded_exes_debug_logging_print_dltx_warnings">
+		<text>Print DLTX failed override warnings (print_dltx_warnings)</text>
 	</string>
-	<string id="ui_mm_metrics_modded_exes">
-		<text>Metrics</text>
+
+	<!-- Optimizations -->
+	<string id="ui_mm_menu_optimizations">
+		<text>Optimizations</text>
+	</string>
+	<string id="ui_mm_optimizations_modded_exes">
+		<text>Optimizations</text>
 	</string>
 	
-	<string id="ui_mm_modded_exes_debug_metrics_lua_gcstep">
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze">
+		<text>Spawn antifreeze (spawn_antifreeze)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_desc">
+		<text>Puts spawning of entities procedure into separate thread, doesn't completely eliminate freezes but tries to minimize them</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch">
+		<text>Spawn antifreeze batch size (spawn_antifreeze_batch)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch_desc">
+		<text>Amount of spawn events to process each frame</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_lua_gcstep">
 		<text>Lua Garbage Collection Step (lua_gcstep)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_metrics_mouse_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_mouse_buffer_size">
 		<text>Mouse Input Buffer Size (mouse_buffer_size)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_metrics_keyboard_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_keyboard_buffer_size">
 		<text>Keyboard Input Buffer Size (keyboard_buffer_size)</text>
 	</string>
 </string_table>

@@ -45,6 +45,7 @@ CALifeStorageManager::~CALifeStorageManager()
 
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
+	PROF_EVENT();
 	LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
 
 	string_path save_name;
@@ -232,6 +233,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
 void CALifeStorageManager::save(NET_Packet& net_packet)
 {
+	PROF_EVENT();
 	prepare_objects_for_save();
 
 	shared_str game_name;
@@ -241,6 +243,7 @@ void CALifeStorageManager::save(NET_Packet& net_packet)
 
 void CALifeStorageManager::prepare_objects_for_save()
 {
+	PROF_EVENT();
 	Level().ClientSend();
 	Level().ClientSave();
 }

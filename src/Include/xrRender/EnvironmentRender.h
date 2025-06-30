@@ -39,7 +39,7 @@ public:
 	virtual void OnFrame(CEnvironment& env) = 0;
 	virtual void OnLoad() = 0;
 	virtual void OnUnload() = 0;
-	virtual void RenderSky(CEnvironment& env) = 0;
+	virtual void RenderSky(CEnvironment& env, bool only_MV = false) = 0;
 	virtual void RenderClouds(CEnvironment& env) = 0;
 	virtual void OnDeviceCreate() = 0;
 	virtual void OnDeviceDestroy() = 0;

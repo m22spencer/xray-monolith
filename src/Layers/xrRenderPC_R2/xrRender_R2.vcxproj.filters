@@ -160,6 +160,9 @@
     <Filter Include="Interfase implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{7b446f08-e762-4e42-9b67-0dd22dbfc8b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfase implementations\ImGuiRender">
+      <UniqueIdentifier>{24ee6acf-5fa3-4d0a-b85d-206d93d0fcdd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -671,6 +674,12 @@
     </ClInclude>
     <ClInclude Include="blender_smaa.h">
       <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1228,6 +1237,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\rendertarget_phase_smaa.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

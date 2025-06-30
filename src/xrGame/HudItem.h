@@ -293,8 +293,9 @@ public:
 	virtual void OnFrame();
 	void net_Relcase(CObject* O);
 
+	void ApplyAimModifiers(Fmatrix& matrix);
 	virtual Fmatrix RayTransform();
-	virtual void g_fireParams(SPickParam& pp);
+	virtual void g_fireParams(SPickParam& pp) {};
 	virtual void Ray(SPickParam& pp);
 	void UpdatePick();
 	SPickParam& GetPick() { return PP; };

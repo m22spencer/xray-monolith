@@ -455,7 +455,7 @@ function HDRLiveEditingControl:Callback_Track(i, val)
     local cmd = hdr_live_editing_commands[i].cmd
     local res = ("%s %s"):format(cmd, val)
     exec_console_cmd(res)
-    printf(res)
+    printf_me(res)
 
     local display_text = val
 

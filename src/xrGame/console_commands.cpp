@@ -135,12 +135,14 @@ extern BOOL pda_map_zoom_in_to_mouse;
 extern BOOL pda_map_zoom_out_to_mouse;
 extern BOOL mouseWheelChangeWeapon;
 extern BOOL mouseWheelInvertZoom;
+extern BOOL mouseWheelInvertChangeWeapons;
 extern BOOL monsterStuckFix;
 extern BOOL logTimestamps;
 extern float f_Freelook_cam_limit;
 extern int MOUSEBUFFERSIZE;
 extern int KEYBOARDBUFFERSIZE;
 extern BOOL print_bone_warnings;
+extern BOOL print_dltx_warnings;
 extern BOOL poltergeist_spawn_corpse_on_death;
 extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
@@ -151,6 +153,10 @@ extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
+extern BOOL fun_allowed;
+
+extern BOOL spawn_antifreeze;
+extern BOOL spawn_antifreeze_debug;
 
 extern CrosshairSettings g_crosshair_camera_near;
 extern CrosshairSettings g_crosshair_camera_far;
@@ -2414,8 +2420,9 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "ai_dbg_lua", &psAI_Flags, aiLua);
 #endif // MASTER_GOLD
 
-        // Moved lua_gcstep outside of DEBUG to allow for easier experimentation.
+    // Moved lua_gcstep outside of DEBUG to allow for easier experimentation.
 	CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+
 #ifdef DEBUG
 	CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
 	CMD3(CCC_Mask, "ai_dbg_brain", &psAI_Flags, aiBrain);
@@ -2811,6 +2818,12 @@ void CCC_RegisterCommands()
 
 	CMD3(CCC_Mask, "blend_move_anims", &psDeviceFlags2, rsBlendMoveAnims);
 
+	CMD4(CCC_Integer, "spawn_antifreeze", &spawn_antifreeze, 0, 1);
+	CMD4(CCC_Integer, "spawn_antifreeze_debug", &spawn_antifreeze_debug, 0, 1);
+
+	// demonized: Restores fun physics bugs like lift
+	CMD4(CCC_Integer, "fun_allowed", &fun_allowed, 0, 1);
+
 #ifdef DEBUG
 	//extern BOOL g_use_new_ballistics;
 	//CMD4(CCC_Integer,	"use_new_ballistics",	&g_use_new_ballistics, 0, 1);
@@ -2882,6 +2895,7 @@ void CCC_RegisterCommands()
 
 	// Mouse Wheel
 	CMD4(CCC_Integer, "mouse_wheel_change_weapon", &mouseWheelChangeWeapon, 0, 1);
+	CMD4(CCC_Integer, "mouse_wheel_invert_change_weapon", &mouseWheelInvertChangeWeapons, 0, 1);
 	CMD4(CCC_Integer, "mouse_wheel_invert_zoom", &mouseWheelInvertZoom, 0, 1);
 
 	//Toggle crash saving
@@ -2903,6 +2917,9 @@ void CCC_RegisterCommands()
 
 	// Print warnings when using bone_position and bone_direction functions and encounter invalid bones
 	CMD4(CCC_Integer, "print_bone_warnings", &print_bone_warnings, 0, 1);
+
+	// Print DLTX warnings when "override section which doesn't exist"
+	CMD4(CCC_Integer, "print_dltx_warnings", &print_dltx_warnings, 0, 1);
 
 	// Poltergeists spawn corpses on death
 	CMD4(CCC_Integer, "poltergeist_spawn_corpse_on_death", &poltergeist_spawn_corpse_on_death, 0, 1);

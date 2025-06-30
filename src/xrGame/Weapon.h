@@ -549,15 +549,17 @@ public:
 
 private:
 	float m_nearwall_zoomed_range;
-	float m_aimpos;
+	bool m_firepos;
+	bool m_aimpos;
 
 public:
+	bool GetFirepos() { return m_firepos; }
+	bool GetAimpos() { return m_aimpos; }
 	float GetTargetNearWallOffset();
 	float GetTargetHudFov();
 
 public:
 	Fmatrix RayTransform();
-	void g_fireParams(SPickParam& pp);
 
 protected:
 	virtual void UpdateFireDependencies_internal();

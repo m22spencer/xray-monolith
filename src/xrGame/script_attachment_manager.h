@@ -48,7 +48,7 @@ private:
 	shared_str m_name;
 
 	Fmatrix m_offset, m_transform;
-	Fvector m_position, m_rotation, m_scale, m_origin;
+	Fvector m_attachment_offset[4];
 
 	IRenderVisual* m_model;
 	IKinematics* m_kinematics;
@@ -59,7 +59,7 @@ private:
 	LPCSTR m_script_ui_func;
 	CUIWindow* m_script_ui;
 	Fmatrix m_script_ui_mat;
-	Fvector m_script_ui_offset[2];
+	Fvector m_script_ui_offset[4];
 	Fvector2 m_script_ui_scale;
 	u16 m_script_ui_bone;
 
@@ -105,20 +105,20 @@ public:
 
 	void SetPosition(Fvector pos) { SetPosition(pos.x, pos.y, pos.z); }
 	void SetPosition(float x, float y, float z);
-	Fvector GetPosition() { return m_position; }
+	Fvector GetPosition() { return m_attachment_offset[0]; }
 
 	void SetRotation(Fvector rot) { SetRotation(rot.x, rot.y, rot.z); }
 	void SetRotation(float x, float y, float z);
-	Fvector GetRotation() { return m_rotation; }
+	Fvector GetRotation() { return m_attachment_offset[1]; }
 
 	void SetScale(Fvector scale) { SetScale(scale.x, scale.y, scale.z); }
 	void SetScale(float x, float y, float z);
 	void SetScale(float scale) { SetScale(Fvector().set(scale, scale, scale)); }
-	Fvector GetScale() { return m_scale; }
+	Fvector GetScale() { return m_attachment_offset[2]; }
 
 	void SetOrigin(Fvector org) { SetOrigin(org.x, org.y, org.z); }
 	void SetOrigin(float x, float y, float z);
-	Fvector GetOrigin() { return m_origin; }
+	Fvector GetOrigin() { return m_attachment_offset[3]; }
 
 	void SetParent(script_attachment* att);
 	void SetParent(CGameObject* obj);
@@ -140,18 +140,28 @@ public:
 
 	void SetScriptUI(LPCSTR ui_func);
 	LPCSTR GetScriptUI() { return m_script_ui_func; }
-	void SetScriptUIPosition(Fvector pos);
-	void SetScriptUIPosition(float x, float y, float z) { SetScriptUIPosition(Fvector().set(x, y, z)); }
+
+	void RecalcScriptUIOffset();
+
+	void SetScriptUIPosition(Fvector pos) { SetScriptUIPosition(pos.x, pos.y, pos.z); }
+	void SetScriptUIPosition(float x, float y, float z);
 	Fvector GetScriptUIPosition() { return m_script_ui_offset[0]; }
-	void SetScriptUIRotation(Fvector rot);
-	void SetScriptUIRotation(float x, float y, float z) { SetScriptUIRotation(Fvector().set(x, y, z)); }
+
+	void SetScriptUIRotation(Fvector rot) { SetScriptUIRotation(rot.x, rot.y, rot.z); }
+	void SetScriptUIRotation(float x, float y, float z);
 	Fvector GetScriptUIRotation() { return m_script_ui_offset[1]; }
+
+	void SetScriptUIScale(Fvector rot) { SetScriptUIScale(rot.x, rot.y, rot.z); }
+	void SetScriptUIScale(float x, float y, float z);
+	Fvector GetScriptUIScale() { return m_script_ui_offset[2]; }
+
+	void SetScriptUIOrigin(Fvector rot) { SetScriptUIOrigin(rot.x, rot.y, rot.z); }
+	void SetScriptUIOrigin(float x, float y, float z);
+	Fvector GetScriptUIOrigin() { return m_script_ui_offset[3]; }
+
 	void SetScriptUIBone(u16 bone) { m_script_ui_bone = bone; }
 	void SetScriptUIBone(LPCSTR bone) { m_script_ui_bone = bone_id(bone); }
 	u16 GetScriptUIBone() { return m_script_ui_bone; }
-	void SetScriptUIScale(Fvector2 scale) { SetScriptUIScale(scale.x, scale.y); }
-	void SetScriptUIScale(float x, float y) { m_script_ui_scale.set(x, y); }
-	Fvector2 GetScriptUIScale() { return m_script_ui_scale; }
 
 	script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name);
 	void RemoveAttachment(LPCSTR name) { RemoveChild(name, true); }

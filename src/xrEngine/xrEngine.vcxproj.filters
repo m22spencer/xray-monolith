@@ -154,6 +154,9 @@
     <Filter Include="Interfaces\Discord">
       <UniqueIdentifier>{35834be4-924f-4f20-acfc-b2f66194b35d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces\ImGui">
+      <UniqueIdentifier>{21c3196b-e8a2-47ba-be1b-b050dda17222}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_d3d_extensions.h">
@@ -480,6 +483,12 @@
     <ClInclude Include="..\3rd party\discord\voice_manager.h">
       <Filter>Interfaces\Discord</Filter>
     </ClInclude>
+    <ClInclude Include="imgui_base.h">
+      <Filter>Interfaces\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_helper.h">
+      <Filter>Interfaces\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -779,11 +788,15 @@
     <ClCompile Include="..\3rd party\discord\voice_manager.cpp">
       <Filter>Interfaces\Discord</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resource.rc">
-      <Filter>General\Resources</Filter>
-    </ResourceCompile>
+    <ClCompile Include="imgui_base.cpp">
+      <Filter>Interfaces\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_base_input.cpp">
+      <Filter>Interfaces\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_helper.cpp">
+      <Filter>Interfaces\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="splash_xrcs_en.bmp">
@@ -792,5 +805,10 @@
     <Image Include="stalker_cs.ico">
       <Filter>General\Resources</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>General\Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

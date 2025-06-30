@@ -205,6 +205,18 @@ BOOL CCar::net_Spawn(CSE_Abstract* DC)
 		m_memory = xr_new<car_memory>(this);
 		m_memory->reload(pUserData->r_string("visual_memory_definition", "section"));
 	}
+	
+	renderable.visual->flags.set(IRenderVisualFlags::eIgnoreOptimization, TRUE);
+
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+
+	if (children)
+	{
+		for (auto* child : *children)
+		{
+			child->flags.set(IRenderVisualFlags::eIgnoreOptimization, TRUE);
+		}
+	}
 
 	return (CScriptEntity::net_Spawn(DC));
 }

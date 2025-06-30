@@ -357,7 +357,7 @@ public:
 	void OnFrame();
 	void lerp(float& current_weight);
 
-	void RenderSky();
+	void RenderSky(bool only_MV = false);
 	void RenderClouds();
 	void RenderFlares();
 	void RenderLast();

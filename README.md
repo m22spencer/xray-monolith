@@ -180,12 +180,59 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 How to compile exes:
 1. Fork this xray-monolith
 2. Clone the fork onto your pc
-3. Select all-in-one-vs2022-wpo branch
-4. Compile the engine-vs2022.sln solution with VS2022
-5. For batch builds of all configurations use `batch_build.bat` in xray-monolith repo
-6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
+3. Run `git submodule update --init --recursive` to pull git submodules
+4. Select all-in-one-vs2022-wpo branch
+5. Compile the engine-vs2022.sln solution with VS2022
+6. For batch builds of all configurations use `batch_build.bat` in xray-monolith repo
+7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.06.30**
+* Disable printing DLTX `!` warnings by default, toggle it with `print_dltx_warnings 1` cvar
+* Lua GC step increased to 300
+* OneMorePseudoCoder:
+  * Don't apply rendering optimizations to cars and helicopters (https://github.com/themrdemonized/xray-monolith/pull/271)
+  * Fix npc footsteps (https://github.com/themrdemonized/xray-monolith/pull/274)
+
+**2025.06.28**
+* Fixed crash to desktop in updateDiscordPresence function due to race condition
+* Spawn antifreeze: do not prefetch G_RPG7 and G_FAKE objects, fixes "incorrect destroy sequence for object" error
+* Ascii1457: SSS 23 Update
+* LVutner: R11G11B10_FLOAT support
+
+**2025.06.27**
+* Disabled initial script prefetches, conflict with SSS
+
+**2025.06.26**
+* Spawn antifreeze: Fixed some random crashes to desktop due to race condition in shader creation
+* LVutner: [Render] PIXEVENTs. Thanks to forserx and frowik
+
+**2025.06.24**
+* Hotfixes:
+  * Spawn antifreeze: Fixed crashing to desktop if model hasn't been found for prefetching
+  * Dynamic news manager: Check if the type of stuff in loot table is actual object, fixes crashes with existing moddb fixes
+* Fixed "overriding /ob2 with /ob3" warning when building
+* Fixed issue https://github.com/themrdemonized/xray-monolith/issues/267
+
+**2025.06.23**
+* Optimization pass:
+  * Spawn Antifreeze: put offloading model and texture resources into separate thread before spawning entities. Enabled by default. If you notice some issues, please report them and turn it off in console `spawn_antifreeze 0` (https://github.com/themrdemonized/xray-monolith/pull/257)
+  * Move Discord update into separate thread
+  * Fixed `trans_outfit.transparent_gg()` function having whole alife loop, now using only game objects
+  * Fix Dynamic News Manager loot table containing possible destroyed objects, leading to busy hands
+  * Changed Lua garbage collection step 400 -> 160
+* Moved project files outside of vs2022 folder, refactor solution file. Should fix broken precompiled headers
+* ProfLander: Integrate optick profiler (https://github.com/themrdemonized/xray-monolith/pull/262)
+
+**2025.06.20**
+* Updated Github Action to use `softprops/action-gh-release`
+* [Feature Request] Added an option to invert Mouse Wheel when changing weapons (https://github.com/themrdemonized/xray-monolith/issues/261)
+* ProfLander: 3D Ballistics Fixes (https://github.com/themrdemonized/xray-monolith/pull/259)
+* Kutez: Update v3 Indoor Gunsound Framework (https://github.com/themrdemonized/xray-monolith/pull/260)
+
+**2025.06.18**
+* Lucy: Script Attachment 3D UI Scale/Origin (https://github.com/themrdemonized/xray-monolith/pull/258)
+
 **2025.06.15**
 * Lucy: Some more changes (https://github.com/themrdemonized/xray-monolith/pull/254)
 
@@ -1316,4 +1363,3 @@ override = true
 
 * Exported distance_to_xz_sqr() function of Fvector
 * Redesigned duplicate section error, it will additionally print what file adds the section in the first place in addition to the file that has the duplicate
-

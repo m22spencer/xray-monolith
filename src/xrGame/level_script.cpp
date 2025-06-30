@@ -1854,7 +1854,11 @@ Fvector g_get_target_pos(ETraceTarget tt)
 	SPickParam* pp = get_pick(tt);
 	if (pp)
 	{
-		return Fvector().mad(pp->defs.start, pp->defs.dir, pp->result.range);
+		CActor* pActor = Actor();
+		Fmatrix mat = pp->barrel_matrix;
+		if (pActor && pActor->HUDview())
+			Device.hud_to_world(mat);
+		return Fvector().mad(mat.c, mat.k, pp->result.range);
 	}
 	return Fvector().set(0, 0, 0);
 }

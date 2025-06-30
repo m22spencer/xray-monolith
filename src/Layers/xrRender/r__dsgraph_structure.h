@@ -51,7 +51,7 @@ public:
 	R_dsgraph::mapScopeHUD_T mapScopeHUDSorted;
 #endif
 	R_dsgraph::mapLandscape_T mapLandscape;
-	R_dsgraph::HUDMask_T HUDMask;
+	//R_dsgraph::HUDMask_T HUDMask; // SSS 23: Deprecated
 	R_dsgraph::HUDMask_T HUDMaskCamAttached;
 	R_dsgraph::mapWater_T mapWater;
 
@@ -188,7 +188,7 @@ public:
 		mapHUDDistort.destroy();
 		mapCamAttachedSorted.destroy();
 		mapLandscape.destroy();
-		HUDMask.destroy();
+		//HUDMask.destroy(); // SSS 23: Deprecated
 		HUDMaskCamAttached.destroy();
 		mapWater.destroy();
 

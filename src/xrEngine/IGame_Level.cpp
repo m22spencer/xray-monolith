@@ -12,6 +12,8 @@
 #include "xr_object.h"
 #include "feel_sound.h"
 
+#include "../xrCore/profiler.h"
+
 //#include "securom_api.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
@@ -185,6 +187,7 @@ void IGame_Level::OnRender()
 
 void IGame_Level::OnFrame()
 {
+	PROF_EVENT("IGame_Level::OnFrame()");
 	// Log ("- level:on-frame: ",u32(Device.dwFrame));
 	// if (_abs(Device.fTimeDelta)<EPS_S) return;
 

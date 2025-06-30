@@ -43,6 +43,49 @@ void CRenderTarget::set_viewport_size(ID3DDeviceContext * dev, float w, float h)
 	dev->RSSetViewports(1, custom_viewport);
 }
 
+void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb)
+{
+	VERIFY(_1 || zb);
+	if (_1)
+	{
+		dwWidth = _1->dwWidth;
+		dwHeight = _1->dwHeight;
+	}
+	else
+	{
+		D3D_DEPTH_STENCIL_VIEW_DESC desc;
+		zb->GetDesc(&desc);
+
+		if (!RImplementation.o.dx10_msaa)
+			VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
+
+		ID3DResource* pRes;
+
+		zb->GetResource(&pRes);
+
+		ID3DTexture2D* pTex = (ID3DTexture2D*)pRes;
+
+		D3D_TEXTURE2D_DESC TexDesc;
+
+		pTex->GetDesc(&TexDesc);
+
+		dwWidth = TexDesc.Width;
+		dwHeight = TexDesc.Height;
+		_RELEASE(pRes);
+	}
+
+	if (_1) RCache.set_RT(_1->pRT, 0);
+	else RCache.set_RT(NULL, 0);
+	if (_2) RCache.set_RT(_2->pRT, 1);
+	else RCache.set_RT(NULL, 1);
+	if (_3) RCache.set_RT(_3->pRT, 2);
+	else RCache.set_RT(NULL, 2);
+	if (_4) RCache.set_RT(_4->pRT, 3);
+	else RCache.set_RT(NULL, 3);
+	RCache.set_ZB(zb);
+	//	RImplementation.rmNormal				();
+}
+
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
 {
 	VERIFY(_1||zb);
@@ -385,6 +428,9 @@ CRenderTarget::CRenderTarget()
 	b_hdr10_lens_flare_upsample   = xr_new<CBlender_hdr10_lens_flare_upsample>();
 
 	// Screen Space Shaders Stuff
+	b_ssfx_fog_scattering = xr_new<CBlender_ssfx_fog_scattering>();
+	b_ssfx_motion_blur = xr_new<CBlender_ssfx_motion_blur>();
+	b_ssfx_taa = xr_new<CBlender_ssfx_taa>();
 	b_ssfx_rain = xr_new<CBlender_ssfx_rain>();
 	b_ssfx_water_blur = xr_new<CBlender_ssfx_water_blur>();
 	b_ssfx_bloom = xr_new<CBlender_ssfx_bloom_build>();
@@ -455,7 +501,7 @@ CRenderTarget::CRenderTarget()
 		{
 			// NV50
 			if (RImplementation.o.dx11_hdr10) {
-            	rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 			} else {
 				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount);
 			}
@@ -498,10 +544,10 @@ CRenderTarget::CRenderTarget()
 		rt_Heat.create(r2_RT_heat, w, h, D3DFMT_A8R8G8B8, SampleCount);
 		//--DSR-- HeatVision_end
 
-        if (RImplementation.o.dx11_hdr10) {
-            rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A16B16G16R16F, RImplementation.o.dx10_msaa ? SampleCount : 1);
+		if (RImplementation.o.dx11_hdr10) {
+			rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A16B16G16R16F, RImplementation.o.dx10_msaa ? SampleCount : 1);
 		} else {
-            rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, RImplementation.o.dx10_msaa ? SampleCount : 1);
+			rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, RImplementation.o.dx10_msaa ? SampleCount : 1);
 		}
 
 		rt_dof.create(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
@@ -519,8 +565,8 @@ CRenderTarget::CRenderTarget()
 			rt_HDR10_HalfRes[0].create(r4_RT_HDR10_halfres0, w/2,  h/2,  D3DFMT_A16B16G16R16F);
 			rt_HDR10_HalfRes[1].create(r4_RT_HDR10_halfres1, w/2,  h/2,  D3DFMT_A16B16G16R16F);
 		}
-                                                         // PDA, probably not ideal though
-		// RT - KD
+		// PDA, probably not ideal though
+// RT - KD
 		rt_sunshafts_0.create(r2_RT_sunshafts0, w, h, D3DFMT_A8R8G8B8);
 		rt_sunshafts_1.create(r2_RT_sunshafts1, w, h, D3DFMT_A8R8G8B8);
 
@@ -540,6 +586,15 @@ CRenderTarget::CRenderTarget()
 		rt_pp_bloom.create(r2_RT_pp_bloom, w, h, D3DFMT_A8R8G8B8);
 
 		// Screen Space Shaders Stuff
+		rt_ssfx_taa.create(r2_RT_ssfx_taa, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Temp RT
+
+		if (RImplementation.o.dx11_hdr10)
+			rt_ssfx_prev_frame.create(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A16B16G16R16F); // Temp RT
+		else
+			rt_ssfx_prev_frame.create(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A8R8G8B8); // Temp RT
+
+		rt_ssfx_motion_vectors.create(r2_RT_ssfx_motion_vectors, w, h, D3DFMT_A16B16G16R16F, SampleCount); // HUD mask & Velocity buffer
+		
 		rt_ssfx.create(r2_RT_ssfx, w, h, D3DFMT_A8R8G8B8); // Temp RT
 		rt_ssfx_temp.create(r2_RT_ssfx_temp, w, h, D3DFMT_A8R8G8B8); // Temp RT
 		rt_ssfx_temp2.create(r2_RT_ssfx_temp2, w, h, D3DFMT_A8R8G8B8); // Temp RT
@@ -585,7 +640,7 @@ CRenderTarget::CRenderTarget()
 
 		rt_ssfx_prevPos.create(r2_RT_ssfx_prevPos, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
-		rt_ssfx_hud.create(r2_RT_ssfx_hud, w, h, D3DFMT_A16B16G16R16F); // HUD mask & Velocity buffer
+		//rt_ssfx_hud.create(r2_RT_ssfx_hud, w, h, D3DFMT_A16B16G16R16F); // Deprecated
 
 		if (RImplementation.o.dx10_msaa)
 		{
@@ -627,6 +682,9 @@ CRenderTarget::CRenderTarget()
 	s_occq.create(b_occq, "r2\\occq");
 
 	// Screen Space Shaders Stuff
+	s_ssfx_fog_scattering.create(b_ssfx_fog_scattering, "ssfx_fog_scattering"); // SSS Fog Scattering
+	s_ssfx_motion_blur.create(b_ssfx_motion_blur, "ssfx_motion_blur"); // SSS Motion Blur
+	s_ssfx_taa.create(b_ssfx_taa, "ssfx_taa"); // SSS TAA
 	s_ssfx_rain.create(b_ssfx_rain, "ssfx_rain"); // SSS Rain
 	s_ssfx_bloom.create(b_ssfx_bloom, "ssfx_bloom"); // SSS Bloom
 	s_ssfx_bloom_lens.create(b_ssfx_bloom_lens, "ssfx_bloom_flares"); // SSS Bloom Lens flare
@@ -643,12 +701,13 @@ CRenderTarget::CRenderTarget()
 
 	s_ssfx_ao.create(b_ssfx_ao, "ssfx_ao"); // SSR
 
-	string32 cskin_buffer;
+	// SSS 23: Deprecated
+	/*string32 cskin_buffer;
 	for (int skin_num = 0; skin_num < 5; skin_num++)
 	{
 		sprintf(cskin_buffer, "ssfx_hud_skin%i", skin_num);
 		s_ssfx_hud[skin_num].create(cskin_buffer);
-	}
+	}*/
 
 	// DIRECT (spot)
 	D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
@@ -1329,6 +1388,9 @@ CRenderTarget::~CRenderTarget()
 	xr_delete(b_smaa);
 
 	// [ SSS Stuff ]
+	xr_delete(b_ssfx_fog_scattering); // SSS MotionBlur
+	xr_delete(b_ssfx_motion_blur); // SSS MotionBlur
+	xr_delete(b_ssfx_taa); // SSS TAA
 	xr_delete(b_ssfx_rain); // SSS Rain
 	xr_delete(b_ssfx_water_blur); // SSS Water Blur
 	xr_delete(b_ssfx_bloom); // SSS Bloom
@@ -1404,7 +1466,6 @@ void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt origi
 	// Place any render targets which must persist between frames here.
 	//   it will ensure they are duplicated when SVP is active
 	VIEWPORT_RT(rt_ssfx_accum)
-	VIEWPORT_RT(rt_ssfx_hud)
 	VIEWPORT_RT(rt_ssfx_ssr)
 	VIEWPORT_RT(rt_ssfx_water)
 

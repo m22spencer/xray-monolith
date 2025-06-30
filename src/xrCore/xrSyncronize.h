@@ -55,4 +55,28 @@ public:
 	bool IsValid() { return pmutex != nullptr; }
 };
 
+class xrCriticalSectionGuard
+{
+private:
+	xrCriticalSection* critical_section;
+
+public:
+	void Enter()
+	{
+		critical_section->Enter();
+	}
+	void Leave()
+	{
+		critical_section->Leave();
+	}
+	xrCriticalSectionGuard(xrCriticalSection* cs) : critical_section(cs) { Enter(); }
+	xrCriticalSectionGuard(xrCriticalSection& cs) : critical_section(&cs) { Enter(); }
+
+	xrCriticalSectionGuard(xrCriticalSectionGuard const& copy) = delete; //noncopyable
+	xrCriticalSectionGuard& operator=(const xrCriticalSectionGuard& Other) = delete;
+	xrCriticalSectionGuard& operator=(xrCriticalSectionGuard&& Other) = delete;
+
+	~xrCriticalSectionGuard() { Leave(); }
+};
+
 #endif // xrSyncronizeH

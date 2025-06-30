@@ -68,6 +68,7 @@ public:
 	virtual void End();
 	virtual void ClearTarget();
 	virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject);
+	virtual void SetCacheXform_prev(Fmatrix& mView, Fmatrix& mProject);
 	virtual void OnAssetsChanged();
 
 public:

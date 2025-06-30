@@ -221,9 +221,9 @@ append(
 		prefix = "weapon",
 		defs = {
 			far = {
-				show = false,
-				use_shader = true,
-				recon = false,
+				show = true,
+				use_shader = false,
+				recon = true,
 				line = false,
 
 				shader = "hud\\cursor",
@@ -231,7 +231,7 @@ append(
 
 				distance_lerp_rate = 40,
 
-				size = 4,
+				size = 1,
 				depth = 25,
 			},
 			near = {
@@ -263,8 +263,8 @@ append(
 		defs = {
 			far = {
 				show = false,
-				use_shader = true,
-				recon = false,
+				use_shader = false,
+				recon = true,
 				line = false,
 
 				shader = "hud\\cursor",
@@ -272,7 +272,7 @@ append(
 
 				distance_lerp_rate = 40,
 
-				size = 4,
+				size = 1,
 				depth = 25,
 			},
 			near = {

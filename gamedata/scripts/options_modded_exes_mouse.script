@@ -12,5 +12,6 @@ PAGE = page {
 		step = 0.01,
 	},
 	list_bool { id = "mouse_wheel_change_weapon" },
+	list_bool { id = "mouse_wheel_invert_change_weapon" },
 	list_bool { id = "mouse_wheel_invert_zoom" },
 }

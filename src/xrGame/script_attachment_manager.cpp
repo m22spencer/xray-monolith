@@ -64,6 +64,8 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_script_ui_mat = Fidentity;
 	m_script_ui_offset[0].set(0, 0, 0);
 	m_script_ui_offset[1].set(0, 0, 0);
+	m_script_ui_offset[2].set(1, 1, 1);
+	m_script_ui_offset[3].set(0, 0, 0);
 	m_script_ui_scale.set(1, 1);
 	m_script_ui_bone = 0;
 	m_script_light = nullptr;
@@ -71,10 +73,10 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_parent_bone = 0;
 	m_offset = Fidentity;
 	m_transform = Fidentity;
-	m_position.set(0, 0, 0);
-	m_rotation.set(0, 0, 0);
-	m_origin.set(0, 0, 0);
-	m_scale.set(1, 1, 1);
+	m_attachment_offset[0].set(0, 0, 0);
+	m_attachment_offset[1].set(0, 0, 0);
+	m_attachment_offset[2].set(1, 1, 1);
+	m_attachment_offset[3].set(0, 0, 0);
 	m_bStopAtEndAnimIsRunning = false;
 	m_anim_end = 0;
 	m_type = eSA_World;
@@ -123,9 +125,10 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat)
 		m_script_light->SetXFORM(LM);
 	}
 
-	if (m_model->dcast_PKinematicsAnimated())
+	IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
+	if (ka || GetType() == eSA_CamAttached)
 	{
-		m_model->dcast_PKinematicsAnimated()->UpdateTracks();
+		if (ka) ka->UpdateTracks();
 		m_kinematics->CalculateBones_Invalidate();
 		m_kinematics->CalculateBones(TRUE);
 	}
@@ -248,9 +251,6 @@ void script_attachment::RenderUI()
 		else
 			ui_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
-		ui_bone.m[1][1] = m_script_ui_scale.x;
-		ui_bone.m[2][2] = m_script_ui_scale.y;
-
 		LM.mul(m_transform, ui_bone);
 		LM.mulB_43(m_script_ui_mat);
 		UIRender->CacheSetXformWorld(LM);
@@ -291,53 +291,49 @@ AttachmentScriptLight* script_attachment::GetLight()
 
 void script_attachment::RecalcOffset()
 {
-	if (!!m_origin.x || !!m_origin.y || !!m_origin.z)
+	Fvector& position = m_attachment_offset[0];
+	Fvector rotation = m_attachment_offset[1];
+	Fvector& scale = m_attachment_offset[2];
+	Fvector& origin = m_attachment_offset[3];
+
+	rotation.mul(PI / 180.f);
+
+	if (!!origin.x || !!origin.y || !!origin.z)
 	{
-		Fmatrix rotation_matrix;
-		
-		m_offset.translate(-m_origin.x, -m_origin.y, -m_origin.z);
-
-		Fvector rotation = m_rotation;
-		rotation.mul(PI / 180.f);
-		rotation_matrix.setHPB(rotation.x, rotation.y, rotation.z);
-
-		m_offset.mulA_43(rotation_matrix);
-
-		m_offset.mulA_43(Fmatrix().scale(m_scale));
-		m_offset.mulA_43(Fmatrix().translate(m_position));
+		m_offset.translate(-origin.x, -origin.y, -origin.z);
+		m_offset.mulA_43(Fmatrix().setHPB(rotation));
+		m_offset.mulA_43(Fmatrix().scale(scale));
+		m_offset.mulA_43(Fmatrix().translate(position));
 	}
 	else
 	{
-		Fvector rotation = m_rotation;
-		rotation.mul(PI / 180.f);
-		m_offset.setHPB(rotation.x, rotation.y, rotation.z);
-
-		m_offset.translate_over(m_position);
-		m_offset.mulB_43(Fmatrix().scale(m_scale));
+		m_offset.setHPB(rotation);
+		m_offset.translate_over(position);
+		m_offset.mulB_43(Fmatrix().scale(scale));
 	}
 }
 
 void script_attachment::SetPosition(float x, float y, float z)
 {
-	m_position.set(x, y, z);
+	m_attachment_offset[0].set(x, y, z);
 	RecalcOffset();
 }
 
 void script_attachment::SetRotation(float x, float y, float z)
 {
-	m_rotation.set(x, y, z);
+	m_attachment_offset[1].set(x, y, z);
 	RecalcOffset();
 }
 
 void script_attachment::SetScale(float x, float y, float z)
 {
-	m_scale.set(x, y, z);
+	m_attachment_offset[2].set(x, y, z);
 	RecalcOffset();
 }
 
 void script_attachment::SetOrigin(float x, float y, float z)
 {
-	m_origin.set(x, y, z);
+	m_attachment_offset[3].set(x, y, z);
 	RecalcOffset();
 }
 
@@ -753,18 +749,52 @@ void script_attachment::SetScriptUI(LPCSTR ui_func)
 		Msg("![Script Attachment]: Script UI functor [%s] does not exist!", ui_func);
 }
 
-void script_attachment::SetScriptUIPosition(Fvector pos)
+void script_attachment::RecalcScriptUIOffset()
 {
-	m_script_ui_offset[0] = pos;
-	m_script_ui_mat.translate_over(m_script_ui_offset[0]);
+	Fvector& position = m_script_ui_offset[0];
+	Fvector rotation = m_script_ui_offset[1];
+	Fvector& scale = m_script_ui_offset[2];
+	Fvector& origin = m_script_ui_offset[3];
+
+	rotation.mul(PI / 180.f);
+
+	if (!!origin.x || !!origin.y || !!origin.z)
+	{
+		m_script_ui_mat.translate(-origin.x, -origin.y, -origin.z);
+		m_script_ui_mat.mulA_43(Fmatrix().setHPB(rotation));
+		m_script_ui_mat.mulA_43(Fmatrix().scale(scale));
+		m_script_ui_mat.mulA_43(Fmatrix().translate(position));
+	}
+	else
+	{
+		m_script_ui_mat.setHPB(rotation);
+		m_script_ui_mat.translate_over(position);
+		m_script_ui_mat.mulB_43(Fmatrix().scale(scale));
+	}
 }
 
-void script_attachment::SetScriptUIRotation(Fvector rot)
+void script_attachment::SetScriptUIPosition(float x, float y, float z)
 {
-	m_script_ui_offset[1] = rot;
-	m_script_ui_offset[1].mul(PI / 180.f);
-	m_script_ui_mat.setHPB(m_script_ui_offset[1].x, m_script_ui_offset[1].y, m_script_ui_offset[1].z);
-	m_script_ui_mat.translate_over(m_script_ui_offset[0]);
+	m_script_ui_offset[0].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIRotation(float x, float y, float z)
+{
+	m_script_ui_offset[1].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIScale(float x, float y, float z)
+{
+	m_script_ui_offset[2].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIOrigin(float x, float y, float z)
+{
+	m_script_ui_offset[3].set(x, y, z);
+	RecalcScriptUIOffset();
 }
 
 void script_attachment::ScriptAttachmentBoneCallback(CBoneInstance* B)

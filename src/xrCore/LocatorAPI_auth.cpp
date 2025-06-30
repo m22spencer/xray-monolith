@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "profiler.h"
+
 struct auth_options
 {
 	xr_vector<shared_str> ignore;
@@ -9,6 +11,8 @@ struct auth_options
 
 void auth_entry(void* p)
 {
+	PROF_EVENT();
+
 	FS.auth_runtime(p);
 }
 
@@ -34,6 +38,8 @@ u64 CLocatorAPI::auth_get()
 
 void CLocatorAPI::auth_runtime(void* params)
 {
+	PROF_EVENT();
+
 	m_auth_lock.Enter();
 	auth_options* _o = (auth_options*)params;
 

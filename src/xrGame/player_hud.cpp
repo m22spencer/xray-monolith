@@ -287,6 +287,15 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		                                               fd.m_FireParticlesXForm.i);
 
 		VERIFY(_valid(fd.m_FireParticlesXForm));
+		
+		// demonized: transforms for fire bone/point silencer, they should be identical to above if they dont exist
+		{
+			Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
+			fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
+			m_item_transform.transform_tiny(fd.vLastFPSilencer);
+			fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
+			VERIFY(_valid(fd.vLastFPSilencer));
+		}
 	}
 
 	if (m_measures.m_prop_flags.test(hud_item_measures::e_fire_point2))
@@ -305,12 +314,6 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		m_item_transform.transform_tiny(fd.vLastSP);
 		VERIFY(_valid(fd.vLastSP));
 	}
-
-	Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
-	fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
-	m_item_transform.transform_tiny(fd.vLastFPSilencer);
-	fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
-	VERIFY(_valid(fd.vLastFPSilencer));
 }
 
 bool attachable_hud_item::need_renderable()

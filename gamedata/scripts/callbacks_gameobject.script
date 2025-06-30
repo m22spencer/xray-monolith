@@ -26,11 +26,23 @@ end
 
 -- Game objects registry
 gameobjects_registry = {}
+_G.gameobjects_registry = gameobjects_registry -- backwards compatibility
 function game_object_on_net_spawn(obj)
 	gameobjects_registry[obj:id()] = obj
 end
 function game_object_on_net_destroy(obj)
 	gameobjects_registry[obj:id()] = nil
+
+	-- Fix dynamic_news_manager loot table
+	local instance = dynamic_news_manager and dynamic_news_manager.get_dynamic_news and dynamic_news_manager.get_dynamic_news()
+	if instance and instance.loot then
+		for i = #instance.loot, 1, -1 do
+			local item = instance.loot[i]
+			if type(item) == "userdata" and item:id() == obj:id() then
+				table.remove(instance.loot, i)
+			end
+		end
+	end
 end
 
 -- Game objects iterator
@@ -117,9 +129,9 @@ end
 
 -- function on_game_start()
 -- 	RegisterScriptCallback("rocket_on_update", function(rocket)
--- 		printf("rocket is flying")
+-- 		printf_me("rocket is flying")
 -- 		local speed = rocket.speed
--- 		printf("speed %s", speed)
+-- 		printf_me("speed %s", speed)
 -- 		-- rocket.engine_active = true
 -- 		if rocket.engine_active then
 -- 			rocket.speed = 15
@@ -404,7 +416,6 @@ end
 
 -- NLTP_ASHES & demonized : Actor on death callback
 AddScriptCallback("actor_on_death")
-
 function actor_on_first_update()
 	db.actor:set_callback(callback.death, function()
 		SendScriptCallback("actor_on_death")
@@ -456,8 +467,42 @@ function ActorMenu_on_item_after_move(npc_id, obj, mode, bag_from)
     end
 end
 
+-- Prefetch HUD visual when moving item to slot
+function actor_item_to_slot_prefetch(item)
+	local hudSec = SYS_GetParam(0, item:section(), "hud")
+	if hudSec then
+		local visual = SYS_GetParam(0, hudSec, "item_visual")
+		if visual then
+			game.prefetch_model(visual)
+		end
+	end
+end
+
+-- Prefetch current items
+function actor_on_first_update_prefetch()
+	db.actor:iterate_inventory(function(npc, item)
+		local ui_texture = SYS_GetParam(0, item:section(), "icons_texture", "ui\\ui_icon_equipment")
+		game.prefetch_texture(ui_texture)
+
+		if item_backpack.is_in_slot(item) then
+			local hudSec = SYS_GetParam(0, item:section(), "hud")
+			if hudSec then
+				local visual = SYS_GetParam(0, hudSec, "item_visual")
+				if visual then
+					game.prefetch_model(visual)
+				end
+			end
+		end
+	end, db.actor)
+end
+
 function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+
+	-- Prefetch callbacks. Disabled for now, conflict with SSS
+	-- RegisterScriptCallback("actor_item_to_slot", actor_item_to_slot_prefetch)
+	-- RegisterScriptCallback("actor_on_first_update", actor_on_first_update_prefetch)
+
 	RegisterScriptCallback("ActorMenu_on_item_after_move", ActorMenu_on_item_after_move)
 	RegisterScriptCallback("anomaly_on_before_activate", anomaly_on_before_activate)
 	RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)

@@ -361,23 +361,32 @@ void CRenderTarget::phase_combine()
 	// Final water rendering ( All the code above can be omitted if the Water module isn't installed )
 	RCache.set_xform_world(Fidentity);
 	RImplementation.r_dsgraph_render_water();
-
+	
 	{
 		if (RImplementation.o.ssfx_rain)
 		{
 			phase_ssfx_rain(); // Render a small color buffer to do the refraction and more
 
 			if (!RImplementation.o.dx10_msaa)
-				u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB);
+				u_setrt(rt_Generic_0, 0, rt_ssfx_motion_vectors, HW.pBaseZB);
 			else
-				u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT);
+				u_setrt(rt_Generic_0_r, 0, rt_ssfx_motion_vectors, rt_MSAADepth->pZRT);
 		}
 
 		g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
 	}
 
-	if (ssfx_PrevPos_Requiered)
-		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
+	/*if (ssfx_PrevPos_Requiered)
+		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());*/
+
+	// Update rt_Generic_temp ( rain and water )
+	if (RImplementation.o.ssfx_glass)
+	{
+		if (!RImplementation.o.dx10_msaa)
+			HW.pContext->CopyResource(rt_Generic_temp->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
+		else
+			HW.pContext->CopyResource(rt_Generic_temp->pTexture->surface_get(), rt_Generic_0_r->pTexture->surface_get());
+	}
 
 	// Forward rendering
 	{
@@ -385,9 +394,9 @@ void CRenderTarget::phase_combine()
 
 		//--DSR-- HeatVision_start
 		if (!RImplementation.o.dx10_msaa)
-			u_setrt(rt_Generic_0, rt_Heat, 0, HW.pBaseZB); // LDR RT
+			u_setrt(rt_Generic_0, rt_Heat, rt_ssfx_motion_vectors, HW.pBaseZB); // LDR RT
 		else
-			u_setrt(rt_Generic_0_r, rt_Heat, 0, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
+			u_setrt(rt_Generic_0_r, rt_Heat, rt_ssfx_motion_vectors, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
 		//--DSR-- HeatVision_end
 
 		RCache.set_CullMode(CULL_CCW);
@@ -482,6 +491,16 @@ void CRenderTarget::phase_combine()
 			phase_sunshafts();
 	}
 
+	if (RImplementation.o.ssfx_fog && ps_ssfx_fog_scattering > 0)
+	{
+		phase_ssfx_fog_scattering();
+	}
+
+	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0)
+	{
+		phase_ssfx_motion_blur();
+	}
+
 	if (scope_3D_fake_enabled)
 	{
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
@@ -537,10 +556,18 @@ void CRenderTarget::phase_combine()
 	//SMAA
 	if (ps_smaa_quality)
 	{
-		//PIX_EVENT(SMAA);
-		phase_smaa();
-		RCache.set_Stencil(FALSE);
+        //PIX_EVENT(SMAA);
+        phase_smaa();
+        RCache.set_Stencil(FALSE);
+    }    
+	
+	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0)
+	{
+		phase_ssfx_taa();
 	}
+
+	if (ssfx_PrevPos_Requiered)
+		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
 
 	// PP enabled ?
 	//	Render to RT texture to be able to copy RT even in windowed mode.

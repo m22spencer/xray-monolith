@@ -19,6 +19,10 @@ shared_str c_c_bias;
 shared_str c_c_scale;
 shared_str c_c_sun;
 
+shared_str c_prev_wave;
+shared_str c_prev_wind;
+
+shared_str c_c_PrevBendersPos;
 shared_str c_c_BendersPos;
 shared_str c_c_BendersSetup;
 
@@ -95,6 +99,10 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 	c_c_scale = "c_scale";
 	c_c_sun = "c_sun";
 
+	c_prev_wave = "prev_wave";
+	c_prev_wind = "prev_wind";
+
+	c_c_PrevBendersPos = "benders_prevpos";
 	c_c_BendersPos = "benders_pos";
 	c_c_BendersSetup = "benders_setup";
 }
@@ -142,8 +150,12 @@ struct FTreeVisual_setup
 
 void FTreeVisual::Render(float LOD)
 {
-	static FTreeVisual_setup tvs;
-	if (tvs.dwFrame != Device.dwFrame) tvs.calculate();
+	static FTreeVisual_setup tvs, prev_tvs;
+	if (tvs.dwFrame != Device.dwFrame)
+	{
+		prev_tvs = tvs; // Save previous frame calculations
+		tvs.calculate();
+	}
 	// setup constants
 #if RENDER!=R_R1
 	Fmatrix xform_v;
@@ -155,6 +167,10 @@ void FTreeVisual::Render(float LOD)
 	RCache.tree.set_consts(tvs.scale, tvs.scale, 0, 0); // consts/scale
 	RCache.tree.set_wave(tvs.wave); // wave
 	RCache.tree.set_wind(tvs.wind); // wind
+
+	RCache.set_c(c_prev_wave, prev_tvs.wave);
+	RCache.set_c(c_prev_wind, prev_tvs.wind);
+
 #if RENDER!=R_R1
 	s *= 1.3333f;
 	RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
@@ -203,6 +219,24 @@ void FTreeVisual::Render(float LOD)
 			{
 				c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
 				c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+			}
+		}
+
+		Fvector4* c_prevgrass;
+		{
+			void* prevGrassData;
+			RCache.get_ConstantDirect(c_c_PrevBendersPos, BendersQty * sizeof(Fvector4) * 2, &prevGrassData, 0, 0);
+
+			c_prevgrass = (Fvector4*)prevGrassData;
+		}
+		VERIFY(c_prevgrass);
+
+		if (c_prevgrass)
+		{
+			for (int Bend = 0; Bend < BendersQty; Bend++)
+			{
+				c_prevgrass[Bend].set(GData.prev_pos[Bend]);
+				c_prevgrass[Bend + 16].set(GData.prev_dir[Bend]);
 			}
 		}
 	}

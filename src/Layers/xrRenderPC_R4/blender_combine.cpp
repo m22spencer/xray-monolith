@@ -48,7 +48,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("ssfx_ao", r2_RT_ssfx_temp);
 		C.r_dx10Texture("ssfx_il", r2_RT_ssfx_temp2);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 
 		jitter(C);
 
@@ -79,7 +80,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_lens_dirt", "shaders\\lens_dirt");
 		C.r_dx10Texture("s_noise_1", "shaders\\noise\\noise_tex");
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Sampler("smp_linear");
@@ -105,7 +107,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_blur_4", r2_RT_blur_4);
 		C.r_dx10Texture("s_blur_8", r2_RT_blur_8);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Texture("s_lut_atlas", "shaders\\lut_atlas");
@@ -134,7 +137,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_blur_4", r2_RT_blur_4);
 		C.r_dx10Texture("s_blur_8", r2_RT_blur_8);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Texture("s_lut_atlas", "shaders\\lut_atlas");
@@ -164,7 +168,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_blur_4", r2_RT_blur_4);
 		C.r_dx10Texture("s_blur_8", r2_RT_blur_8);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Texture("s_lut_atlas", "shaders\\lut_atlas");
@@ -232,7 +237,8 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("ssfx_ao", r2_RT_ssfx_temp);
 		C.r_dx10Texture("ssfx_il", r2_RT_ssfx_temp2);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 
 		jitter(C);
 
@@ -263,7 +269,8 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_lens_dirt", "shaders\\lens_dirt");
 		C.r_dx10Texture("s_noise_1", "shaders\\noise\\noise_tex");
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Sampler("smp_linear");
@@ -293,7 +300,8 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_lens_dirt", "shaders\\lens_dirt");
 		C.r_dx10Texture("s_noise_1", "shaders\\noise\\noise_tex");
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Sampler("smp_linear");
@@ -318,7 +326,8 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_blur_4", r2_RT_blur_4);
 		C.r_dx10Texture("s_blur_8", r2_RT_blur_8);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Texture("s_lut_atlas", "shaders\\lut_atlas");
@@ -348,7 +357,8 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_blur_4", r2_RT_blur_4);
 		C.r_dx10Texture("s_blur_8", r2_RT_blur_8);
 
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
+		C.r_dx10Texture("s_ssfx_sss", r2_RT_ssfx_sss); // Debug
 		C.r_dx10Texture("s_ssfx_bloom", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Texture("s_lut_atlas", "shaders\\lut_atlas");

@@ -88,13 +88,13 @@ const u32 v_clouds_fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
 // Environment render
 //-----------------------------------------------------------------------------
 //BOOL bNeed_re_create_env = FALSE;
-void CEnvironment::RenderSky()
+void CEnvironment::RenderSky(bool only_MV)
 {
 #ifndef _EDITOR
 	if (0 == g_pGameLevel) return;
 #endif
 
-	m_pRender->RenderSky(*this);
+	m_pRender->RenderSky(*this, only_MV);
 	/*
 	// clouds_sh.create ("clouds","null");
 	//. this is the bug-fix for the case when the sky is broken

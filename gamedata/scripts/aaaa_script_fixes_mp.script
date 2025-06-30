@@ -578,3 +578,32 @@ function item_weapon.detach_scope(weapon)
 		alife_clone_weapon(old_weapon, parent_section)
 	end
 end
+
+-- Fixed 65534 loop in this
+function trans_outfit.transparent_gg()
+	if not trans_outfit.ReadOutfitBlindnessKoeff then return end
+
+	local range1 
+	local outfit_in_slot = db.actor:item_in_slot(7)
+
+	if not outfit_in_slot then 
+		range1 = 80  
+	elseif trans_outfit.ReadOutfitBlindnessKoeff(outfit_in_slot:section()) > 0.0 then
+		range1 = trans_outfit.ReadOutfitBlindnessKoeff(outfit_in_slot:section())
+	else 
+		range1 = 80 
+	end  
+
+	for i = 1, #db.OnlineStalkers do
+		local id = db.OnlineStalkers[i]
+		local obj_around = gameobjects_registry[id]
+		if obj_around and id ~= AC_ID then
+			local dist_act_npc = db.actor:position():distance_to_sqr(obj_around:position())
+			if dist_act_npc <= 120*120 then  
+				obj_around:set_range(range1)
+			else 
+				obj_around:set_range(80) 
+			end 
+		end 
+	end
+end 
