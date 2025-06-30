@@ -1478,6 +1478,8 @@ void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt origi
 	VIEWPORT_RT(rt_ssfx_sss_tmp)
 
 	VIEWPORT_RT(rt_ssfx_prevPos)
+	VIEWPORT_RT(rt_ssfx_prev_frame)
+	VIEWPORT_RT(rt_ssfx_motion_vectors)
 }
 
 void CRenderTarget::reset_light_marker(bool bResetStencil)

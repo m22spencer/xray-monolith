@@ -496,7 +496,7 @@ void CRenderTarget::phase_combine()
 		phase_ssfx_fog_scattering();
 	}
 
-	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0)
+	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0 && !Device.m_SecondViewport.IsSVPFrame())
 	{
 		phase_ssfx_motion_blur();
 	}
@@ -561,7 +561,7 @@ void CRenderTarget::phase_combine()
         RCache.set_Stencil(FALSE);
     }    
 	
-	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0)
+	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0 && !Device.m_SecondViewport.IsSVPFrame())
 	{
 		phase_ssfx_taa();
 	}
