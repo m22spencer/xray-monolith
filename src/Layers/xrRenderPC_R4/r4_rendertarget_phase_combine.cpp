@@ -542,16 +542,11 @@ void CRenderTarget::phase_combine()
 		phase_heatvision();
 	//--DSR-- HeatVision_end
 
-	if (scope_fake_enabled || Device.m_SecondViewport.IsSVPFrame())
+	if (scope_fake_enabled)
 	{
 		phase_fakescope(); //crookr
 	}
 
-	if (Device.m_SecondViewport.IsSVPFrame()) {
-		// At this point, the scope view is done. 
-		//    we do not want to post process.
-		return;
-	}
 
 	//SMAA
 	if (ps_smaa_quality)
@@ -561,13 +556,22 @@ void CRenderTarget::phase_combine()
         RCache.set_Stencil(FALSE);
     }    
 	
-	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0 && !Device.m_SecondViewport.IsSVPFrame())
+	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0 && !Device.m_SecondViewport.IsSVPActive())
 	{
 		phase_ssfx_taa();
 	}
 
 	if (ssfx_PrevPos_Requiered)
 		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
+
+
+	if (Device.m_SecondViewport.IsSVPFrame()) {
+		phase_fakescope();
+
+		// At this point, the scope view is done. 
+		//    we do not want to post process.
+		return;
+	}
 
 	// PP enabled ?
 	//	Render to RT texture to be able to copy RT even in windowed mode.

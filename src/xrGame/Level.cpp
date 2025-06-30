@@ -1114,7 +1114,18 @@ void EnsureDeviceState(std::function<void()> f)
 	Fmatrix old_proj = Device.mProject;
 	Fmatrix old_proj_hud = Device.mProjectHud;
 
+	// disable some SSS effects for now (heavy performance impact and incorrect motion vectors)
+	auto taa = ps_ssfx_taa.x; ps_ssfx_taa.x = 0;
+	auto mblur = ps_ssfx_motionblur.y; ps_ssfx_motionblur.y = 0;
+	auto ao = ps_ssfx_ao.y; ps_ssfx_ao.y = 0;
+	auto il = ps_ssfx_il.y; ps_ssfx_il.y = 0;
+
 	f();
+
+	ps_ssfx_taa.x = taa;
+	ps_ssfx_motionblur.y = mblur;
+	ps_ssfx_ao.y = ao;
+	ps_ssfx_il.y = il;
 
 	Device.m_SecondViewport.isSVPFrame = false;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
