@@ -655,6 +655,8 @@ CRenderTarget::CRenderTarget()
 			rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 	}
 
+	map_viewport_render_targets([](auto _1, auto _2) -> void {});
+
 	s_hdr10_bloom_downsample.create(b_hdr10_bloom_downsample, "hdr10_bloom_downsample");
 	s_hdr10_bloom_blur.create(b_hdr10_bloom_blur, "hdr10_bloom_blur");
 	s_hdr10_bloom_upsample.create(b_hdr10_bloom_upsample, "hdr10_bloom_upsample");
@@ -1457,8 +1459,8 @@ CRenderTarget::~CRenderTarget()
 // Trickery to create unique buffers for each viewport
 #define VIEWPORT_RT(RT) \
 static ref_rt RT##_vp[2]; \
-if (!RT##_vp[0]) RT##_vp[0].create(#RT "_main", RT->dwWidth, RT->dwHeight, RT->fmt); \
-if (!RT##_vp[1]) RT##_vp[1].create(#RT "_svp", RT->dwWidth, RT->dwHeight, RT->fmt); \
+if (!RT##_vp[0]) RT##_vp[0].create("$user$" #RT "_main", RT->dwWidth, RT->dwHeight, RT->fmt); \
+if (!RT##_vp[1]) RT##_vp[1].create("$user$" #RT "_svp", RT->dwWidth, RT->dwHeight, RT->fmt); \
 f(RT, RT##_vp);
 
 void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt original, ref_rt views[2])> f) {
