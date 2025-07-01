@@ -34,11 +34,15 @@ public:
 			C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
 #endif	//	USE_DX10
 			C.r_End();
+			break;
 
 		case 1:
+#if defined(USE_DX10) || defined(USE_DX11)
 			C.r_Pass("ssfx_sky_mv", "ssfx_sky_mv", FALSE, TRUE, FALSE);
 			C.PassSET_ZB(FALSE, FALSE);
 			C.r_End();
+#endif
+			break;
 		}
 	}
 };
