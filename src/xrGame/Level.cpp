@@ -662,9 +662,14 @@ void CLevel::ProcessGameEvents()
 						bool valid = true;
 						if (pSettings->line_exist(section.c_str(), "class"))
 						{
-							// Do not prefetch fake missiles of a weapon
 							auto c = pSettings->r_string(section.c_str(), "class");
-							valid = (strstr(c, "G_RPG7") == nullptr) && (strstr(c, "G_FAKE") == nullptr);
+
+							// Do not prefetch fake missiles of a weapon
+							valid &= strstr(c, "G_RPG7") == nullptr;
+							valid &= strstr(c, "G_FAKE") == nullptr;
+
+							// Do not prefetch helicopters
+							valid &= strstr(c, "C_HLCP") == nullptr;
 						}
 						return valid;
 					};

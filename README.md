@@ -187,6 +187,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.02**
+* Spawn Antifreeze: Don't prefetch helicopters, might fix issue https://github.com/themrdemonized/xray-monolith/issues/278
+
 **2025.07.01**
 * `hanging_lamp_ignore_match_configuration` cvar to circumvent the SSS23 + HF crash, related to https://github.com/themrdemonized/xray-monolith/issues/273
 * Fix https://github.com/themrdemonized/xray-monolith/issues/276
