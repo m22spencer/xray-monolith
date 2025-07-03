@@ -277,7 +277,7 @@ void CPseudoGigant::on_activate_control(ControlCom::EControlType type)
 		{
 			CPhysicsShellHolder* obj = smart_cast<CPhysicsShellHolder*>(m_nearest[i]);
 			if (obj && obj->ID() != 0 && obj->ID() != ID()) {
-				luabind::functor<void> funct;
+				::luabind::functor<void> funct;
 				if (ai().script_engine().functor("_G.CPseudoGigant__OnStartStompAnimation", funct))
 				{
 					funct(obj->lua_game_object(), this->lua_game_object());
@@ -320,7 +320,7 @@ void CPseudoGigant::on_threaten_execute()
 			HS.hit_type = ALife::eHitTypeStrike;
 
 			bool doHit = true;
-			luabind::functor<bool> funct;
+			::luabind::functor<bool> funct;
 			CScriptHit tLuaHit(&HS);
 			if (ai().script_engine().functor("_G.CPseudoGigant__BeforeHitCallback", funct))
 			{
@@ -334,7 +334,7 @@ void CPseudoGigant::on_threaten_execute()
 				//Msg("hit entity %d, name %s, damage %f", obj->ID(), obj->Name(), hit_value);
 				obj->Hit(&HS);
 
-				luabind::functor<void> hitFunct;
+				::luabind::functor<void> hitFunct;
 				if (ai().script_engine().functor("_G.CPseudoGigant__HitCallback", hitFunct))
 				{
 					hitFunct(obj->lua_game_object(), this->lua_game_object(), &tLuaHit, HS.boneID);

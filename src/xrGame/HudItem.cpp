@@ -586,7 +586,7 @@ void CHudItem::UpdateCL()
 
 void CHudItem::OnMotionMark(u32 state, const motion_marks& M)
 {
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (ai().script_engine().functor("_G.CHudItem__OnMotionMark", funct))
 		funct(state, *M.name, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
 }
@@ -643,7 +643,7 @@ void CHudItem::on_a_hud_attach()
 {
 	if (script_ui_funct && nullptr == script_ui)
 	{
-		luabind::functor<CUIDialogWndEx*> funct;
+		::luabind::functor<CUIDialogWndEx*> funct;
 		if (ai().script_engine().functor(script_ui_funct, funct))
 		{
 			CUIDialogWndEx* ret = funct();
@@ -693,11 +693,11 @@ u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, f
 {
 	if (IsAttachedToHUD())
 	{
-		luabind::functor<luabind::object> funct;
+		::luabind::functor<::luabind::object> funct;
 		if (ai().script_engine().functor("_G.CHudItem__PlayHUDMotion", funct))
 		{
 			
-			luabind::object table = luabind::newtable(ai().script_engine().lua());
+			::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 			table["anm_name"] = *M;
 			table["anm_mixin"] = !!bMixIn;
 			table["anm_mixin2"] = bMixIn2;
@@ -705,15 +705,15 @@ u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, f
 			table["anm_speed"] = speed;
 			table["anm_end"] = end;
 
-			luabind::object const& output = funct(table, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
+			::luabind::object const& output = funct(table, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
 			if (output && output.type() == LUA_TTABLE)
 			{
-				M = luabind::object_cast<LPCSTR>(output["anm_name"]);
-				bMixIn = luabind::object_cast<bool>(output["anm_mixin"]);
-				bMixIn2 = luabind::object_cast<bool>(output["anm_mixin2"]);
-				state = luabind::object_cast<u32>(output["anm_state"]);
-				speed = luabind::object_cast<float>(output["anm_speed"]);
-				end = luabind::object_cast<float>(output["anm_end"]);
+				M = ::luabind::object_cast<LPCSTR>(output["anm_name"]);
+				bMixIn = ::luabind::object_cast<bool>(output["anm_mixin"]);
+				bMixIn2 = ::luabind::object_cast<bool>(output["anm_mixin2"]);
+				state = ::luabind::object_cast<u32>(output["anm_state"]);
+				speed = ::luabind::object_cast<float>(output["anm_speed"]);
+				end = ::luabind::object_cast<float>(output["anm_end"]);
 			}
 
 			if (M == "$cancel")

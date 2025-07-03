@@ -552,10 +552,10 @@ BOOL CHangingLamp::UsedAI_Locations()
 #pragma optimize("s",on)
 void CHangingLamp::script_register(lua_State* L)
 {
-	luabind::module(L)
+	::luabind::module(L)
 	[
-		luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
-		.def(luabind::constructor<>())
+		::luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
+		.def(::luabind::constructor<>())
 		.def("turn_on", &CHangingLamp::TurnOn)
 		.def("turn_off", &CHangingLamp::TurnOff)
 		.def("set_color_animator", &CHangingLamp::SetLanim)

@@ -84,7 +84,7 @@ void CExplosiveItem::shedule_Update(u32 dt)
 		FindNormal(normal);
 		CExplosive::GenExplodeEvent(Position(), normal);
 		CParticlesPlayer::StopParticles(ID(), BI_NONE, true);
-		luabind::functor<void> funct;
+		::luabind::functor<void> funct;
 		if (ai().script_engine().functor("_G.CExplosiveItem__OnExplode", funct))
 		{
 			funct(this->lua_game_object());

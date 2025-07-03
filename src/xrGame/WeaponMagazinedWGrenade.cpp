@@ -273,7 +273,7 @@ void CWeaponMagazinedWGrenade::SetAmmoElapsed2(int ammo_count)
 	};
 }
 
-void CWeaponMagazinedWGrenade::AmmoTypeForEach2(const luabind::functor<bool> &funct)
+void CWeaponMagazinedWGrenade::AmmoTypeForEach2(const ::luabind::functor<bool> &funct)
 {
 	for (u8 i = 0; i < u8(m_ammoTypes2.size()); ++i)
 	{

@@ -319,7 +319,7 @@ u32 CCustomOutfit::ef_equipment_type() const
 u32 CCustomOutfit::get_artefact_count() const
 {
 	u32 artefact_count = m_artefact_count;
-	luabind::functor<int> funct;
+	::luabind::functor<int> funct;
 		if (ai().script_engine().functor("_G.CCustomOutfit_get_artefact_count", funct))
 		{
 			artefact_count = funct(artefact_count);

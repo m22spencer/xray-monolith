@@ -205,7 +205,7 @@ void CStepManager::update(bool b_hud_view)
 						SGameMtl* mt = GMLib.GetMaterialByID(mtl_pair->GetMtl1());
 						if (mt)
 						{
-							luabind::functor<bool>	funct;
+							::luabind::functor<bool>	funct;
 							if (ai().script_engine().functor("_G.CActor__FootstepCallback", funct))
 							{
 								if (funct(*mt->m_Name, m_step_info.params.step[i].power, b_hud_view))

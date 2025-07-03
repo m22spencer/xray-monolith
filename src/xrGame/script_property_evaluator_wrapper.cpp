@@ -14,7 +14,7 @@
 
 void CScriptPropertyEvaluatorWrapper::setup(CScriptGameObject* object, CPropertyStorage* storage)
 {
-	luabind::call_member<void>(this, "setup", object, storage);
+	::luabind::call_member<void>(this, "setup", object, storage);
 }
 
 void CScriptPropertyEvaluatorWrapper::setup_static(CScriptPropertyEvaluator* evaluator, CScriptGameObject* object,
@@ -27,10 +27,10 @@ bool CScriptPropertyEvaluatorWrapper::evaluate()
 {
 	try
 	{
-		return (luabind::call_member<bool>(this, "evaluate"));
+		return (::luabind::call_member<bool>(this, "evaluate"));
 	}
 #ifdef DEBUG
-	catch(luabind::cast_failed &exception) {
+	catch(::luabind::cast_failed &exception) {
 #ifdef LOG_ACTION
 		ai().script_engine().script_log (ScriptStorage::eLuaMessageTypeError,"SCRIPT RUNTIME ERROR : evaluator [%s] returns value with not a %s type!",m_evaluator_name,exception.info()->name());
 #else

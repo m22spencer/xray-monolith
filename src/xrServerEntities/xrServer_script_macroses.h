@@ -129,7 +129,7 @@ class CALifeSmartTerrainTask;
 	DEFINE_LUA_WRAPPER_METHOD_0			(bfUseful,	bool)
 
 template <typename T>
-struct CWrapperPure : public T, public luabind::wrap_base
+struct CWrapperPure : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperPure<T> self_type;
@@ -142,7 +142,7 @@ struct CWrapperPure : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstract : public T, public luabind::wrap_base
+struct CWrapperAbstract : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstract<T> self_type;
@@ -155,7 +155,7 @@ struct CWrapperAbstract : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractALife : public T, public luabind::wrap_base
+struct CWrapperAbstractALife : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractALife<T> self_type;
@@ -168,7 +168,7 @@ struct CWrapperAbstractALife : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractDynamicALife : public T, public luabind::wrap_base
+struct CWrapperAbstractDynamicALife : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractDynamicALife<T> self_type;
@@ -181,7 +181,7 @@ struct CWrapperAbstractDynamicALife : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractOnlineOfflineGroup : public T, public luabind::wrap_base
+struct CWrapperAbstractOnlineOfflineGroup : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractOnlineOfflineGroup<T> self_type;
@@ -194,7 +194,7 @@ struct CWrapperAbstractOnlineOfflineGroup : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractZone : public T, public luabind::wrap_base
+struct CWrapperAbstractZone : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractZone<T> self_type;
@@ -207,7 +207,7 @@ struct CWrapperAbstractZone : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractCreature : public T, public luabind::wrap_base
+struct CWrapperAbstractCreature : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractCreature<T> self_type;
@@ -220,7 +220,7 @@ struct CWrapperAbstractCreature : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractMonster : public T, public luabind::wrap_base
+struct CWrapperAbstractMonster : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractMonster<T> self_type;
@@ -233,7 +233,7 @@ struct CWrapperAbstractMonster : public T, public luabind::wrap_base
 };
 
 template <typename T>
-struct CWrapperAbstractItem : public T, public luabind::wrap_base
+struct CWrapperAbstractItem : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperAbstractItem<T> self_type;

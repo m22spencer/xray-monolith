@@ -38,9 +38,9 @@ int CDbgLuaHelper::PrepareLua(lua_State* l)
 
 void CDbgLuaHelper::PrepareLuaBind()
 {
-	luabind::set_pcall_callback(hookLuaBind);
+	::luabind::set_pcall_callback(hookLuaBind);
 #if !XRAY_EXCEPTIONS
-	luabind::set_error_callback(errormessageLuaBind);
+	::luabind::set_error_callback(errormessageLuaBind);
 #endif
 }
 
@@ -510,8 +510,8 @@ void CDbgLuaHelper::DrawVariable(lua_State* l, const char* name, bool bOpenTable
 
 
 		/*	case LUA_TUSERDATA:{
-					luabind::detail::object_rep* obj = static_cast<luabind::detail::object_rep*>(lua_touserdata(L, -1));
-					luabind::detail::lua_reference& r = obj->get_lua_table();
+					::luabind::detail::object_rep* obj = static_cast<::luabind::detail::object_rep*>(lua_touserdata(L, -1));
+					::luabind::detail::lua_reference& r = obj->get_lua_table();
 					lua_State * ls = NULL;
 					r.get(ls);
 					DrawTable(ls, name);

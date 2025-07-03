@@ -56,7 +56,7 @@ namespace smart_cover
 		void load_loopholes(shared_str const& table_id);
 		void load_transitions(shared_str const& table_id);
 		void process_loopholes();
-		void load_actions(luabind::object const& table, ActionsList& result);
+		void load_actions(::luabind::object const& table, ActionsList& result);
 	};
 } // namespace smart_cover
 

@@ -131,7 +131,7 @@ CActor::pickup_result_t CActor::PickupModeUpdate()
 		m_pUsableObject->nonscript_usable() && !Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
 	{
 		//Tronex: ability to prevent item picking up if the export returns false
-		luabind::functor<bool> func;
+		::luabind::functor<bool> func;
 		if (ai().script_engine().functor("bind_stalker_ext.actor_on_item_before_pickup", func))
 		{
 			callback_handled = true;
@@ -240,7 +240,7 @@ void CActor::PickupModeUpdate_COD(pickup_result_t pickup_result)
 	CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
 
 	{
-		luabind::functor<void> func;
+		::luabind::functor<void> func;
 		if (ai().script_engine().functor("_G.CPickupModeUpdate_COD", func))
 		{
 			func(pNearestItem && pNearestItem->cast_game_object() ? pNearestItem->cast_game_object()->lua_game_object() : nullptr);
@@ -252,7 +252,7 @@ void CActor::PickupModeUpdate_COD(pickup_result_t pickup_result)
 		//Tronex: ability to prevent item picking up if the export returns false
 		if (!pickup_result.callback_handled)
 		{
-			luabind::functor<bool> func;
+			::luabind::functor<bool> func;
 			if (ai().script_engine().functor("bind_stalker_ext.actor_on_item_before_pickup", func))
 			{
 				bool allow_pickup = func(pNearestItem->cast_game_object()->lua_game_object());

@@ -470,7 +470,7 @@ void CBaseMonster::Hit(SHit* pHDS)
 
 	CScriptHit tLuaHit(pHDS);
 
-	luabind::functor<bool>	funct;
+	::luabind::functor<bool>	funct;
 	if (ai().script_engine().functor("_G.CBaseMonster__BeforeHitCallback", funct))
 	{
 		if (!funct(this->lua_game_object(), &tLuaHit, pHDS->boneID))

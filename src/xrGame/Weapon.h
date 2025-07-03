@@ -439,7 +439,7 @@ public:
 	virtual u8 GetCurrentHudOffsetIdx();
 
 	// Tronex script exports
-	void AmmoTypeForEach(const luabind::functor<bool>& funct);
+	void AmmoTypeForEach(const ::luabind::functor<bool>& funct);
 	float GetMagazineWeightScript() const { return GetMagazineWeight(m_magazine); }
 	int GetAmmoCount_forType_Script(LPCSTR type) const { return GetAmmoCount_forType(type); }
 	LPCSTR GetGrenadeLauncherNameScript() const { return *GetGrenadeLauncherName(); }

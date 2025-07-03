@@ -226,7 +226,7 @@ bool CScriptGameObject::IsInvUpgradeEnabled()
 	return pInventoryOwner->IsInvUpgradeEnabled();
 }
 
-void CScriptGameObject::ForEachInventoryItems(const luabind::functor<bool>& functor)
+void CScriptGameObject::ForEachInventoryItems(const ::luabind::functor<bool>& functor)
 {
 	CInventoryOwner* owner = smart_cast<CInventoryOwner*>(&object());
 	if (!owner)
@@ -253,7 +253,7 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<bool>& func
 }
 
 //1
-void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateInventory(::luabind::functor<bool> functor, ::luabind::object object)
 {
 	CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
 	if (!inventory_owner)
@@ -270,7 +270,7 @@ void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind
 			return;
 }
 
-void CScriptGameObject::IterateRuck(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateRuck(::luabind::functor<bool> functor, ::luabind::object object)
 {
 	CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
 	if (!inventory_owner)
@@ -287,7 +287,7 @@ void CScriptGameObject::IterateRuck(luabind::functor<bool> functor, luabind::obj
 			return;
 }
 
-void CScriptGameObject::IterateBelt(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateBelt(::luabind::functor<bool> functor, ::luabind::object object)
 {
 	CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
 	if (!inventory_owner)
@@ -304,7 +304,7 @@ void CScriptGameObject::IterateBelt(luabind::functor<bool> functor, luabind::obj
 			return;
 }
 
-void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateInventoryBox(::luabind::functor<bool> functor, ::luabind::object object)
 {
 	CInventoryBox* inventory_box = smart_cast<CInventoryBox*>(&this->object());
 	if (!inventory_box)
@@ -902,11 +902,11 @@ int CScriptGameObject::CharacterRank()
 	return monster->Rank();
 }
 
-luabind::object CScriptGameObject::CharacterDialogs()
+::luabind::object CScriptGameObject::CharacterDialogs()
 {
 	CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
 
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!pInventoryOwner)
 	{
@@ -2198,7 +2198,7 @@ bool CScriptGameObject::HasUpgrade(LPCSTR upgrade)
 	return item->has_upgrade(upgrade);
 }
 
-void CScriptGameObject::IterateInstalledUpgrades(const luabind::functor<bool>& functor)
+void CScriptGameObject::IterateInstalledUpgrades(const ::luabind::functor<bool>& functor)
 {
 	CInventoryItem* Item = smart_cast<CInventoryItem*>(&object());
 	if (!Item)

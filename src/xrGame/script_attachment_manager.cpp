@@ -402,9 +402,9 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 	m_parent_object->add_attachment(GetName(), this);
 }
 
-luabind::object script_attachment::GetParent()
+::luabind::object script_attachment::GetParent()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["object"] = m_parent_object ? m_parent_object->lua_game_object() : nullptr;
 	table["attachment"] = m_parent_attachment ? m_parent_attachment : nullptr;
 	return table;
@@ -607,9 +607,9 @@ LPCSTR script_attachment::bone_name(u16 bone_id)
 }
 
 // demonized: list all bones
-luabind::object script_attachment::list_bones()
+::luabind::object script_attachment::list_bones()
 {
-	luabind::object result = luabind::newtable(ai().script_engine().lua());
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 
 	auto bones = m_kinematics->list_bones();
 	for (const auto& bone : bones)
@@ -697,7 +697,7 @@ void script_attachment::SetName(LPCSTR name)
 	m_name = name;
 }
 
-const luabind::object& script_attachment::GetUserdata() const
+const ::luabind::object& script_attachment::GetUserdata() const
 {
 	if (!m_userdata)
 	{
@@ -731,7 +731,7 @@ void script_attachment::SetScriptUI(LPCSTR ui_func)
 {
 	if (m_script_ui_func != nullptr && 0 == xr_strcmp(m_script_ui_func, ui_func)) return;
 
-	luabind::functor<CUIDialogWndEx*> funct;
+	::luabind::functor<CUIDialogWndEx*> funct;
 
 	if (ai().script_engine().functor(ui_func, funct))
 	{
@@ -857,7 +857,7 @@ void script_attachment::SetBoneCallback(u16 bone_id, u16 parent_bone, bool overw
 	m_kinematics->LL_GetBoneInstance(bone_id).set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
 }
 
-void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmatrix>& func, bool overwrite)
+void script_attachment::SetBoneCallback(u16 bone_id, const ::luabind::functor<Fmatrix>& func, bool overwrite)
 {
 	if (bone_id >= m_kinematics->LL_BoneCount())
 	{
@@ -899,9 +899,9 @@ Fvector script_attachment::GetCenter()
 	return { 0,0,0 };
 }
 
-luabind::object script_attachment::GetShaders()
+::luabind::object script_attachment::GetShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -913,7 +913,7 @@ luabind::object script_attachment::GetShaders()
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShader();
 		subtable["texture"] = m_model->getDebugTexture();
 		table[1] = subtable;
@@ -924,7 +924,7 @@ luabind::object script_attachment::GetShaders()
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
 		table[i] = subtable;
@@ -934,9 +934,9 @@ luabind::object script_attachment::GetShaders()
 	return table;
 }
 
-luabind::object script_attachment::GetDefaultShaders()
+::luabind::object script_attachment::GetDefaultShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -948,7 +948,7 @@ luabind::object script_attachment::GetDefaultShaders()
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShaderDef();
 		subtable["texture"] = m_model->getDebugTextureDef();
 		table[1] = subtable;
@@ -959,7 +959,7 @@ luabind::object script_attachment::GetDefaultShaders()
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
 		table[i] = subtable;

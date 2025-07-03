@@ -132,7 +132,7 @@ float CAI_Stalker::GetWeaponAccuracy() const
 			base *= (m_disp_run_stand * g_dispersion_factor + g_dispersion_base); // fallback to worst aim if state could not determined, this should never happen (tm)
 	}
 
-	luabind::functor<float> func;
+	::luabind::functor<float> func;
 	if (ai().script_engine().functor("_g.CAI_Stalker__GetWeaponAccuracy", func))
 	{
 		base = func(lua_game_object(), W ? W->lua_game_object() : nullptr, base, movement().body_state(), movement().movement_type());
@@ -399,7 +399,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 	{
 		CScriptHit tLuaHit(&HDS);
 
-		luabind::functor<bool>	funct;
+		::luabind::functor<bool>	funct;
 		if (ai().script_engine().functor("_G.CAI_Stalker__BeforeHitCallback", funct))
 		{
 			if (!funct(this->lua_game_object(), &tLuaHit, HDS.boneID))
@@ -459,7 +459,7 @@ void CAI_Stalker::update_best_item_info()
 
 void CAI_Stalker::update_best_item_info_impl()
 {
-	luabind::functor<CScriptGameObject*> funct;
+	::luabind::functor<CScriptGameObject*> funct;
 	if (ai().script_engine().functor("_g.update_best_weapon", funct))
 	{
 		CGameObject* cur_itm = smart_cast<CGameObject*>(m_best_item_to_kill);

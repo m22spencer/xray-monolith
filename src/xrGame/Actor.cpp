@@ -673,7 +673,7 @@ void CActor::Hit(SHit* pHDS)
 			{
 				CScriptHit tLuaHit(&HDS);
 
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (ai().script_engine().functor("_G.CActor__BeforeHitCallback", funct))
 				{
 					if (!funct(this->lua_game_object(), &tLuaHit, HDS.boneID))
@@ -1291,7 +1291,7 @@ void CActor::UpdateCL()
 		if (!discord_gameinfo.loadscreen && discord_gameinfo.ex_update)
 		{
 			//Update Iron Man state and lives
-			luabind::functor<bool> ironman_enabled;
+			::luabind::functor<bool> ironman_enabled;
 			if (ai().script_engine().functor("_g.IsHardcoreMode", ironman_enabled))
 			{
 				if (ironman_enabled && ironman_enabled())
@@ -1303,7 +1303,7 @@ void CActor::UpdateCL()
 			if (discord_gameinfo.ironman)
 			{
 				//Lives left
-				luabind::functor<int> ironman_lives;
+				::luabind::functor<int> ironman_lives;
 				if (ai().script_engine().functor("ironman_manager.get_lives_left", ironman_lives))
 				{
 					if (ironman_lives)
@@ -1325,7 +1325,7 @@ void CActor::UpdateCL()
 			}
 
 			//Story Mode
-			luabind::functor<bool> game_mode;
+			::luabind::functor<bool> game_mode;
 			if (ai().script_engine().functor("_g.IsStoryMode", game_mode) && game_mode())
 				snprintf(discord_gameinfo.gamemode, 128, xr_ToUTF8(*CStringTable().translate("st_cap_check_story")));
 
@@ -1338,7 +1338,7 @@ void CActor::UpdateCL()
 			{
 				snprintf(discord_gameinfo.gamemode, 128, xr_ToUTF8(*CStringTable().translate("st_cap_check_azazel_mode")));
 
-				luabind::functor<int> possessed_lives;
+				::luabind::functor<int> possessed_lives;
 				if (ai().script_engine().functor("azazel_mode.get_possessed_lives", possessed_lives))
 				{
 					int lives_possessed = possessed_lives();
@@ -1393,7 +1393,7 @@ void CActor::set_safemode(bool status)
 void CActor::RPC_UpdateFaction()
 {
 	//Update player's REAL Faction
-	luabind::functor<LPCSTR> real_faction;
+	::luabind::functor<LPCSTR> real_faction;
 	if (ai().script_engine().functor("_g.get_actor_true_community", real_faction))
 	{
 		if (real_faction)
@@ -1410,7 +1410,7 @@ void CActor::RPC_UpdateFaction()
 void CActor::RPC_UpdateRank()
 {
 	//Rank		
-	luabind::functor<LPCSTR> actor_rank;
+	::luabind::functor<LPCSTR> actor_rank;
 	if (ai().script_engine().functor("ranks.get_player_rank_name", actor_rank))
 	{
 		if (actor_rank)
@@ -1426,13 +1426,13 @@ void CActor::RPC_UpdateRank()
 void CActor::RPC_UpdateReputation()
 {
 	//Reputation		
-	luabind::functor<int> actor_rep_val;
+	::luabind::functor<int> actor_rep_val;
 	if (ai().script_engine().functor("ranks.get_player_reputation", actor_rep_val))
 	{
 		if (actor_rep_val)
 		{
 			int reputation = actor_rep_val();
-			luabind::functor<LPCSTR> actor_rep;
+			::luabind::functor<LPCSTR> actor_rep;
 			if (ai().script_engine().functor("alun_utils.get_reputation_name", actor_rep))
 			{
 				if (actor_rep)
@@ -2377,18 +2377,18 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
 
 float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
 {
-	luabind::functor<luabind::object> funct;
+	::luabind::functor<::luabind::object> funct;
 	if (ai().script_engine().functor("_G.CActor__HitArtefactsOnBelt", funct))
 	{
-		luabind::object table = luabind::newtable(ai().script_engine().lua());
+		::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 		table["override"] = false;
 		table["hit_power"] = hit_power;
 
-		luabind::object output = funct(table, hit_power, hit_type);
+		::luabind::object output = funct(table, hit_power, hit_type);
 		if (output && output.type() == LUA_TTABLE)
 		{
-			if (luabind::object_cast<bool>(output["override"]))
-				return luabind::object_cast<float>(output["hit_power"]);
+			if (::luabind::object_cast<bool>(output["override"]))
+				return ::luabind::object_cast<float>(output["hit_power"]);
 		}
 	}
 

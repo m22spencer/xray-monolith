@@ -181,8 +181,8 @@ LPCSTR CPhraseDialog::GetPhraseText(const shared_str& phrase_id, bool current_sp
 #ifdef DIALOG_UPGRADE
 	if (ph->m_script_text_id.length() > 0)
 	{
-		luabind::functor<LPCSTR> lua_function;
-		luabind::object parameters_table = luabind::newtable(ai().script_engine().lua());
+		::luabind::functor<LPCSTR> lua_function;
+		::luabind::object parameters_table = ::luabind::newtable(ai().script_engine().lua());
 		string256 str = { 0 };
 		xr_sprintf(str, sizeof(str), ph->m_script_text_id.c_str());
 		LPCSTR v1 = strchr(str, '(');
@@ -210,7 +210,7 @@ LPCSTR CPhraseDialog::GetPhraseText(const shared_str& phrase_id, bool current_sp
 
     if (ph->m_script_text_id.length() > 0)
     {
-        luabind::functor<LPCSTR> lua_function;
+        ::luabind::functor<LPCSTR> lua_function;
         bool functor_exists = ai().script_engine().functor(ph->m_script_text_id.c_str(), lua_function);
         THROW3(functor_exists, "Cannot find function", ph->m_script_text_id.c_str());
 
@@ -266,7 +266,7 @@ void CPhraseDialog::load_shared(LPCSTR)
 	{
 		LPCSTR func = pXML->Read(dialog_node, "init_func", 0, "");
 
-		luabind::functor<void> lua_function;
+		::luabind::functor<void> lua_function;
 		bool functor_exists = ai().script_engine().functor(func, lua_function);
 		THROW3(functor_exists, "Cannot find precondition", func);
 		lua_function(this);

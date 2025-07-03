@@ -352,7 +352,7 @@ void CUIInventoryUpgradeWnd::OnMesBoxYes()
 		if (parent_wnd)
 		{
 			//Alundaio: tell script that item has been upgraded
-			luabind::functor<void> funct;
+			::luabind::functor<void> funct;
 			ai().script_engine().functor("inventory_upgrades.effect_upgrade_item", funct);
 			if (funct)
 			{

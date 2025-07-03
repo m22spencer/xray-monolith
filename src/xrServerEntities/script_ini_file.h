@@ -65,7 +65,7 @@ public:
 	void close();
 
 	// demonized: DLTX
-	luabind::object DLTX_scriptGetSection(LPCSTR sec);
+	::luabind::object DLTX_scriptGetSection(LPCSTR sec);
 #endif
 
 DECLARE_SCRIPT_REGISTER_FUNCTION

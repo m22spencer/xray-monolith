@@ -64,7 +64,7 @@ public:
 	}
 };
 
-typedef DLL_PureWrapper<DLL_Pure, luabind::wrap_base> CDLL_PureWrapper;
+typedef DLL_PureWrapper<DLL_Pure, ::luabind::wrap_base> CDLL_PureWrapper;
 
 /*	
 template <typename base, typename luabind_base = Loki::EmptyType>
@@ -143,7 +143,7 @@ public:
 	}
 };
 
-typedef ISpatialWrapper<ISpatial,luabind::wrap_base> CISpatialWrapper;
+typedef ISpatialWrapper<ISpatial,::luabind::wrap_base> CISpatialWrapper;
 */
 
 template <typename base, typename luabind_base = Loki::EmptyType>
@@ -183,7 +183,7 @@ public:
 	*/
 };
 
-typedef ISheduledWrapper<ISheduled, luabind::wrap_base> CISheduledWrapper;
+typedef ISheduledWrapper<ISheduled, ::luabind::wrap_base> CISheduledWrapper;
 
 template <typename base, typename luabind_base = Loki::EmptyType>
 class IRenderableWrapper : public heritage<base, luabind_base>::result
@@ -230,9 +230,9 @@ public:
 	*/
 };
 
-typedef IRenderableWrapper<IRenderable, luabind::wrap_base> CIRenderableWrapper;
+typedef IRenderableWrapper<IRenderable, ::luabind::wrap_base> CIRenderableWrapper;
 
-//typedef DLL_PureWrapper<CObject,luabind::wrap_base> CObjectDLL_Pure;
+//typedef DLL_PureWrapper<CObject,::luabind::wrap_base> CObjectDLL_Pure;
 //typedef ISpatialWrapper<CObjectDLL_Pure>			CObjectISpatial;
 //typedef ISheduledWrapper<CObjectDLL_Pure>			CObjectISheduled;
 //typedef IRenderableWrapper<CObjectISheduled>		CObjectIRenderable;
@@ -269,7 +269,7 @@ typedef IRenderableWrapper<IRenderable, luabind::wrap_base> CIRenderableWrapper;
 //};
 
 
-typedef DLL_PureWrapper<CGameObject, luabind::wrap_base> CGameObjectDLL_Pure;
+typedef DLL_PureWrapper<CGameObject, ::luabind::wrap_base> CGameObjectDLL_Pure;
 //typedef ISpatialWrapper<CGameObjectDLL_Pure>				CGameObjectISpatial;
 typedef ISheduledWrapper<CGameObjectDLL_Pure> CGameObjectISheduled;
 typedef IRenderableWrapper<CGameObjectISheduled> CGameObjectIRenderable;
@@ -318,7 +318,7 @@ public:
 
 	virtual BOOL net_Spawn(CSE_Abstract* data)
 	{
-		return (luabind::call_member<bool>(this, "net_Spawn", data));
+		return (::luabind::call_member<bool>(this, "net_Spawn", data));
 	}
 
 	static bool net_Spawn_static(CGameObject* self, CSE_Abstract* abstract)
@@ -327,7 +327,7 @@ public:
 	}
 };
 
-class CEntityWrapper : public CEntity, public luabind::wrap_base
+class CEntityWrapper : public CEntity, public ::luabind::wrap_base
 {
 public:
 	IC CEntityWrapper()
@@ -340,7 +340,7 @@ public:
 
 	virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element)
 	{
-		luabind::call_member<void>(this, "HitSignal", P, local_dir, who, element);
+		::luabind::call_member<void>(this, "HitSignal", P, local_dir, who, element);
 	}
 
 	static void HitSignal_static(CEntity* self, float P, Fvector& local_dir, CObject* who, s16 element)
@@ -351,7 +351,7 @@ public:
 
 	virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir)
 	{
-		luabind::call_member<void>(this, "HitImpulse", P, vWorldDir, vLocalDir);
+		::luabind::call_member<void>(this, "HitImpulse", P, vWorldDir, vLocalDir);
 	}
 
 	static void HitImpulse_static(float P, Fvector& vWorldDir, Fvector& vLocalDir)

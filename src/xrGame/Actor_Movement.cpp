@@ -85,7 +85,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 				}
 			}
 
-			luabind::functor<bool> on_land;
+			::luabind::functor<bool> on_land;
 			if (ai().script_engine().functor("_G.CActor_on_land", on_land))
 				on_land(character_physics_support()->movement()->GetContactSpeed());
 		}
@@ -224,7 +224,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 			Jump = m_fJumpSpeed;
 			m_fJumpTime = s_fJumpTime;
 
-			luabind::functor<bool> on_jump;
+			::luabind::functor<bool> on_jump;
 			if (ai().script_engine().functor("_G.CActor_on_jump", on_jump))
 				on_jump();
 

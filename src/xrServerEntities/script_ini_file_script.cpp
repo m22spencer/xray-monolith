@@ -31,7 +31,7 @@ CScriptIniFile* reload_system_ini()
 	return ((CScriptIniFile*)pSettings);
 }
 
-void section_for_each(CScriptIniFile* self, luabind::functor<bool> functor)
+void section_for_each(CScriptIniFile* self, ::luabind::functor<bool> functor)
 {
 	typedef CInifile::Root sections_type;
 	sections_type& sections = self->sections();
@@ -54,7 +54,7 @@ CScriptIniFile* get_game_ini()
 }
 #endif // XRGAME_EXPORTS
 
-bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::internal_string&N, luabind::internal_string& V)
+bool r_line(CScriptIniFile* self, LPCSTR S, int L, ::luabind::internal_string&N, ::luabind::internal_string& V)
 {
 	THROW3(self->section_exist(S), "Cannot find section", S);
 	THROW2((int)self->line_count(S) > L, "Invalid line number");
@@ -123,9 +123,9 @@ int get_modded_exes_version() {
 	return result;
 }
 
-luabind::object get_string_table() {
+::luabind::object get_string_table() {
 	auto pData = CStringTable::getPData();
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	if (!pData) {
 		return table;
 	}

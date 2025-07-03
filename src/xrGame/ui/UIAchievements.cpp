@@ -41,7 +41,7 @@ void CUIAchievements::Update()
 	if (ParentHasMe() && !m_repeat)
 		return;
 
-	luabind::functor<bool> f;
+	::luabind::functor<bool> f;
 	R_ASSERT(ai().script_engine().functor(m_functor_str, f));
 	if (f())
 	{

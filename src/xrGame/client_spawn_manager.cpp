@@ -20,7 +20,7 @@ CClientSpawnManager::~CClientSpawnManager()
 }
 
 void CClientSpawnManager::add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id,
-                              const luabind::functor<void>& functor, const luabind::object& object)
+                              const ::luabind::functor<void>& functor, const ::luabind::object& object)
 {
 	CSpawnCallback callback;
 	callback.m_callback.set(functor, object);
@@ -28,7 +28,7 @@ void CClientSpawnManager::add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID
 }
 
 void CClientSpawnManager::add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id,
-                              const luabind::functor<void>& lua_function)
+                              const ::luabind::functor<void>& lua_function)
 {
 	CSpawnCallback callback;
 	callback.m_callback.set(lua_function);

@@ -289,14 +289,14 @@ void CScriptEngine::setup_callbacks()
 #endif
 	{
 #if !XRAY_EXCEPTIONS
-		luabind::set_error_callback(CScriptEngine::lua_error);
+		::luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
 
-		luabind::set_pcall_callback(CScriptEngine::lua_pcall_failed);
+		::luabind::set_pcall_callback(CScriptEngine::lua_pcall_failed);
 	}
 
 #if !XRAY_EXCEPTIONS
-	luabind::set_cast_failed_callback(lua_cast_failed);
+	::luabind::set_cast_failed_callback(lua_cast_failed);
 #endif
 	lua_atpanic(lua(), CScriptEngine::lua_panic);
 }
@@ -369,7 +369,7 @@ void CScriptEngine::init()
     }
 #endif // #ifdef USE_LUA_STUDIO
 
-	luabind::open(lua());
+	::luabind::open(lua());
 	setup_callbacks();
 	export_classes(lua());
 	setup_auto_load();
@@ -441,7 +441,7 @@ void CScriptEngine::load_common_scripts()
 			if (object("_G", I, LUA_TFUNCTION))
 			{
 				//				lua_dostring			(lua(),xr_strcat(I,"()"));
-				luabind::functor<void> f;
+				::luabind::functor<void> f;
 				R_ASSERT(functor(I, f));
 				f();
 			}
@@ -521,7 +521,7 @@ void CScriptEngine::register_script_classes()
 	for (u32 i = 0; i < n; ++i)
 	{
 		_GetItem(*m_class_registrators, i, I);
-		luabind::functor<void> result;
+		::luabind::functor<void> result;
 		if (!functor(I, result))
 		{
 			script_log(eLuaMessageTypeError, "Cannot load class registrator %s!", I);
@@ -531,7 +531,7 @@ void CScriptEngine::register_script_classes()
 	}
 }
 
-bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& object, int type)
+bool CScriptEngine::function_object(LPCSTR function_to_call, ::luabind::object& object, int type)
 {
 	if (!xr_strlen(function_to_call))
 		return (false);
@@ -555,7 +555,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
 	if (!this->object(name_space, function, type))
 		return (false);
 
-	luabind::object lua_namespace = this->name_space(name_space);
+	::luabind::object lua_namespace = this->name_space(name_space);
 	object = lua_namespace[function];
 	return (true);
 }

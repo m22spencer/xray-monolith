@@ -250,7 +250,7 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
 				inventory().Ruck(iitem);
 				break; //2
 			case GEG_PLAYER_ITEM_EAT:
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (iitem && ai().script_engine().functor("_G.CInventory__eat", funct))
 				{
 					CGameObject* GO = iitem->cast_game_object();

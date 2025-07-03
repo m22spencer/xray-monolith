@@ -271,7 +271,7 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool b_free)
 		);
 
 	// use some script discounts
-	luabind::functor<float> func;
+	::luabind::functor<float> func;
 	if (b_buying)
 		R_ASSERT(ai().script_engine().functor("trade_manager.get_buy_discount", func));
 	else

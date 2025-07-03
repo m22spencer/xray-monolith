@@ -476,7 +476,7 @@ void CHUDManager::OnScreenResolutionChanged()
 
 	pUIGame->OnConnected();
 
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (ai().script_engine().functor("_G.CHUDManager_OnScreenResolutionChanged", funct))
 		funct();
 }

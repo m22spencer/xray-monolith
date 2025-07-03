@@ -190,6 +190,7 @@ How to compile exes:
 
 ## Changelog
 **2025.07.06**
+* Replaced all occurences of `luabind` to `::luabind`
 * Migrated projects to C++17 standard
 
 **2025.07.05**

@@ -536,7 +536,7 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 	CUIWndCallback::OnEvent(pWnd, msg, pData);
 	if (pWnd == m_UIPropertiesBox && msg == PROPERTY_CLICKED && m_UIPropertiesBox->GetClickedItem())
 	{
-		luabind::functor<void> funct;
+		::luabind::functor<void> funct;
 		if (ai().script_engine().functor("pda.property_box_clicked", funct))
 			funct(m_UIPropertiesBox);
 	}
@@ -572,7 +572,7 @@ Fvector2 CUIMapWnd::GetGlobalMapCoordsForMouse()
 void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
 {
 	m_UIPropertiesBox->RemoveAll();
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	CMapSpot* sp = nullptr;
 	if (ai().script_engine().functor("pda.property_box_add_properties", funct))
 	{
@@ -583,7 +583,7 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
 	}
 
 	// demonized: possibility to click trigger properties box anywhere on the map with right click
-	luabind::functor<void> rcFunct;
+	::luabind::functor<void> rcFunct;
 	if (ai().script_engine().functor("_G.COnRightClickMap", rcFunct))
 	{
 		auto gm = GlobalMap();
@@ -730,7 +730,7 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
 				current_gvid++;
 			}
 
-			luabind::object table = luabind::newtable(ai().script_engine().lua());
+			::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 			/*table["gm_cursor_pos"] = cursor_pos;
 			table["gm_map_abs"] = map_abs;
 			table["lm_bound_rect"] = lm_bound_rect;

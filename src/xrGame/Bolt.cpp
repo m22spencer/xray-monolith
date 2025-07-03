@@ -29,7 +29,7 @@ void CBolt::Throw()
 	CMissile* l_pBolt = smart_cast<CMissile*>(m_fake_missile);
 	if (!l_pBolt) return;
 
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (m_pInventory && smart_cast<CInventoryOwner*>(H_Parent()) &&
 		ai().script_engine().functor("_G.CBolt__State", funct))
 	{
@@ -123,7 +123,7 @@ void CBolt::PutNextToSlot()
 
 		if (pNext)
 		{
-			luabind::functor<CScriptGameObject*> funct;
+			::luabind::functor<CScriptGameObject*> funct;
 			if (ai().script_engine().functor("_g.CMissile__PutNextToSlot", funct))
 			{
 				CScriptGameObject* obj = funct(pNext->lua_game_object());
@@ -159,7 +159,7 @@ void CBolt::State(u32 state, u32 old_state)
 				xr_delete(m_pPhysicsShell);
 				//m_dwDestroyTime			= 0xffffffff;
 
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (m_pInventory && smart_cast<CInventoryOwner*>(H_Parent()) && 
 					ai().script_engine().functor("_G.CBolt__State", funct))
 				{
