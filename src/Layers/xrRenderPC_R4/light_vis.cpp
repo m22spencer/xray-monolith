@@ -10,6 +10,10 @@ const u32 cullfragments = 4;
 
 void light::vis_prepare()
 {
+	// Avoid doing any vis calculation for SVP frames. Instead re-use the last main view vis data
+	if (Device.m_SecondViewport.IsSVPFrame())
+		return;
+
 	if (int(indirect_photons) != ps_r2_GI_photons) gi_generate();
 
 	//	. test is sheduled for future	= keep old result
@@ -66,6 +70,10 @@ void light::vis_prepare()
 
 void light::vis_update()
 {
+	// Avoid doing any vis calculation for SVP frames. Instead re-use the last main view vis data
+	if (Device.m_SecondViewport.IsSVPFrame())
+		return;
+
 	//	. not pending	->>> return (early out)
 	//	. test-result:	visible:
 	//		. shedule for 'large' interval
