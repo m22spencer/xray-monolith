@@ -1403,7 +1403,7 @@ void CWeapon::renderable_Render()
 	else
 		RenderHud(TRUE);
 
-	if (scope_debug >= 2 && !Device.m_SecondViewport.IsSVPFrame()) {
+	if (scope_debug >= 2 && !Device.m_SecondViewport.IsSVPFrame() && GetHUDmode()) {
 		DebugDrawWeapon();
 	}
 
