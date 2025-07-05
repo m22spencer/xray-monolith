@@ -241,8 +241,8 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 					{
 						for (int Bend = 0; Bend < BendersQty; Bend++)
 						{
-							c_prev_grass[Bend].set(GData.prev_pos[Bend]);
-							c_prev_grass[Bend + 16].set(GData.prev_dir[Bend]);
+							c_prev_grass[Bend].set(GData.prev_pos[Device.m_SecondViewport.IsSVPFrame()][Bend]);
+							c_prev_grass[Bend + 16].set(GData.prev_dir[Device.m_SecondViewport.IsSVPFrame()][Bend]);
 						}
 					}
 				}
