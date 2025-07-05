@@ -187,6 +187,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.05**
+* Ascii1457: SSS 23.2 Update
+
 **2025.07.03**
 * Ascii1457: SSS 23.1 Update
 
