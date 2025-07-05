@@ -159,10 +159,12 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 
   Above mentioned options are applicable only for scopes which have prescribed values in file scoperadii.script
 
-  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)]
+  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)])
     * Minimal zoom is equal to either mechanical zoom or the one prescribed in section min_scope_zoom_factor.
     * The step of zoom adjustment is more precise. Also, it's possible to adjust the step of zoom with the console command zoom_step_count [1.0, 10.0], this option is also applicable to the binoculars.
   * In the new version all implementations from fakelens.script have moved directly to the engine. fakelens.script remained as a layer between the engine and scopeRadii.script
+
+* Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
@@ -187,6 +189,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.06**
+* Migrated projects to C++17 standard
+
 **2025.07.05**
 * Ascii1457: SSS 23.2 Update
 
