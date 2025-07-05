@@ -1103,6 +1103,7 @@ void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud
 	Device.fASPECT = fAspect;
 
 	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
+	Device.prepare_matrices();
 }
 
 void EnsureDeviceState(std::function<void()> f)
@@ -1114,23 +1115,14 @@ void EnsureDeviceState(std::function<void()> f)
 	Fmatrix old_proj = Device.mProject;
 	Fmatrix old_proj_hud = Device.mProjectHud;
 
-	// disable some SSS effects for now (heavy performance impact and incorrect motion vectors)
-	auto taa = ps_ssfx_taa.x; ps_ssfx_taa.x = 0;
-	auto mblur = ps_ssfx_motionblur.y; ps_ssfx_motionblur.y = 0;
-	auto ao = ps_ssfx_ao.y; ps_ssfx_ao.y = 0;
-	auto il = ps_ssfx_il.y; ps_ssfx_il.y = 0;
 
 	f();
-
-	ps_ssfx_taa.x = taa;
-	ps_ssfx_motionblur.y = mblur;
-	ps_ssfx_ao.y = ao;
-	ps_ssfx_il.y = il;
 
 	Device.m_SecondViewport.isSVPFrame = false;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
 
 	SetMatrices(old_cam, old_proj, old_proj_hud);
+	Device.m_pRender->SetCacheXform_prev(Device.matrices_previous[0].mView, Device.matrices_previous[0].mProject);
 }
 
 void CLevel::RenderSecondViewport()
@@ -1152,6 +1144,10 @@ void CLevel::RenderSecondViewport()
 		auto svp_proj_hud = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, 0.001, fFarPlane_hud);
 
 		SetMatrices(scope_camera, svp_proj, svp_proj_hud);
+		Device.matrices[1].mView.invert(scope_camera);
+		Device.matrices[1].mProject = svp_proj;
+		Device.matrices[1].mProjectHud = svp_proj_hud;
+		Device.m_pRender->SetCacheXform_prev(Device.matrices_previous[1].mView, Device.matrices_previous[1].mProject);
 
 		inherited::OnRender();
 	});
@@ -1159,10 +1155,6 @@ void CLevel::RenderSecondViewport()
 
 void CLevel::OnRender()
 {
-	Device.matrices[0].mView = Device.mView;
-	Device.matrices[0].mProject = Device.mProject;
-	Device.matrices[0].mProjectHud = Device.mProjectHud;
-
 	if (game && Device.m_SecondViewport.IsSVPActive())
 		RenderSecondViewport();
 	

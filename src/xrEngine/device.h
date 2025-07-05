@@ -95,12 +95,15 @@ public:
 	float fASPECT;
 	float ViewportNear = 0.2f;
 
-	// Data for the main camera (1)
-	struct Matrices {
+	// Data for the main camera (1), and svp camera (2)
+	struct MatrixData {
 		Fmatrix mView;
 		Fmatrix mProject;
 		Fmatrix mProjectHud;
-	} matrices[1];
+	};
+
+	MatrixData matrices[2];
+	MatrixData matrices_previous[2];
 protected:
 
 	u32 Timer_MM_Delta;
@@ -435,6 +438,7 @@ public:
 	}
 
 public:
+	void prepare_matrices();
 	void xr_stdcall on_idle();
 	bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 

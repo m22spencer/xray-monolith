@@ -124,8 +124,8 @@ protected:
 	SkeletonWMVec wallmarks;
 	u32 wm_frame;
 	u32 CurrentFrame;
-	Fmatrix	Matrix_Prev;
-	Fmatrix Matrix_Temp;
+	Fmatrix	Matrix_Prev[2];
+	Fmatrix Matrix_Temp[2];
 	xr_vector<dxRender_Visual*> children_invisible;
 
 	// Globals
