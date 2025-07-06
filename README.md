@@ -190,6 +190,9 @@ How to compile exes:
 
 ## Changelog
 **2025.07.06**
+* Spawn antifreeze:
+  * Added `mod_system_spawn_antifreeze_ignore.ltx` file, lines in that file are sections that won't be processed by antifreeze. Partially addresses issue https://github.com/themrdemonized/xray-monolith/issues/283
+  * Fixed CTD on a possible condition when trying to spawn child items while parent is already destroyed and not exists in ALife, fixes issue https://github.com/themrdemonized/xray-monolith/issues/284
 * Replaced all occurences of `luabind` to `::luabind`
 * Migrated projects to C++17 standard
 
