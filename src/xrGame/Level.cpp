@@ -688,7 +688,9 @@ void CLevel::ProcessGameEvents()
 						static auto safe_insert = [](models_set& models, LPCSTR model) {
 							if (model)
 							{
-								LPCSTR modelWithoutExtension = model;
+								string_path modelWithoutExtension;
+								xr_strcpy(modelWithoutExtension, sizeof(modelWithoutExtension), model);
+								xr_strlwr(modelWithoutExtension);
 								if (strext(modelWithoutExtension)) *strext(modelWithoutExtension) = 0;
 								if (xr_strcmp(modelWithoutExtension, "") != 0 && xr_strcmp(modelWithoutExtension, ".ogf") != 0)
 									models.insert(modelWithoutExtension);

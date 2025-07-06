@@ -154,6 +154,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{369C
 		..\gamedata\configs\mod_system_base_hud.ltx = ..\gamedata\configs\mod_system_base_hud.ltx
 		..\gamedata\configs\mod_system_flashlight_definition.ltx = ..\gamedata\configs\mod_system_flashlight_definition.ltx
 		..\gamedata\configs\mod_system_shader_crosshair.ltx = ..\gamedata\configs\mod_system_shader_crosshair.ltx
+		..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx = ..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx
 		..\gamedata\configs\patrol_paths.ltx = ..\gamedata\configs\patrol_paths.ltx
 	EndProjectSection
 EndProject
