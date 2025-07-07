@@ -524,12 +524,44 @@ ALife::_OBJECT_ID alife_max_id(const CALifeSimulator* self)
 	return self->objects().max_id;
 }
 
-//-Alundaio
-CALifeObjectRegistry::OBJECT_REGISTRY const& alife_objects(const CALifeSimulator *self)
+::luabind::object alife_object_ids(const CALifeSimulator* self, const bool keytable = false, const bool withActor = false)
 {
 	VERIFY(self);
+
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 	const CALifeObjectRegistry& objects = self->objects();
-	return objects.objects();
+	int i = 1;
+	for (const auto& [id, obj] : objects.objects())
+	{
+		if (!withActor && id == 0)
+		{
+			continue;
+		}
+		const int index = keytable ? id : i;
+		result[index] = keytable ? true : id;
+		i++;
+	}
+	return result;
+}
+
+::luabind::object alife_objects(const CALifeSimulator *self, const bool keytable = false, const bool withActor = false)
+{
+	VERIFY(self);
+	
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
+	const CALifeObjectRegistry& objects = self->objects();
+	int i = 1;
+	for (const auto& [id, obj] : objects.objects())
+	{
+		if (!withActor && id == 0)
+		{
+			continue;
+		}
+		const int index = keytable ? id : i;
+		result[index] = obj;
+		i++;
+	}
+	return result;
 }
 
 xr_vector<u16>& get_children(const CALifeSimulator *self, CSE_Abstract *object)
@@ -595,10 +627,12 @@ void CALifeSimulator::script_register(lua_State* L)
 		//Alundaio: END
 
 		// demonized: iterate alife objects
+		.def("object_ids", &alife_object_ids)
+		.def("objects", &alife_objects)
 		.def("iterate_objects", &CALifeSimulator__iterate_objects)
-		.def("iterate_objects_without_actor", &CALifeSimulator__iterate_objects_without_actor)
+		/*.def("iterate_objects_without_actor", &CALifeSimulator__iterate_objects_without_actor)
 		.def("objects_iter", &alife_object_iter)
-		.def("objects_without_actor_iter", &alife_object_without_actor_iter)
+		.def("objects_without_actor_iter", &alife_object_without_actor_iter)*/
 		.def("max_id", &alife_max_id)
 
 		, def("alife", &alife)
