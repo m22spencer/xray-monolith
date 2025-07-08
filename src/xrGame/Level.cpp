@@ -613,6 +613,13 @@ void CLevel::ProcessSpawnEvents()
 
 		if (spawn_antifreeze_debug) Msg("[ProcessSpawnEvents] spawning section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
 
+		// demonized: If item is II_BOLT class - go through anyway
+		if (pSettings->line_exist(section.c_str(), "class") && strstr(pSettings->r_string(section.c_str(), "class"), "II_BOLT") != nullptr)
+		{
+			// demonized: this is a sin, but its an easy way
+			goto spawn;
+		}
+
 		// demonized: If there is a parent of this object, check if its still in alife
 		if (parent_id != 0xffff)
 		{
@@ -625,6 +632,7 @@ void CLevel::ProcessSpawnEvents()
 			}
 		}
 
+	spawn:
 		u16 dummy16;
 		P.r_begin(dummy16);
 		cl_Process_Spawn(P);

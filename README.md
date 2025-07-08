@@ -189,6 +189,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.08**
+* Spawn antifreeze: fixed issue related to bolts, introduced in previous version: https://github.com/themrdemonized/xray-monolith/issues/287
+
 **2025.07.06**
 * Spawn antifreeze:
   * Added `mod_system_spawn_antifreeze_ignore.ltx` file, lines in that file are sections that won't be processed by antifreeze. Partially addresses issue https://github.com/themrdemonized/xray-monolith/issues/283
