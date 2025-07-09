@@ -215,12 +215,18 @@ void CRenderTarget::phase_3DSSReticle()
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, 0, HW.pBaseZB);
+	// For SVP, we need to mask the motion vectors
+	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
+	auto mvec = svp_rendering_main_view ? RImplementation.Target->rt_ssfx_motion_vectors : 0;
+
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, mvec, HW.pBaseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
 	RImplementation.render_Reticle();
+
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, 0, HW.pBaseZB);
 };
 #endif

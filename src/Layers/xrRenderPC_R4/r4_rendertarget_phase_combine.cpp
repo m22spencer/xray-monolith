@@ -501,8 +501,7 @@ void CRenderTarget::phase_combine()
 		phase_ssfx_motion_blur();
 	}
 
-	auto svp_active = Device.m_SecondViewport.IsSVPActive();
-	if (scope_3D_fake_enabled && !svp_active)
+	if (scope_3D_fake_enabled)
 	{
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
 	}
@@ -571,14 +570,6 @@ void CRenderTarget::phase_combine()
 		// At this point, the scope view is done. 
 		//    we do not want to post process.
 		return;
-	}
-
-	if (scope_3D_fake_enabled && svp_active)
-	{
-		// Currently, svp must be rendered after taa.
-		//   Setting the g-buffer to the lens position breaks dof
-		//   Having it discarded (3dss) breaks motion vectors
-		phase_3DSSReticle();
 	}
 
 	// PP enabled ?
