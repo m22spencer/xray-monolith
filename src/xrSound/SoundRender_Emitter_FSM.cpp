@@ -49,6 +49,34 @@ void CSoundRender_Emitter::update(float dt)
 		m_current_state = stStopped;
 	}
 
+	// demonized: add preplay update, calculate delay based on distance and speed of sound
+	if (need_preplay_update && m_current_state < stPlaying)
+	{
+		if (_valid(p_source.position) && !p_source.position.similar(Fvector().set(0.f, 0.f, 0.f)))
+		{
+			float speedOfSound = 343.f;
+			auto delay = (p_source.position.distance_to(SoundRender->listener_position()) / speedOfSound) * soundSmoothingParams::distanceBasedDelayPower;
+			if (delay > 0.f)
+			{
+				if (m_current_state == stStarting || m_current_state == stStartingLooped)
+				{
+					starting_delay = delay;
+					m_current_state = m_current_state == stStarting ? stStartingDelayed : stStartingLoopedDelayed;
+				}
+				else
+				{
+					starting_delay += delay;
+				}
+				need_preplay_update = false;
+				Msg("CSoundRender_Emitter::update, file %s, state %s, need_preplay_update, delay %.2f", source()->file_name(), magic_enum::enum_name(m_current_state).data(), starting_delay);
+			}
+		}
+	}
+	else
+	{
+		need_preplay_update = false;
+	}
+
 	switch (m_current_state)
 	{
 	case stStopped:

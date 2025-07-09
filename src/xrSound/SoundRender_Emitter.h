@@ -29,6 +29,9 @@ public:
 		stFORCEDWORD = u32(-1)
 	};
 
+private:
+	bool need_preplay_update;
+
 public:
 #ifdef DEBUG
 	u32							dbg_ID;

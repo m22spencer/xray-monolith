@@ -8,6 +8,7 @@
 #include "../xrEngine/XR_IOConsole.h"
 
 namespace soundSmoothingParams {
+	float distanceBasedDelayPower = 1.f;
 	float power = 1.8;
 	int steps = 15;
 	float alpha = getAlpha();
