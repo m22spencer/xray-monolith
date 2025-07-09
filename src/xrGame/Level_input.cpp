@@ -30,7 +30,7 @@
 //Alundaio
 #include "pch_script.h"
 #include "../../xrServerEntities/script_engine.h"
-using namespace luabind;
+
 //-Alundaio
 
 #ifdef DEBUG
@@ -58,7 +58,7 @@ void CLevel::IR_OnMouseWheel(int direction)
 #ifdef MOUSE_INPUT_CALLBACKS
     if (g_actor) {
         // demonized: add mouse wheel callback with consuming input
-        luabind::functor<bool> funct;
+        ::luabind::functor<bool> funct;
         if (ai().script_engine().functor("_G.COnMouseWheel", funct))
         {
             if (!funct(direction))
@@ -105,7 +105,7 @@ void CLevel::IR_OnMouseHold(int btn)
 
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
-    luabind::functor<bool> funct;
+    ::luabind::functor<bool> funct;
     if (ai().script_engine().functor("level_input.on_mouse_move", funct))
     {
         if (funct(dx, dy, g_bDisableAllInput))
@@ -184,7 +184,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         return;
     }
 
-    luabind::functor<bool> funct;
+    ::luabind::functor<bool> funct;
     if (ai().script_engine().functor("level_input.on_key_press", funct))
     {
         if (funct(key, _curr, g_bDisableAllInput))
@@ -531,7 +531,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 	//			ai().level_graph().set_start_point();
 	//			m_bSynchronization	= false;
 	//		}
-	//		luabind::functor<void>	functor;
+	//		::luabind::functor<void>	functor;
 	//		ai().script_engine().functor("alife_test.set_switch_online",functor);
 	//		functor(0,false);
 	//	}
@@ -574,7 +574,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
 {
 	if (!bReady) return;
 
-    luabind::functor<bool> funct;
+    ::luabind::functor<bool> funct;
     if (ai().script_engine().functor("level_input.on_key_release", funct))
     {
         if (funct(key, get_binded_action(key), g_bDisableAllInput))
@@ -607,7 +607,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
 
 void CLevel::IR_OnKeyboardHold(int key)
 {
-    luabind::functor<bool> funct;
+    ::luabind::functor<bool> funct;
     if (ai().script_engine().functor("level_input.on_key_hold", funct))
     {
         if (funct(key, get_binded_action(key), g_bDisableAllInput))

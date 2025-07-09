@@ -7,7 +7,7 @@
 #include "doors_door.h"
 #include "doors.h"
 
-using namespace luabind;
+
 
 CUsableScriptObject::CUsableScriptObject()
 {

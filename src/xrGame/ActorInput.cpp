@@ -56,7 +56,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 			if ((mstate_wishful & mcLookout) && !IsGameTypeSingle()) return;
 
 			// Tronex: export to allow/prevent weapon fire if returned false
-			luabind::functor<bool> funct;
+			::luabind::functor<bool> funct;
 			if (ai().script_engine().functor("_G.CActor_Fire", funct))
 			{
 				if (!funct())
@@ -236,7 +236,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 			{
 				PIItem itm = inventory().GetAny(item_name.c_str());
 
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (itm && ai().script_engine().functor("_G.CInventory__eat", funct))
 				{
 					CGameObject* GO = itm->cast_game_object();
@@ -561,7 +561,7 @@ void CActor::ActorUse()
 		if (object && Level().IR_GetKeyState(DIK_LSHIFT))
 		{
 			bool b_allow = !!pSettings->line_exist("ph_capture_visuals", object->cNameVisual());
-			luabind::functor<bool> funct;
+			::luabind::functor<bool> funct;
 			if (ai().script_engine().functor("_G.CActor__OnBeforePHCapture", funct))
 				b_allow = funct(object->lua_game_object(), b_allow);
 

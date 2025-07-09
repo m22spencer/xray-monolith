@@ -36,10 +36,10 @@ void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
 	Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));
 }
 
-luabind::object get_console_bounds(CConsole* c, LPCSTR cmd)
+::luabind::object get_console_bounds(CConsole* c, LPCSTR cmd)
 {
 	IConsole_Command* command = c->GetCommand(cmd);
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	if (command)
 	{
 		CCC_Float* float_command = smart_cast<CCC_Float*>(command);

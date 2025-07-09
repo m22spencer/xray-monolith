@@ -1171,7 +1171,8 @@ static class ssfx_jitter : public R_constant_setup
 		float JitterX = 0;
 		float JitterY = 0;
 
-		if (ps_ssfx_taa.x > 0)
+#if defined(USE_DX11)
+		if (ps_ssfx_taa.x > 0 && RImplementation.o.ssfx_taa)
 		{
 			static Fvector2 TAA_Offset[4] = 
 			{
@@ -1184,6 +1185,7 @@ static class ssfx_jitter : public R_constant_setup
 			JitterX = TAA_Offset[ Device.dwFrame % 4 ].x / Device.dwWidth;
 			JitterY = TAA_Offset[ Device.dwFrame % 4 ].y / Device.dwHeight;
 		}
+#endif
 
 		RCache.set_c(C, JitterX * ps_ssfx_taa.y, JitterY * ps_ssfx_taa.y, ps_ssfx_taa.x, ps_ssfx_taa.w);
 

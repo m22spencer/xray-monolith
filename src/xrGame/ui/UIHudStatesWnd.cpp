@@ -610,7 +610,7 @@ void CUIHudStatesWnd::UpdateZones()
 		if (zone_info.snd_time > zone_info.cur_period)
 		{
 			zone_info.snd_time = 0.0f;
-			luabind::functor<bool> funct;
+			::luabind::functor<bool> funct;
 			if (ai().script_engine().functor("_G.CZone_Touch", funct))
 			{
 				if (funct(pZone->lua_game_object()))

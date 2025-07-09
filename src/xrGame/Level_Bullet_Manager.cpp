@@ -131,7 +131,7 @@ void SBullet::Init(const Fvector& position,
 
 // demonized: construct bullet table for Lua
 void populateBulletTable (
-	luabind::object& table,
+	::luabind::object& table,
 	const Fvector& position,
 	const Fvector& direction,
 	float speed,
@@ -280,9 +280,9 @@ void CBulletManager::AddBullet(const Fvector& position,
 	bullet.flags.aim_bullet = AimBullet;
 
 	// demonized - bullet on init callback
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.CBulletOnInit", funct)) {
-		luabind::object table = luabind::newtable(ai().script_engine().lua());
+		::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 		populateBulletTable(
 			table,
 			position,
@@ -947,9 +947,9 @@ static bool try_update_bullet(SBullet& bullet, Fvector const& gravity, float con
 	bullet.life_time = time;
 
 	// demonized: bullet on update callback
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.CBulletOnUpdate", funct)) {
-		luabind::object table = luabind::newtable(ai().script_engine().lua());
+		::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 		populateBulletTable(
 			table,
 			bullet.bullet_pos,
@@ -967,15 +967,15 @@ static bool try_update_bullet(SBullet& bullet, Fvector const& gravity, float con
 		funct(table);
 
 		/*
-		luabind::object output = funct(table);
+		::luabind::object output = funct(table);
 
 		if (output && output.type() == LUA_TTABLE) {
-			bullet.bullet_pos = luabind::object_cast<Fvector>(table["position"]);
-			bullet.dir = luabind::object_cast<Fvector>(table["direction"]);
-			bullet.speed = luabind::object_cast<float>(table["speed"]);
-			bullet.fly_dist = luabind::object_cast<float>(table["distance"]);
-			bullet.weapon_id = luabind::object_cast<u16>(table["weapon_id"]);
-			bullet.parent_id = luabind::object_cast<u16>(table["parent_id"]);
+			bullet.bullet_pos = ::luabind::object_cast<Fvector>(table["position"]);
+			bullet.dir = ::luabind::object_cast<Fvector>(table["direction"]);
+			bullet.speed = ::luabind::object_cast<float>(table["speed"]);
+			bullet.fly_dist = ::luabind::object_cast<float>(table["distance"]);
+			bullet.weapon_id = ::luabind::object_cast<u16>(table["weapon_id"]);
+			bullet.parent_id = ::luabind::object_cast<u16>(table["parent_id"]);
 		}
 		*/
 	}
@@ -1236,9 +1236,9 @@ void CBulletManager::CommitEvents() // @ the start of frame
 		case EVENT_HIT:
 			{
 				// demonized: bullet on impact callback
-				luabind::functor<void> funct;
+				::luabind::functor<void> funct;
 				if (ai().script_engine().functor("_G.CBulletOnImpact", funct)) {
-					luabind::object table = luabind::newtable(ai().script_engine().lua());
+					::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 					populateBulletTable(
 						table,
 						!fis_zero(end_point.x) && !fis_zero(end_point.y) && !fis_zero(end_point.z) ? end_point : bullet->bullet_pos,
@@ -1264,9 +1264,9 @@ void CBulletManager::CommitEvents() // @ the start of frame
 		case EVENT_REMOVE:
 			{
 				// demonized: bullet on remove callback
-				luabind::functor<void> funct;
+				::luabind::functor<void> funct;
 				if (ai().script_engine().functor("_G.CBulletOnRemove", funct)) {
-					luabind::object table = luabind::newtable(ai().script_engine().lua());
+					::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 					populateBulletTable(
 						table,
 						!fis_zero(end_point.x) && !fis_zero(end_point.y) && !fis_zero(end_point.z) ? end_point : bullet->bullet_pos,

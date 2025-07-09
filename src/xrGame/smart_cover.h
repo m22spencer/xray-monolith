@@ -60,7 +60,7 @@ namespace smart_cover
 		void vertex(loophole const& loophole, loophole_data& loophole_data);
 	public:
 		cover(object const& object, DescriptionPtr description, bool is_combat_cover, bool can_fire,
-		      luabind::object const& loopholes);
+		      ::luabind::object const& loopholes);
 		~cover();
 		IC Loopholes const& loopholes() const;
 		IC object const& object() const;

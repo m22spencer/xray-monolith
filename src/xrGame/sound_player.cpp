@@ -20,7 +20,7 @@
 #include "profiler.h"
 #include "sound_collection_storage.h"
 #include "object_broker.h"
-using namespace luabind;
+
 
 CSoundPlayer::CSoundPlayer(CObject* object)
 {
@@ -243,7 +243,7 @@ void CSoundPlayer::play(u32 internal_type, u32 max_start_time, u32 min_start_tim
 	string256 name;
 	xr_sprintf(name, "%s%s%i", *sound.m_sound_player_prefix, *sound.m_sound_prefix, (random_id + 1));
 	//Msg("Sound name \"%s\"", name);
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.CAI_Stalker_OnPhraseCallback", funct))
 	{
 		CGameObject* g_obj = smart_cast<CGameObject*>(m_object);

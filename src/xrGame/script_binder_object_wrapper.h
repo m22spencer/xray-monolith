@@ -13,7 +13,7 @@
 
 class CScriptGameObject;
 
-class CScriptBinderObjectWrapper : public CScriptBinderObject, public luabind::wrap_base
+class CScriptBinderObjectWrapper : public CScriptBinderObject, public ::luabind::wrap_base
 {
 public:
 	CScriptBinderObjectWrapper(CScriptGameObject* object);

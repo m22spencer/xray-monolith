@@ -79,7 +79,10 @@ extern u64 g_qwEStartGameTime;
 ENGINE_API
 extern float psHUD_FOV_def;
 extern float psSqueezeVelocity;
+
+// Lua
 extern int psLUA_GCSTEP;
+extern BOOL lua_debug;
 
 float g_end_modif = 0.f;
 
@@ -154,6 +157,8 @@ extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
 extern BOOL fun_allowed;
+
+extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
 
 extern BOOL spawn_antifreeze;
 extern BOOL spawn_antifreeze_debug;
@@ -2422,6 +2427,7 @@ void CCC_RegisterCommands()
 
     // Moved lua_gcstep outside of DEBUG to allow for easier experimentation.
 	CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+	CMD4(CCC_Integer, "lua_debug", &lua_debug, 0, 1);
 
 #ifdef DEBUG
 	CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
@@ -2920,6 +2926,9 @@ void CCC_RegisterCommands()
 
 	// Print DLTX warnings when "override section which doesn't exist"
 	CMD4(CCC_Integer, "print_dltx_warnings", &print_dltx_warnings, 0, 1);
+
+	// Ignore "no renderer type set for hanging-lamp" error
+	CMD4(CCC_Integer, "hanging_lamp_ignore_match_configuration", &alifeObjectHangingLampIgnoreMatchConfiguration, 0, 1);
 
 	// Poltergeists spawn corpses on death
 	CMD4(CCC_Integer, "poltergeist_spawn_corpse_on_death", &poltergeist_spawn_corpse_on_death, 0, 1);

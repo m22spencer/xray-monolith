@@ -262,7 +262,7 @@ void xr_stdcall CBurer::StaminaHit()
 
 	if (do_weapon_drop)
 	{
-		luabind::functor<bool> funct;
+		::luabind::functor<bool> funct;
 		if (ai().script_engine().functor("_G.CBurer_BeforeWeaponDropCallback", funct))
 			do_weapon_drop = funct(this->lua_game_object(), active_weapon->lua_game_object());
 	}

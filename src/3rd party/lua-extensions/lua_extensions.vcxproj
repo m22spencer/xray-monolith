@@ -26,6 +26,7 @@
     <ProjectGuid>{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}</ProjectGuid>
     <RootNamespace>rvp</RootNamespace>
     <ProjectName>lua_extensions</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -141,6 +142,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/Ob3 %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -169,6 +171,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -198,6 +201,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -227,6 +231,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -257,6 +262,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>/Ob3 %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -273,11 +279,43 @@
     <ClCompile Include="base.cpp" />
     <ClCompile Include="lfs.c" />
     <ClCompile Include="lmarshal.c" />
+    <ClCompile Include="luasocket\auxiliar.c" />
+    <ClCompile Include="luasocket\buffer.c" />
+    <ClCompile Include="luasocket\compat.c" />
+    <ClCompile Include="luasocket\except.c" />
+    <ClCompile Include="luasocket\inet.c" />
+    <ClCompile Include="luasocket\io.c" />
+    <ClCompile Include="luasocket\luasocket.c" />
+    <ClCompile Include="luasocket\mime.c" />
+    <ClCompile Include="luasocket\options.c" />
+    <ClCompile Include="luasocket\select.c" />
+    <ClCompile Include="luasocket\tcp.c" />
+    <ClCompile Include="luasocket\timeout.c" />
+    <ClCompile Include="luasocket\udp.c" />
+    <ClCompile Include="luasocket\wsocket.c" />
+    <ClCompile Include="luapanda.cpp" />
     <ClCompile Include="script_additional_libs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lfs.h" />
     <ClInclude Include="lmarshal.h" />
+    <ClInclude Include="luasocket\auxiliar.h" />
+    <ClInclude Include="luasocket\buffer.h" />
+    <ClInclude Include="luasocket\compat.h" />
+    <ClInclude Include="luasocket\except.h" />
+    <ClInclude Include="luasocket\inet.h" />
+    <ClInclude Include="luasocket\io.h" />
+    <ClInclude Include="luasocket\luasocket.h" />
+    <ClInclude Include="luasocket\mime.h" />
+    <ClInclude Include="luasocket\options.h" />
+    <ClInclude Include="luasocket\pierror.h" />
+    <ClInclude Include="luasocket\select.h" />
+    <ClInclude Include="luasocket\socket.h" />
+    <ClInclude Include="luasocket\tcp.h" />
+    <ClInclude Include="luasocket\timeout.h" />
+    <ClInclude Include="luasocket\udp.h" />
+    <ClInclude Include="luasocket\wsocket.h" />
+    <ClInclude Include="luapanda.h" />
     <ClInclude Include="script_additional_libs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

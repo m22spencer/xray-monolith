@@ -5,7 +5,7 @@
 
 using namespace luabind;
 
-void BoosterForEach(CActorCondition* conditions, const luabind::functor<bool> &funct)
+void BoosterForEach(CActorCondition* conditions, const ::luabind::functor<bool> &funct)
 {
 	CEntityCondition::BOOSTER_MAP& cur_booster_influences = conditions->GetCurBoosterInfluences();
 	CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
@@ -34,7 +34,7 @@ void ClearAllBoosters(CActorCondition* conditions)
 	cur_booster_influences.clear();
 }
 
-void WoundForEach(CActorCondition* conditions, const luabind::functor<bool> &funct)
+void WoundForEach(CActorCondition* conditions, const ::luabind::functor<bool> &funct)
 {
 	CEntityCondition::WOUND_VECTOR const& cur_wounds = conditions->wounds();
 	CEntityCondition::WOUND_VECTOR::const_iterator it = conditions->wounds().begin();

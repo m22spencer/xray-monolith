@@ -12,7 +12,7 @@
 
 class CScriptGameObject;
 
-class CScriptActionPlannerActionWrapper : public CScriptActionPlannerAction, public luabind::wrap_base
+class CScriptActionPlannerActionWrapper : public CScriptActionPlannerAction, public ::luabind::wrap_base
 {
 	typedef CScriptActionPlannerAction inherited;
 public:

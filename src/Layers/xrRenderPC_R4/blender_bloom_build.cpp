@@ -164,6 +164,7 @@ void CBlender_ssfx_bloom_build::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Texture("s_scene", r2_RT_blur_2);
 		C.r_dx10Texture("s_emissive", r2_RT_ssfx_bloom_emissive);
+		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Sampler("smp_linear");
 		C.r_dx10Sampler("smp_rtlinear");

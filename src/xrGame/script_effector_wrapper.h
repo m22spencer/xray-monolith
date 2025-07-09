@@ -10,7 +10,7 @@
 
 #include "script_effector.h"
 
-class CScriptEffectorWrapper : public CScriptEffector, public luabind::wrap_base
+class CScriptEffectorWrapper : public CScriptEffector, public ::luabind::wrap_base
 {
 public:
 	IC CScriptEffectorWrapper(int iType, float fTime);

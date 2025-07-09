@@ -159,10 +159,23 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 
   Above mentioned options are applicable only for scopes which have prescribed values in file scoperadii.script
 
-  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)]
+  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)])
     * Minimal zoom is equal to either mechanical zoom or the one prescribed in section min_scope_zoom_factor.
     * The step of zoom adjustment is more precise. Also, it's possible to adjust the step of zoom with the console command zoom_step_count [1.0, 10.0], this option is also applicable to the binoculars.
   * In the new version all implementations from fakelens.script have moved directly to the engine. fakelens.script remained as a layer between the engine and scopeRadii.script
+
+* Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
+
+* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform
+  * Type `lua_debug 1` in console and reload the save or start a new game
+  * To use it, you need to install VSCode and LuaPanda extension: https://marketplace.visualstudio.com/items?itemName=stuartwang.luapanda
+  * Open your `gamedata/scripts` folder in VSCode
+  * Copy `.vscode` folder from the archive into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts/.vscode
+  * Copy `LuaPanda.lua`, `dynamic_callbacks.lua`, `global.lua`, `socket.lua` into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts
+  * Return to VSCode, go to `Run and Debug` section and start debugging or press F5 key
+  * Open in-game console with `~` key and type `run_string debugger_attach()`. If you do everything correctly and engine is working properly too, you will get an entry breakpoint at `global.lua` file in VSCode.
+  * You have to re-enable the debugger every time you start a new game or load a save, so you have to type `run_string debugger_attach()` in console again.
+  * Debugger is working dynamically, so you can add/remove files from your VSCode folder and it will automatically update the list of files available for debugging.
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
@@ -187,6 +200,30 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.08**
+* Spawn antifreeze: fixed issue related to bolts, introduced in previous version: https://github.com/themrdemonized/xray-monolith/issues/287
+* SaloEater: Debug scripts with luapanda (https://github.com/themrdemonized/xray-monolith/pull/251)
+
+**2025.07.06**
+* Spawn antifreeze:
+  * Added `mod_system_spawn_antifreeze_ignore.ltx` file, lines in that file are sections that won't be processed by antifreeze. Partially addresses issue https://github.com/themrdemonized/xray-monolith/issues/283
+  * Fixed CTD on a possible condition when trying to spawn child items while parent is already destroyed and not exists in ALife, fixes issue https://github.com/themrdemonized/xray-monolith/issues/284
+* Replaced all occurences of `luabind` to `::luabind`
+* Migrated projects to C++17 standard
+
+**2025.07.05**
+* Ascii1457: SSS 23.2 Update
+
+**2025.07.03**
+* Ascii1457: SSS 23.1 Update
+
+**2025.07.02**
+* Spawn Antifreeze: Don't prefetch helicopters, might fix issue https://github.com/themrdemonized/xray-monolith/issues/278
+
+**2025.07.01**
+* `hanging_lamp_ignore_match_configuration` cvar to circumvent the SSS23 + HF crash, related to https://github.com/themrdemonized/xray-monolith/issues/273
+* Fix https://github.com/themrdemonized/xray-monolith/issues/276
+
 **2025.06.30**
 * Disable printing DLTX `!` warnings by default, toggle it with `print_dltx_warnings 1` cvar
 * Lua GC step increased to 300

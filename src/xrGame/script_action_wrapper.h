@@ -10,7 +10,7 @@
 
 #include "action_base.h"
 
-class CScriptActionWrapper : public CScriptActionBase, public luabind::wrap_base
+class CScriptActionWrapper : public CScriptActionBase, public ::luabind::wrap_base
 {
 public:
 	IC CScriptActionWrapper(CScriptGameObject* object = 0, LPCSTR action_name = "");

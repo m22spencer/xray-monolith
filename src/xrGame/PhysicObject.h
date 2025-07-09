@@ -159,7 +159,7 @@ protected:
 #ifdef CPHYSICOBJECT_CHANGE
 private:
 	LPCSTR m_physic_contact_callback;
-	luabind::functor<bool> m_physic_contact_function;
+	::luabind::functor<bool> m_physic_contact_function;
 public:
 	static void PhysicContactCallback(bool &do_colide, bool bo1, dContact &c, SGameMtl *material_1, SGameMtl *material_2);
 	bool PhysicContactFunction(CGameObject *who);

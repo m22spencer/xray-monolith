@@ -627,7 +627,7 @@ void CCustomZone::shedule_Update(u32 dt)
 			// Ignore object override script callback
 			if (pEntityAlive)
 			{
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (ai().script_engine().functor("_G.CCustomZone_BeforeActivateCallback", funct))
 					info.zone_ignore = !funct(this->lua_game_object(), pObject->lua_game_object());
 			}

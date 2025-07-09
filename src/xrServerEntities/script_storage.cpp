@@ -24,6 +24,22 @@
 #include "lua.hpp"
 #endif
 
+extern "C"
+{
+#include <lua.h>
+	int luaopen_marshal(lua_State* L);
+
+}
+struct luajit
+{
+	static void open_lib(lua_State* L, pcstr module_name, lua_CFunction function)
+	{
+		lua_pushcfunction(L, function);
+		lua_pushstring(L, module_name);
+		lua_call(L, 1, 0);
+	}
+};
+
 LPCSTR file_header_old =
 	"\
                           local function script_name() \
@@ -146,7 +162,7 @@ u32 game_lua_memory_usage()
 #endif //!USE_DL_ALLOCATOR
 
 static LPVOID __cdecl luabind_allocator(
-	luabind::memory_allocation_function_parameter const,
+	::luabind::memory_allocation_function_parameter const,
 	void const* const pointer,
 	size_t const size
 )
@@ -177,8 +193,8 @@ static LPVOID __cdecl luabind_allocator(
 
 void setup_luabind_allocator()
 {
-	luabind::allocator = &luabind_allocator;
-	luabind::allocator_parameter = 0;
+	::luabind::allocator = &luabind_allocator;
+	::luabind::allocator_parameter = 0;
 }
 
 
@@ -304,7 +320,9 @@ CScriptStorage::~CScriptStorage()
 		lua_close(m_virtual_machine);
 }
 
-extern int luaopen_lua_extensions(lua_State* L);
+extern int luaopen_lua_extensions(lua_State* L, bool IsDebug = false);
+extern lua_CFunction luaopen_socket_core_init();
+extern void pdebug_init_init(lua_State* L);
 
 void disable_os_funcs(lua_State* L)
 {
@@ -325,6 +343,54 @@ void disable_os_funcs(lua_State* L)
 	lua_pop(L, 1);
 }
 
+bool LoadKernelScriptToGlobal(lua_State* L, const char* name)
+{
+	string_path FileName;
+	xr_string FixedFileName = name;
+	//FixedFileName = "kernel\\" + FixedFileName; //When this line is enabled all lua files are not being loaded after loading a game
+
+	if (FS.exist(FileName, "$game_scripts$", FixedFileName.data()))
+	{
+		int	start = lua_gettop(L);
+		IReader* l_tpFileReader = FS.r_open(FileName);
+
+		string_path NameSpace;
+		xr_strcpy(NameSpace, name);
+
+		if (strext(NameSpace))
+			*strext(NameSpace) = 0;
+
+		if (luaL_loadbuffer(L, (const char*)l_tpFileReader->pointer(), l_tpFileReader->length(), NameSpace))
+		{
+			lua_settop(L, start);
+			return false;
+		}
+		else
+		{
+			int errFuncId = -1;
+			int	l_iErrorCode = lua_pcall(L, 0, 0, (-1 == errFuncId) ? 0 : errFuncId);
+			if (l_iErrorCode)
+			{
+#ifdef DEBUG
+				g_pScriptEngine->print_output(L, name, l_iErrorCode);
+#endif
+				lua_settop(L, start);
+				return false;
+			}
+		}
+
+
+		FS.r_close(l_tpFileReader);
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+};
+
+BOOL lua_debug = FALSE;
 void CScriptStorage::reinit()
 {
 	if (m_virtual_machine)
@@ -348,16 +414,7 @@ void CScriptStorage::reinit()
 	if (strstr(Core.Params, "-nojit"))
 		luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
 #else // USE_LUAJIT_ONE
-    // initialize lua standard library functions
-    struct luajit
-    {
-        static void open_lib(lua_State *L, pcstr module_name, lua_CFunction function)
-        {
-            lua_pushcfunction(L, function);
-            lua_pushstring(L, module_name);
-            lua_call(L, 1, 0);
-        }
-    }; // struct lua;
+    // initialize lua standard library functions    
 
     luajit::open_lib(lua(), "", luaopen_base);
     luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
@@ -366,6 +423,9 @@ void CScriptStorage::reinit()
     luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
     luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
+    luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
+	luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
+	luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
 
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
@@ -375,21 +435,39 @@ void CScriptStorage::reinit()
         luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif //-DEBUG
 
-    if (!strstr(Core.Params, "-nojit"))
-    {
-        luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
+	if (!strstr(Core.Params, "-nojit"))
+	{
+		luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
 #ifndef DEBUG
-        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
-        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
-        dojitopt(lua(), "2");
+		put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
+		put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
+		dojitopt(lua(), "2");
 #endif //!DEBUG
-    }
+	}
 
 #endif //!USE_LUAJIT_ONE
-
-	luaopen_lua_extensions(lua());
+	bool isDebugEnabled = lua_debug;
+	luaopen_lua_extensions(lua(), isDebugEnabled);
 	disable_os_funcs(lua());
 
+	if (isDebugEnabled)
+	{
+		Msg("!lua_debug 1, opening socket and initializing LuaPanda");
+		LoadKernelScriptToGlobal(lua(), "global.lua");
+		LoadKernelScriptToGlobal(lua(), "dynamic_callbacks.lua");
+
+		// Sockets
+		luajit::open_lib(lua(), "socket.core", luaopen_socket_core_init());
+		bool SocketTest = LoadKernelScriptToGlobal(lua(), "socket.lua");
+
+		// Panda
+		if (SocketTest)
+		{
+			pdebug_init_init(lua());
+			LoadKernelScriptToGlobal(lua(), "LuaPanda.lua");
+		}
+	}
+	
 	if (strstr(Core.Params, "-_g"))
 		file_header = file_header_new; //AVO: I get fatal crash at the start if this is used
 	else
@@ -1064,12 +1142,12 @@ bool CScriptStorage::object(LPCSTR namespace_name, LPCSTR identifier, int type)
 	return (result);
 }
 
-luabind::object CScriptStorage::name_space(LPCSTR namespace_name)
+::luabind::object CScriptStorage::name_space(LPCSTR namespace_name)
 {
 	string256 S1;
 	xr_strcpy(S1, namespace_name);
 	LPSTR S = S1;
-	luabind::object lua_namespace = luabind::get_globals(lua());
+	::luabind::object lua_namespace = ::luabind::get_globals(lua());
 	for (;;)
 	{
 		if (!xr_strlen(S))

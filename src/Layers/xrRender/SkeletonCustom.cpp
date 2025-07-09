@@ -772,9 +772,9 @@ void CKinematics::AddWallmark(const Fmatrix* parent_xform, const Fvector3& start
 	wallmarks.push_back(wm);
 }
 
-struct zero_wm_pred : public std::unary_function<intrusive_ptr<CSkeletonWallmark>, bool>
+struct zero_wm_pred
 {
-	bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == 0; }
+	bool operator()(const intrusive_ptr<CSkeletonWallmark> x) const { return x == 0; }
 };
 
 void CKinematics::CalculateWallmarks()

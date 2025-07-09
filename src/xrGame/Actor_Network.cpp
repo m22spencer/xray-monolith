@@ -661,7 +661,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
 
 
 	//-------------------------------------
-	m_States.empty();
+	m_States.clear();
 	//-------------------------------------
 	if (!g_Alive())
 	{

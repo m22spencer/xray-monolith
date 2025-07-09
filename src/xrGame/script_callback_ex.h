@@ -11,7 +11,7 @@
 #include "ai_space.h"
 #include "script_engine.h"
 
-IC bool compare_safe(const luabind::object& o1, const luabind::object& o2)
+IC bool compare_safe(const ::luabind::object& o1, const ::luabind::object& o2)
 {
 	if ((o1.type() == LUA_TNIL) && (o2.type() == LUA_TNIL))
 		return (true);
@@ -27,7 +27,7 @@ IC bool compare_safe(const luabind::object& o1, const luabind::object& o2)
 
 #if XRAY_EXCEPTIONS
 #	define process_error \
-		catch(luabind::error &e) {\
+		catch(::luabind::error &e) {\
 			if (e.state())\
 				ai().script_engine().print_output(e.state(),"",LUA_ERRRUN);\
 			else\
@@ -75,8 +75,8 @@ public:
 	typedef _return_type return_type;
 
 private:
-	typedef luabind::functor<_return_type> functor_type;
-	typedef luabind::object object_type;
+	typedef ::luabind::functor<_return_type> functor_type;
+	typedef ::luabind::object object_type;
 	typedef bool (CScriptCallbackEx_::*unspecified_bool_type)() const;
 
 protected:

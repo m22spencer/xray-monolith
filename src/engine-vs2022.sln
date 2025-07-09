@@ -109,8 +109,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8EC4
 		..\gamedata\scripts\callbacks_gameobject.script = ..\gamedata\scripts\callbacks_gameobject.script
 		..\gamedata\scripts\class_registrator_modded_exes.script = ..\gamedata\scripts\class_registrator_modded_exes.script
 		..\gamedata\scripts\dxml_core.script = ..\gamedata\scripts\dxml_core.script
+		..\gamedata\scripts\dynamic_callbacks.lua = ..\gamedata\scripts\dynamic_callbacks.lua
 		..\gamedata\scripts\fakelens.script = ..\gamedata\scripts\fakelens.script
+		..\gamedata\scripts\global.lua = ..\gamedata\scripts\global.lua
 		..\gamedata\scripts\ltx_help_ex.script = ..\gamedata\scripts\ltx_help_ex.script
+		..\gamedata\scripts\LuaPanda.lua = ..\gamedata\scripts\LuaPanda.lua
 		..\gamedata\scripts\lua_help_ex.script = ..\gamedata\scripts\lua_help_ex.script
 		..\gamedata\scripts\modded_exes_migration.script = ..\gamedata\scripts\modded_exes_migration.script
 		..\gamedata\scripts\modxml_inject_keybinds.script = ..\gamedata\scripts\modxml_inject_keybinds.script
@@ -143,6 +146,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8EC4
 		..\gamedata\scripts\options_modded_exes_wallmarks.script = ..\gamedata\scripts\options_modded_exes_wallmarks.script
 		..\gamedata\scripts\scopeRadii.script = ..\gamedata\scripts\scopeRadii.script
 		..\gamedata\scripts\slaxml.script = ..\gamedata\scripts\slaxml.script
+		..\gamedata\scripts\socket.lua = ..\gamedata\scripts\socket.lua
 		..\gamedata\scripts\true_first_person_death.script = ..\gamedata\scripts\true_first_person_death.script
 		..\gamedata\scripts\ui_options_modded_exes.script = ..\gamedata\scripts\ui_options_modded_exes.script
 		..\gamedata\scripts\_g_patches.script = ..\gamedata\scripts\_g_patches.script
@@ -154,6 +158,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{369C
 		..\gamedata\configs\mod_system_base_hud.ltx = ..\gamedata\configs\mod_system_base_hud.ltx
 		..\gamedata\configs\mod_system_flashlight_definition.ltx = ..\gamedata\configs\mod_system_flashlight_definition.ltx
 		..\gamedata\configs\mod_system_shader_crosshair.ltx = ..\gamedata\configs\mod_system_shader_crosshair.ltx
+		..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx = ..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx
 		..\gamedata\configs\patrol_paths.ltx = ..\gamedata\configs\patrol_paths.ltx
 	EndProjectSection
 EndProject

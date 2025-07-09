@@ -40,7 +40,7 @@ namespace smart_cover
 		return (s_exit_loophole_id);
 	}
 
-	shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in)
+	shared_str parse_vertex(::luabind::object const& table, LPCSTR identifier, bool const& in)
 	{
 		return (
 			transform_vertex(
@@ -116,7 +116,7 @@ void description::load_loopholes(shared_str const& table_id)
 	xr_strcat(temp, ".loopholes");
 	m_table_id = table_id;
 
-	luabind::object loopholes;
+	::luabind::object loopholes;
 	bool result =
 		ai().script_engine().function_object(
 			temp,
@@ -125,11 +125,11 @@ void description::load_loopholes(shared_str const& table_id)
 		);
 	VERIFY2(result, make_string("bad or missing loopholes table in smart_cover [%s]", table_id.c_str()));
 
-	luabind::object::iterator I = loopholes.begin();
-	luabind::object::iterator E = loopholes.end();
+	::luabind::object::iterator I = loopholes.begin();
+	::luabind::object::iterator E = loopholes.end();
 	for (; I != E; ++I)
 	{
-		luabind::object table = *I;
+		::luabind::object table = *I;
 		if (table.type() != LUA_TTABLE)
 		{
 			VERIFY(table.type() != LUA_TNIL);
@@ -202,7 +202,7 @@ void description::load_transitions(shared_str const& table_id)
 	xr_strcat(temp, *table_id);
 	xr_strcat(temp, ".transitions");
 
-	luabind::object transitions;
+	::luabind::object transitions;
 	bool result =
 		ai().script_engine().function_object(
 			temp,
@@ -211,11 +211,11 @@ void description::load_transitions(shared_str const& table_id)
 		);
 	VERIFY(result);
 
-	luabind::object::iterator I = transitions.begin();
-	luabind::object::iterator E = transitions.end();
+	::luabind::object::iterator I = transitions.begin();
+	::luabind::object::iterator E = transitions.end();
 	for (; I != E; ++I)
 	{
-		luabind::object table = *I;
+		::luabind::object table = *I;
 		if (table.type() != LUA_TTABLE)
 		{
 			VERIFY(table.type() != LUA_TNIL);
@@ -238,15 +238,15 @@ void description::load_transitions(shared_str const& table_id)
 	}
 }
 
-void description::load_actions(luabind::object const& table, description::ActionsList& result)
+void description::load_actions(::luabind::object const& table, description::ActionsList& result)
 {
-	luabind::object actions;
+	::luabind::object actions;
 	parse_table(table, "actions", actions);
-	luabind::object::iterator I = actions.begin();
-	luabind::object::iterator E = actions.end();
+	::luabind::object::iterator I = actions.begin();
+	::luabind::object::iterator E = actions.end();
 	for (; I != E; ++I)
 	{
-		luabind::object tmp = *I;
+		::luabind::object tmp = *I;
 		transitions::action* action = xr_new<transitions::action>(tmp);
 		result.push_back(action);
 	}

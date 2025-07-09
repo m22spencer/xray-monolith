@@ -613,6 +613,26 @@ void CLevel::ProcessSpawnEvents()
 
 		if (spawn_antifreeze_debug) Msg("[ProcessSpawnEvents] spawning section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
 
+		// demonized: If item is II_BOLT class - go through anyway
+		if (pSettings->line_exist(section.c_str(), "class") && strstr(pSettings->r_string(section.c_str(), "class"), "II_BOLT") != nullptr)
+		{
+			// demonized: this is a sin, but its an easy way
+			goto spawn;
+		}
+
+		// demonized: If there is a parent of this object, check if its still in alife
+		if (parent_id != 0xffff)
+		{
+			auto parent_obj = ai().alife().objects().object(parent_id);
+			if (!parent_obj || !parent_obj->m_bOnline)
+			{
+				if (spawn_antifreeze_debug) Msg("![ProcessSpawnEvents] parent object is not in alife, do not spawn, section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
+				it = spawn_events->queue.erase(it); // remove current event
+				continue;
+			}
+		}
+
+	spawn:
 		u16 dummy16;
 		P.r_begin(dummy16);
 		cl_Process_Spawn(P);
@@ -659,13 +679,25 @@ void CLevel::ProcessGameEvents()
 					u16 obj_id = GetSpawnInfo(P, parent_id, section);
 
 					static auto isValidToPrefetch = [](u16 parent_id, shared_str& section, u16 obj_id, NET_Packet& P) {
+						if (pSettings->line_exist("spawn_antifreeze_ignore", section))
+						{
+							return false;
+						}
+
 						bool valid = true;
+
 						if (pSettings->line_exist(section.c_str(), "class"))
 						{
-							// Do not prefetch fake missiles of a weapon
 							auto c = pSettings->r_string(section.c_str(), "class");
-							valid = (strstr(c, "G_RPG7") == nullptr) && (strstr(c, "G_FAKE") == nullptr);
+
+							// Do not prefetch fake missiles of a weapon
+							valid &= strstr(c, "G_RPG7") == nullptr;
+							valid &= strstr(c, "G_FAKE") == nullptr;
+
+							// Do not prefetch helicopters
+							valid &= strstr(c, "C_HLCP") == nullptr;
 						}
+
 						return valid;
 					};
 
@@ -676,8 +708,11 @@ void CLevel::ProcessGameEvents()
 						static auto safe_insert = [](models_set& models, LPCSTR model) {
 							if (model)
 							{
-								LPCSTR modelWithoutExtension = model;
+								string_path modelWithoutExtension;
+								xr_strcpy(modelWithoutExtension, model);
+								xr_strlwr(modelWithoutExtension);
 								if (strext(modelWithoutExtension)) *strext(modelWithoutExtension) = 0;
+
 								if (xr_strcmp(modelWithoutExtension, "") != 0 && xr_strcmp(modelWithoutExtension, ".ogf") != 0)
 									models.insert(modelWithoutExtension);
 							}
