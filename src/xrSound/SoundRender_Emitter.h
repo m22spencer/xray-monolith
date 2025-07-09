@@ -86,7 +86,7 @@ public:
 	virtual void set_frequency(float scale)
 	{
 		VERIFY(_valid(scale));
-		p_source.freq = scale;
+		p_source.freq = scale + p_source.pitch_variation;
 		if (fTimeToStop != 0.f)
 			fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSpeedOfSound));
 	}

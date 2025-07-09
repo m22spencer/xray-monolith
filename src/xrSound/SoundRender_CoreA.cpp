@@ -9,6 +9,7 @@
 
 namespace soundSmoothingParams {
 	float distanceBasedDelayPower = 1.f;
+	float pitchVariationPower = 0.f;
 	float power = 1.8;
 	int steps = 15;
 	float alpha = getAlpha();
