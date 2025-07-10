@@ -62,6 +62,7 @@ public:
 
 	smapvis			svis;		// used for 6-cubemap faces
 	ref_rt          rt_smap_depth;
+	u32             smap_render_frame = 0;
 
 	ref_shader		s_spot;
 	ref_shader		s_point;
