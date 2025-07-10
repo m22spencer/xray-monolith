@@ -3289,20 +3289,29 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 			}
 		};
 
+		Fmatrix objectiveLensCamera;
+
 		// No ogf files contain an objective lens bone, so we need an alternative
-		auto objective_lens_from_offset = [this, model, hi]() -> void {
+		auto objective_lens_from_offset = [this, model, hi, &objectiveLensCamera]() -> void {
 			if (!eyepieceLens.visual)
 				return;
 
 			// Many guns have had their mesh directly scaled, so the only reliable unit of
 			//    measurement is based off the only reliable mesh in the file. The lens.
 			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(eyepieceLens.radius);
+			Fvector4 o2 = o;
 
-			auto offset = Fmatrix().translate({ o.x, o.y, o.z });
+			// Move camera
+			auto l = o.w / tan(deg2rad(GetMinScopeZoomFactor() * 0.75) / 2.0);
+			o2.z -= l;
+
+			auto offset  = Fmatrix().translate({ o.x, o.y, o.z });
+			auto offset2 = Fmatrix().translate({ o2.x, o2.y, o2.z });
 			auto r = o.w;
 
 			// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
 			objectiveLens.transform.mul(offset, eyepieceLens.transform);
+			objectiveLensCamera.mul(offset2, eyepieceLens.transform);
 			objectiveLens.radius = r;
 		};
 
@@ -3311,12 +3320,10 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		else update_lens(objectiveLens);		
 
 		// If we could not find the eyepiece lens, we have to disable SVP camera.
-		if (eyepieceLens.radius < EPS)
+		if (objectiveLens.radius < EPS)
 			return false;
 
-		// Prefer the objective lens, but if not found use the eyepiece, without weapon in scope
-		auto attachToLens = objectiveLens.radius < EPS ? eyepieceLens : objectiveLens;
-		camera.mulB_43(attachToLens.transform);
+		camera.mulB_43(objectiveLensCamera);
 		return true;
 	}
 
@@ -3386,10 +3393,19 @@ void CWeapon::DebugDrawWeapon()
 			CDebugRenderer().draw_line(Fmatrix().identity(), v0, f.mul(100).add(v0), color, true);
 		};
 
+		auto draw_camera = [this, draw_circle](u32 color) -> void {
+			Fmatrix camera;
+			if (GetSVPCameraMatrix(camera)) {
+				auto cm = 1.0 / 100.0;
+				draw_circle(camera.mulB_43(Fmatrix().scale(.25*cm, .25*cm, 0.0)), color, true);
+			}
+		};
+
 		draw_lens(eyepieceLens, eyepieceLens.visual ? 0xff0000ff : 0xffff0000);
 		draw_lens(objectiveLens, objectiveLens.visual ? 0xff00ff00 : 0xffffff00);
 		draw_fire_direction(0xffff0000);
 		draw_scope_ray(0xff00ffff);
+		draw_camera(0xffffffff);
 	}
 }
 
