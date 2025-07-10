@@ -81,7 +81,7 @@ void CRender::render_lights(light_Package& LP)
 	}
 
 	// 2. refactor - infact we could go from the backside and sort in ascending order
-	{
+	if (false) {
 		xr_vector<light*>& source = LP.v_shadowed;
 		xr_vector<light*> refactored;
 		refactored.reserve(source.size());
@@ -105,6 +105,7 @@ void CRender::render_lights(light_Package& LP)
 					source.erase(source.begin() + test);
 					test --;
 				}
+				break;
 			}
 		}
 
@@ -139,12 +140,15 @@ void CRender::render_lights(light_Package& LP)
 		Target->phase_smap_spot_clear();
 		xr_vector<light*>& source = LP.v_shadowed;
 		light* L = source.back();
+		HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+		L->X.S.posX = 0;
+		L->X.S.posY = 0;
+		L->X.S.size = RImplementation.o.smapsize;
 		u16 sid = L->vis.smap_ID;
-		while (true)
 		{
 			if (source.empty()) break;
 			L = source.back();
-			if (L->vis.smap_ID != sid) break;
+			//if (L->vis.smap_ID != sid) break;
 			source.pop_back();
 			Lights_LastFrame.push_back(L);
 
@@ -193,6 +197,8 @@ void CRender::render_lights(light_Package& LP)
 			L->svis.end();
 			r_pmask(true, false);
 		}
+
+		HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, L->rt_smap_depth->pSurface);
 
 		PIX_EVENT(UNSHADOWED_LIGHTS);
 

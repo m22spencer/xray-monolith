@@ -41,6 +41,11 @@ light::light(void) : ISpatial(g_SpatialSpace)
 	vis.query_order = 0;
 	vis.visible = true;
 	vis.pending = false;
+
+	D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
+	u32 size = RImplementation.o.smapsize;
+	auto ptr = reinterpret_cast<std::uintptr_t>(this);
+	rt_smap_depth.create(std::to_string(ptr).c_str(), size, size, depth_format);
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
@@ -55,6 +60,8 @@ light::~light()
 #if (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 	for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
 		if (this == RImplementation.Lights_LastFrame[it]) RImplementation.Lights_LastFrame[it] = 0;
+
+	rt_smap_depth.destroy();
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 

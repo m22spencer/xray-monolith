@@ -61,6 +61,7 @@ public:
 	u32							indirect_photons;
 
 	smapvis			svis;		// used for 6-cubemap faces
+	ref_rt          rt_smap_depth;
 
 	ref_shader		s_spot;
 	ref_shader		s_point;
