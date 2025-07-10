@@ -107,7 +107,7 @@ void CRender::render_lights(light_Package& LP)
 		L->X.S.posY = 0;
 		L->X.S.size = RImplementation.o.smapsize;
 		u16 sid = L->vis.smap_ID;
-		if (L->smap_render_frame < Device.dwFrame) {
+		if (L->smap_render_frame < Device.dwFrame && !Device.m_SecondViewport.IsSVPFrame()) {
 			L->smap_render_frame = Device.dwFrame;
 			HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 			Lights_LastFrame.push_back(L);
