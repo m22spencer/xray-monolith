@@ -501,6 +501,8 @@ void CWeapon::SetZoomType(u8 new_zoom_type)
     {
         funct(this->lua_game_object(), previous_zoom_type, m_zoomtype);
     }
+
+	UpdateSecondVP();
 }
 
 extern float g_ironsights_factor;
