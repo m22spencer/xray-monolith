@@ -80,39 +80,6 @@ void CRender::render_lights(light_Package& LP)
 		}
 	}
 
-	// 2. refactor - infact we could go from the backside and sort in ascending order
-	{
-		xr_vector<light*>& source = LP.v_shadowed;
-		xr_vector<light*> refactored;
-		refactored.reserve(source.size());
-		u32 total = source.size();
-
-		for (u16 smap_ID = 0; refactored.size() != total; smap_ID++)
-		{
-			LP_smap_pool.initialize(RImplementation.o.smapsize);
-			std::sort(source.begin(), source.end(), pred_area);
-			for (u32 test = 0; test < source.size(); test++)
-			{
-				light* L = source[test];
-				SMAP_Rect R;
-				if (LP_smap_pool.push(R, L->X.S.size))
-				{
-					// OK
-					L->X.S.posX = R.min.x;
-					L->X.S.posY = R.min.y;
-					L->vis.smap_ID = smap_ID;
-					refactored.push_back(L);
-					source.erase(source.begin() + test);
-					test --;
-				}
-			}
-		}
-
-		// save (lights are popped from back)
-		std::reverse(refactored.begin(), refactored.end());
-		LP.v_shadowed = refactored;
-	}
-
 	PIX_EVENT(SHADOWED_LIGHTS);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -129,23 +96,19 @@ void CRender::render_lights(light_Package& LP)
 	//	if (left_some_lights_that_doesn't cast shadows)
 	//		accumulate them
 	HOM.Disable();
-	while (LP.v_shadowed.size())
+	for (auto L : LP.v_shadowed)
 	{
 		// if (has_spot_shadowed)
-		xr_vector<light*> L_spot_s;
 		stats.s_used ++;
 
 		// generate spot shadowmap
 		Target->phase_smap_spot_clear();
-		xr_vector<light*>& source = LP.v_shadowed;
-		light* L = source.back();
+		L->X.S.posX = 0;
+		L->X.S.posY = 0;
 		u16 sid = L->vis.smap_ID;
-		while (true)
-		{
-			if (source.empty()) break;
-			L = source.back();
-			if (L->vis.smap_ID != sid) break;
-			source.pop_back();
+		if (L->smap_render_frame < Device.dwFrame && !Device.m_SecondViewport.IsSVPFrame()) {
+			L->smap_render_frame = Device.dwFrame;
+			HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 			Lights_LastFrame.push_back(L);
 
 			// render
@@ -160,7 +123,6 @@ void CRender::render_lights(light_Package& LP)
 			if (bNormal || bSpecial)
 			{
 				stats.s_merged ++;
-				L_spot_s.push_back(L);
 				Target->phase_smap_spot(L);
 				RCache.set_xform_world(Fidentity);
 				RCache.set_xform_view(L->X.S.view);
@@ -193,6 +155,8 @@ void CRender::render_lights(light_Package& LP)
 			L->svis.end();
 			r_pmask(true, false);
 		}
+
+		HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, L->rt_smap_depth->pSurface);
 
 		PIX_EVENT(UNSHADOWED_LIGHTS);
 
@@ -232,39 +196,29 @@ void CRender::render_lights(light_Package& LP)
 		}
 
 		PIX_EVENT(SPOT_LIGHTS_ACCUM_VOLUMETRIC);
+		// TODO: This originally only ran under if (bNormal || bSpecial)
+		//    check if we need to strore this information on shadow map generation
 
 		//		if (was_spot_shadowed)		->	accum spot shadowed
-		if (!L_spot_s.empty())
+		Target->accum_spot(L);
+		render_indirect(L);
+
+		PIX_EVENT(ACCUM_VOLUMETRIC);
+		if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
 		{
-			PIX_EVENT(ACCUM_SPOT);
-			for (u32 it = 0; it < L_spot_s.size(); it++)
-			{
-				Target->accum_spot(L_spot_s[it]);
-				render_indirect(L_spot_s[it]);
-			}
+			// Current Resolution
+			float w = float(Device.dwWidth);
+			float h = float(Device.dwHeight);
 
-			PIX_EVENT(ACCUM_VOLUMETRIC);
-			if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
-			{
-				// Current Resolution
-				float w = float(Device.dwWidth);
-				float h = float(Device.dwHeight);
+			// Adjust resolution
+			if (RImplementation.o.ssfx_volumetric)
+				Target->set_viewport_size(HW.pContext, w / 8, h / 8);
 
-				// Adjust resolution
-				if (RImplementation.o.ssfx_volumetric)
-					Target->set_viewport_size(HW.pContext, w / 8, h / 8);
-
-				for (u32 it = 0; it < L_spot_s.size(); it++)
-				{
-					Target->accum_volumetric(L_spot_s[it]);
-				}
+			Target->accum_volumetric(L);
 				
-				// Restore resolution
-				if (RImplementation.o.ssfx_volumetric)
-					Target->set_viewport_size(HW.pContext, w, h);
-			}
-
-			L_spot_s.clear();
+			// Restore resolution
+			if (RImplementation.o.ssfx_volumetric)
+				Target->set_viewport_size(HW.pContext, w, h);
 		}
 	}
 
