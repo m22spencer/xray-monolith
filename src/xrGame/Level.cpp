@@ -1256,7 +1256,10 @@ void CLevel::OnRender()
 	if (!game)
 		return;
 	Game().OnRender();
-	BulletManager().Render();
+
+	// Tracers are not accurately rendered under SVP, so disable them.
+	if (!Device.m_SecondViewport.IsSVPActive()) 
+		BulletManager().Render();
 
 	if (use_reshade)
 		render_reshade_effects();
