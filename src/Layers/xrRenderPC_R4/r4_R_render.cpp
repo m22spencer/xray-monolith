@@ -239,6 +239,9 @@ void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
 
 void CRender::Render()
 {
+	// FIXME: Volumetric lights are currently not working for pip.
+	ps_r2_ls_flags.set(R2FLAG_VOLUMETRIC_LIGHTS, false);
+
 	FlipViewportTexturesIfNeeded(Target);
 
 	PIX_EVENT(CRender_Render);
