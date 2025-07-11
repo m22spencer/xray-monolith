@@ -1009,16 +1009,6 @@ void CHudItem::ApplyAimModifiers(Fmatrix& matrix)
 		}
 	}
 
-	// If in pip, use the scope camera as the player eye
-	// FIXME: may no longer be necessary with ApplyAimModifiers rework
-	CWeapon* pWeapon = pActor ? smart_cast<CWeapon*>(pActor->inventory().ActiveItem()) : NULL;
-	Fmatrix svp_cam;
-	if (pWeapon && Device.m_SecondViewport.IsSVPActive() && Actor()->scopeCameraMatrix(svp_cam))
-	{
-		hud_pick.defs.start = { 0, 0, 0 }; svp_cam.transform(hud_pick.defs.start);
-		hud_pick.defs.dir = { 0, 0, 1 }; svp_cam.transform_dir(hud_pick.defs.dir);
-	}
-
 	// If aim position is disabled...
 	bool aimpos = HUD().AimposActive();
 	if (!aimpos)
