@@ -105,7 +105,6 @@ void CRender::render_lights(light_Package& LP)
 		Target->phase_smap_spot_clear();
 		L->X.S.posX = 0;
 		L->X.S.posY = 0;
-		L->X.S.size = RImplementation.o.smapsize;
 		u16 sid = L->vis.smap_ID;
 		if (L->smap_render_frame < Device.dwFrame && !Device.m_SecondViewport.IsSVPFrame()) {
 			L->smap_render_frame = Device.dwFrame;
