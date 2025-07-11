@@ -45,7 +45,9 @@ light::light(void) : ISpatial(g_SpatialSpace)
 	D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
 	u32 size = RImplementation.o.smapsize;
 	auto ptr = reinterpret_cast<std::uintptr_t>(this);
-	rt_smap_depth.create(std::to_string(ptr).c_str(), size, size, depth_format);
+	auto name = "$user$light-" + std::to_string(ptr);
+
+	rt_smap_depth.create(name.c_str(), size, size, depth_format);
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
