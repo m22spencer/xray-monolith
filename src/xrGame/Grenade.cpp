@@ -245,7 +245,7 @@ void CGrenade::PutNextToSlot()
 
 		if (pNext)
 		{
-			luabind::functor<CScriptGameObject*> funct;
+			::luabind::functor<CScriptGameObject*> funct;
 			if (ai().script_engine().functor("_g.CMissile__PutNextToSlot", funct))
 			{
 				CScriptGameObject* obj = funct(pNext->lua_game_object());

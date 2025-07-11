@@ -65,7 +65,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_waterFall", "water\\water_flowing_nmap");
 
 #if defined(USE_DX11)
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_motion_vectors);
 #endif
 		C.r_End();
 

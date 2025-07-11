@@ -105,3 +105,29 @@ public:
 	CBlender_ssfx_water_blur();
 	virtual ~CBlender_ssfx_water_blur();
 };
+
+class CBlender_ssfx_motion_blur : public IBlender
+{
+public:
+	virtual LPCSTR getComment() { return "ssfx_motion_blur"; }
+	virtual BOOL canBeDetailed() { return FALSE; }
+	virtual BOOL canBeLMAPped() { return FALSE; }
+
+	virtual void Compile(CBlender_Compile& C);
+
+	CBlender_ssfx_motion_blur();
+	virtual ~CBlender_ssfx_motion_blur();
+};
+
+class CBlender_ssfx_fog_scattering : public IBlender
+{
+public:
+	virtual LPCSTR getComment() { return "ssfx_fog_scattering"; }
+	virtual BOOL canBeDetailed() { return FALSE; }
+	virtual BOOL canBeLMAPped() { return FALSE; }
+
+	virtual void Compile(CBlender_Compile& C);
+
+	CBlender_ssfx_fog_scattering();
+	virtual ~CBlender_ssfx_fog_scattering();
+};

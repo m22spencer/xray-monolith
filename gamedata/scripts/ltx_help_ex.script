@@ -20,7 +20,8 @@
         silenced_tracers - Option to disable silencers hiding the tracer on a per weapon basis
         fire_point_silencer - Adjust fire point when silencer is attached, defaults to the value of fire_point. Supports both HUD and world models
 		nearwall_zoomed_range - Maximum offset toward camera when aiming down sight close to a wall.
-        aimpos - Disables g_aimpos for this weapon if set to false.
+        firepos - Disables g_firepos / g_firepos_zoom for this weapon if set to false.
+        aimpos - Disables g_aimpos / g_aimpos_zoom for this weapon if set to false.
         ai_rpm - Set RPM of weapon for AI (only for SSRS)
         modular_attachments - enable modular attachments (https://github.com/themrdemonized/xray-monolith/pull/135)
         modular_scope_group - section which is used to define available scopes (modular attachments)

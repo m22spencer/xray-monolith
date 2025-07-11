@@ -21,6 +21,7 @@ void key_binding_registrator::script_register(lua_State* L)
 {
 	module(L)
 	[
+		def("dik_to_keyname", &dik_to_keyname),
 		def("dik_to_bind", &dik_to_bind),
 		def("bind_to_dik", &get_action_dik),
 		def("key_state", &key_state),

@@ -48,7 +48,12 @@ CHW::CHW() :
 	//pD3D(NULL),
 	m_pAdapter(0),
 	pDevice(NULL),
-	m_move_window(true)
+#if defined(USE_DX11)
+	m_move_window(true),
+	pAnnotation(nullptr)
+#else
+    m_move_window(true)
+#endif
 //pBaseRT(NULL),
 //pBaseZB(NULL)
 {
@@ -502,6 +507,8 @@ void CHW::CreateDevice(HWND hwnd, bool move_window)
 
     _RELEASE(swapchain3);
 
+    R_CHK(pContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (void**)&pAnnotation));
+
 #else
 	R = D3DX10CreateDeviceAndSwapChain(m_pAdapter,
         m_DriverType,
@@ -656,6 +663,9 @@ void CHW::DestroyDevice()
     _SHOW_REF("DeviceREF:", HW.pDevice);
     _RELEASE(HW.pDevice);
 
+#if defined(USE_DX11)
+    _RELEASE(pAnnotation);
+#endif
 
     DestroyD3D();
 

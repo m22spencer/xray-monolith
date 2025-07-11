@@ -418,8 +418,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\nvtt\squish\singlecolourlookup.inl">
-      <Filter>src</Filter>
-    </None>
+    <None Include="src\nvtt\squish\singlecolourlookup.inl" />
   </ItemGroup>
 </Project>

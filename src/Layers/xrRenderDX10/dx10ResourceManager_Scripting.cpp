@@ -327,7 +327,7 @@ static void *lua_alloc		(void *ud, void *ptr, size_t osize, size_t nsize) {
 #endif // USE_DL_ALLOCATOR
 
 // export
-extern int luaopen_lua_extensions(lua_State* L);
+extern int luaopen_lua_extensions(lua_State* L, bool IsDebug = false);
 
 void CResourceManager::LS_Load()
 {
@@ -352,10 +352,10 @@ void CResourceManager::LS_Load()
 
 	luaopen_lua_extensions(LSVM);
 
-	luabind::open(LSVM);
+	::luabind::open(LSVM);
 #if !XRAY_EXCEPTIONS
-	if (0 == luabind::get_error_callback())
-		luabind::set_error_callback(LuaError);
+	if (0 == ::luabind::get_error_callback())
+		::luabind::set_error_callback(LuaError);
 #endif
 
 	function(LSVM, "log", LuaLog3);

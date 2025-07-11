@@ -496,7 +496,7 @@ void CWeapon::SetZoomType(u8 new_zoom_type)
     int previous_zoom_type = m_zoomtype;
     m_zoomtype = new_zoom_type;
 
-    luabind::functor<void> funct;
+    ::luabind::functor<void> funct;
     if (ai().script_engine().functor("_G.CWeapon_OnSwitchZoomType", funct))
     {
         funct(this->lua_game_object(), previous_zoom_type, m_zoomtype);
@@ -899,6 +899,7 @@ void CWeapon::Load(LPCSTR section)
 
 	m_nearwall_zoomed_range = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_zoomed_range", 0.04f);
 
+	m_firepos = READ_IF_EXISTS(pSettings, r_bool, section, "firepos", true);
 	m_aimpos = READ_IF_EXISTS(pSettings, r_bool, section, "aimpos", true);
 }
 
@@ -1383,7 +1384,10 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
 bool CWeapon::need_renderable()
 {
-	return !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+	bool svp_has_objective_lens = (scope_svp_enabled > 1 && objectiveLens.radius > EPS);
+	bool not_in_scope = !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+
+	return svp_has_objective_lens || not_in_scope;
 }
 
 void CWeapon::renderable_Render()
@@ -1398,6 +1402,10 @@ void CWeapon::renderable_Render()
 		RenderHud(FALSE);
 	else
 		RenderHud(TRUE);
+
+	if (scope_debug >= 2 && !Device.m_SecondViewport.IsSVPFrame() && GetHUDmode()) {
+		DebugDrawWeapon();
+	}
 
 	inherited::renderable_Render();
 }
@@ -2984,7 +2992,7 @@ float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
 	return res;
 }
 
-void CWeapon::AmmoTypeForEach(const luabind::functor<bool> &funct)
+void CWeapon::AmmoTypeForEach(const ::luabind::functor<bool> &funct)
 {
 	for (u8 i = 0; i < u8(m_ammoTypes.size()); ++i)
 	{
@@ -3187,7 +3195,7 @@ void CWeapon::ZoomDec()
 
 	clamp(f, m_zoom_params.m_fScopeZoomFactor * power, min_zoom_factor);
 	SetZoomFactor(f / power);
-	
+
 	m_fRTZoomFactor = GetZoomFactor() * power;
 }
 
@@ -3217,21 +3225,188 @@ u32 CWeapon::Cost() const
 	return res;
 }
 
-float CWeapon::GetSecondVPFov() const
-{
-	if (m_zoom_params.m_bUseDynamicZoom && IsSecondVPZoomPresent())
-		return (m_fRTZoomFactor / 100.f) * g_fov;
-
-	return GetSecondVPZoomFactor() * g_fov;
-}
-
 void CWeapon::UpdateSecondVP()
 {
 	if (!(ParentIsActor() && (m_pInventory != NULL) && (m_pInventory->ActiveItem() == this)))
 		return;
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
-	Device.m_SecondViewport.SetSVPActive(m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed());
+	Device.m_SecondViewport.SetSVPActive((scope_debug && scope_svp_enabled && IsSecondVPZoomPresent())
+		|| (m_zoomtype == 0 && pActor->cam_Active() == pActor->cam_FirstEye() && IsSecondVPZoomPresent() && IsZoomed()));
+}
+
+void CWeapon::SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective) {
+	auto hi = HudItemData();
+	auto model = hi ? hi->m_model : NULL;
+	if (hi && model) {
+		auto find_shader = [model, hi](LPCSTR name) -> IRenderVisual* {
+			if (!name)
+				return NULL;
+
+			auto r = model->dcast_RenderVisual();
+
+			if (r) {
+				auto children = r->get_children();
+
+				for (auto* child : *children)
+				{
+					auto shader = child->getDebugShaderDef();
+					if (xr_strcmp(shader, name) == 0) {
+						return child;
+					}
+				}
+			}
+
+			return NULL;
+			};
+
+		eyepieceLens.visual = find_shader(eyepiece);
+		objectiveLens.visual = find_shader(objective);
+	}
+}
+
+bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
+{
+	auto hi = HudItemData();
+	auto model = hi ? hi->m_model : NULL;
+	if (hi && model) {
+		camera.set(hi->m_item_transform);
+
+		auto m_measures = hi->m_measures;
+
+		SetLensShaderNames("models\\scope_reticle", "models\\scope_objective_lens");
+
+		auto update_lens = [model, hi](Lens& lens) -> void {
+			if (lens.visual) {
+				// We bypass all the offsets, and animations and everything else.
+				//   pull the occlusion culling bounds directly from the render data.
+				auto vis = lens.visual;
+				if (vis) {
+					auto dvis = vis->getVisData();
+					lens.transform.mul(hi->m_model->LL_GetTransform_R(0), Fmatrix().translate(dvis.sphere.P));
+					lens.radius = dvis.sphere.R;
+				}
+			}
+		};
+
+		Fmatrix objectiveLensCamera;
+
+		// No ogf files contain an objective lens bone, so we need an alternative
+		auto objective_lens_from_offset = [this, model, hi, &objectiveLensCamera]() -> void {
+			if (!eyepieceLens.visual)
+				return;
+
+			// Many guns have had their mesh directly scaled, so the only reliable unit of
+			//    measurement is based off the only reliable mesh in the file. The lens.
+			Fvector4 o = Fvector4(scope_objective_lens_offset).mul(eyepieceLens.radius);
+			Fvector4 o2 = o;
+
+			// Move camera
+			auto l = o.w / tan(deg2rad(GetMinScopeZoomFactor() * 0.75) / 2.0);
+			o2.z -= l;
+
+			auto offset  = Fmatrix().translate({ o.x, o.y, o.z });
+			auto offset2 = Fmatrix().translate({ o2.x, o2.y, o2.z });
+			auto r = o.w;
+
+			// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
+			objectiveLens.transform.mul(offset, eyepieceLens.transform);
+			objectiveLensCamera.mul(offset2, eyepieceLens.transform);
+			objectiveLens.radius = r;
+		};
+
+		update_lens(eyepieceLens);
+		if (!objectiveLens.visual) objective_lens_from_offset();
+		else update_lens(objectiveLens);		
+
+		// If we could not find the eyepiece lens, we have to disable SVP camera.
+		if (objectiveLens.radius < EPS)
+			return false;
+
+		camera.mulB_43(objectiveLensCamera);
+		return true;
+	}
+
+	return false;
+}
+
+void CWeapon::DebugDrawWeapon()
+{
+	auto hi = HudItemData();
+	auto model = hi ? hi->m_model : NULL;
+	if (hi && model) {
+		auto trans = hi->m_item_transform;
+
+		auto draw_circle = [](Fmatrix m, u32 color, bool bHud) -> void {
+			int n = 100;
+			Fvector v0, s;
+			for (int i = 0; i < n + 1; i++) {
+				float angle = float(i) / float(n) * PI * 2.0;
+
+				Fvector v1 = { cos(angle), sin(angle), .0f };
+				m.transform(v1);
+				if (i > 0) CDebugRenderer().draw_line({}, v0, v1, color, bHud);
+				v0 = v1;
+			}
+		};
+
+		auto draw_lens = [trans, draw_circle](Lens lens, u32 color) -> void {
+			auto lens_t = Fmatrix(trans).mulB_43(lens.transform);
+			draw_circle(Fmatrix(lens_t).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector v1 = { 0, 0, 100 };
+			lens_t.transform(v0);
+			lens_t.transform(v1);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v0, v1, color, true);
+		};
+
+		auto draw_scope_ray = [trans, this](u32 color) -> void {
+			auto lens_eye = Fmatrix(trans).mulB_43(eyepieceLens.transform);
+			auto lens_obj = Fmatrix(trans).mulB_43(objectiveLens.transform);
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector v1 = Fvector(v0);
+
+			lens_eye.transform(v0);
+			lens_obj.transform(v1);
+
+			Fvector d = Fvector(v1).sub(v0).normalize().mul(100);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v1, Fvector(v1).add(d), color, true);
+		};
+
+		auto draw_fire_direction = [hi](u32 color) -> void {
+			hud_item_measures& measures = hi->m_measures;
+
+			Fmatrix matrix = Fmatrix(hi->m_item_transform);
+			matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
+			matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
+
+			Fvector v0 = { 0, 0, 0 };
+			Fvector f = { 0, 0, 1 };
+
+			matrix.transform(v0);
+			hi->m_item_transform.transform_dir(f);
+
+			CDebugRenderer().draw_line(Fmatrix().identity(), v0, f.mul(100).add(v0), color, true);
+		};
+
+		auto draw_camera = [this, draw_circle](u32 color) -> void {
+			Fmatrix camera;
+			if (GetSVPCameraMatrix(camera)) {
+				auto cm = 1.0 / 100.0;
+				draw_circle(camera.mulB_43(Fmatrix().scale(.25*cm, .25*cm, 0.0)), color, true);
+			}
+		};
+
+		draw_lens(eyepieceLens, eyepieceLens.visual ? 0xff0000ff : 0xffff0000);
+		draw_lens(objectiveLens, objectiveLens.visual ? 0xff00ff00 : 0xffffff00);
+		draw_fire_direction(0xffff0000);
+		draw_scope_ray(0xff00ffff);
+		draw_camera(0xffffffff);
+	}
 }
 
 Fmatrix CWeapon::RayTransform()
@@ -3241,34 +3416,16 @@ Fmatrix CWeapon::RayTransform()
 
 	Fmatrix matrix;
 
-	// If we're in first-person...
 	if (GetHUDmode())
 	{
-		// Compose barrel matrix
+		// If we're in first-person, use the HUD item transform
 		matrix = hi->m_item_transform;
 		matrix.mulB_43(hi->m_model->LL_GetTransform(measures.m_fire_bone));
 		matrix.mulB_43(Fmatrix().translate(measures.m_fire_point_offset));
-
-		// If aim position is not enabled
-		bool aimpos = m_aimpos && HUD().AimposActive();
-		if (!aimpos)
-		{
-			// Aim toward camera look position
-			Fvector pos = matrix.c;
-			auto pick = HUD().GetPick();
-			Fvector target = Fvector().add(pick.defs.start, Fvector().mul(pick.defs.dir, pick.defs.range));
-			Fvector delta = Fvector().sub(target, pos).normalize();
-
-			float h, p, b;
-			delta.getHP(h, p);
-			float _h, _p;
-			Device.mInvView.getHPB(_h, _p, b);
-			matrix.setHPB(h, p, b);
-			matrix.c = pos;
-		}
 	}
 	else
 	{
+		// If we're in third-person, use the world item transform
 		matrix = XFORM();
 
 		if (psActorFlags.test(AF_FIREDIR_THIRD_PERSON))
@@ -3295,19 +3452,11 @@ Fmatrix CWeapon::RayTransform()
 			matrix.mulB_43(hud_rot);
 		}
 
+		// Offset by the world-space fire point
 		matrix.mulB_43(Fmatrix().translate(vLoadedFirePoint));
 	}
 
+	ApplyAimModifiers(matrix);
+
 	return matrix;
-}
-
-void CWeapon::g_fireParams(SPickParam& pp)
-{
-	// Block base implementation if aimpos is enabled
-	if (HUD().AimposActive())
-	{
-		return;
-	}
-
-	CHudItem::g_fireParams(pp);
 }

@@ -36,7 +36,7 @@
 #include "../ActorBackpack.h"
 #include "../actor_defs.h"
 
-using namespace luabind; //Alundaio
+ //Alundaio
 
 void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
@@ -1421,7 +1421,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1437,7 +1437,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1453,7 +1453,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use3_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1469,7 +1469,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use4_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1485,7 +1485,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use5_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1501,7 +1501,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use6_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1517,7 +1517,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use7_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1533,7 +1533,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use8_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1549,7 +1549,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use9_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1565,7 +1565,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use10_functor", 0);
 	if (functor_name)
 	{
-		luabind::functor<LPCSTR> funct1;
+		::luabind::functor<LPCSTR> funct1;
 		if (ai().script_engine().functor(functor_name, funct1))
 		{
 			act_str = funct1(GO->lua_game_object());
@@ -1660,7 +1660,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct1;
+				::luabind::functor<bool> funct1;
 				if (ai().script_engine().functor(functor_name, funct1))
 				{
 					if (funct1(GO->lua_game_object()))
@@ -1675,7 +1675,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct2;
+				::luabind::functor<bool> funct2;
 				if (ai().script_engine().functor(functor_name, funct2))
 				{
 					if (funct2(GO->lua_game_object()))
@@ -1690,7 +1690,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use3_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct3;
+				::luabind::functor<bool> funct3;
 				if (ai().script_engine().functor(functor_name, funct3))
 				{
 					if (funct3(GO->lua_game_object()))
@@ -1705,7 +1705,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use4_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct4;
+				::luabind::functor<bool> funct4;
 				if (ai().script_engine().functor(functor_name, funct4))
 				{
 					if (funct4(GO->lua_game_object()))
@@ -1720,7 +1720,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use5_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct5;
+				::luabind::functor<bool> funct5;
 				if (ai().script_engine().functor(functor_name, funct5))
 				{
 					if (funct5(GO->lua_game_object()))
@@ -1735,7 +1735,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use6_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct6;
+				::luabind::functor<bool> funct6;
 				if (ai().script_engine().functor(functor_name, funct6))
 				{
 					if (funct6(GO->lua_game_object()))
@@ -1750,7 +1750,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use7_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct7;
+				::luabind::functor<bool> funct7;
 				if (ai().script_engine().functor(functor_name, funct7))
 				{
 					if (funct7(GO->lua_game_object()))
@@ -1765,7 +1765,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use8_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct8;
+				::luabind::functor<bool> funct8;
 				if (ai().script_engine().functor(functor_name, funct8))
 				{
 					if (funct8(GO->lua_game_object()))
@@ -1780,7 +1780,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use9_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct9;
+				::luabind::functor<bool> funct9;
 				if (ai().script_engine().functor(functor_name, funct9))
 				{
 					if (funct9(GO->lua_game_object()))
@@ -1795,7 +1795,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use10_action_functor", 0);
 			if (functor_name)
 			{
-				luabind::functor<bool> funct10;
+				::luabind::functor<bool> funct10;
 				if (ai().script_engine().functor(functor_name, funct10))
 				{
 					if (funct10(GO->lua_game_object()))

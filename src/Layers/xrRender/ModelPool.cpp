@@ -97,7 +97,7 @@ dxRender_Visual* CModelPool::Instance_Duplicate(dxRender_Visual* V)
 	return N;
 }
 
-dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
+dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register, bool assert)
 {
 	dxRender_Visual* V;
 	string_path fn;
@@ -117,7 +117,10 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
 				Msg("!Can't find model file '%s'.",name);
                 return 0;
 #else
-				Debug.fatal(DEBUG_INFO, "Can't find model file '%s'.", name);
+				if (assert)	
+					Debug.fatal(DEBUG_INFO, "Can't find model file '%s'.", name);
+				else
+					return nullptr;
 #endif
 			}
 	}
@@ -229,7 +232,7 @@ dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 	return Model;
 }
 
-dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
+dxRender_Visual* CModelPool::Create(const char* name, IReader* data, bool assert)
 {
 #ifdef _EDITOR
 	if (!name||!name[0])	return 0;
@@ -260,7 +263,12 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 			// 2. If not found
 			bAllowChildrenDuplicate = FALSE;
 			if (data) Base = Instance_Load(low_name, data, TRUE);
-			else Base = Instance_Load(low_name, TRUE);
+			else Base = Instance_Load(low_name, TRUE, assert);
+			if (!Base)
+			{
+				// If not found and assert is false, return nullptr
+				return nullptr;
+			}
 			bAllowChildrenDuplicate = TRUE;
 #ifdef _EDITOR
 			if (!Base)		return 0;
@@ -417,10 +425,11 @@ void CModelPool::Prefetch()
 	Logging(TRUE);
 }
 
-void CModelPool::Prefetch_One(LPCSTR N)
+void CModelPool::Prefetch_One(LPCSTR N, bool assert)
 {
-	dxRender_Visual* V = Create(N);
-	Delete(V,FALSE);
+	dxRender_Visual* V = Create(N, 0, assert);
+	if (V)
+		Delete(V,FALSE);
 }
 
 dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)

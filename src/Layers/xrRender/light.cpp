@@ -41,6 +41,13 @@ light::light(void) : ISpatial(g_SpatialSpace)
 	vis.query_order = 0;
 	vis.visible = true;
 	vis.pending = false;
+
+	D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
+	u32 size = RImplementation.o.smapsize;
+	auto ptr = reinterpret_cast<std::uintptr_t>(this);
+	auto name = "$user$light-" + std::to_string(ptr);
+
+	rt_smap_depth.create(name.c_str(), size, size, depth_format);
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
@@ -55,6 +62,8 @@ light::~light()
 #if (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 	for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
 		if (this == RImplementation.Lights_LastFrame[it]) RImplementation.Lights_LastFrame[it] = 0;
+
+	rt_smap_depth.destroy();
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
@@ -342,7 +351,8 @@ void light::export_(light_Package& package)
 					L->set_shadow(true);
 					L->set_position(position);
 					L->set_rotation(cmDir[f], R);
-					L->set_cone(PI_DIV_2 + 0.5f); // Add some extra angle to avoid problems with the shadow map frustum.
+					//L->set_cone(PI_DIV_2 + 0.5f); // SSS : Deprecated
+					L->set_cone(PI_DIV_2);
 					L->set_range(range);
 					L->set_color(color);
 					L->spatial.sector = spatial.sector; //. dangerous?

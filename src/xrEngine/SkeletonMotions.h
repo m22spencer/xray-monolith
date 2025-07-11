@@ -158,7 +158,7 @@ public:
 	bool StopAtEnd();
 };
 
-struct accel_str_pred : public std::binary_function<shared_str, shared_str, bool>
+struct accel_str_pred
 {
 	IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
 };
@@ -186,20 +186,32 @@ public:
 
 class ENGINE_API CPartition
 {
-	CPartDef P[MAX_PARTS];
+	xr_vector<CPartDef*> P;
 public:
-	IC CPartDef& operator[](u16 id) { return P[id]; }
-	IC const CPartDef& part(u16 id) const { return P[id]; }
+	IC CPartDef* operator[](u16 id) { return P.size() > id ? P.at(id) : nullptr; }
+	IC const CPartDef* part(u16 id) const { return P.size() > id ? P.at(id) : nullptr; }
+	CPartDef* create()
+	{
+		if (P.size() > MAX_PARTS) return nullptr;
+		P.emplace_back(xr_new<CPartDef>());
+		return P.back();
+	}
 	u16 part_id(const shared_str& name) const;
-	u32 mem_usage() { return P[0].mem_usage() * MAX_PARTS; }
+	u32 mem_usage() { return P[0]->mem_usage() * P.size(); }
 	void load(IKinematics* V, LPCSTR model_name);
 
-	u8 count() const
+	u8 count() const { return P.size(); };
+
+	CPartition()
 	{
-		u8 ret = 0;
-		for (u8 i = 0; i < MAX_PARTS; ++i) if (P[i].Name.size())ret++;
-		return ret;
-	};
+		P.reserve(MAX_PARTS);
+	}
+
+	~CPartition()
+	{
+		for (auto& PartDef : P)
+			xr_delete(PartDef);
+	}
 };
 
 // shared motions

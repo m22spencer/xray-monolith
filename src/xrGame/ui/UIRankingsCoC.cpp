@@ -10,7 +10,7 @@
 #include "../../xrServerEntities/script_engine.h"
 #include "../string_table.h"
 
-using namespace luabind;
+
 
 CUIRankingsCoC::CUIRankingsCoC(CUIScrollView* parent): m_parent(parent)
 {
@@ -49,33 +49,33 @@ void CUIRankingsCoC::Update()
 	//if(ParentHasMe())
 	//	return;
 
-	luabind::functor<bool> functorCanShow;
+	::luabind::functor<bool> functorCanShow;
 	if (ai().script_engine().functor("pda.coc_rankings_can_show", functorCanShow))
 	{
 		if (functorCanShow(m_index))
 		{
 			if (!ParentHasMe())
 			{
-				luabind::functor<LPCSTR> functorSetName;
+				::luabind::functor<LPCSTR> functorSetName;
 				if (ai().script_engine().functor("pda.coc_rankings_set_name", functorSetName))
 					SetName(functorSetName(m_index));
 
-				luabind::functor<LPCSTR> functorSetDescription;
+				::luabind::functor<LPCSTR> functorSetDescription;
 				if (ai().script_engine().functor("pda.coc_rankings_set_description", functorSetDescription))
 					SetDescription(functorSetDescription(m_index));
 
 
-				luabind::functor<LPCSTR> functorSetHint;
+				::luabind::functor<LPCSTR> functorSetHint;
 				if (ai().script_engine().functor("pda.coc_rankings_set_hint", functorSetHint))
 					SetHint(functorSetHint(m_index));
 
 
-				luabind::functor<LPCSTR> functorSetIcon;
+				::luabind::functor<LPCSTR> functorSetIcon;
 				if (ai().script_engine().functor("pda.coc_rankings_set_icon", functorSetIcon))
 					SetIcon(functorSetIcon(m_index));
 
 				/*
-				luabind::functor<LPCSTR> functorShowBorder;
+				::luabind::functor<LPCSTR> functorShowBorder;
 				if (ai().script_engine().functor("pda.coc_rankings_show_border", functorShowBorder))
 				{
 					if (functorShowBorder(m_index))

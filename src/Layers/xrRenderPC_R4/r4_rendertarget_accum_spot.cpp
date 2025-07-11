@@ -470,8 +470,8 @@ void CRenderTarget::accum_volumetric(light* L)
 		fQuality = ps_ssfx_volumetric.z;
 		iNumSlices = (int)(24 * fQuality);
 
-		// Intensity mod to OMNIPART && HUD
-		if (L->flags.type == IRender_Light::OMNIPART || L->flags.bHudMode)
+		// Intensity mod to OMNIPART && Player Light
+		if (L->flags.type == IRender_Light::OMNIPART || L->sss_is_playerlight)
 			IntensityMod = 0.2f;
 
 		// Set Intensity

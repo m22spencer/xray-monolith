@@ -27,6 +27,12 @@ BIND_DECLARE(wv);
 BIND_DECLARE(vp);
 BIND_DECLARE(wvp);
 
+BIND_DECLARE(v_prev);
+BIND_DECLARE(p_prev);
+BIND_DECLARE(wv_prev);
+BIND_DECLARE(vp_prev);
+BIND_DECLARE(wvp_prev);
+
 #define DECLARE_TREE_BIND(c)	\
 	class cl_tree_##c: public R_constant_setup	{virtual void setup(R_constant* C) {RCache.tree.set_c_##c(C);} };	\
 	static cl_tree_##c	tree_binder_##c
@@ -752,6 +758,10 @@ static class cl_near_far_plane : public R_constant_setup
 } binder_near_far_plane;
 
 // Screen Space Shaders Stuff
+extern Fvector4 ps_ssfx_floravariation;
+extern Fvector4 ps_ssfx_fog;
+extern Fvector4 ps_ssfx_motionblur;
+
 extern Fvector4 ps_ssfx_pom;
 extern Fvector4 ps_ssfx_terrain_pom;
 
@@ -988,6 +998,14 @@ static class ssfx_wind_anim : public R_constant_setup
 	}
 }    ssfx_wind_anim;
 
+static class ssfx_wind_anim_prev : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		RCache.set_c(C, Device.wind_anim_prev);
+	}
+}    ssfx_wind_anim_prev;
+
 static class ssfx_lut : public R_constant_setup
 {
 	virtual void setup(R_constant* C)
@@ -1146,6 +1164,66 @@ static class ssfx_pom : public R_constant_setup
 	}
 }    ssfx_pom;
 
+static class ssfx_jitter : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		float JitterX = 0;
+		float JitterY = 0;
+
+#if defined(USE_DX11)
+		if (ps_ssfx_taa.x > 0 && RImplementation.o.ssfx_taa)
+		{
+			static Fvector2 TAA_Offset[4] = 
+			{
+				{  0.0f, -1.0f },
+				{ -1.0f,  0.0f },
+				{  1.0f,  0.0f },
+				{  0.0f,  1.0f }
+			};
+
+			JitterX = TAA_Offset[ Device.dwFrame % 4 ].x / Device.dwWidth;
+			JitterY = TAA_Offset[ Device.dwFrame % 4 ].y / Device.dwHeight;
+		}
+#endif
+
+		RCache.set_c(C, JitterX * ps_ssfx_taa.y, JitterY * ps_ssfx_taa.y, ps_ssfx_taa.x, ps_ssfx_taa.w);
+
+	}
+}    ssfx_jitter;
+
+static class ssfx_fTimeDelta : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		RCache.set_c(C, Device.fTimeDelta, 0, 0, 0);
+	}
+}    ssfx_fTimeDelta;
+
+static class ssfx_motionblur : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		RCache.set_c(C, ps_ssfx_motionblur);
+	}
+}    ssfx_motionblur;
+
+static class ssfx_fog : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		RCache.set_c(C, ps_ssfx_fog);
+	}
+}    ssfx_fog;
+
+static class ssfx_floravariation : public R_constant_setup
+{
+	virtual void setup(R_constant* C)
+	{
+		RCache.set_c(C, ps_ssfx_floravariation);
+	}
+}    ssfx_floravariation;
+
 /* --- HDR10 parameters --- */
 extern float ps_r4_hdr10_whitepoint_nits;
 extern float ps_r4_hdr10_ui_nits;
@@ -1301,6 +1379,12 @@ void CBlender_Compile::SetMapping()
 	r_Constant("m_WVP", &binder_wvp);
 	r_Constant("m_inv_V", &binder_inv_v);
 
+	r_Constant("m_v_prev", &binder_v_prev);
+	r_Constant("m_p_prev", &binder_p_prev);
+	r_Constant("m_wv_prev", &binder_wv_prev);
+	r_Constant("m_vp_prev", &binder_vp_prev);
+	r_Constant("m_wvp_prev", &binder_wvp_prev);
+
 	r_Constant("m_xform_v", &tree_binder_m_xform_v);
 	r_Constant("m_xform", &tree_binder_m_xform);
 	r_Constant("consts", &tree_binder_consts);
@@ -1376,7 +1460,12 @@ void CBlender_Compile::SetMapping()
 	// PDA
 	r_Constant("pda_params", &binder_pda_params);
 
-	// Screen Space Shaders
+	// Screen Space Shaders	
+	r_Constant("ssfx_floravariation", &ssfx_floravariation);
+	r_Constant("ssfx_fog", &ssfx_fog);
+	r_Constant("ssfx_timedelta", &ssfx_fTimeDelta);
+	r_Constant("ssfx_motionblur", &ssfx_motionblur);
+	r_Constant("ssfx_jitter", &ssfx_jitter);
 	r_Constant("ssfx_pom", &ssfx_pom);
 
 	r_Constant("ssfx_terrain_pom", &ssfx_terrain_pom);
@@ -1398,6 +1487,7 @@ void CBlender_Compile::SetMapping()
 	r_Constant("ssfx_terrain_offset", &ssfx_terrain_offset);
 	r_Constant("ssfx_shadow_bias", &ssfx_shadow_bias);
 	r_Constant("ssfx_wind_anim", &ssfx_wind_anim);
+	r_Constant("ssfx_wind_anim_prev", &ssfx_wind_anim_prev);
 	r_Constant("sky_color", &binder_sky_color);
 	r_Constant("ssfx_wpn_dof_1", &ssfx_wpn_dof_1);
 	r_Constant("ssfx_wpn_dof_2", &ssfx_wpn_dof_2);

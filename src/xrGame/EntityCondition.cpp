@@ -425,7 +425,7 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
 
 // demonized: add lua callback before hit but after calculations
 // pHDS and hit_power will be changed after execution
-static inline void applyBeforeHitAfterCalcsCallback(CEntityAlive* target, const luabind::functor<void>& funct, SHit* pHDS, float& hit_power, const float hit_part = 1)
+static inline void applyBeforeHitAfterCalcsCallback(CEntityAlive* target, const ::luabind::functor<void>& funct, SHit* pHDS, float& hit_power, const float hit_part = 1)
 {
 	CScriptHit tLuaHit(pHDS);
 	tLuaHit.m_fPower = hit_power;
@@ -457,7 +457,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
 
 	// demonized: add lua callback before hit but after calculations
 	// don't call if there is no target
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	bool has_func = ai().script_engine().functor("_G.CBeforeHitAfterCalcs", funct);
 
 	switch (pHDS->hit_type)

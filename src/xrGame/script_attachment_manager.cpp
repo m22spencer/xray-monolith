@@ -5,6 +5,53 @@
 #include "actor.h"
 #include "ui\UIScriptWnd.h"
 
+//#define DEBUG_VISBOX
+
+#ifdef DEBUG_VISBOX
+#include "debug_renderer.h"
+#endif
+
+static void update_visbox_attachment(IKinematics* k)
+{
+	script_attachment* att = static_cast<script_attachment*>(k->GetUpdateCallbackParam());
+	if (!att) return;
+
+	if (k->NeedUCalc())
+	{
+		for (auto& pair : *att->GetAttachments())
+		{
+			script_attachment* child_att = pair.second;
+			if (child_att->GetType() != att->GetType()) continue;
+
+			Fbox Box = child_att->Box();
+
+			Fmatrix offset;
+			offset.mul(child_att->BoneTransform(k), child_att->GetOffset());
+			Box.xform(offset);
+
+			// Update Box
+			Fbox& kbox = const_cast<Fbox&>(k->GetBox());
+			kbox.merge(Box);
+
+			// Update Sphere
+			Fsphere& kshere = k->dcast_RenderVisual()->getVisData().sphere;
+			kbox.getsphere(kshere.P, kshere.R);
+		}
+	}
+
+#ifdef DEBUG_VISBOX
+	Fmatrix box, cent;
+	cent.translate(k->dcast_RenderVisual()->getVisData().sphere.P);
+	box.mul(att->GetTransform(), cent);
+
+	const Fbox& kbox = k->GetBox();
+	Fvector radius;
+	kbox.getradius(radius);
+	CDebugRenderer& render = Level().debug_renderer();
+	render.draw_obb(box, radius, D3DCOLOR_XRGB(150, 0, 150), att->GetType() == eSA_HUD);
+#endif
+}
+
 script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 {
 	m_name = name;
@@ -17,22 +64,26 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_script_ui_mat = Fidentity;
 	m_script_ui_offset[0].set(0, 0, 0);
 	m_script_ui_offset[1].set(0, 0, 0);
+	m_script_ui_offset[2].set(1, 1, 1);
+	m_script_ui_offset[3].set(0, 0, 0);
+	m_script_ui_scale.set(1, 1);
 	m_script_ui_bone = 0;
 	m_script_light = nullptr;
 	m_script_light_bone = 0;
 	m_parent_bone = 0;
 	m_offset = Fidentity;
 	m_transform = Fidentity;
-	m_position.set(0, 0, 0);
-	m_rotation.set(0, 0, 0);
-	m_origin.set(0, 0, 0);
-	m_scale.set(1, 1, 1);
+	m_attachment_offset[0].set(0, 0, 0);
+	m_attachment_offset[1].set(0, 0, 0);
+	m_attachment_offset[2].set(1, 1, 1);
+	m_attachment_offset[3].set(0, 0, 0);
 	m_bStopAtEndAnimIsRunning = false;
 	m_anim_end = 0;
 	m_type = eSA_World;
 	m_last_upd_frame = 0;
 	m_current_motion = "idle";
 	m_model_name = "";
+	m_userdata = nullptr;
 	LoadModel(model_name);
 	PlayMotion("idle", false);
 }
@@ -74,9 +125,10 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat)
 		m_script_light->SetXFORM(LM);
 	}
 
-	if (m_model->dcast_PKinematicsAnimated())
+	IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
+	if (ka || GetType() == eSA_CamAttached)
 	{
-		m_model->dcast_PKinematicsAnimated()->UpdateTracks();
+		if (ka) ka->UpdateTracks();
 		m_kinematics->CalculateBones_Invalidate();
 		m_kinematics->CalculateBones(TRUE);
 	}
@@ -239,53 +291,49 @@ AttachmentScriptLight* script_attachment::GetLight()
 
 void script_attachment::RecalcOffset()
 {
-	if (!!m_origin.x || !!m_origin.y || !!m_origin.z)
+	Fvector& position = m_attachment_offset[0];
+	Fvector rotation = m_attachment_offset[1];
+	Fvector& scale = m_attachment_offset[2];
+	Fvector& origin = m_attachment_offset[3];
+
+	rotation.mul(PI / 180.f);
+
+	if (!!origin.x || !!origin.y || !!origin.z)
 	{
-		Fmatrix rotation_matrix;
-		
-		m_offset.translate(m_origin);
-
-		Fvector rotation = m_rotation;
-		rotation.mul(PI / 180.f);
-		rotation_matrix.setHPB(rotation.x, rotation.y, rotation.z);
-
-		m_offset.mulA_43(rotation_matrix);
-
-		m_offset.mulA_43(Fmatrix().scale(m_scale));
-		m_offset.mulA_43(Fmatrix().translate(m_position));
+		m_offset.translate(-origin.x, -origin.y, -origin.z);
+		m_offset.mulA_43(Fmatrix().setHPB(rotation));
+		m_offset.mulA_43(Fmatrix().scale(scale));
+		m_offset.mulA_43(Fmatrix().translate(position));
 	}
 	else
 	{
-		Fvector rotation = m_rotation;
-		rotation.mul(PI / 180.f);
-		m_offset.setHPB(rotation.x, rotation.y, rotation.z);
-
-		m_offset.translate_over(m_position);
-		m_offset.mulB_43(Fmatrix().scale(m_scale));
+		m_offset.setHPB(rotation);
+		m_offset.translate_over(position);
+		m_offset.mulB_43(Fmatrix().scale(scale));
 	}
 }
 
-void script_attachment::SetPosition(Fvector pos)
+void script_attachment::SetPosition(float x, float y, float z)
 {
-	m_position = pos;
+	m_attachment_offset[0].set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetRotation(Fvector rot)
+void script_attachment::SetRotation(float x, float y, float z)
 {
-	m_rotation = rot;
+	m_attachment_offset[1].set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetScale(Fvector scale)
+void script_attachment::SetScale(float x, float y, float z)
 {
-	m_scale = scale;
+	m_attachment_offset[2].set(x, y, z);
 	RecalcOffset();
 }
 
-void script_attachment::SetOrigin(Fvector org)
+void script_attachment::SetOrigin(float x, float y, float z)
 {
-	m_origin = org.invert();
+	m_attachment_offset[3].set(x, y, z);
 	RecalcOffset();
 }
 
@@ -354,9 +402,9 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 	m_parent_object->add_attachment(GetName(), this);
 }
 
-luabind::object script_attachment::GetParent()
+::luabind::object script_attachment::GetParent()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["object"] = m_parent_object ? m_parent_object->lua_game_object() : nullptr;
 	table["attachment"] = m_parent_attachment ? m_parent_attachment : nullptr;
 	return table;
@@ -559,9 +607,9 @@ LPCSTR script_attachment::bone_name(u16 bone_id)
 }
 
 // demonized: list all bones
-luabind::object script_attachment::list_bones()
+::luabind::object script_attachment::list_bones()
 {
-	luabind::object result = luabind::newtable(ai().script_engine().lua());
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 
 	auto bones = m_kinematics->list_bones();
 	for (const auto& bone : bones)
@@ -590,7 +638,7 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 	m_kinematics = m_model->dcast_PKinematics();
 	R_ASSERT(m_kinematics);
 
-	//Bone Callbacks
+	// Bone Callbacks
 	if (keep_bc && m_bone_callbacks.size() && count_prev <= m_kinematics->LL_BoneCount())
 	{
 		for (auto& pair : m_bone_callbacks)
@@ -600,6 +648,10 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 
 		PlayMotion(*m_current_motion, false);
 	}
+
+	// Visibility Box Update
+	m_kinematics->SetUpdateCallback(update_visbox_attachment);
+	m_kinematics->SetUpdateCallbackParam(this);
 }
 
 void script_attachment::SetName(LPCSTR name)
@@ -645,11 +697,41 @@ void script_attachment::SetName(LPCSTR name)
 	m_name = name;
 }
 
+const ::luabind::object& script_attachment::GetUserdata() const
+{
+	if (!m_userdata)
+	{
+		const_cast<::luabind::object*>(m_userdata) = xr_new<::luabind::object>();
+		*m_userdata = ::luabind::newtable(ai().script_engine().lua());
+	}
+	return *m_userdata;
+}
+
+void script_attachment::SetUserdata(::luabind::object obj)
+{
+	if (!obj || obj.type() == LUA_TNIL)
+	{
+		xr_delete(m_userdata);
+		m_userdata = nullptr;
+		return;
+	}
+
+	if (obj.type() != LUA_TTABLE)
+	{
+		Msg("![Script Attachment]: Trying to set userdata to wrong type! (Allowed types: table, nil)");
+		return;
+	}
+
+	if (!m_userdata) m_userdata = xr_new<::luabind::object>();
+
+	*m_userdata = obj;
+}
+
 void script_attachment::SetScriptUI(LPCSTR ui_func)
 {
 	if (m_script_ui_func != nullptr && 0 == xr_strcmp(m_script_ui_func, ui_func)) return;
 
-	luabind::functor<CUIDialogWndEx*> funct;
+	::luabind::functor<CUIDialogWndEx*> funct;
 
 	if (ai().script_engine().functor(ui_func, funct))
 	{
@@ -667,18 +749,52 @@ void script_attachment::SetScriptUI(LPCSTR ui_func)
 		Msg("![Script Attachment]: Script UI functor [%s] does not exist!", ui_func);
 }
 
-void script_attachment::SetScriptUIPosition(Fvector pos)
+void script_attachment::RecalcScriptUIOffset()
 {
-	m_script_ui_offset[0] = pos;
-	m_script_ui_mat.translate_over(m_script_ui_offset[0]);
+	Fvector& position = m_script_ui_offset[0];
+	Fvector rotation = m_script_ui_offset[1];
+	Fvector& scale = m_script_ui_offset[2];
+	Fvector& origin = m_script_ui_offset[3];
+
+	rotation.mul(PI / 180.f);
+
+	if (!!origin.x || !!origin.y || !!origin.z)
+	{
+		m_script_ui_mat.translate(-origin.x, -origin.y, -origin.z);
+		m_script_ui_mat.mulA_43(Fmatrix().setHPB(rotation));
+		m_script_ui_mat.mulA_43(Fmatrix().scale(scale));
+		m_script_ui_mat.mulA_43(Fmatrix().translate(position));
+	}
+	else
+	{
+		m_script_ui_mat.setHPB(rotation);
+		m_script_ui_mat.translate_over(position);
+		m_script_ui_mat.mulB_43(Fmatrix().scale(scale));
+	}
 }
 
-void script_attachment::SetScriptUIRotation(Fvector rot)
+void script_attachment::SetScriptUIPosition(float x, float y, float z)
 {
-	m_script_ui_offset[1] = rot;
-	m_script_ui_offset[1].mul(PI / 180.f);
-	m_script_ui_mat.setHPB(m_script_ui_offset[1].x, m_script_ui_offset[1].y, m_script_ui_offset[1].z);
-	m_script_ui_mat.translate_over(m_script_ui_offset[0]);
+	m_script_ui_offset[0].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIRotation(float x, float y, float z)
+{
+	m_script_ui_offset[1].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIScale(float x, float y, float z)
+{
+	m_script_ui_offset[2].set(x, y, z);
+	RecalcScriptUIOffset();
+}
+
+void script_attachment::SetScriptUIOrigin(float x, float y, float z)
+{
+	m_script_ui_offset[3].set(x, y, z);
+	RecalcScriptUIOffset();
 }
 
 void script_attachment::ScriptAttachmentBoneCallback(CBoneInstance* B)
@@ -741,7 +857,7 @@ void script_attachment::SetBoneCallback(u16 bone_id, u16 parent_bone, bool overw
 	m_kinematics->LL_GetBoneInstance(bone_id).set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
 }
 
-void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmatrix>& func, bool overwrite)
+void script_attachment::SetBoneCallback(u16 bone_id, const ::luabind::functor<Fmatrix>& func, bool overwrite)
 {
 	if (bone_id >= m_kinematics->LL_BoneCount())
 	{
@@ -770,6 +886,11 @@ void script_attachment::RemoveBoneCallback(u16 bone_id)
 	}
 }
 
+const Fbox& script_attachment::Box()
+{
+	return m_model->dcast_PKinematics()->GetBox();
+}
+
 Fvector script_attachment::GetCenter()
 {
 	if (m_model)
@@ -778,9 +899,9 @@ Fvector script_attachment::GetCenter()
 	return { 0,0,0 };
 }
 
-luabind::object script_attachment::GetShaders()
+::luabind::object script_attachment::GetShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -792,7 +913,7 @@ luabind::object script_attachment::GetShaders()
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShader();
 		subtable["texture"] = m_model->getDebugTexture();
 		table[1] = subtable;
@@ -803,7 +924,7 @@ luabind::object script_attachment::GetShaders()
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
 		table[i] = subtable;
@@ -813,9 +934,9 @@ luabind::object script_attachment::GetShaders()
 	return table;
 }
 
-luabind::object script_attachment::GetDefaultShaders()
+::luabind::object script_attachment::GetDefaultShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -827,7 +948,7 @@ luabind::object script_attachment::GetDefaultShaders()
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShaderDef();
 		subtable["texture"] = m_model->getDebugTextureDef();
 		table[1] = subtable;
@@ -838,7 +959,7 @@ luabind::object script_attachment::GetDefaultShaders()
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
 		table[i] = subtable;

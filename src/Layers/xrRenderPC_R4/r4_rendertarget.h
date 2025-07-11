@@ -76,6 +76,9 @@ public:
 	IBlender* b_hdao_msaa_cs;
 
 	// [SSS Stuff]
+	IBlender* b_ssfx_fog_scattering;
+	IBlender* b_ssfx_motion_blur;
+	IBlender* b_ssfx_taa;
 	IBlender* b_ssfx_rain;
 	IBlender* b_ssfx_water_blur;
 	IBlender* b_ssfx_bloom_downsample;
@@ -178,7 +181,7 @@ public:
 	ref_rt rt_ssfx_temp3;
 
 	ref_rt rt_ssfx_accum;
-	ref_rt rt_ssfx_hud;
+	//ref_rt rt_ssfx_hud; // DEPRECATED
 	ref_rt rt_ssfx_ssr;
 	ref_rt rt_ssfx_water;
 	ref_rt rt_ssfx_water_waves;
@@ -208,13 +211,17 @@ public:
 	ref_rt rt_ssfx_bloom_tmp8_2;
 	ref_rt rt_ssfx_bloom_tmp4_2;
 
+	ref_rt rt_ssfx_taa;
+	ref_rt rt_ssfx_prev_frame;
+	ref_rt rt_ssfx_motion_vectors;
+
 	ref_rt rt_ssfx_prevPos;
 
 	ref_shader s_ssfx_water;
 	ref_shader s_ssfx_water_blur;
 	ref_shader s_ssfx_water_ssr;
 	ref_shader s_ssfx_ao;
-	ref_shader s_ssfx_hud[5];
+	//ref_shader s_ssfx_hud[5]; // SSS23: DEPRECATED
 
 	struct PreviousData {
 		Fmatrix Matrix_previous, Matrix_current;
@@ -274,6 +281,8 @@ private:
 	ref_shader s_gasmask_dudv;
 	ref_shader s_nightvision;
 	ref_shader s_fakescope; //crookr
+	ref_shader s_scope_preprocess;
+	ref_shader s_scope_debug;
 	ref_shader s_heatvision; //--DSR-- HeatVision
 	ref_shader s_smaa;
 
@@ -295,6 +304,9 @@ private:
 	ref_shader s_accum_volume_msaa[8];
 
 	// Screen Space Shaders Stuff
+	ref_shader s_ssfx_fog_scattering;
+	ref_shader s_ssfx_motion_blur;
+	ref_shader s_ssfx_taa;
 	ref_shader s_ssfx_rain;
 	ref_shader s_ssfx_bloom;
 	ref_shader s_ssfx_bloom_lens;
@@ -407,6 +419,7 @@ public:
 	void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
 	void u_compute_texgen_screen(Fmatrix& dest);
 	void u_compute_texgen_jitter(Fmatrix& dest);
+	void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb);
 	void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
 	void u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
 	void u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -436,6 +449,7 @@ public:
 	void phase_ssao();
 	void phase_hdao();
 	void phase_downsamp();
+	void phase_scope_debug();
 	void phase_wallmarks();
 	void phase_smap_direct(light* L, u32 sub_phase);
 	void phase_smap_direct_tsh(light* L, u32 sub_phase);
@@ -447,6 +461,9 @@ public:
 	void shadow_direct(light* L, u32 dls_phase);
 
 	// SSS Stuff
+	void phase_ssfx_taa();
+	void phase_ssfx_motion_blur();
+	void phase_ssfx_fog_scattering();
 	void phase_ssfx_rain(); // Bloom PP
 	void phase_ssfx_bloom(); // Bloom PP
 	void phase_ssfx_sss(); // SSS

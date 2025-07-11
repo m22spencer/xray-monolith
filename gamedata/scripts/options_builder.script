@@ -83,10 +83,10 @@ end
 
 -- RGBA color sliders
 function curr_crosshair_clr(id, n)
-	-- printf("curr_crosshair_clr(%s, %s)", id, n)
+	-- printf_me("curr_crosshair_clr(%s, %s)", id, n)
 	local curr = get_console_cmd(nil, id)
 	curr = tostring(curr)
-	-- printf("  curr: %s", curr)
+	-- printf_me("  curr: %s", curr)
 	local r,g,b,a = string.match(curr,"(%d+), (%d+), (%d+), (%d+)")
 	if n == "a" then
 		return tonumber(a)
@@ -101,16 +101,16 @@ function curr_crosshair_clr(id, n)
 end
 
 function func_crosshair_clr(id, n)
-	printf("func_crosshair_clr(%s, %s)", id, n)
+	printf_me("func_crosshair_clr(%s, %s)", id, n)
 	local val = ui_options.opt_temp["modded_exes/visual/crosshair/" .. id .. "_" .. n]
-	printf("val: %s", val)
+	printf_me("val: %s", val)
 	if (val == nil) then
 		return
 	end
 
 	local curr = get_console_cmd(nil, id)
 	curr = tostring(curr)
-	printf("curr: %s", curr)
+	printf_me("curr: %s", curr)
 	local r,g,b,a = string.match(curr,"(%d+), (%d+), (%d+), (%d+)")
 	if n == "a" then
 		a = val

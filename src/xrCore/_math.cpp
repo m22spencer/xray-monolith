@@ -11,6 +11,8 @@
 #define MMNOJOY
 #include <mmsystem.h>
 
+#include "profiler.h"
+
 // Initialized on startup
 XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
@@ -371,8 +373,13 @@ void __cdecl thread_entry(void* _params)
 	thread_name(startup->name);
 	thread_t* entry = startup->entry;
 	void* arglist = startup->args;
-	xr_delete(startup);
 	_initialize_cpu_thread();
+
+	// emit profiler thread
+	PROF_THREAD(startup->name);
+
+	// clean up
+	xr_delete(startup);
 
 	// call
 	entry(arglist);

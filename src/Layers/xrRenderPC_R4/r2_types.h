@@ -86,7 +86,7 @@
 #define		r2_RT_ssfx_temp2		"$user$ssfx_temp2" // SSS Temp3
 #define		r2_RT_ssfx_temp3		"$user$ssfx_temp3"
 #define		r2_RT_ssfx_accum		"$user$ssfx_accum" // SSS Volumetric
-#define		r2_RT_ssfx_hud			"$user$ssfx_hud" // HUD & Velocity Buffer
+//#define		r2_RT_ssfx_hud			"$user$ssfx_hud" // HUD & Velocity Buffer
 
 #define		r2_RT_ssfx_ssr			"$user$ssfx_ssr" // SSR Acc
 #define		r2_RT_ssfx_water		"$user$ssfx_water" // Water Acc
@@ -116,6 +116,10 @@
 #define		r2_RT_ssfx_bloom_tmp16_2		"$user$ssfx_bloom_tmp16_2" // Bloom
 #define		r2_RT_ssfx_bloom_tmp8_2		"$user$ssfx_bloom_tmp8_2" // Bloom
 #define		r2_RT_ssfx_bloom_tmp4_2		"$user$ssfx_bloom_tmp4_2" // Bloom
+
+#define		r2_RT_ssfx_taa				"$user$ssfx_taa" // TAA
+#define		r2_RT_ssfx_prev_frame		"$user$ssfx_prev_frame" // Prev Frame
+#define		r2_RT_ssfx_motion_vectors	"$user$ssfx_motion_vectors" // Motion vectors
 
 #define		r2_RT_ssfx_prevPos		"$user$ssfx_prev_p" // Prev Position
 

@@ -1,0 +1,13 @@
+function normal(shader, t_base, t_second, t_detail)
+	shader:begin("stub_notransform_t", "scope_debug")
+	: zb(false, false)
+	: blend(true, blend.srcalpha, blend.invsrcalpha)
+	shader:dx10texture("vp2", "$user$viewport2")
+	shader:dx10sampler("smp_base")
+	shader:dx10texture("pp_m", "$user$rt_ssfx_prevPos_main")
+	shader:dx10texture("pp_s", "$user$rt_ssfx_prevPos_svp")
+	shader:dx10texture("mv_m", "$user$rt_ssfx_motion_vectors_main")
+	shader:dx10texture("mv_s", "$user$rt_ssfx_motion_vectors_svp")
+	shader:dx10texture("pf_m", "$user$rt_ssfx_prev_frame_main")
+	shader:dx10texture("pf_s", "$user$rt_ssfx_prev_frame_svp")
+end

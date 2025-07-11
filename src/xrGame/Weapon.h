@@ -47,6 +47,12 @@ struct SafemodeAnm
 	float power, speed;
 };
 
+struct Lens {
+	Fmatrix transform = Fmatrix().identity();
+	float radius = 0.0;
+	IRenderVisual* visual = NULL;
+};
+
 class CWeapon : public CHudItemObject,
                 public CShootingObject
 {
@@ -87,7 +93,11 @@ public:
 	float CWeapon::GetSecondVPFov() const;
 	IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
 	IC float GetSecondVPZoomFactor() const { return GetZoomFactor(); }
-	IC float IsSecondVPZoomPresent() const { return scope_svp_enabled && GetSecondVPZoomFactor() > 0.005f; }
+	float IsSecondVPZoomPresent() { 
+		return scope_svp_enabled
+			&& GetSecondVPZoomFactor() > 0.005f
+			&& GetSVPCameraMatrix(Fmatrix());
+	}
 
 	// Up
 	// Magazine system & etc
@@ -95,6 +105,9 @@ public:
 	int bullet_cnt;
 	int last_hide_bullet;
 	bool bHasBulletsToHide;
+
+	Lens eyepieceLens;
+	Lens objectiveLens;
 
 	//--DSR-- SilencerOverheat_start
 	float temperature;
@@ -113,6 +126,9 @@ public:
 	virtual void HUD_VisualBulletUpdate(bool force = false, int force_idx = -1);
 
 	void UpdateSecondVP();
+	void SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective);
+	bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera);
+
 
 	virtual void UpdateCL();
 	virtual void shedule_Update(u32 dt);
@@ -440,7 +456,7 @@ public:
 	virtual u8 GetCurrentHudOffsetIdx();
 
 	// Tronex script exports
-	void AmmoTypeForEach(const luabind::functor<bool>& funct);
+	void AmmoTypeForEach(const ::luabind::functor<bool>& funct);
 	float GetMagazineWeightScript() const { return GetMagazineWeight(m_magazine); }
 	int GetAmmoCount_forType_Script(LPCSTR type) const { return GetAmmoCount_forType(type); }
 	LPCSTR GetGrenadeLauncherNameScript() const { return *GetGrenadeLauncherName(); }
@@ -533,15 +549,17 @@ public:
 
 private:
 	float m_nearwall_zoomed_range;
-	float m_aimpos;
+	bool m_firepos;
+	bool m_aimpos;
 
 public:
+	bool GetFirepos() { return m_firepos; }
+	bool GetAimpos() { return m_aimpos; }
 	float GetTargetNearWallOffset();
 	float GetTargetHudFov();
 
 public:
 	Fmatrix RayTransform();
-	void g_fireParams(SPickParam& pp);
 
 protected:
 	virtual void UpdateFireDependencies_internal();
@@ -561,6 +579,7 @@ protected:
 	};
 
 	virtual void LoadFireParams(LPCSTR section);
+	void DebugDrawWeapon();
 public:
 	IC const Fvector& get_LastFP()
 	{

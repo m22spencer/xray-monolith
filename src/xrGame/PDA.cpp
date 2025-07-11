@@ -334,7 +334,7 @@ void CPda::UpdateCL()
 			{
 				if (!m_bPowerSaving)
 				{
-					luabind::functor<void> funct;
+					::luabind::functor<void> funct;
 					if (ai().script_engine().functor("pda.on_low_battery", funct))
 						funct();
 					m_bPowerSaving = true;
@@ -1087,7 +1087,7 @@ void CPda::PlayScriptFunction()
 {
 	if (xr_strcmp(m_functor_str, ""))
 	{
-		luabind::functor<void> m_functor;
+		::luabind::functor<void> m_functor;
 		R_ASSERT(ai().script_engine().functor(m_functor_str.c_str(), m_functor));
 		m_functor();
 	}

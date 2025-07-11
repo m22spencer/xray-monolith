@@ -110,6 +110,7 @@ enum EGameActions
 	kFREELOOK,
 
 	kCAM_AUTOAIM,
+	kEDITOR,
 
 	kLASTACTION,
 	kNOTBINDED,
@@ -141,7 +142,7 @@ struct _action
 	_key_group key_group;
 };
 
-LPCSTR dik_to_keyname(int _dik);
+LPCSTR dik_to_keyname(int _dik, bool bLocalize);
 int keyname_to_dik(LPCSTR _name);
 _keyboard* keyname_to_ptr(LPCSTR _name);
 _keyboard* dik_to_ptr(int _dik, bool bSafe);

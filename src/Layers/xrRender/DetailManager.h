@@ -240,7 +240,7 @@ public:
 	void hw_Unload();
 	void hw_Render();
 #if defined(USE_DX10) || defined(USE_DX11)
-	void							hw_Render_dump	(const Fvector4 &consts, const Fvector4 &wave, const Fvector4 &wind, u32 var_id, u32 lod_id);
+	void hw_Render_dump(const Fvector4 &consts, const Fvector4 &wave, const Fvector4 &wind, const Fvector4& prev_wave, const Fvector4& prev_wind, u32 var_id, u32 lod_id);
 #else	//	USE_DX10
 	void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
 #endif	//	USE_DX10

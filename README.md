@@ -25,7 +25,7 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
   * Install modded exes following the instructions above
 
 * Q: The game crashes on DX11 Fullscreen on Linux
-* A: You need to add `--dxgi-old` parameter into `commandline.txt` file or via making a shotcut to exe and adding argument there
+* A: You need to add `--dxgi-old` parameter into `commandline.txt` file or via making a shortcut to exe and adding argument there
 
 * Q: I have conflicts, crashes and bugs with shaders when i use Beef NVG, SSS, or Enhanced Shaders
 * A: If you are using those mods, install this package via MO2, and put it higher priority than those mods: https://github.com/deggua/xray-hdr10-shaders/releases/latest
@@ -46,7 +46,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
   * Attempting to override sections no longer crash the game, but prints the message into the log. All sections that triggers that error will be printed
   * Duplicate section errors now prints the root file where the error happened for easier checking mod_... ltxes
   * DLTX received possibility to create section if it doesn't exists and override section if it does with the same symbol `@`.
-  Below is the example for `newsection` that wasn't defined. Firstly its created with one param `override = false`, then its overriden with `override = true`
+  Below is the example for `newsection` that wasn't defined. Firstly its created with one param `override = false`, then its overridden with `override = true`
 
   ```
   @[newsection]
@@ -159,10 +159,23 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 
   Above mentioned options are applicable only for scopes which have prescribed values in file scoperadii.script
 
-  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)]
+  * Added alternative zoom control (toggle with new_zoom_enable [on/off (default)])
     * Minimal zoom is equal to either mechanical zoom or the one prescribed in section min_scope_zoom_factor.
     * The step of zoom adjustment is more precise. Also, it's possible to adjust the step of zoom with the console command zoom_step_count [1.0, 10.0], this option is also applicable to the binoculars.
   * In the new version all implementations from fakelens.script have moved directly to the engine. fakelens.script remained as a layer between the engine and scopeRadii.script
+
+* Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
+
+* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform
+  * Type `lua_debug 1` in console and reload the save or start a new game
+  * To use it, you need to install VSCode and LuaPanda extension: https://marketplace.visualstudio.com/items?itemName=stuartwang.luapanda
+  * Open your `gamedata/scripts` folder in VSCode
+  * Copy `.vscode` folder from the archive into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts/.vscode
+  * Copy `LuaPanda.lua`, `dynamic_callbacks.lua`, `global.lua`, `socket.lua` into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts
+  * Return to VSCode, go to `Run and Debug` section and start debugging or press F5 key
+  * Open in-game console with `~` key and type `run_string debugger_attach()`. If you do everything correctly and engine is working properly too, you will get an entry breakpoint at `global.lua` file in VSCode.
+  * You have to re-enable the debugger every time you start a new game or load a save, so you have to type `run_string debugger_attach()` in console again.
+  * Debugger is working dynamically, so you can add/remove files from your VSCode folder and it will automatically update the list of files available for debugging.
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
@@ -180,12 +193,95 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 How to compile exes:
 1. Fork this xray-monolith
 2. Clone the fork onto your pc
-3. Select all-in-one-vs2022-wpo branch
-4. Compile the engine-vs2022.sln solution with VS2022
-5. For batch builds of all configurations use `batch_build.bat` in xray-monolith repo
-6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
+3. Run `git submodule update --init --recursive` to pull git submodules
+4. Select all-in-one-vs2022-wpo branch
+5. Compile the engine-vs2022.sln solution with VS2022
+6. For batch builds of all configurations use `batch_build.bat` in xray-monolith repo
+7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.08**
+* Spawn antifreeze: fixed issue related to bolts, introduced in previous version: https://github.com/themrdemonized/xray-monolith/issues/287
+* SaloEater: Debug scripts with luapanda (https://github.com/themrdemonized/xray-monolith/pull/251)
+
+**2025.07.06**
+* Spawn antifreeze:
+  * Added `mod_system_spawn_antifreeze_ignore.ltx` file, lines in that file are sections that won't be processed by antifreeze. Partially addresses issue https://github.com/themrdemonized/xray-monolith/issues/283
+  * Fixed CTD on a possible condition when trying to spawn child items while parent is already destroyed and not exists in ALife, fixes issue https://github.com/themrdemonized/xray-monolith/issues/284
+* Replaced all occurences of `luabind` to `::luabind`
+* Migrated projects to C++17 standard
+
+**2025.07.05**
+* Ascii1457: SSS 23.2 Update
+
+**2025.07.03**
+* Ascii1457: SSS 23.1 Update
+
+**2025.07.02**
+* Spawn Antifreeze: Don't prefetch helicopters, might fix issue https://github.com/themrdemonized/xray-monolith/issues/278
+
+**2025.07.01**
+* `hanging_lamp_ignore_match_configuration` cvar to circumvent the SSS23 + HF crash, related to https://github.com/themrdemonized/xray-monolith/issues/273
+* Fix https://github.com/themrdemonized/xray-monolith/issues/276
+
+**2025.06.30**
+* Disable printing DLTX `!` warnings by default, toggle it with `print_dltx_warnings 1` cvar
+* Lua GC step increased to 300
+* OneMorePseudoCoder:
+  * Don't apply rendering optimizations to cars and helicopters (https://github.com/themrdemonized/xray-monolith/pull/271)
+  * Fix npc footsteps (https://github.com/themrdemonized/xray-monolith/pull/274)
+
+**2025.06.28**
+* Fixed crash to desktop in updateDiscordPresence function due to race condition
+* Spawn antifreeze: do not prefetch G_RPG7 and G_FAKE objects, fixes "incorrect destroy sequence for object" error
+* Ascii1457: SSS 23 Update
+* LVutner: R11G11B10_FLOAT support
+
+**2025.06.27**
+* Disabled initial script prefetches, conflict with SSS
+
+**2025.06.26**
+* Spawn antifreeze: Fixed some random crashes to desktop due to race condition in shader creation
+* LVutner: [Render] PIXEVENTs. Thanks to forserx and frowik
+
+**2025.06.24**
+* Hotfixes:
+  * Spawn antifreeze: Fixed crashing to desktop if model hasn't been found for prefetching
+  * Dynamic news manager: Check if the type of stuff in loot table is actual object, fixes crashes with existing moddb fixes
+* Fixed "overriding /ob2 with /ob3" warning when building
+* Fixed issue https://github.com/themrdemonized/xray-monolith/issues/267
+
+**2025.06.23**
+* Optimization pass:
+  * Spawn Antifreeze: put offloading model and texture resources into separate thread before spawning entities. Enabled by default. If you notice some issues, please report them and turn it off in console `spawn_antifreeze 0` (https://github.com/themrdemonized/xray-monolith/pull/257)
+  * Move Discord update into separate thread
+  * Fixed `trans_outfit.transparent_gg()` function having whole alife loop, now using only game objects
+  * Fix Dynamic News Manager loot table containing possible destroyed objects, leading to busy hands
+  * Changed Lua garbage collection step 400 -> 160
+* Moved project files outside of vs2022 folder, refactor solution file. Should fix broken precompiled headers
+* ProfLander: Integrate optick profiler (https://github.com/themrdemonized/xray-monolith/pull/262)
+
+**2025.06.20**
+* Updated Github Action to use `softprops/action-gh-release`
+* [Feature Request] Added an option to invert Mouse Wheel when changing weapons (https://github.com/themrdemonized/xray-monolith/issues/261)
+* ProfLander: 3D Ballistics Fixes (https://github.com/themrdemonized/xray-monolith/pull/259)
+* Kutez: Update v3 Indoor Gunsound Framework (https://github.com/themrdemonized/xray-monolith/pull/260)
+
+**2025.06.18**
+* Lucy: Script Attachment 3D UI Scale/Origin (https://github.com/themrdemonized/xray-monolith/pull/258)
+
+**2025.06.15**
+* Lucy: Some more changes (https://github.com/themrdemonized/xray-monolith/pull/254)
+
+**2025.06.11**
+* Lucy: ImGui implementation with script support (https://github.com/themrdemonized/xray-monolith/pull/250)
+
+**2025.06.09**
+* NLTP_ASHES: Exported `_keyboard`'s `key_name` and `key_local_name` to Lua (https://github.com/themrdemonized/xray-monolith/pull/248)
+
+**2025.06.08**
+* NLTP_ASHES: Add `actor_on_death` callback (https://github.com/themrdemonized/xray-monolith/pull/244)
+
 **2025.06.05**
 * The engine will crash if override sound failed to be initialised in `_G.COnBeforePlayHudSound` callback
 * ProfLander: Fix black default crosshair (https://github.com/themrdemonized/xray-monolith/pull/242)
@@ -1304,4 +1400,3 @@ override = true
 
 * Exported distance_to_xz_sqr() function of Fvector
 * Redesigned duplicate section error, it will additionally print what file adds the section in the first place in addition to the file that has the duplicate
-

@@ -515,7 +515,10 @@
 		<text>Менять оружие колесом мыши (mouse_wheel_change_weapon)</text>
 	</string>
 	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_zoom">
-		<text>Инвертировать колесо мыши (mouse_wheel_invert_zoom)</text>
+		<text>Инвертировать колесо мыши зуме (mouse_wheel_invert_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_control_mouse_mouse_wheel_invert_change_weapon">
+		<text>Инвертировать колесо мыши при смене оружия (mouse_wheel_invert_change_weapon)</text>
 	</string>
 
 	<!-- Camera -->
@@ -712,22 +715,49 @@
 	<string id="ui_mm_modded_exes_debug_logging_print_bone_warnings">
 		<text>Предупреждения invalid bone в логе (print_bone_warnings)</text>
 	</string>
-
-	<!-- Metrics -->
-	<string id="ui_mm_menu_metrics">
-		<text>Метрики</text>
+	<string id="ui_mm_modded_exes_debug_logging_print_dltx_warnings">
+		<text>Предупреждения DLTX в логе (print_dltx_warnings)</text>
 	</string>
-	<string id="ui_mm_metrics_modded_exes">
-		<text>Метрики</text>
+
+	<!-- Errors -->
+	<string id="ui_mm_menu_errors">
+		<text>Ошибки</text>
+	</string>
+	<string id="ui_mm_errors_modded_exes">
+		<text>Ошибки</text>
 	</string>
 	
-	<string id="ui_mm_modded_exes_debug_metrics_lua_gcstep">
+	<string id="ui_mm_modded_exes_debug_errors_hanging_lamp_ignore_match_configuration">
+		<text>Не крашить на ошибке "no renderer type set for hanging-lamp" (hanging_lamp_ignore_match_configuration)</text>
+	</string>
+
+	<!-- optimizations -->
+	<string id="ui_mm_menu_optimizations">
+		<text>Оптимизации</text>
+	</string>
+	<string id="ui_mm_optimizations_modded_exes">
+		<text>Оптимизации</text>
+	</string>
+	
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze">
+		<text>Меньше фризов при спавне (spawn_antifreeze)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_desc">
+		<text>Вынесение процедуры спавна сущностей в отдельный поток, не устраняет фризы полностью, но пытается свести их к минимуму</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch">
+		<text>Кол-во спавн событий на фрейм (spawn_antifreeze_batch)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_spawn_antifreeze_batch_desc">
+		<text>Кол-во спавн событий которые будут выполнены каждый фрейм</text>
+	</string>	
+	<string id="ui_mm_modded_exes_optimizations_lua_gcstep">
 		<text>Lua шаг сборщика мусора (lua_gcstep)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_metrics_mouse_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_mouse_buffer_size">
 		<text>Буфер ввода для мыши (mouse_buffer_size)</text>
 	</string>
-	<string id="ui_mm_modded_exes_debug_metrics_keyboard_buffer_size">
+	<string id="ui_mm_modded_exes_optimizations_keyboard_buffer_size">
 		<text>Буфер ввода для клавиатуры (keyboard_buffer_size)</text>
 	</string>
 </string_table>

@@ -192,7 +192,7 @@ Shader* CResourceManager::_cpp_Create(IBlender* B, LPCSTR s_shader, LPCSTR s_tex
 	_ParseList(C.L_matrices, s_matrices);
 
 #if defined(USE_DX11)
-	if (::Render->hud_loading && RImplementation.o.ssfx_hud_raindrops)
+	if (::Render->hud_loading && RImplementation.o.ssfx_core)
 	{
 		C.HudElement = true;
 	}

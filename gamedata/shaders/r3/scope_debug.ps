@@ -1,0 +1,34 @@
+#include "night_vision.h"
+#include "common.h"
+
+Texture2D vp2;
+
+Texture2D pp_m;
+Texture2D pp_s;
+
+Texture2D mv_m;
+Texture2D mv_s;
+
+Texture2D pf_m;
+Texture2D pf_s;
+
+float3 _main(p_screen I,  float4 pos2d) 
+{
+	float2 tc = pos2d.xy * screen_res.zw;
+
+	tc /= 0.25;
+
+	if (tc.x > 3.0 || tc.y > 1.0)
+		discard;
+		
+	float2 r = float2(1.0, 3.0);
+
+	return tc.x > 2.0 ? (tc.y > 0.66 ? pf_s.Sample(smp_base, tc*r) : tc.y > 0.33 ? pp_s.Sample(smp_base, tc*r) : (mv_s.Sample(smp_base, tc*r) * 100.0))
+		 : tc.x > 1.0 ? (tc.y > 0.66 ? pf_m.Sample(smp_base, tc*r) : tc.y > 0.33 ? pp_m.Sample(smp_base, tc*r) : (mv_m.Sample(smp_base, tc*r) * 100.0))
+		 : vp2.Sample(smp_base, tc);
+}
+
+float4 main(p_screen I,  float4 pos2d : SV_POSITION) : SV_Target
+{
+	return float4(_main(I, pos2d) % 1.0f, 1.0);
+}

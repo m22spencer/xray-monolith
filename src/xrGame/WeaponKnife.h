@@ -59,9 +59,6 @@ public:
 	virtual bool NeedBlendAnm();
 	virtual bool MovingAnimAllowedNow();
 
-	virtual Fmatrix RayTransform();
-	virtual void g_fireParams(SPickParam& pp) {};
-
 	virtual bool IsZoomEnabled() const { return false; }
 
 	void Fire2Start();

@@ -184,6 +184,9 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{3382f8e1-4f96-444a-a5b8-f6230eb36502}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfase implementations\ImGuiRender">
+      <UniqueIdentifier>{524f6fa6-0fca-4f18-85ee-b0d3ba6b3b33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -758,6 +761,12 @@
     </ClInclude>
     <ClInclude Include="blender_smaa.h">
       <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1405,6 +1414,9 @@
     </ClCompile>
     <ClCompile Include="blender_smaa.cpp">
       <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interfase implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

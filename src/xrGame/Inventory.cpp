@@ -30,7 +30,7 @@
 using namespace InventoryUtilities;
 //Alundaio
 #include "../../xrServerEntities/script_engine.h"
-using namespace luabind;
+
 //-Alundaio
 
 // what to block
@@ -864,7 +864,7 @@ void CInventory::Update()
 			}
 
 			// demonized: add on changed slot callback
-			luabind::functor<void> funct;
+			::luabind::functor<void> funct;
 			auto prev_obj = ActiveItem() ? ActiveItem()->object().lua_game_object() : NULL;
 			auto prev_slot = m_iActiveSlot;
 			m_iActiveSlot = GetNextActiveSlot();
@@ -1124,7 +1124,7 @@ bool CInventory::Eat(PIItem pIItem)
 	Msg( "--- Actor [%d] use or eat [%d][%s]", entity_alive->ID(), pItemToEat->object().ID(), pItemToEat->object().cNameSect().c_str() );
 #endif // MP_LOGGING
 	/*
-		luabind::functor<bool>	funct;
+		::luabind::functor<bool>	funct;
 		if (ai().script_engine().functor("_G.CInventory__eat", funct))
 		{
 			if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(), (smart_cast<CGameObject*>(pIItem))->lua_game_object()))
@@ -1333,7 +1333,7 @@ u32 CInventory::BeltWidth() const
 			artefact_count =  outfit->get_artefact_count();
 		}
 	}
-	luabind::functor<int> funct;
+	::luabind::functor<int> funct;
 		if (ai().script_engine().functor("actor_menu_inventory.CInventory_BeltWidth", funct))
 		{
 			artefact_count = funct(artefact_count);
@@ -1350,7 +1350,7 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
 		{
 			if (bOverride)
 			{
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
 				{
 					if (!funct(m_pOwner->cast_game_object()->lua_game_object(),
@@ -1371,7 +1371,7 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
 			{
 				if (bOverride)
 				{
-					luabind::functor<bool> funct;
+					::luabind::functor<bool> funct;
 					if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
 					{
 						if (!funct(m_pOwner->cast_game_object()->lua_game_object(),
@@ -1397,7 +1397,7 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
 				{
 					if (bOverride)
 					{
-						luabind::functor<bool> funct;
+						::luabind::functor<bool> funct;
 						if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
 						{
 							if (!funct(m_pOwner->cast_game_object()->lua_game_object(),

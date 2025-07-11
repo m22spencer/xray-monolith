@@ -15,6 +15,8 @@
 XRCORE_API CInifile const* pSettings = NULL;
 XRCORE_API CInifile const* pSettingsAuth = NULL;
 
+BOOL print_dltx_warnings = FALSE;
+
 //#define INICACHE_PRINT_DEBUG
 
 CInifile* CInifile::Create(const char* szFileName, BOOL ReadOnly)
@@ -368,7 +370,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 					if (!bIsCurrentSectionOverride)
 					{
 
-						Debug.fatal(DEBUG_INFO, "Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *Current->Name, *Current->Name, m_file_name, SectionToFilename[std::string(Current->Name.c_str())].c_str(), currentFileName);
+						Debug.fatal(DEBUG_INFO, "[DLTX] Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *Current->Name, *Current->Name, m_file_name, SectionToFilename[std::string(Current->Name.c_str())].c_str(), currentFileName);
 					}
 
 					//Overwrite existing override data
@@ -989,7 +991,8 @@ void CInifile::Load(IReader* F, LPCSTR path
 			auto override_filenames = OverrideToFilename.find(i->first);
 			if (override_filenames != OverrideToFilename.end()) {
 				for (auto &override_filename : override_filenames->second) {
-					Msg("!!!DLTX ERROR Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", i->first.c_str(), m_file_name, override_filename.first.c_str());
+					if (print_dltx_warnings)
+						Msg("~[DLTX] WARNING: Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", i->first.c_str(), m_file_name, override_filename.first.c_str());
 				}
 			}
 		}

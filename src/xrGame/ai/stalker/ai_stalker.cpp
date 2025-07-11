@@ -51,7 +51,7 @@
 #include "../../visual_memory_manager.h"
 #include "../../enemy_manager.h"
 #include "../../../xrServerEntities/alife_human_brain.h"
-#include "../../profiler.h"
+#include "profiler.h"
 #include "../../BoneProtections.h"
 #include "../../stalker_animation_names.h"
 #include "../../stalker_decision_space.h"
@@ -937,8 +937,8 @@ void CAI_Stalker::update_object_handler()
 			CObjectHandler::update();
 		}
 #ifdef DEBUG
-		catch (luabind::cast_failed &message) {
-			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+		catch (::luabind::cast_failed &message) {
+			Msg						("! Expression \"%s\" from ::luabind::object to %s",message.what(),message.info()->name());
 			throw;
 		}
 #endif
@@ -1252,8 +1252,8 @@ void CAI_Stalker::Think()
 			brain().update(update_delta);
 			//		}
 #ifdef DEBUG
-			//		catch (luabind::cast_failed &message) {
-			//			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+			//		catch (::luabind::cast_failed &message) {
+			//			Msg						("! Expression \"%s\" from ::luabind::object to %s",message.what(),message.info()->name());
 			//throw;
 			//		}
 #endif
@@ -1283,8 +1283,8 @@ void CAI_Stalker::Think()
 			movement().update(update_delta);
 			//	}
 #if 0//def DEBUG
-	catch (luabind::cast_failed &message) {
-		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+	catch (::luabind::cast_failed &message) {
+		Msg						("! Expression \"%s\" from ::luabind::object to %s",message.what(),message.info()->name());
 		movement().initialize	();
 		movement().update		(update_delta);
 		throw;

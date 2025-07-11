@@ -65,6 +65,14 @@ bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_SYSCHAR:
 		result = 0;
 		return true;
+
+	case WM_CHAR:
+		Device.imgui().InputChar(wParam);
+		return false;
+
+	case WM_INPUTLANGCHANGE:
+		Device.imgui().UpdateInputLang();
+		return false;
 	}
 
 	return (false);

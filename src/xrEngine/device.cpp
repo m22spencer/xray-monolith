@@ -2,6 +2,7 @@
 #include "../xrCDB/frustum.h"
 #include "xr_ioconsole.h"
 #include "xr_input.h"
+#include "../xrCore/profiler.h"
 
 #pragma warning(disable:4995)
 // mmsystem.h
@@ -46,6 +47,8 @@ ref_light precache_light = 0;
 extern discord::Core* discord_core;
 extern bool use_discord;
 
+extern Fvector4 ps_ssfx_grass_interactive;
+
 #ifdef ECO_RENDER
 std::chrono::high_resolution_clock::time_point tlastf = std::chrono::high_resolution_clock::now(), tcurrentf = std::
 	                                               chrono::high_resolution_clock::now();
@@ -56,6 +59,8 @@ ENGINE_API float refresh_rate = 0;
 
 BOOL CRenderDevice::Begin()
 {
+	PROF_EVENT();
+
 #ifndef DEDICATED_SERVER
 	switch (m_pRender->GetDeviceState())
 	{
@@ -95,6 +100,8 @@ extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
 {
+	PROF_EVENT();
+
 #ifndef DEDICATED_SERVER
 
 
@@ -166,29 +173,42 @@ void mt_Thread(void* ptr)
 	auto& device = *static_cast<CRenderDevice*>(ptr);
 	while (true)
 	{
+		PROF_EVENT();
+
+		START_PROFILE("Wait for device");
 		// waiting for Device permission to execute
 		device.mt_csEnter.Enter();
 
 		if (device.mt_bMustExit)
 		{
+			PROF_EVENT("Must exit");
+
 			device.mt_bMustExit = FALSE; // Important!!!
 			device.mt_csEnter.Leave(); // Important!!!
 			return;
 		}
 		// we has granted permission to execute
 		mt_Thread_marker = device.dwFrame;
+		STOP_PROFILE;
 
+		START_PROFILE("Process seqParallel");
 		for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
 			device.seqParallel[pit]();
 		device.seqParallel.clear_not_free();
-		device.seqFrameMT.Process(rp_Frame);
+		STOP_PROFILE;
 
+		START_PROFILE("Process seqFrameMT");
+		device.seqFrameMT.Process(rp_Frame);
+		STOP_PROFILE;
+
+		START_PROFILE("Synchronization");
 		// now we give control to device - signals that we are ended our work
 		device.mt_csEnter.Leave();
 		// waits for device signal to continue - to start again
 		device.mt_csLeave.Enter();
 		// returns sync signal to device
 		device.mt_csLeave.Leave();
+		STOP_PROFILE;
 	}
 }
 
@@ -273,6 +293,8 @@ void mt_FreezeThread(void *ptr) {
 
 	while (true)
 	{
+		PROF_EVENT();
+
 		if (g_loading_events.size())
 			freezetime = 25000.0f;
 		else
@@ -280,13 +302,43 @@ void mt_FreezeThread(void *ptr) {
 
 		repeatcheck = 500.f;
 
+		START_PROFILE("Check timer");
 		if (FreezeTimer.GetElapsed_sec()*1000.f > freezetime)
 		{
 			FlushLog();
 			repeatcheck = 5000.f;
 		}
+		STOP_PROFILE;
+
 		Sleep(repeatcheck);
 	}
+}
+
+void CRenderDevice::prepare_matrices()
+{
+	auto svp = m_SecondViewport.IsSVPFrame();
+	// Previous frame data -- 
+	mView_prev = Device.matrices_previous[svp].mView;
+	mProject_prev = Device.matrices_previous[svp].mProject;
+	//mFullTransform_prev = mFullTransform_saved; // Unused?
+
+	m_pRender->SetCacheXform_prev(mView_prev, mProject_prev);
+
+	// Save previous frame grass benders data
+	IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+
+	GData.prev_pos[svp][0].set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
+	GData.prev_dir[svp][0].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+	for (int pBend = 1; pBend < _min(16, ps_ssfx_grass_interactive.y + 1); pBend++)
+	{
+		GData.prev_pos[svp][pBend].set(GData.pos[pBend].x, GData.pos[pBend].y, GData.pos[pBend].z, GData.radius_curr[pBend]);
+		GData.prev_dir[svp][pBend].set(GData.dir[pBend].x, GData.dir[pBend].y, GData.dir[pBend].z, GData.str[pBend]);
+	}
+
+	// Save wind animation position
+	wind_anim_prev = wind_anim_saved;
+	wind_anim_saved = g_pGamePersistent->Environment().wind_anim;
 }
 
 void CRenderDevice::on_idle()
@@ -299,14 +351,22 @@ void CRenderDevice::on_idle()
 		return;
 	}
 
+	PROF_FRAME("X-RAY Primary thread");
+	PROF_EVENT();
+
 #ifdef DEDICATED_SERVER
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
+
+	START_PROFILE("Set stat gathering");
 	if (psDeviceFlags.test(rsStatistic))
 		g_bEnableStatGather = TRUE;
 	else g_bEnableStatGather = FALSE;
+	STOP_PROFILE;
+
 	if (g_loading_events.size())
 	{
+		PROF_EVENT("Pop loading event");
 		if (g_loading_events.front()())
 			g_loading_events.pop_front();
 		pApp->LoadDraw();
@@ -314,13 +374,17 @@ void CRenderDevice::on_idle()
 	}
 
 	if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
+	{
+		PROF_EVENT("Start xrSASH Benchmark");
 		g_SASH.StartBenchmark();
+	}
 
 	FrameMove();
 
 	// Precache
 	if (dwPrecacheFrame)
 	{
+		PROF_EVENT("Precache frame");
 		float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
 		float angle = PI_MUL_2 * factor;
 		vCameraDirection.set(_sin(angle), 0, _cos(angle));
@@ -332,9 +396,20 @@ void CRenderDevice::on_idle()
 	}
 
 	// Matrices
+	START_PROFILE("Matrices");
 	mFullTransform.mul(mProject, mView);
 	mFullTransformHud.mul(mProjectHud, mView);
 	m_pRender->SetCacheXform(mView, mProject);
+
+	Device.matrices_previous[0] = Device.matrices[0];
+	Device.matrices_previous[1] = Device.matrices[1];
+
+	Device.matrices[0].mView = mView;
+	Device.matrices[0].mProject = mProject;
+	Device.matrices[0].mProjectHud = mProjectHud;
+
+	prepare_matrices();
+
 	//RCache.set_xform_view ( mView );
 	//RCache.set_xform_project ( mProject );
 	D3DXMatrixInverse((D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
@@ -343,16 +418,21 @@ void CRenderDevice::on_idle()
 	mFullTransform_saved = mFullTransform;
 	mView_saved = mView;
 	mProject_saved = mProject;
+	STOP_PROFILE;
 
 	// *** Resume threads
 	// Capture end point - thread must run only ONE cycle
 	// Release start point - allow thread to run
+	START_PROFILE("Resume threads");
 	mt_csLeave.Enter();
 	mt_csEnter.Leave();
+	STOP_PROFILE;
 
 #ifdef ECO_RENDER // ECO_RENDER START
 	if (Device.Paused() || IsMainMenuActive() || ps_framelimiter)
 	{
+		PROF_EVENT("Eco Render");
+
 		if (refresh_rate == 0)
 			refresh_rate = GetMonitorRefresh();
 
@@ -373,33 +453,22 @@ void CRenderDevice::on_idle()
 	}
 #endif // ECO_RENDER END
 
-	//Discord
-	if (use_discord && psDeviceFlags2.test(rsDiscord))
-	{
-		discord_core->RunCallbacks();
-
-		static float last_update;
-		if (!last_update)
-		{
-			updateDiscordPresence();
-			last_update = Device.fTimeGlobal;
-		}
-		else if ((Device.fTimeGlobal - last_update) > discord_update_rate)
-		{
-			updateDiscordPresence();
-			last_update = Device.fTimeGlobal;
-		}
-	}
-
 #ifndef DEDICATED_SERVER
 	Statistic->RenderTOTAL_Real.FrameStart();
 	Statistic->RenderTOTAL_Real.Begin();
 
 	if (b_is_Active && Begin())
 	{
+		START_PROFILE("Process seqRender");
 		seqRender.Process(rp_Render);
+		STOP_PROFILE;
+
 		if (psDeviceFlags.test(rsCameraPos) || psDeviceFlags.test(rsStatistic) || Statistic->errors.size())
+		{
+			PROF_EVENT("Draw statistics");
 			Statistic->Show();
+		}
+
 		End();
 	}
 	Statistic->RenderTOTAL_Real.End();
@@ -409,12 +478,15 @@ void CRenderDevice::on_idle()
 	// *** Suspend threads
 	// Capture startup point
 	// Release end point - allow thread to wait for startup point
+	START_PROFILE("Suspend threads");
 	mt_csEnter.Enter();
 	mt_csLeave.Leave();
+	STOP_PROFILE;
 
 	// Ensure, that second thread gets chance to execute anyway
 	if (dwFrame != mt_Thread_marker)
 	{
+		PROF_EVENT("Execute second thread");
 		for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
 			Device.seqParallel[pit]();
 		Device.seqParallel.clear_not_free();
@@ -443,6 +515,7 @@ void CRenderDevice::message_loop_editor()
 
 void CRenderDevice::Screenshot()
 {
+	PROF_EVENT();
 	Render->Screenshot();
 }
 
@@ -469,6 +542,32 @@ void CRenderDevice::message_loop()
 	}
 }
 
+void mt_DiscordThread(void*)
+{
+	while (true)
+	{
+		if (!pApp)
+		{
+			Msg("[Discord] pApp destroyed, killing thread");
+			return;
+		}
+
+		//Discord
+		if (use_discord && psDeviceFlags2.test(rsDiscord))
+		{
+			START_PROFILE("Discord");
+			discord_core->RunCallbacks();
+			updateDiscordPresence();
+			STOP_PROFILE;
+			Sleep(int(discord_update_rate * 1000));
+		}
+		else
+		{
+			Sleep(1000); // Sleep for 1 second if Discord is not used or disabled
+		}
+	}
+}
+
 void CRenderDevice::Run()
 {
 	// DUMP_PHASE;
@@ -492,6 +591,7 @@ void CRenderDevice::Run()
 	mt_bMustExit = FALSE;
 	thread_spawn(mt_FreezeThread, "Freeze detecting thread", 0, 0);
 	thread_spawn(mt_Thread, "X-RAY Secondary thread", 0, this);
+	thread_spawn(mt_DiscordThread, "X-RAY Discord thread", 0, 0);
 	// Message cycle
 	seqAppStart.Process(rp_AppStart);
 
@@ -511,11 +611,15 @@ u32 app_inactive_time_start = 0;
 
 void CRenderDevice::FrameMove()
 {
+	PROF_EVENT();
+
 	dwFrame++;
 	Core.dwFrame = dwFrame;
 	dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
 	if (psDeviceFlags.test(rsConstantFPS))
 	{
+		PROF_EVENT("Constant FPS");
+
 		// 20ms = 50fps
 		//fTimeDelta = 0.020f;
 		//fTimeGlobal += 0.020f;
@@ -529,6 +633,8 @@ void CRenderDevice::FrameMove()
 	}
 	else
 	{
+		PROF_EVENT("Timer FPS");
+
 		// Timer
 		float fPreviousFrameTime = Timer.GetElapsed_sec();
 		Timer.Start(); // previous frame
@@ -551,7 +657,9 @@ void CRenderDevice::FrameMove()
 	Statistic->EngineTOTAL.Begin();
 	// TODO: HACK to test loading screen.
 	//if(!g_bLoaded)
+	START_PROFILE("Process seqFrame");
 	Device.seqFrame.Process(rp_Frame);
+	STOP_PROFILE;
 	g_bLoaded = TRUE;
 	//else
 	// seqFrame.Process(rp_Frame);
@@ -563,6 +671,8 @@ ENGINE_API BOOL bShowPauseString = TRUE;
 
 void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 {
+	PROF_EVENT();
+
 	static int snd_emitters_ = -1;
 
 	if (g_bBenchmark)
@@ -703,6 +813,8 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 
 void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)
 {
+	PROF_EVENT();
+
 	if (mt)
 		seqFrameMT.Add(f, REG_PRIORITY_HIGH);
 	else
@@ -711,6 +823,8 @@ void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)
 
 void CRenderDevice::RemoveSeqFrame(pureFrame* f)
 {
+	PROF_EVENT();
+
 	seqFrameMT.Remove(f);
 	seqFrame.Remove(f);
 }
@@ -722,6 +836,8 @@ CLoadScreenRenderer::CLoadScreenRenderer()
 
 void CLoadScreenRenderer::start(bool b_user_input)
 {
+	PROF_EVENT();
+
 	Device.seqRender.Add(this, 0);
 	b_registered = true;
 	b_need_user_input = b_user_input;
@@ -729,6 +845,8 @@ void CLoadScreenRenderer::start(bool b_user_input)
 
 void CLoadScreenRenderer::stop()
 {
+	PROF_EVENT();
+
 	if (!b_registered)
 		return;
 	Device.seqRender.Remove(this);
@@ -739,6 +857,8 @@ void CLoadScreenRenderer::stop()
 
 void CLoadScreenRenderer::OnRender()
 {
+	PROF_EVENT();
+
 	pApp->load_draw_internal();
 }
 

@@ -41,10 +41,10 @@ protected:
 public:
 	IC CClientSpawnManager();
 	virtual ~CClientSpawnManager();
-	void add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, const luabind::functor<void>& functor,
-	         const luabind::object& object);
+	void add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, const ::luabind::functor<void>& functor,
+	         const ::luabind::object& object);
 	void add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id,
-	         const luabind::functor<void>& lua_function);
+	         const ::luabind::functor<void>& lua_function);
 	void add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, const CALLBACK_TYPE& object_callback);
 	void add(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, CSpawnCallback& callback);
 	void remove(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id);

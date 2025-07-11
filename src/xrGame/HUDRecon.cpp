@@ -46,7 +46,7 @@ float recon_maxspeed = 10.f;
 CHUDRecon::CHUDRecon()
 {
 	fuzzyShowInfo = 0.f;
-	bDoTransform = true;
+	bDoTransform = false;
 }
 
 CHUDRecon::~CHUDRecon()

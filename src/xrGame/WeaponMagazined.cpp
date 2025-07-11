@@ -188,8 +188,12 @@ void CWeaponMagazined::Load(LPCSTR section)
 			m_sounds.LoadSound(section, "snd_silncer_shot_misfire_actor", "sndSilencerShotMisfireActor", false, m_eSoundShot);
 
 		// Indoor
-		if (WeaponSoundExist(section, "snd_silncer_shoot_indoor"))
+		if (WeaponSoundExist(section, "snd_silncer_shot_indoor")) {
+			m_sounds.LoadSound(section, "snd_silncer_shot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
+		} else if (WeaponSoundExist(section, "snd_silncer_shoot_indoor")) {
 			m_sounds.LoadSound(section, "snd_silncer_shoot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
+		} // Change section name from "shoot" to "shot" for consistency while keeping the old one for compatibility
+		
 		if (WeaponSoundExist(section, "snd_silncer_shot_actor_indoor"))
 			m_sounds.LoadSound(section, "snd_silncer_shot_actor_indoor", "sndSilencerShotActorIndoor", false, m_eSoundShot);
 		if (WeaponSoundExist(section, "snd_silncer_shoot_actor_first_indoor"))
@@ -909,7 +913,7 @@ void CWeaponMagazined::PlaySoundShot()
 
 				string128 sndNameFirst;
 				strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
-				if (m_sounds.FindSoundItem(sndNameFirst, false))
+				if (m_sounds.FindSoundItem(sndNameFirst, false) && g_gunsnd_indoor < 1.f)
 				{
 					m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
 				}
@@ -924,7 +928,7 @@ void CWeaponMagazined::PlaySoundShot()
 
 				string128 sndName;
 				strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
-				if (m_sounds.FindSoundItem(sndName, false))
+				if (m_sounds.FindSoundItem(sndName, false) && g_gunsnd_indoor < 1.f)
 				{
 					m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
 				}
@@ -962,32 +966,11 @@ void CWeaponMagazined::PlaySoundShot()
 
 	if (bMisfire)
 	{
-		if (g_gunsnd_indoor>0.75f) {
-			string128 sndNameMisfireIndoor;
-			strconcat(sizeof(sndNameMisfireIndoor), sndNameMisfireIndoor, m_sSndShotCurrent.c_str(), "MisfireIndoor");
-			if (m_sounds.FindSoundItem(sndNameMisfireIndoor, false))
-			{
-				m_sounds.PlaySound(sndNameMisfireIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor_volume);
-				return;
-			}
-		}
-
 		string128 sndNameMisfire;
 		strconcat(sizeof(sndNameMisfire), sndNameMisfire, m_sSndShotCurrent.c_str(), "Misfire");
 		if (m_sounds.FindSoundItem(sndNameMisfire, false))
 		{
 			m_sounds.PlaySound(sndNameMisfire, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
-			return;
-		}
-	}
-
-	if (g_gunsnd_indoor>0.75f)
-	{
-		string128 sndNameIndoor;
-		strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
-		if (m_sounds.FindSoundItem(sndNameIndoor, false))
-		{
-			m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor_volume);
 			return;
 		}
 	}

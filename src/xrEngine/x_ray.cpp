@@ -28,6 +28,7 @@
 #include <unicode\unistr.h>
 #include <unicode\ucnv.h>
 #include <discord\discord.h>
+#include "../xrCore/profiler.h"
 
 #include "xrSash.h"
 
@@ -72,6 +73,9 @@ float discord_update_rate = .5f;
 bool use_reshade = false;
 extern bool init_reshade();
 extern void unregister_reshade();
+
+//ImGui
+#pragma comment(lib, "imgui.lib")
 
 static LPSTR month_id[12] =
 {
@@ -138,7 +142,16 @@ struct _SoundProcessor : public pureFrame
 	{
 		//Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
 		Device.Statistic->Sound.Begin();
-		::Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
+
+		// Sound information must be played from main view, not active render view
+		Fvector p, d, t;
+		Fmatrix c;
+		c.invert(Device.matrices[0].mView);
+		c.transform(p.set(0,0,0));
+		c.transform_dir(d.set(0,0,1));
+		c.transform_dir(t.set(0,1,0));
+
+		::Sound->update(p, d, t);
 		Device.Statistic->Sound.End();
 	}
 } SoundProcessor;
@@ -305,6 +318,8 @@ void execUserScript()
 
 void slowdownthread(void*)
 {
+	PROF_EVENT();
+
 	// Sleep (30*1000);
 	for (;;)
 	{
@@ -378,6 +393,8 @@ void DiscordLog(discord::LogLevel level, std::string message)
 
 void updateDiscordPresence()
 {
+	PROF_EVENT();
+
 	if (!use_discord)
 		return;
 
@@ -577,10 +594,8 @@ void Startup()
 	}
 
 	// Initialize APP
-	//#ifndef DEDICATED_SERVER
 	ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
 	Device.Create();
-	//#endif
 
 	LALib.OnCreate();
 	pApp = xr_new<CApplication>();
@@ -619,7 +634,10 @@ void Startup()
 	xr_delete(g_SpatialSpacePhysic);
 	xr_delete(g_SpatialSpace);
 	DEL_INSTANCE(g_pGamePersistent);
+
 	xr_delete(pApp);
+	pApp = NULL;
+
 	Engine.Event.Dump();
 
 	// Destroying
@@ -1466,6 +1484,8 @@ void CApplication::destroy_loading_shaders()
 
 PROTECT_API void CApplication::LoadDraw()
 {
+	PROF_EVENT();
+
 	if (g_appLoaded) return;
 	Device.dwFrame += 1;
 
@@ -1510,6 +1530,8 @@ void CApplication::LoadSwitch()
 // Sequential
 void CApplication::OnFrame()
 {
+	PROF_EVENT();
+
 	Engine.Event.OnFrame();
 	g_SpatialSpace->update();
 	g_SpatialSpacePhysic->update();
@@ -1519,6 +1541,8 @@ void CApplication::OnFrame()
 
 void CApplication::Level_Append(LPCSTR folder)
 {
+	PROF_EVENT();
+
 	string_path N1, N2, N3, N4;
 	strconcat(sizeof(N1), N1, folder, "level");
 	strconcat(sizeof(N2), N2, folder, "level.ltx");
@@ -1540,6 +1564,8 @@ void CApplication::Level_Append(LPCSTR folder)
 
 void CApplication::Level_Scan()
 {
+	PROF_EVENT();
+
 	//SECUROM_MARKER_PERFORMANCE_ON(8)
 
 	for (u32 i = 0; i < Levels.size(); i++)
@@ -1563,6 +1589,8 @@ void CApplication::Level_Scan()
 
 void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 {
+	PROF_EVENT();
+
 	strconcat(sizeof(dest), dest, "intro\\intro_", level_name);
 
 	u32 len = xr_strlen(dest);
@@ -1576,6 +1604,8 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 
 void CApplication::Level_Set(u32 L)
 {
+	PROF_EVENT();
+
 	//SECUROM_MARKER_PERFORMANCE_ON(9)
 
 	if (L >= Levels.size()) return;
@@ -1615,6 +1645,8 @@ void CApplication::Level_Set(u32 L)
 
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
+	PROF_EVENT();
+
 	int result = -1;
 
 	////SECUROM_MARKER_SECURITY_ON(7)
@@ -1665,6 +1697,8 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
 CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 {
+	PROF_EVENT();
+
 	CLocatorAPI::archives_it it = FS.m_archives.begin();
 	CLocatorAPI::archives_it it_e = FS.m_archives.end();
 
@@ -1684,6 +1718,8 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 
 void CApplication::LoadAllArchives()
 {
+	PROF_EVENT();
+
 	if (FS.load_all_unloaded_archives())
 	{
 		Level_Scan();

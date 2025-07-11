@@ -25,6 +25,7 @@
 
 #include "../Include/xrRender/FactoryPtr.h"
 #include "../Include/xrRender/RenderDeviceRender.h"
+#include "imgui_base.h"
 
 #ifdef INGAME_EDITOR
 # include "../Include/editor/interfaces.hpp"
@@ -77,6 +78,12 @@ public:
 	Fmatrix mFullTransform;
 	Fmatrix mFullTransformHud;
 
+	Fmatrix mView_prev;
+	Fmatrix mProject_prev;
+
+	Fvector4 wind_anim_prev;
+	Fvector4 wind_anim_saved;
+
 	// Copies of corresponding members. Used for synchronization.
 	Fvector vCameraPosition_saved;
 
@@ -87,6 +94,16 @@ public:
 	float fFOV;
 	float fASPECT;
 	float ViewportNear = 0.2f;
+
+	// Data for the main camera (1), and svp camera (2)
+	struct MatrixData {
+		Fmatrix mView;
+		Fmatrix mProject;
+		Fmatrix mProjectHud;
+	};
+
+	MatrixData matrices[2];
+	MatrixData matrices_previous[2];
 protected:
 
 	u32 Timer_MM_Delta;
@@ -421,6 +438,7 @@ public:
 	}
 
 public:
+	void prepare_matrices();
 	void xr_stdcall on_idle();
 	bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 
@@ -429,6 +447,13 @@ private:
 	virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
 	virtual void _BCL RemoveSeqFrame(pureFrame* f);
 	virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
+
+private:
+	xr_imgui::ide m_imgui;
+
+public:
+	xr_imgui::ide& imgui() { return m_imgui; }
+	bool imgui_shown() const { return m_imgui.is_shown(); }
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }

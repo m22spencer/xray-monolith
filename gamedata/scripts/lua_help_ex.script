@@ -86,6 +86,7 @@
     }
 
     globals {
+        string dik_to_keyname(number dik, boolean localize)
         int get_modded_exes_version() // Returns modded exes version in integer format
         table get_string_table() // Returns all translated strings in [string id] = string text format 
     }
@@ -774,6 +775,12 @@
         function set_ui_rotation(vector);
         function set_ui_rotation(number, number, number);
         function get_ui_rotation();
+        function set_ui_scale(vector);
+        function set_ui_scale(number, number, number);
+        function get_ui_scale();
+        function set_ui_origin(vector);
+        function set_ui_origin(number, number, number);
+        function get_ui_origin();
 
         -- Script Light
         function attach_light(attachment_script_light*);
@@ -788,6 +795,9 @@
 		function get_default_shaders()
 		function set_shader(number, string, string)
 		function reset_shader(number)
+
+        -- Userdata
+        property userdata
     }
     
     Script Attachment Guide: https://igigog.github.io/anomaly-modding-book/tutorials/scripting/script-attachments.html

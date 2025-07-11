@@ -4,13 +4,13 @@
 #include "xr_input.h"
 #include "iinputreceiver.h"
 
-void IInputReceiver::IR_Capture(void)
+void IInputReceiver::IR_Capture()
 {
 	VERIFY(pInput);
 	pInput->iCapture(this);
 }
 
-void IInputReceiver::IR_Release(void)
+void IInputReceiver::IR_Release()
 {
 	VERIFY(pInput);
 	pInput->iRelease(this);

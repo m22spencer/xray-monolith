@@ -9,6 +9,7 @@
 #pragma warning(disable:4995)
 #include <malloc.h>
 #include "dxerr.h"
+#include "profiler.h"
 
 //#pragma warning(pop)
 
@@ -1174,6 +1175,8 @@ void IPureClient::Sync_Average()
 
 void sync_thread(void* P)
 {
+	PROF_EVENT();
+
 	SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_TIME_CRITICAL);
 	IPureClient* C = (IPureClient*)P;
 	C->Sync_Thread();

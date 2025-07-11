@@ -5,6 +5,7 @@
 #include "HUDManager.h"
 #include "HUDItem.h"
 #include "Actor.h"
+#include "Weapon.h"
 
 Flags32 psCrosshair_Flags = {};
 
@@ -43,12 +44,13 @@ CrosshairSettings g_crosshair_camera_near = CrosshairSettings(
 
 CrosshairSettings g_crosshair_weapon_far = CrosshairSettings(
 	{
-		CROSSHAIR_USE_SHADER
+		CROSSHAIR_SHOW |
+		CROSSHAIR_RECON
 	},
 	"hud\\cursor",
 	"ui\\cursor_plus",
 	40.f,
-	4.f,
+	1.f,
 	25.f,
 	C_WHITE,
 	.25f,
@@ -73,12 +75,12 @@ CrosshairSettings g_crosshair_weapon_near = CrosshairSettings(
 
 CrosshairSettings g_crosshair_device_far = CrosshairSettings(
 	{
-		CROSSHAIR_USE_SHADER
+		CROSSHAIR_RECON
 	},
 	"hud\\cursor",
 	"ui\\cursor_plus",
 	40.f,
-	4.f,
+	1.f,
 	25.f,
 	C_WHITE,
 	.25f,
@@ -204,8 +206,8 @@ void TargetCrosshair::Update(const SPickParam& pp, bool is_far)
 	crosshair.SetShader(&settings.shader);
 	crosshair.SetTexture(&settings.texture);
 
-	// If firepos is active
-	if (HUD().FireposActive())
+	// If aimpos is active
+	if (HUD().AimposActive())
 	{
 		// Rotate the crosshair
 		Fvector hpb_barrel, hpb_cam;
@@ -221,7 +223,6 @@ void TargetCrosshair::Update(const SPickParam& pp, bool is_far)
 		opacity_target = settings.occluded_opacity;
 
 	IntegrateOpacity(pp, opacity_target);
-
 }
 
 void TargetCrosshair::Render(const SPickParam& pp)
@@ -369,56 +370,63 @@ void CHUDTarget::ShowCrosshair(bool b)
 void CHUDTarget::Render()
 {
 	CActor* pActor = Actor();
+
 	if (!pActor)
+		return;
+
+	if (!m_bShowCrosshair)
 		return;
 
 	CHUDManager& hud = HUD();
 	bool firepos_active = hud.FireposActive();
 	bool aimpos_active = hud.AimposActive();
 
-	if (psCrosshair_Flags.is(CROSSHAIR_INDEPENDENT))
+	m_weapon.crosshair_near.recon.SetDoTransform(firepos_active || aimpos_active);
+	m_weapon.crosshair_far.recon.SetDoTransform(firepos_active || aimpos_active);
+	m_device.crosshair_near.recon.SetDoTransform(firepos_active || aimpos_active);
+	m_device.crosshair_far.recon.SetDoTransform(firepos_active || aimpos_active);
+
+	// Render primary hand crosshair
+	attachable_hud_item* pAttach0 = g_player_hud->attached_item(0);
+	if (pAttach0)
 	{
-		const SPickParam& pick_hud = HUD().GetPick();
-		m_camera.crosshair_near.recon.SetDoTransform(!firepos_active && aimpos_active);
-		m_camera.crosshair_far.recon.SetDoTransform(!firepos_active && aimpos_active);
-		m_camera.Update(pick_hud);
-
-		if (m_bShowCrosshair)
-			m_camera.Render(pick_hud);
-
-		attachable_hud_item* pWeapon = g_player_hud->attached_item(0);
+		CHudItem* pItem = pAttach0->m_parent_hud_item;
+		CWeapon* pWeapon = dynamic_cast<CWeapon*>(pItem);
 		if (pWeapon)
 		{
-			CHudItem* pItem = pWeapon->m_parent_hud_item;
-			if (pItem)
-			{
-				const SPickParam& pick = pItem->GetPick();
-				m_weapon.Update(pick);
-				if (m_bShowCrosshair)
-					m_weapon.Render(pick);
-			}
+			const SPickParam* pick = &pItem->GetPick();
+			m_weapon.Update(*pick);
+			m_weapon.Render(*pick);
+			if (!psCrosshair_Flags.is(CROSSHAIR_INDEPENDENT))
+				return;
 		}
-
-		attachable_hud_item* pDevice = g_player_hud->attached_item(1);
-		if (pActor->HUDview() && pDevice)
+		else
 		{
-			CHudItem* pItem = pDevice->m_parent_hud_item;
-			if (pItem)
-			{
-				const SPickParam& pick = pItem->GetPick();
-				m_device.Update(pick);
-				if (m_bShowCrosshair)
-					m_device.Render(pick);
-			}
+			const SPickParam* pick = &pItem->GetPick();
+			m_device.Update(*pick);
+			m_device.Render(*pick);
+			if (!psCrosshair_Flags.is(CROSSHAIR_INDEPENDENT))
+				return;
 		}
 	}
-	else
+
+	// Render secondary hand crosshair
+	attachable_hud_item* pDevice = g_player_hud->attached_item(1);
+	if (pActor->HUDview() && pDevice)
 	{
-		SPickParam& pick = pActor->GetPick();
-		m_camera.crosshair_near.recon.SetDoTransform(firepos_active || aimpos_active);
-		m_camera.crosshair_far.recon.SetDoTransform(!firepos_active && aimpos_active);
-		m_camera.Update(pick);
-		if (m_bShowCrosshair)
-			m_camera.Render(pick);
+		CHudItem* pItem = pDevice->m_parent_hud_item;
+		if (pItem)
+		{
+			const SPickParam* pick = &pItem->GetPick();
+			m_device.Update(*pick);
+			m_device.Render(*pick);
+			if (!psCrosshair_Flags.is(CROSSHAIR_INDEPENDENT))
+				return;
+		}
 	}
+
+	// Render camera crosshair
+	const SPickParam& pick_hud = HUD().GetPick();
+	m_camera.Update(pick_hud);
+	m_camera.Render(pick_hud);
 }
