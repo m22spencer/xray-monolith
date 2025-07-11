@@ -560,3 +560,18 @@ CBottleItem* CScriptGameObject::cast_BottleItem()
 	return ii ? smart_cast<CBottleItem*>(ii) : (0);
 }
 //end AVO
+
+void CScriptGameObject::memory_remove_links(const CScriptGameObject* tpLuaGameObject)
+{
+	CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
+	if (monster)
+	{
+		monster->memory().remove_links(&tpLuaGameObject->object());
+	}
+	else
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
+			"CGameObject : cannot access class member memory_remove_links!");
+	}
+}
+

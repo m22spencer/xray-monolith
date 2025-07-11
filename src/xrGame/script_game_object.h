@@ -1139,6 +1139,7 @@ public:
 	void RemoveAttachment(LPCSTR name);
 	void RemoveAttachment(script_attachment* child);
 	void IterateAttachments(::luabind::functor<bool> functor);
+	void memory_remove_links(const CScriptGameObject* tpLuaGameObject);
 
 	doors::door* m_door;
 
