@@ -18,7 +18,7 @@ void light::vis_prepare()
 	//		. perform testing				= ???,		pending
 
 	u32 frame = Device.dwFrame;
-	if (frame < vis.frame2test) return;
+	if (frame < vis.frame2test || Device.m_SecondViewport.IsSVPFrame()) return;
 
 	float safe_area = VIEWPORT_NEAR;
 	{
