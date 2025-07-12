@@ -38,6 +38,10 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 			float perceived_dist = dist / tanf(fov_rad * 0.5f);
 			float dist_k = perceived_dist / dist;
 
+			xrCriticalSectionGuard g(UCalc_Mutex);
+
+			if (UCalc_Time == RDEVICE.dwTimeGlobal) return;
+
 			bool bVisible = (dist < IK_ALWAYS_CALC_DIST * dist_k) ||
 				(
 					(dist < IK_CALC_DIST * dist_k) &&
