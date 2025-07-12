@@ -163,6 +163,10 @@ extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
 extern BOOL spawn_antifreeze;
 extern BOOL spawn_antifreeze_debug;
 
+extern float IK_CALC_DIST;
+extern float IK_ALWAYS_CALC_DIST;
+extern BOOL r_optimize_calculate_bones;
+
 extern CrosshairSettings g_crosshair_camera_near;
 extern CrosshairSettings g_crosshair_camera_far;
 extern CrosshairSettings g_crosshair_weapon_near;
@@ -2826,6 +2830,10 @@ void CCC_RegisterCommands()
 
 	CMD4(CCC_Integer, "spawn_antifreeze", &spawn_antifreeze, 0, 1);
 	CMD4(CCC_Integer, "spawn_antifreeze_debug", &spawn_antifreeze_debug, 0, 1);
+
+	CMD4(CCC_Float, "ik_calc_dist", &IK_CALC_DIST, 50, 150);
+	CMD4(CCC_Float, "ik_always_calc_dist", &IK_ALWAYS_CALC_DIST, 10, 50);
+	CMD4(CCC_Integer, "r__optimize_calculate_bones", &r_optimize_calculate_bones, 0, 1);
 
 	// demonized: Restores fun physics bugs like lift
 	CMD4(CCC_Integer, "fun_allowed", &fun_allowed, 0, 1);

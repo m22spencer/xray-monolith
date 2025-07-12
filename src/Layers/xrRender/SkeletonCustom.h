@@ -5,6 +5,8 @@
 #include		"fhierrarhyvisual.h"
 #include		"../../xrEngine/bone.h"
 #include		"../../Include/xrRender/Kinematics.h"
+#include "../../xrEngine/IRenderable.h"
+#include <optional>
 
 // consts
 extern xrCriticalSection UCalc_Mutex;
@@ -15,6 +17,7 @@ class CInifile;
 class CBoneData;
 struct SEnumVerticesCallback;
 
+class IRenderable;
 // MT-locker
 struct UCalc_mtlock
 {
@@ -120,6 +123,11 @@ public:
 
 public:
 	dxRender_Visual* m_lod;
+
+	IC auto getXForm()
+	{
+		return renderableParent ? std::optional<const Fmatrix>(renderableParent->renderable.xform) : std::nullopt;
+	}
 protected:
 	SkeletonWMVec wallmarks;
 	u32 wm_frame;

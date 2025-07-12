@@ -50,8 +50,8 @@ extern	BOOL death_anim_debug;
 #define USE_SMART_HITS
 #define USE_IK
 
-#define IK_CALC_DIST 100.f
-#define IK_ALWAYS_CALC_DIST 20.f
+float IK_CALC_DIST = 100.f;
+float IK_ALWAYS_CALC_DIST = 20.f;
 
 //void  NodynamicsCollide( bool& do_colide, bool bo1, dContact& c, SGameMtl * /*material_1*/, SGameMtl * /*material_2*/ )
 //{
@@ -654,11 +654,15 @@ void CCharacterPhysicsSupport::in_UpdateCL()
 
 		m_EntityAlife.XFORM().transform_tiny(p, vis.sphere.P);
 
+		// demonized: replace dist with FOV adjusted distance
 		float dist = Device.vCameraPosition.distance_to(p);
+		float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
+		float perceived_dist = dist / tanf(fov_rad * 0.5f);
+		float dist_k = perceived_dist / dist;
 
-		if (dist < IK_CALC_DIST)
+		if (dist < IK_CALC_DIST * dist_k)
 		{
-			if (view_frust.testSphere_dirty(p, vis.sphere.R) || dist < IK_ALWAYS_CALC_DIST)
+			if (view_frust.testSphere_dirty(p, vis.sphere.R) || dist < (IK_ALWAYS_CALC_DIST * dist_k))
 			{
 				update_interactive_anims();
 				ik_controller()->Update();
