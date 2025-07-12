@@ -50,7 +50,7 @@ extern	BOOL death_anim_debug;
 #define USE_SMART_HITS
 #define USE_IK
 
-float IK_CALC_DIST = 100.f;
+float IK_CALC_DIST = 80.f;
 float IK_ALWAYS_CALC_DIST = 20.f;
 
 //void  NodynamicsCollide( bool& do_colide, bool bo1, dContact& c, SGameMtl * /*material_1*/, SGameMtl * /*material_2*/ )
