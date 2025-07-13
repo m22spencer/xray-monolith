@@ -9,7 +9,7 @@
 
 namespace soundSmoothingParams {
 	float distanceBasedDelayPower = 1.f;
-	float distanceBasedDelayMinDistance = 30.f;
+	float distanceBasedDelayMinDistance = 50.f;
 	float pitchVariationPower = 0.f;
 	float power = 1.8;
 	int steps = 15;

@@ -124,6 +124,11 @@ public:
 public:
 	dxRender_Visual* m_lod;
 
+	IC bool canBeOptimized()
+	{
+		return renderableParent && renderableParent->canOptimizeCalculateBones();
+	}
+
 	IC auto getXForm()
 	{
 		return renderableParent ? std::optional<const Fmatrix>(renderableParent->renderable.xform) : std::nullopt;

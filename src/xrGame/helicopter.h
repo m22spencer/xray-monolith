@@ -310,6 +310,9 @@ public:
 	virtual BOOL renderable_ShadowGenerate() { return FALSE; }
 	virtual BOOL renderable_ShadowReceive() { return TRUE; }
 
+	// demonized: check if object is eligible for bone calc optimization
+	bool canOptimizeCalculateBones() override { return false; };
+
 	virtual void OnEvent(NET_Packet& P, u16 type);
 	virtual void UpdateCL();
 	virtual void shedule_Update(u32 time_delta);

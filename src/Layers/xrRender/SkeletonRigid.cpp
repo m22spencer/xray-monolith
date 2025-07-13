@@ -25,40 +25,39 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 
 
 	// demonized: don't calculate bones when the object is far away and not in frustum
-	if (r_optimize_calculate_bones)
-		if (auto xForm = getXForm())
+	// Available only if can get parent xform
+	// Refactor later for per object basis
+	if (auto xForm = getXForm())
+	{
+		Fvector p;
+		xForm.value().transform_tiny(p, vis.sphere.P);
+
+		// Perceivable distance depending on FOV, so that objects will behave normal in binoculars
+		float dist = Device.vCameraPosition.distance_to(p);
+		float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
+		float perceived_dist = dist / tanf(fov_rad * 0.5f);
+		float dist_k = perceived_dist / dist;
+
+		UCalc_mtlock lock;
+
+		if (UCalc_Time == RDEVICE.dwTimeGlobal)
+			return;
+
+		// Visibility check, perform always
+		bool visibleCheck = (dist < IK_ALWAYS_CALC_DIST * dist_k) || ::Render->ViewBase.testSphere_dirty(p, vis.sphere.R);
+		if (!visibleCheck)
 		{
-			Fvector p;
-			xForm.value().transform_tiny(p, vis.sphere.P);
-
-			// Perceivable distance depending on FOV, so that objects will behave normal in binoculars
-			float dist = Device.vCameraPosition.distance_to(p);
-			float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
-			float perceived_dist = dist / tanf(fov_rad * 0.5f);
-			float dist_k = perceived_dist / dist;
-
-			UCalc_mtlock lock;
-
-			if (UCalc_Time == RDEVICE.dwTimeGlobal) return;
-
-			bool bVisible = (dist < IK_ALWAYS_CALC_DIST * dist_k) ||
-				(
-					(dist < IK_CALC_DIST * dist_k) &&
-					::Render->ViewBase.testSphere_dirty(p, vis.sphere.R)
-				);
-
-			if (!bVisible)
-			{
-				/*if (RDEVICE.dwTimeGlobal % UCalc_Interval < 5)
-				{
-					Fvector p;
-					p = xForm.value().c;
-					Msg("CKinematics::CalculateBones, vis not visible, skip, box position %.2f, %.2f, %.2f, dist %.2f", p.x, p.y, p.z, dist / dist_k);
-				}*/
-				UCalc_Time = RDEVICE.dwTimeGlobal;
-				return;
-			}
+			UCalc_Time = RDEVICE.dwTimeGlobal;
+			return;
 		}
+
+		// distance check, perform when cvar is enabled and can be optimized
+		if (r_optimize_calculate_bones && canBeOptimized() && (dist > IK_CALC_DIST * dist_k))
+		{
+			UCalc_Time = RDEVICE.dwTimeGlobal;
+			return;
+		}
+	}
 
 	UCalc_mtlock lock;
 	OnCalculateBones();
