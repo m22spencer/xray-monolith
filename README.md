@@ -209,6 +209,20 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.14**
+* DLTX: Allow DLTX's `>` to create the property if it doesn't exist (https://github.com/themrdemonized/xray-monolith/issues/289)
+* Optimizations:
+  * Skeleton models outside of view frustum won't have bones calculations, less CPU load
+  * Additionally `r__optimize_calculate_bones` cvar allows to disable calculations for far away objects (default enabled)
+  * `ik_calc_dist` acts as a distance, over which calculations stop (default 100)
+  * `ik_always_calc_dist` is a distance, under which models will perform calculations even when not in frustum (default 20)
+  * In heavily populated maps with loads of entities expect around 2ms less frame time if you are bound by CPU
+* Sound:
+  * Added distance based delay according to the normal 343m/s speed of sound. Console variables to tweak:
+    * `snd_distance_based_delay_power` controls the delay strength. 0 will disable delay. Default 1
+    * `snd_distance_based_delay_min_distance` controls minimum distance in meters to start noticing the delay. Default 50
+  * Added optional pitch variation to sounds. Every time the sound is played it will have slightly different pitch. `snd_pitch_variation_power` controls the variation strength. Default 0
+
 **2025.07.12**
 * lulnope: expose `memory_remove_links` to lua scripts
 
