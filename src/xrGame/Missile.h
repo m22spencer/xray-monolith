@@ -78,7 +78,7 @@ protected:
 
 	CMissile* m_fake_missile;
 
-	u32 dwUpdateSounds_Frame;
+	u32 dwUpdateSounds_Frame = 0;
 
 	//параметры броска
 

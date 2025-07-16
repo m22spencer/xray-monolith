@@ -36,7 +36,7 @@ protected:
 	bool m_needReload;
 	// General
 	//кадр момента пересчета UpdateSounds
-	u32 dwUpdateSounds_Frame;
+	u32 dwUpdateSounds_Frame = 0;
 protected:
 	virtual void OnMagazineEmpty();
 
@@ -62,6 +62,7 @@ protected:
 	virtual void OnStateSwitch(u32 S, u32 oldState);
 
 	virtual void UpdateSounds();
+	void __stdcall UpdateSoundsPositions();
 
 	bool TryReload();
 
