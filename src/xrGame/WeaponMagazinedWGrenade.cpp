@@ -1004,7 +1004,7 @@ bool CWeaponMagazinedWGrenade::TryPlayAnimBore()
 void CWeaponMagazinedWGrenade::UpdateSoundsPositionsImpl()
 {
 	inherited::UpdateSoundsPositionsImpl();
-	Fvector P = get_LastFP();
+	auto& P = get_LastFP();
 	m_sounds.SetPosition("sndShotG", P);
 	m_sounds.SetPosition("sndReloadG", P);
 	m_sounds.SetPosition("sndSwitch", P);

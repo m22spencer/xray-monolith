@@ -298,7 +298,7 @@ void CWeaponKnife::UpdateCL()
 
 	dwUpdateSounds_Frame = Device.dwFrame;
 
-	Fvector P = get_LastFP();
+	auto& P = get_LastFP();
 
 	m_sounds.SetPosition("sndShow", P);
 	m_sounds.SetPosition("sndHide", P);
