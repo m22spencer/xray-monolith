@@ -773,7 +773,7 @@ void CWeaponMagazined::UpdateSounds()
 	}
 	else
 	{
-		Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
 	}
 
 	dwUpdateSounds_Frame = Device.dwFrame;
