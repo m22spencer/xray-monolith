@@ -441,7 +441,7 @@ void CRenderTarget::phase_combine()
 	//u_setrt(rt_Generic_1,0,0,HW.pBaseZB);
 
 	// Distortion filter
-	BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
+	bDistort = RImplementation.o.distortion_enabled; // This can be modified
 	{
 		u32 count = RImplementation.mapDistort.size() + RImplementation.mapHUDDistort.size();
 		if ((count < 1 && !_menu_pp))
@@ -501,9 +501,12 @@ void CRenderTarget::phase_combine()
 		phase_ssfx_motion_blur();
 	}
 
-	if (scope_3D_fake_enabled)
+	if (scope_3D_fake_enabled && !Device.m_SecondViewport.IsSVPFrame())
 	{
+		
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
+
+		phase_3DSSReticle_fixup();
 	}
 
 	//Compute blur textures
@@ -525,6 +528,8 @@ void CRenderTarget::phase_combine()
 		phase_dof();
 	}
 
+	RImplementation.mapScopeHUDSorted.clear();
+
 	if (!Device.m_SecondViewport.IsSVPFrame())
 		phase_lut();
 
@@ -542,7 +547,7 @@ void CRenderTarget::phase_combine()
 		phase_heatvision();
 	//--DSR-- HeatVision_end
 
-	if (scope_fake_enabled)
+	if (scope_fake_enabled && !Device.m_SecondViewport.IsSVPFrame())
 	{
 		phase_fakescope(); //crookr
 	}
@@ -565,7 +570,7 @@ void CRenderTarget::phase_combine()
 
 
 	if (Device.m_SecondViewport.IsSVPFrame()) {
-		phase_fakescope();
+		phase_svp_capture();
 
 		// At this point, the scope view is done. 
 		//    we do not want to post process.

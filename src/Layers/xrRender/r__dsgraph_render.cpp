@@ -770,7 +770,6 @@ void R_dsgraph_structure::r_dsgraph_render_ScopeSorted()  //  Redotix99: for 3D 
 	// Rendering
 	rmNear();
 	mapScopeHUDSorted.traverseRL(sorted_L1);
-	mapScopeHUDSorted.clear();
 	rmNormal();
 
 	// Restore projection
