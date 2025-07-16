@@ -713,7 +713,8 @@ void CWeaponMagazined::UpdateCL()
 	UpdateSounds();
 }
 
-void CWeaponMagazined::UpdateSoundsPositions()
+BOOL mt_UpdateWeaponSounds = TRUE;
+void CWeaponMagazined::UpdateSoundsPositionsImpl()
 {
 	PROF_EVENT();
 
@@ -762,12 +763,18 @@ void CWeaponMagazined::UpdateSoundsPositions()
 		m_sounds.SetPosition("sndShotMisfireActorIndoor", P);
 }
 
+void CWeaponMagazined::UpdateSoundsPositions()
+{
+	UpdateSoundsPositionsImpl();
+}
+
 void CWeaponMagazined::UpdateSounds()
 {
 	if (Device.dwFrame == dwUpdateSounds_Frame)
 		return;
 
-	if (!g_bootComplete || dwUpdateSounds_Frame == 0)
+	// demonized: put updates of m_sounds into second thread
+	if (!g_bootComplete || !mt_UpdateWeaponSounds || dwUpdateSounds_Frame == 0 )
 	{
 		UpdateSoundsPositions();
 	}

@@ -158,6 +158,8 @@ extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
 extern BOOL fun_allowed;
 
+extern BOOL mt_UpdateWeaponSounds;
+
 extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
 
 extern BOOL spawn_antifreeze;
@@ -2827,6 +2829,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "weapon_sway", &psDeviceFlags2, rsAimSway);
 
 	CMD3(CCC_Mask, "blend_move_anims", &psDeviceFlags2, rsBlendMoveAnims);
+
+	CMD4(CCC_Integer, "mt_update_weapon_sounds", &mt_UpdateWeaponSounds, 0, 1);
 
 	CMD4(CCC_Integer, "spawn_antifreeze", &spawn_antifreeze, 0, 1);
 	CMD4(CCC_Integer, "spawn_antifreeze_debug", &spawn_antifreeze_debug, 0, 1);

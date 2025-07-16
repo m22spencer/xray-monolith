@@ -49,8 +49,8 @@ void CWeaponRevolver::PlayAnimReload()
 	}
 }
 
-void CWeaponRevolver::UpdateSounds()
+void CWeaponRevolver::UpdateSoundsPositionsImpl()
 {
-	inherited::UpdateSounds();
+	inherited::UpdateSoundsPositionsImpl();
 	m_sounds.SetPosition("sndClose", get_LastFP());
 }

@@ -62,6 +62,7 @@ protected:
 	virtual void OnStateSwitch(u32 S, u32 oldState);
 
 	virtual void UpdateSounds();
+	virtual void UpdateSoundsPositionsImpl();
 	void __stdcall UpdateSoundsPositions();
 
 	bool TryReload();
