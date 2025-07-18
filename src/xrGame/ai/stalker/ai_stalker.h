@@ -233,6 +233,8 @@ public:
 	virtual void ChangeVisual(shared_str NewVisual);
 
 	void AdjustHeadOrientation(float targetPitch, float targetYaw, float targetRoll);
+	void LookAtActorSoftReset(CBoneInstance* headBone);
+	bool LookAtActorLuaResult = true;
 
 #ifdef DEBUG
 	virtual void						OnHUDDraw							(CCustomHUD* hud);

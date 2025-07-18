@@ -1101,6 +1101,8 @@ CPHDestroyable* CAI_Stalker::ph_destroyable()
 
 #include "../../enemy_manager.h"
 
+BOOL NPCsLookAtActor = TRUE;
+float NPCsLookAtActorMinDistance = 3.5f;
 void CAI_Stalker::shedule_Update(u32 DT)
 {
 	// Optimization update
@@ -1132,6 +1134,14 @@ void CAI_Stalker::shedule_Update(u32 DT)
 			if (g_Alive())
 			{
 				animation().play_delayed_callbacks();
+
+				::luabind::functor<bool> funct;
+				float distance = Actor()->Position().distance_to(Position());
+				auto luaObject = lua_game_object();
+				if (luaObject && distance < NPCsLookAtActorMinDistance && ai().script_engine().functor("_G.CNPCBeforeLookAtActor", funct))
+				{
+					LookAtActorLuaResult = funct(luaObject, distance);
+				}
 
 #ifndef USE_SCHEDULER_IN_AGENT_MANAGER
 				agent_manager().update();
@@ -1627,64 +1637,72 @@ void CAI_Stalker::AdjustHeadOrientation(float targetPitch, float targetYaw, floa
 	savedOrientation.z = angle_inertion(savedOrientation.z, targetRoll, angle_difference(savedOrientation.z, targetRoll), PI_MUL_2, Device.fTimeDelta);
 };
 
-BOOL NPCsLookAtActor = TRUE;
+void CAI_Stalker::LookAtActorSoftReset(CBoneInstance* headBone)
+{
+	AdjustHeadOrientation(0.f, 0.f, 0.f);
+	Fmatrix M;
+	M.setHPB(VPUSH(savedOrientation));
+	headBone->mTransform.mulB_43(M);
+}
+
 void CAI_Stalker::LookAtActor(CBoneInstance* headBone) {
 	if (!g_Alive()) return;
 	if (!Actor()) return;
 	if (wounded()) return;
 
-	if (!NPCsLookAtActor || Actor()->Position().distance_to(Position()) > 4.f)
+	// soft reset if cvar is disabled
+	if (!NPCsLookAtActor)
+		return LookAtActorSoftReset(headBone);
+
+	// soft reset if far enough
+	float distance = Actor()->Position().distance_to(Position());
+	if (distance > NPCsLookAtActorMinDistance)
+		return LookAtActorSoftReset(headBone);
+
+	// soft reset if can't see actor
+	if (!memory().visual().visible_right_now(Actor()))
+		return LookAtActorSoftReset(headBone);
+
+	// soft reset if lua callback returned false
+	if (!LookAtActorLuaResult)
+		return LookAtActorSoftReset(headBone);
+
+	Fmatrix actorHead;
+	smart_cast<IKinematics*>(Actor()->Visual())->Bone_GetAnimPos(actorHead, u16(Actor()->m_head), u8(-1), false);
+	actorHead.mulA_43(Actor()->XFORM());
+
+	Fmatrix myHead = headBone->mTransform;
+	myHead.mulA_43(XFORM());
+	myHead.c.mad(myHead.i, .15f);
+
+	Fvector dir, cam_pos = Actor()->HUDview() ? Actor()->cam_FirstEye()->Position() : actorHead.c;
+	dir.sub(cam_pos, myHead.c).normalize();
+
+	Fmatrix target_matrix;
+	target_matrix.identity();
+	target_matrix.k.set(dir);
+	Fvector::generate_orthonormal_basis_normalized(target_matrix.k, target_matrix.i, target_matrix.j);
+	target_matrix.j.invert();
+	target_matrix.mulA_43(Fmatrix(headBone->mTransform).mulA_43(XFORM()).invert());
+
+	float yaw, pitch, roll;
+	target_matrix.getHPB(pitch, yaw, roll);
+
+	clamp(pitch, -0.75f, 0.7f);
+	clamp(yaw, -1.0f, 1.0f);
+	clamp(roll, -0.4f, 0.4f);
+
+	bool inRange = (pitch > -0.7f && pitch < 0.65f) && (yaw > -0.9f && yaw < 0.9f) && (roll > -0.35f && roll < 0.35f);
+	if (inRange && dTimeNfSeen < Device.dwTimeGlobal)
 	{
-		AdjustHeadOrientation(0.f, 0.f, 0.f);
-		Fmatrix M;
-		M.setHPB(VPUSH(savedOrientation));
-		headBone->mTransform.mulB_43(M);
-		return;
+		dTimeFSeen = Device.dwTimeGlobal + 1000;
+		AdjustHeadOrientation(pitch, yaw, roll);
 	}
 
-	if (memory().visual().visible_right_now(Actor()))
+	bool outOfRange = !(pitch > -0.75f && pitch < 0.7f) && !(yaw > -1.2f && yaw < 1.2f) && !(roll > -0.5f && roll < 0.5f);
+	if (outOfRange && dTimeFSeen < Device.dwTimeGlobal)
 	{
-		Fmatrix actorHead;
-		smart_cast<IKinematics*>(Actor()->Visual())->Bone_GetAnimPos(actorHead, u16(Actor()->m_head), u8(-1), false);
-		actorHead.mulA_43(Actor()->XFORM());
-
-		Fmatrix myHead = headBone->mTransform;
-		myHead.mulA_43(XFORM());
-		myHead.c.mad(myHead.i, .15f);
-
-		Fvector dir, cam_pos = Actor()->HUDview() ? Actor()->cam_FirstEye()->Position() : actorHead.c;
-		dir.sub(cam_pos, myHead.c).normalize();
-
-		Fmatrix target_matrix;
-		target_matrix.identity();
-		target_matrix.k.set(dir);
-		Fvector::generate_orthonormal_basis_normalized(target_matrix.k, target_matrix.i, target_matrix.j);
-		target_matrix.j.invert();
-		target_matrix.mulA_43(Fmatrix(headBone->mTransform).mulA_43(XFORM()).invert());
-
-		float yaw, pitch, roll;
-		target_matrix.getHPB(pitch, yaw, roll);
-
-		clamp(pitch, -0.75f, 0.7f);
-		clamp(yaw, -1.0f, 1.0f);
-		clamp(roll, -0.4f, 0.4f);
-
-		bool inRange = (pitch > -0.7f && pitch < 0.65f) && (yaw > -0.9f && yaw < 0.9f) && (roll > -0.35f && roll < 0.35f);
-		if (inRange && dTimeNfSeen < Device.dwTimeGlobal)
-		{
-			dTimeFSeen = Device.dwTimeGlobal + 1000;
-			AdjustHeadOrientation(pitch, yaw, roll);
-		}
-
-		bool outOfRange = !(pitch > -0.75f && pitch < 0.7f) && !(yaw > -1.2f && yaw < 1.2f) && !(roll > -0.5f && roll < 0.5f);
-		if (outOfRange && dTimeFSeen < Device.dwTimeGlobal)
-		{
-			dTimeNfSeen = Device.dwTimeGlobal + 1000;
-			AdjustHeadOrientation(0.f, 0.f, 0.f);
-		}
-	}
-	else
-	{
+		dTimeNfSeen = Device.dwTimeGlobal + 1000;
 		AdjustHeadOrientation(0.f, 0.f, 0.f);
 	}
 
