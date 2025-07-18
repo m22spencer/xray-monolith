@@ -12,6 +12,7 @@ void check_kinematics(CKinematics* _k, LPCSTR s);
 
 extern float IK_CALC_DIST;
 extern float IK_ALWAYS_CALC_DIST;
+extern ENGINE_API BOOL g_bootComplete;
 BOOL r_optimize_calculate_bones = TRUE;
 
 class IRenderable;
@@ -27,42 +28,46 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 	// Available only if can get parent xform
 	// Refactor later for per object basis
 	float update_rate_k = 1.f;
-	if (auto xForm = getXForm())
+	if (g_bootComplete)
 	{
-		Fvector p;
-		xForm.value().transform_tiny(p, vis.sphere.P);
-
-		// Perceivable distance depending on FOV, so that objects will behave normal in binoculars
-		float dist = Device.vCameraPosition.distance_to(p);
-		float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
-		float perceived_dist = dist / tanf(fov_rad * 0.5f);
-		float dist_k = perceived_dist / dist;
-		update_rate_k = _max(1.f, dist / (IK_CALC_DIST * dist_k));
-
-		// Visibility check, perform always
-		bool visibleCheck = (dist < IK_ALWAYS_CALC_DIST * dist_k) || ::Render->ViewBase.testSphere_dirty(p, vis.sphere.R);
-		if (!visibleCheck)
+		if (auto xForm = getXForm())
 		{
-			bForceExact = FALSE;
-			update_rate_k = _max(2.f, update_rate_k);
+			Fvector p;
+			xForm.value().transform_tiny(p, vis.sphere.P);
 
-			/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+			// Perceivable distance depending on FOV, so that objects will behave normal in binoculars
+			float dist = Device.vCameraPosition.distance_to(p);
+			float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
+			float perceived_dist = dist / tanf(fov_rad * 0.5f);
+			float dist_k = perceived_dist / dist;
+			update_rate_k = _max(1.f, dist / (IK_CALC_DIST * dist_k));
+
+			// Visibility check, perform always
+			bool visibleCheck = (dist < IK_ALWAYS_CALC_DIST * dist_k) || ::Render->ViewBase.testSphere_dirty(p, vis.sphere.R);
+			if (!visibleCheck)
 			{
-				Msg("CKinematics::CalculateBones, object out of frustum, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
-			}*/
-		}
+				bForceExact = FALSE;
+				update_rate_k = _max(2.f, update_rate_k);
 
-		// distance check, perform when cvar is enabled and can be optimized
-		if (r_optimize_calculate_bones && canBeOptimized() && (dist > IK_CALC_DIST * dist_k))
-		{
-			bForceExact = FALSE;
+				/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+				{
+					Msg("CKinematics::CalculateBones, object out of frustum, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
+				}*/
+			}
 
-			/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+			// distance check, perform when cvar is enabled and can be optimized
+			if (r_optimize_calculate_bones && canBeOptimized() && (dist > IK_CALC_DIST * dist_k))
 			{
-				Msg("CKinematics::CalculateBones, object canBeOptimized and dist > IK_CALC_DIST * dist_k, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
-			}*/
+				bForceExact = FALSE;
+
+				/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+				{
+					Msg("CKinematics::CalculateBones, object canBeOptimized and dist > IK_CALC_DIST * dist_k, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
+				}*/
+			}
 		}
 	}
+	
 
 	UCalc_mtlock lock;
 	OnCalculateBones();
