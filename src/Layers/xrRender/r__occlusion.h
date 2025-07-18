@@ -33,6 +33,9 @@ public:
 #else	//	USE_DX10
 	typedef u32 occq_result;
 #endif	//	USE_DX10
+	struct occq_try_result { bool complete = false; occq_result fragments; };
+private:
+	void occq_close(u32& ID);
 public:
 	R_occlusion();
 	~R_occlusion();
@@ -41,5 +44,6 @@ public:
 	void occq_destroy();
 	u32 occq_begin(u32& ID); // returns 'order'
 	void occq_end(u32& ID);
+	occq_try_result occq_try_get(u32& ID);
 	occq_result occq_get(u32& ID);
 };

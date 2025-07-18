@@ -246,6 +246,7 @@ public:
 	// HW-occlusion culling
 	IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
 	IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
+	IC R_occlusion::occq_try_result occq_try_get(u32& ID) { return HWOCC.occq_try_get(ID); }
 	IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
 	ICF void apply_object(IRenderable* O)
