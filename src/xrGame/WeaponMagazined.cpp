@@ -777,13 +777,13 @@ void CWeaponMagazined::UpdateSounds()
 		return;
 
 	// demonized: put updates of m_sounds into second thread
-	if (!g_bootComplete || !mt_UpdateWeaponSounds || dwUpdateSounds_Frame == 0 )
+	if (g_bootComplete && mt_UpdateWeaponSounds && dwUpdateSounds_Frame != 0 )
 	{
-		UpdateSoundsPositions();
+		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
 	}
 	else
 	{
-		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+		UpdateSoundsPositions();
 	}
 
 	dwUpdateSounds_Frame = Device.dwFrame;
