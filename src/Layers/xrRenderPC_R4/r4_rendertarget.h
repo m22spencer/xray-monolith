@@ -405,6 +405,7 @@ private:
 public:
 	CRenderTarget();
 	~CRenderTarget();
+	void svp_scissor_hack(float width, float height);
 	void map_viewport_render_targets(std::function<void(ref_rt original, ref_rt views[2])> f);
 	void accum_point_geom_create();
 	void accum_point_geom_destroy();

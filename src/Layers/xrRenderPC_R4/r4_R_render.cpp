@@ -229,9 +229,38 @@ void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
 		return;    // Correct textures are already mapped
 
 	auto last = last_viewport;
-	Target->map_viewport_render_targets([current_viewport, last](ref_rt original, ref_rt views[2]) -> void {
-		HW.pContext->CopyResource(views[last]->pSurface, original->pSurface);
-		HW.pContext->CopyResource(original->pSurface, views[current_viewport]->pSurface);
+	Target->map_viewport_render_targets([Target, current_viewport, last](ref_rt original, ref_rt views[2]) -> void {
+		if (scope_svp_enabled == 3) {
+			// For this mode, we only want to copy the region covering the objective lens.
+			auto copy = [Target](int type, ref_rt dst, ref_rt src) -> void {
+				if (type == 0) HW.pContext->CopyResource(dst->pSurface, src->pSurface);
+				else {
+					//update clip rect
+					Target->svp_scissor_hack(dst->dwWidth, dst->dwHeight);
+					auto r = Device.m_SecondViewport.clipRect;
+					D3D11_BOX box;
+					box.left = r.left;
+					box.top = r.top;
+					box.right = r.right;
+					box.bottom = r.bottom;
+					box.front = 0;
+					box.back = 1;
+
+					const FLOAT clear[4] = { .0f, .0f, .0f, .0f };
+					// Must clear garbage from outside the clip rect, as postprocessing samples it.
+					HW.pContext->ClearRenderTargetView(dst->pRT, clear);
+					HW.pContext->CopySubresourceRegion(dst->pSurface, 0, box.left, box.top, 0, src->pSurface, 0, &box);
+
+				}
+			};
+			copy(last, views[last], original);
+			copy(current_viewport, original, views[current_viewport]);
+		}
+		else 
+		{
+			HW.pContext->CopyResource(views[last]->pSurface, original->pSurface);
+			HW.pContext->CopyResource(original->pSurface, views[current_viewport]->pSurface);
+		}		
 	});
 
 	last_viewport = current_viewport;

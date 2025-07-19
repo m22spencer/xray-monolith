@@ -542,7 +542,7 @@ void CRenderTarget::phase_combine()
 		phase_heatvision();
 	//--DSR-- HeatVision_end
 
-	if (scope_fake_enabled)
+	if (scope_fake_enabled && !scope_svp_enabled)
 	{
 		phase_fakescope(); //crookr
 	}

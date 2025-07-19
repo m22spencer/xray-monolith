@@ -99,7 +99,24 @@ void CRenderTarget::phase_fakescope()
 
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
-		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), dest_rt->pTexture->surface_get());
+		auto r = Device.m_SecondViewport.clipRect;
+
+#if USE_DX11
+		if (scope_svp_enabled == 3) {
+			// Copy only the objective lens screenspace bounding box
+			D3D11_BOX box;
+			box.left = r.left;
+			box.top = r.top;
+			box.right = r.right;
+			box.bottom = r.bottom;
+			box.front = 0;
+			box.back = 1;
+			const FLOAT clear[4] = { .0f, .0f, .0f, .0f };
+			HW.pContext->ClearRenderTargetView(rt_secondVP->pRT, clear);
+			HW.pContext->CopySubresourceRegion(rt_secondVP->pSurface, 0, box.left, box.top, 0, dest_rt->pSurface, 0, &box);
+		}
+		else HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), dest_rt->pTexture->surface_get());
+#endif
 		return;
 	}
 

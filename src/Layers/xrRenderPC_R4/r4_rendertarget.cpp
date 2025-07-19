@@ -41,6 +41,14 @@ void CRenderTarget::set_viewport_size(ID3DDeviceContext * dev, float w, float h)
 	custom_viewport[0].Width = w;
 	custom_viewport[0].Height = h;
 	dev->RSSetViewports(1, custom_viewport);
+
+	svp_scissor_hack(w, h);
+}
+
+// Compute a bounding box for the scopes objective lens in screen space
+void CRenderTarget::svp_scissor_hack(float width, float height)
+{
+	Device.m_SecondViewport.clipRect = Device.m_SecondViewport.computeRect(width, height);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb)
@@ -84,6 +92,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 3);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
@@ -125,6 +134,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
@@ -163,6 +173,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
 	else RCache.set_RT(NULL, 1);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -177,6 +188,7 @@ void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTa
 	RCache.set_RT(_3, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(W, H);
 }
 
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
@@ -1474,6 +1486,9 @@ void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt origi
 	VIEWPORT_RT(rt_ssfx_ao)
 	VIEWPORT_RT(rt_ssfx_il)
 
+	//VIEWPORT_RT(rt_ssfx)
+	//VIEWPORT_RT(rt_ssfx_temp)
+	//VIEWPORT_RT(rt_ssfx_temp2)
 	VIEWPORT_RT(rt_ssfx_sss)
 	VIEWPORT_RT(rt_ssfx_sss_ext)
 	VIEWPORT_RT(rt_ssfx_sss_ext2)
