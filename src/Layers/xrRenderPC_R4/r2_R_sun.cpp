@@ -1418,7 +1418,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 	// Accumulate
 	Target->phase_accumulator();
 
-	if (Target->use_minmax_sm_this_frame())
+	
+	if (!skip_shadow_maps && Target->use_minmax_sm_this_frame())
 	{
 		PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
 		Target->create_minmax_SM();
