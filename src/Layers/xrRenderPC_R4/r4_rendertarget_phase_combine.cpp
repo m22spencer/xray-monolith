@@ -496,7 +496,7 @@ void CRenderTarget::phase_combine()
 		phase_ssfx_fog_scattering();
 	}
 
-	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0 && !Device.m_SecondViewport.IsSVPFrame())
+	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0)
 	{
 		phase_ssfx_motion_blur();
 	}
@@ -533,14 +533,16 @@ void CRenderTarget::phase_combine()
 	if (!Device.m_SecondViewport.IsSVPFrame())
 		phase_lut();
 
-	if(ps_r2_mask_control.x > 0)
-	{
-		phase_gasmask_dudv();
-		phase_gasmask_drops();
-	}
+	if (!Device.m_SecondViewport.IsSVPFrame()) {
+		if (ps_r2_mask_control.x > 0)
+		{
+			phase_gasmask_dudv();
+			phase_gasmask_drops();
+		}
 
-	if(ps_r2_nightvision > 0 && !Device.m_SecondViewport.IsSVPFrame())
-		phase_nightvision();
+		if (ps_r2_nightvision > 0)
+			phase_nightvision();
+	}
 
 	//--DSR-- HeatVision_start
 	if (ps_r2_heatvision > 0)
