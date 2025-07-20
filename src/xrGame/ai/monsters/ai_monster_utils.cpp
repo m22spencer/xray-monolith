@@ -6,8 +6,8 @@
 #include "../../level_graph.h"
 #include "../../../Include/xrRender/Kinematics.h"
 #include "basemonster/base_monster.h"
-// проверить, находится ли объект entity на ноде
-// возвращает позицию объекта, если он находится на ноде, или центр его ноды
+// РїСЂРѕРІРµСЂРёС‚СЊ, РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РѕР±СЉРµРєС‚ entity РЅР° РЅРѕРґРµ
+// РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ РѕР±СЉРµРєС‚Р°, РµСЃР»Рё РѕРЅ РЅР°С…РѕРґРёС‚СЃСЏ РЅР° РЅРѕРґРµ, РёР»Рё С†РµРЅС‚СЂ РµРіРѕ РЅРѕРґС‹
 Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position)
 {
 	if (
@@ -20,7 +20,7 @@ Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position
 		return (ai().level_graph().vertex_position(entity->ai_location().level_vertex()));
 }
 
-// возвращает true, если объект entity находится на ноде
+// РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РѕР±СЉРµРєС‚ entity РЅР°С…РѕРґРёС‚СЃСЏ РЅР° РЅРѕРґРµ
 bool object_position_valid(const CEntity* entity)
 {
 	return (

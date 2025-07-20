@@ -10,7 +10,7 @@ void CMotionStats::update()
 	_new.time = pMonster->m_dwCurrentTime;
 	_data[index] = _new;
 
-	// обновить значение index
+	// РѕР±РЅРѕРІРёС‚СЊ Р·РЅР°С‡РµРЅРёРµ index
 	if ((index + 1) >= MAX_ELEMS)
 	{
 		for (u32 i = 0; i < (MAX_ELEMS - 1); i++)
@@ -37,7 +37,7 @@ bool CMotionStats::is_good_motion(u32 elems_checked)
 
 	for (u32 i = from_index; i > to_index; i--)
 	{
-		// считать только, если все элементы содержат одинаковые скорости	
+		// СЃС‡РёС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ, РµСЃР»Рё РІСЃРµ СЌР»РµРјРµРЅС‚С‹ СЃРѕРґРµСЂР¶Р°С‚ РѕРґРёРЅР°РєРѕРІС‹Рµ СЃРєРѕСЂРѕСЃС‚Рё	
 		if (!fsimilar(test_speed, _data[i].speed)) break;
 
 		float cur_dist = _data[i].position.distance_to(_data[i - 1].position);

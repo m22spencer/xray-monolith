@@ -58,13 +58,13 @@ class CControlPathBuilderBase : public CControl_ComBase
 		IC void set_position(const Fvector& p) { _position.set(p); }
 	} m_target_set, m_target_found;
 
-	u32 m_time; // время перестроения пути
+	u32 m_time; // РІСЂРµРјСЏ РїРµСЂРµСЃС‚СЂРѕРµРЅРёСЏ РїСѓС‚Рё
 	u32 m_last_time_target_set;
 	float m_distance_to_path_end;
 	bool m_failed;
 	u32 m_last_time_dir_set;
 
-	bool m_target_actual; // устанавливаемый таргет соответствует предыдущему
+	bool m_target_actual; // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Р№ С‚Р°СЂРіРµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РїСЂРµРґС‹РґСѓС‰РµРјСѓ
 
 	struct
 	{
@@ -98,7 +98,7 @@ class CControlPathBuilderBase : public CControl_ComBase
 
 	bool m_path_end;
 
-	// состояние, в котором path_builder работает независимо
+	// СЃРѕСЃС‚РѕСЏРЅРёРµ, РІ РєРѕС‚РѕСЂРѕРј path_builder СЂР°Р±РѕС‚Р°РµС‚ РЅРµР·Р°РІРёСЃРёРјРѕ
 	u32 m_time_global_failed_started;
 	u32 m_time_path_updated_external;
 
@@ -168,7 +168,7 @@ private:
 	void find_target_point_set();
 	void find_target_point_failed();
 
-	void select_target(); // выбрать 
+	void select_target(); // РІС‹Р±СЂР°С‚СЊ 
 
 	void set_path_builder_params(); // set params to control
 
@@ -179,7 +179,7 @@ private:
 	void on_path_end();
 	void on_path_updated();
 
-	// нашли позицию, найти ноду
+	// РЅР°С€Р»Рё РїРѕР·РёС†РёСЋ, РЅР°Р№С‚Рё РЅРѕРґСѓ
 	void find_node();
 
 	bool global_failed();

@@ -34,7 +34,7 @@ CGameFont* GetFontDI()
 	return mngr().pFontDI;
 }
 
-//шрифты для интерфейса
+//С€СЂРёС„С‚С‹ РґР»СЏ РёРЅС‚РµСЂС„РµР№СЃР°
 CGameFont* GetFontGraffiti19Russian()
 {
 	return mngr().pFontGraffiti19Russian;

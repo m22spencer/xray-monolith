@@ -108,8 +108,8 @@ void setup_location_types(GameGraph::TERRAIN_VECTOR& m_vertex_types, CInifile co
 
 //////////////////////////////////////////////////////////////////////////
 
-//âîçìîæíîå îòêëîíåíèå îò çíà÷åíèÿ ðåïóòàöèè
-//çàäàíîãî â ïðîôèëå è äëÿ êîíêðåòíîãî ïåðñîíàæà
+//Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾Ðµ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð¸Ðµ Ð¾Ñ‚ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ñ€ÐµÐ¿ÑƒÑ‚Ð°Ñ†Ð¸Ð¸
+//Ð·Ð°Ð´Ð°Ð½Ð¾Ð³Ð¾ Ð² Ð¿Ñ€Ð¾Ñ„Ð¸Ð»Ðµ Ð¸ Ð´Ð»Ñ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ð¾Ð³Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð°
 #define REPUTATION_DELTA	10
 #define RANK_DELTA			10
 
@@ -334,16 +334,16 @@ shared_str CSE_ALifeTraderAbstract::specific_character()
 	char_info.Load(character_profile());
 
 
-	//ïðîôèëü çàäàí èíäåêñîì
+	//Ð¿Ñ€Ð¾Ñ„Ð¸Ð»ÑŒ Ð·Ð°Ð´Ð°Ð½ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð¼
 	if (char_info.data()->m_CharacterId.size())
 	{
 		set_specific_character(char_info.data()->m_CharacterId);
 		return m_SpecificCharacter;
 	}
-		//ïðîôèëü çàäàí øàáëîíîì
+		//Ð¿Ñ€Ð¾Ñ„Ð¸Ð»ÑŒ Ð·Ð°Ð´Ð°Ð½ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð¼
 		//
-		//ïðîâåðÿåì âñå èíôîðìàöèè î ïåðñîíàæå, çàïîìèíàåì ïîäõîäÿùèå,
-		//à ïîòîì äåëàåì ñëó÷àéíûé âûáîð
+		//Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð²ÑÐµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ðµ, Ð·Ð°Ð¿Ð¾Ð¼Ð¸Ð½Ð°ÐµÐ¼ Ð¿Ð¾Ð´Ñ…Ð¾Ð´ÑÑ‰Ð¸Ðµ,
+		//Ð° Ð¿Ð¾Ñ‚Ð¾Ð¼ Ð´ÐµÐ»Ð°ÐµÐ¼ ÑÐ»ÑƒÑ‡Ð°Ð¹Ð½Ñ‹Ð¹ Ð²Ñ‹Ð±Ð¾Ñ€
 	else
 	{
 		m_CheckedCharacters.clear();
@@ -368,7 +368,7 @@ shared_str CSE_ALifeTraderAbstract::specific_character()
 			}
 			if (!char_info.data()->m_Class.size() || class_found)
 			{
-				//çàïîìíèòü ïïîäõîäÿùèé ïåðñîíàæ ñ ôëàæêîì m_bDefaultForCommunity
+				//Ð·Ð°Ð¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ Ð¿Ð¿Ð¾Ð´Ñ…Ð¾Ð´ÑÑ‰Ð¸Ð¹ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶ Ñ Ñ„Ð»Ð°Ð¶ÐºÐ¾Ð¼ m_bDefaultForCommunity
 				if (spec_char.data()->m_bDefaultForCommunity)
 					m_DefaultCharacters.push_back(id);
 
@@ -382,7 +382,7 @@ shared_str CSE_ALifeTraderAbstract::specific_character()
 						int* count = NULL;
 						if (ai().get_alife())
 							count = ai().alife().registry(specific_characters).object(id, true);
-						//åñëè èíäåêñ åùå íå áûë èñïîëüçîâàí
+						//ÐµÑÐ»Ð¸ Ð¸Ð½Ð´ÐµÐºÑ ÐµÑ‰Ðµ Ð½Ðµ Ð±Ñ‹Ð» Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½
 						if (NULL == count)
 #endif
 							m_CheckedCharacters.push_back(id);
@@ -422,7 +422,7 @@ void CSE_ALifeTraderAbstract::set_specific_character(shared_str new_spec_char)
 	R_ASSERT(new_spec_char.size());
 
 #ifdef XRGAME_EXPORTS
-	//óáðàòü ïðåäûäóùèé íîìåð èç ðååñòðà
+	//ÑƒÐ±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð½Ð¾Ð¼ÐµÑ€ Ð¸Ð· Ñ€ÐµÐµÑÑ‚Ñ€Ð°
 	if (m_SpecificCharacter.size())
 	{
 		if (ai().get_alife())
@@ -435,7 +435,7 @@ void CSE_ALifeTraderAbstract::set_specific_character(shared_str new_spec_char)
 #ifdef XRGAME_EXPORTS
 	if (ai().get_alife())
 	{
-		//çàïîìíèòü, òî ÷òî ìû èñïîëüçîâàëè èíäåêñ
+		//Ð·Ð°Ð¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ, Ñ‚Ð¾ Ñ‡Ñ‚Ð¾ Ð¼Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¸ Ð¸Ð½Ð´ÐµÐºÑ
 		int a = 1;
 		ai().alife().registry(specific_characters).add(m_SpecificCharacter, a, true);
 	}
@@ -525,7 +525,7 @@ void CSE_ALifeTraderAbstract::set_specific_character(shared_str new_spec_char)
 		if (min_m != max_m) m_dwMoney += ::Random.randI(max_m - min_m);
 	}
 #else
-	//â ðåäàêòîðå ñïåöèôè÷åñêèé ïðîôèëü îñòàâëÿåì íå çàïîëíåíûì
+	//Ð² Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¾Ñ€Ðµ ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð¿Ñ€Ð¾Ñ„Ð¸Ð»ÑŒ Ð¾ÑÑ‚Ð°Ð²Ð»ÑÐµÐ¼ Ð½Ðµ Ð·Ð°Ð¿Ð¾Ð»Ð½ÐµÐ½Ñ‹Ð¼
 	m_SpecificCharacter = NULL;
 #endif
 }
@@ -545,7 +545,7 @@ shared_str CSE_ALifeTraderAbstract::character_profile()
 
 #ifdef XRGAME_EXPORTS
 
-//äëÿ ðàáîòû ñ relation system
+//Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ relation system
 u16 CSE_ALifeTraderAbstract::object_id() const
 {
 	return base()->ID;

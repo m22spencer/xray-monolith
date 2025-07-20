@@ -587,13 +587,13 @@ void ATTACK_ON_RUN_STATE::execute()
 	object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
 	object->path().extrapolate_path(true);
 
-	// îáðàáîòàòü squad èíôî	
+	// Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ squad Ð¸Ð½Ñ„Ð¾	
 	object->path().set_use_dest_orient(false);
 
 	// 	CMonsterSquad *squad	= monster_squad().get_squad(object);
 	// 	if (squad && squad->SquadActive())
 	// 	{
-	// 		// Ïîëó÷èòü êîìàíäó
+	// 		// ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ
 	// 		SSquadCommand command;
 	// 		squad->GetCommand(object, command);
 	// 		if (command.type == SC_ATTACK)

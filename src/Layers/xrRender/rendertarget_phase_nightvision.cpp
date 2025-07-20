@@ -94,15 +94,6 @@ void CRenderTarget::phase_fakescope()
 	//Set geometry
 	RCache.set_Geometry(g_combine);
 
-	if (Device.m_SecondViewport.IsSVPFrame()) {
-		RCache.set_Element(s_scope_preprocess->E[1]);
-
-		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-
-		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), dest_rt->pTexture->surface_get());
-		return;
-	}
-
 	//Set pass
 	RCache.set_Element(s_fakescope->E[ps_r2_nightvision]);
 	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -210,23 +201,90 @@ void CRenderTarget::phase_heatvision()
 #if defined(USE_DX11)	//  Redotix99: for 3D Shader Based Scopes 		(sorry for using the nightvision phase file)
 void CRenderTarget::phase_3DSSReticle()
 {
+	PIX_EVENT(PHASE_SCOPE_RETICLE);
 	HW.pContext->CopyResource(rt_Generic_2->pTexture->surface_get(), RImplementation.Target->rt_Position->pTexture->surface_get());
 
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
-	// For SVP, we need to mask the motion vectors
-	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
-	auto mvec = svp_rendering_main_view ? RImplementation.Target->rt_ssfx_motion_vectors : 0;
-
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, mvec, HW.pBaseZB);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, HW.pBaseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
+	for (auto N : RImplementation.mapScopeHUDSorted) {
+		RCache.set_Element(N.val.se);
+		RCache.set_c("scope_render_phase", 2);  // Draw
+		RCache.set_c("bDistort", bDistort);
+	}
 	RImplementation.render_Reticle();
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, 0, HW.pBaseZB);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, HW.pBaseZB);
+};
+
+/** Mask motion vectors & clear distortion rt
+  */
+void CRenderTarget::phase_3DSSReticle_fixup()
+{
+	PIX_EVENT(PHASE_SCOPE_FIXUP);
+	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
+	auto mvec = RImplementation.Target->rt_ssfx_motion_vectors;
+	auto distort = bDistort ? RImplementation.Target->rt_Generic_1 : 0;
+
+	// Do not set color or position buffers, as these are done in the prior phase.
+	u_setrt(0, 0, mvec, distort, HW.pBaseZB);
+
+	RCache.set_CullMode(CULL_CCW);
+	RCache.set_Stencil(FALSE);
+	RCache.set_ColorWriteEnable();
+
+	for (auto N : RImplementation.mapScopeHUDSorted) {
+		RCache.set_Element(N.val.se);
+		RCache.set_c("scope_render_phase", 3);  // Fixup
+		RCache.set_c("bDistort", bDistort);
+	}
+	RImplementation.render_Reticle();
+
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, HW.pBaseZB);
+};
+
+/** Run scope preprocesson the current frame and store in svp rt.
+  * (Handle anything that needs to read from the g-buffer here.)
+  */
+void CRenderTarget::phase_svp_capture()
+{
+	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
+	u_setrt(rt_Color, nullptr, nullptr, nullptr);
+
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	RCache.set_Element(s_scope_preprocess->E[1]);
+	RCache.set_c("scope_render_phase", 1);  // PREPASS
+	RCache.set_c("bDistort", bDistort);
+
+	
+	{   // Draw fullscreen triangle.
+		u32 Offset = 0;
+		u32 C = color_rgba(0, 0, 0, 255);
+
+		float d_Z = EPS_S;
+		float d_W = 1.0f;
+		float w = float(Device.dwWidth);
+		float h = float(Device.dwHeight);
+
+		Fvector2 tc;
+		tc.set(1.0, 1.0);
+		FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
+		pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
+		pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
+		pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
+		RCache.Vertex.Unlock(3, g_combine->vb_stride);
+		RCache.set_Geometry(g_combine);
+		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+	}
+
+	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
 };
 #endif

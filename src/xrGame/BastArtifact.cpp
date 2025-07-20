@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 // BastArtifact.cpp
-// BastArtefact - артефакт мочалка
+// BastArtefact - Р°СЂС‚РµС„Р°РєС‚ РјРѕС‡Р°Р»РєР°
 ///////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -30,7 +30,7 @@ CBastArtefact::~CBastArtefact(void)
 {
 }
 
-//вызывается при столкновении мочалки с чем-то
+//РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёРё РјРѕС‡Р°Р»РєРё СЃ С‡РµРј-С‚Рѕ
 void CBastArtefact::ObjectContactCallback(bool& /**do_colide/**/, bool bo1, dContact& c, SGameMtl* /*material_1*/,
                                           SGameMtl* /*material_2*/)
 {
@@ -41,7 +41,7 @@ void CBastArtefact::ObjectContactCallback(bool& /**do_colide/**/, bool bo1, dCon
 
 	if (!l_pUD1 || !l_pUD2) return;
 
-	//определить кто есть кто, из двух столкнувшихся предметов
+	//РѕРїСЂРµРґРµР»РёС‚СЊ РєС‚Рѕ РµСЃС‚СЊ РєС‚Рѕ, РёР· РґРІСѓС… СЃС‚РѕР»РєРЅСѓРІС€РёС…СЃСЏ РїСЂРµРґРјРµС‚РѕРІ
 	CBastArtefact* pBastArtefact = l_pUD1 ? smart_cast<CBastArtefact*>(l_pUD1->ph_ref_object) : NULL;
 	if (!pBastArtefact) pBastArtefact = l_pUD2 ? smart_cast<CBastArtefact*>(l_pUD2->ph_ref_object) : NULL;
 	if (!pBastArtefact) return;
@@ -56,7 +56,7 @@ void CBastArtefact::ObjectContactCallback(bool& /**do_colide/**/, bool bo1, dCon
 
 void CBastArtefact::BastCollision(CEntityAlive* pEntityAlive)
 {
-	//попали во что-то живое
+	//РїРѕРїР°Р»Рё РІРѕ С‡С‚Рѕ-С‚Рѕ Р¶РёРІРѕРµ
 	if (pEntityAlive && pEntityAlive->g_Alive())
 	{
 		m_AttakingEntity = NULL;
@@ -132,14 +132,14 @@ void CBastArtefact::UpdateCLChild()
 	//Log						("--- A - CBastArtefact",*cName());
 	//Log						("--- A - CBastArtefact",renderable.xform);
 
-	//современем энергия по немногу тоже уменьшается
+	//СЃРѕРІСЂРµРјРµРЅРµРј СЌРЅРµСЂРіРёСЏ РїРѕ РЅРµРјРЅРѕРіСѓ С‚РѕР¶Рµ СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ
 	if (m_fEnergy > 0) m_fEnergy -= m_fEnergyDecreasePerTime * Device.fTimeDelta;
 
 	if (getVisible() && m_pPhysicsShell)
 	{
 		if (m_bStrike)
 		{
-			//выбрать жертву, если она еще не выбрана
+			//РІС‹Р±СЂР°С‚СЊ Р¶РµСЂС‚РІСѓ, РµСЃР»Рё РѕРЅР° РµС‰Рµ РЅРµ РІС‹Р±СЂР°РЅР°
 			if (!m_AliveList.empty() && m_AttakingEntity == NULL)
 			{
 				CEntityAlive* pEntityToHit = NULL;
@@ -167,7 +167,7 @@ void CBastArtefact::UpdateCLChild()
 			{
 				m_fEnergy -= m_fStrikeImpulse;
 
-				//бросить артефакт на выбранную цель
+				//Р±СЂРѕСЃРёС‚СЊ Р°СЂС‚РµС„Р°РєС‚ РЅР° РІС‹Р±СЂР°РЅРЅСѓСЋ С†РµР»СЊ
 				Fvector dir;
 				m_AttakingEntity->Center(dir);
 				dir.sub(this->Position());
@@ -220,7 +220,7 @@ void CBastArtefact::Hit(SHit* pHDS)
 
 		if (m_fEnergy > m_fEnergyMax) m_fEnergy = m_fEnergyMax;
 
-		//чтоб выстрел не повлиял на траекторию полета артефакта
+		//С‡С‚РѕР± РІС‹СЃС‚СЂРµР» РЅРµ РїРѕРІР»РёСЏР» РЅР° С‚СЂР°РµРєС‚РѕСЂРёСЋ РїРѕР»РµС‚Р° Р°СЂС‚РµС„Р°РєС‚Р°
 		HDS.impulse = 0;
 	}
 
@@ -229,7 +229,7 @@ void CBastArtefact::Hit(SHit* pHDS)
 }
 
 
-//объект можно поднять только в спокойном состоянии
+//РѕР±СЉРµРєС‚ РјРѕР¶РЅРѕ РїРѕРґРЅСЏС‚СЊ С‚РѕР»СЊРєРѕ РІ СЃРїРѕРєРѕР№РЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё
 bool CBastArtefact::Useful() const
 {
 	if (m_fEnergy > 0)

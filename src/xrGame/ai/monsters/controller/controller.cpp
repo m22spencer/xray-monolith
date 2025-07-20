@@ -311,7 +311,7 @@ BOOL CController::net_Spawn(CSE_Abstract* DC)
 
 void CController::UpdateControlled()
 {
-	// если есть враг, проверить может ли быть враг взят под контроль
+	// РµСЃР»Рё РµСЃС‚СЊ РІСЂР°Рі, РїСЂРѕРІРµСЂРёС‚СЊ РјРѕР¶РµС‚ Р»Рё Р±С‹С‚СЊ РІСЂР°Рі РІР·СЏС‚ РїРѕРґ РєРѕРЅС‚СЂРѕР»СЊ
 	if (EnemyMan.get_enemy())
 	{
 		CControlledEntityBase* entity = smart_cast<CControlledEntityBase *>(
@@ -320,7 +320,7 @@ void CController::UpdateControlled()
 		{
 			if (!entity->is_under_control() && (m_controlled_objects.size() < m_max_controlled_number))
 			{
-				// взять под контроль
+				// РІР·СЏС‚СЊ РїРѕРґ РєРѕРЅС‚СЂРѕР»СЊ
 				entity->set_under_control(this);
 				entity->set_task_follow(this);
 				m_controlled_objects.push_back(const_cast<CEntityAlive *>(EnemyMan.get_enemy()));
@@ -555,7 +555,7 @@ void CController::draw_fire_particles()
 	CEntityAlive* enemy = const_cast<CEntityAlive*>(EnemyMan.get_enemy());
 	if (!EnemyMan.see_enemy_now()) return;
 
-	// вычислить позицию и направленность партикла
+	// РІС‹С‡РёСЃР»РёС‚СЊ РїРѕР·РёС†РёСЋ Рё РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ РїР°СЂС‚РёРєР»Р°
 	Fvector my_head_pos;
 	my_head_pos.set(get_head_position(this));
 

@@ -41,6 +41,14 @@ void CRenderTarget::set_viewport_size(ID3DDeviceContext * dev, float w, float h)
 	custom_viewport[0].Width = w;
 	custom_viewport[0].Height = h;
 	dev->RSSetViewports(1, custom_viewport);
+
+	svp_scissor_hack(w, h);
+}
+
+// Compute a bounding box for the scopes objective lens in screen space
+void CRenderTarget::svp_scissor_hack(float width, float height)
+{
+	Device.m_SecondViewport.clipRect = Device.m_SecondViewport.computeRect(width, height);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb)
@@ -84,6 +92,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 3);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
@@ -125,6 +134,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
@@ -163,6 +173,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
 	else RCache.set_RT(NULL, 1);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -177,6 +188,7 @@ void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTa
 	RCache.set_RT(_3, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
+	svp_scissor_hack(W, H);
 }
 
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
@@ -552,11 +564,11 @@ CRenderTarget::CRenderTarget()
 
 		rt_dof.create(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
 
+		rt_secondVP.create(r2_RT_secondVP, w, h, rt_Color->fmt, 1);
+
 		if (RImplementation.o.dx11_hdr10) {
-			rt_secondVP.create(r2_RT_secondVP, w, h, D3DFMT_A2R10G10B10, 1); //--#SM+#-- +SecondVP+ // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM
 			rt_ui_pda.create(r2_RT_ui, w, h, D3DFMT_A2R10G10B10); // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM
 		} else {
-			rt_secondVP.create(r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8, 1); //--#SM+#-- +SecondVP+
 			rt_ui_pda.create(r2_RT_ui, w, h, D3DFMT_A8R8G8B8);
 		}
 
@@ -1474,6 +1486,9 @@ void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt origi
 	VIEWPORT_RT(rt_ssfx_ao)
 	VIEWPORT_RT(rt_ssfx_il)
 
+	//VIEWPORT_RT(rt_ssfx)
+	//VIEWPORT_RT(rt_ssfx_temp)
+	//VIEWPORT_RT(rt_ssfx_temp2)
 	VIEWPORT_RT(rt_ssfx_sss)
 	VIEWPORT_RT(rt_ssfx_sss_ext)
 	VIEWPORT_RT(rt_ssfx_sss_ext2)

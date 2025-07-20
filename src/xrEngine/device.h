@@ -146,6 +146,22 @@ public:
 		bool isActive; // Oeaa aeoeaaoee ?aiaa?a ai aoi?ie au?ii?o
 
 	public:
+		Irect clipRect;
+
+		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
+		Irect computeRect(float width, float height) {
+			Fvector v = { width, height };
+
+			auto c = Fvector(v).mul(0.5);
+			auto s = v.y * 0.5;
+			auto hs = s * 0.5;
+
+			auto min = Fvector(c).sub(hs);
+			auto max = Fvector(c).add(hs);
+
+			return { static_cast<int>(min.x), static_cast<int>(min.y), static_cast<int>(max.x), static_cast<int>(max.y) };
+		}
+
 		bool isSVPFrame = false;
 		IC bool IsSVPActive() { return isActive; }
 		void SetSVPActive(bool bState);

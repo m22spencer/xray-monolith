@@ -1592,7 +1592,7 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
 	b_on_object = b_on_object || object;
 
 
-	////////////////////////нужно сместить колижен!!
+	////////////////////////РЅСѓР¶РЅРѕ СЃРјРµСЃС‚РёС‚СЊ РєРѕР»РёР¶РµРЅ!!
 	//////////////
 	FootProcess(c, do_collide, bo1);
 	if (!do_collide) return;

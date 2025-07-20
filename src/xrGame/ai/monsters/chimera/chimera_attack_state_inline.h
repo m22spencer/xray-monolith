@@ -117,7 +117,7 @@ bool ChimeraAttackState<Object>::check_if_jump_possible(Fvector const& target)
 template <class Object>
 bool ChimeraAttackState<Object>::jump(Fvector const& target, bool attack_jump)
 {
-	// получить вектор направления и его мир угол
+	// РїРѕР»СѓС‡РёС‚СЊ РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ Рё РµРіРѕ РјРёСЂ СѓРіРѕР»
 	float dir_yaw = (target - object->Position()).getH();
 	dir_yaw = angle_normalize(-dir_yaw);
 	float yaw_current, yaw_target;

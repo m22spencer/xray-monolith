@@ -8,7 +8,7 @@
 #include "mmsystem.h"
 
 // replaced with standard AVIIF_KEYFRAME
-//rr #define AVIINDEX_ISKEYFRAME 0x10 // ключевой кадр
+//rr #define AVIINDEX_ISKEYFRAME 0x10 // РєР»СЋС‡РµРІРѕР№ РєР°РґСЂ
 
 // reverse enginered AVI index v.1 format
 /*struct AviIndex {
@@ -59,7 +59,7 @@ typedef struct
 		WORD bottom;
 	};
 
-	// RECT rcFrame; - лажа в MSDN
+	// RECT rcFrame; - Р»Р°Р¶Р° РІ MSDN
 } AVIStreamHeaderCustom;
 
 class ENGINE_API CAviPlayerCustom
@@ -75,8 +75,8 @@ protected:
 	BITMAPINFOHEADER m_biOutFormat;
 	BITMAPINFOHEADER m_biInFormat;
 
-	float m_fRate; // стандартная скорость, fps
-	float m_fCurrentRate; // текущая скорость, fps
+	float m_fRate; // СЃС‚Р°РЅРґР°СЂС‚РЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ, fps
+	float m_fCurrentRate; // С‚РµРєСѓС‰Р°СЏ СЃРєРѕСЂРѕСЃС‚СЊ, fps
 
 	DWORD m_dwFrameTotal;
 	DWORD m_dwFrameCurrent;

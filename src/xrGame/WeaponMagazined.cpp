@@ -72,6 +72,9 @@ CWeaponMagazined::~CWeaponMagazined()
 	}
 
 	// sounds
+	auto I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+	if (I != Device.seqParallel.end())
+		Device.seqParallel.erase(I);
 }
 
 void CWeaponMagazined::net_Destroy()
@@ -680,6 +683,7 @@ void CWeaponMagazined::on_b_hud_detach()
 	}
 }
 
+extern ENGINE_API BOOL g_bootComplete;
 void CWeaponMagazined::UpdateCL()
 {
 	inherited::UpdateCL();
@@ -712,21 +716,19 @@ void CWeaponMagazined::UpdateCL()
 	UpdateSounds();
 }
 
-void CWeaponMagazined::UpdateSounds()
+BOOL mt_UpdateWeaponSounds = TRUE;
+void CWeaponMagazined::UpdateSoundsPositionsImpl()
 {
-	if (Device.dwFrame == dwUpdateSounds_Frame)
-		return;
+	PROF_EVENT();
 
-	dwUpdateSounds_Frame = Device.dwFrame;
-
-	Fvector P = get_LastFP();
+	auto& P = get_LastFP();
 	m_sounds.SetPosition("sndShow", P);
 	m_sounds.SetPosition("sndHide", P);
 	m_sounds.SetPosition("sndReload", P);
 
 	// New Sounds
 	if (m_sounds.FindSoundItem("sndReloadEmpty", false))
-		m_sounds.SetPosition("sndReloadEmpty", P); 
+		m_sounds.SetPosition("sndReloadEmpty", P);
 	if (m_sounds.FindSoundItem("sndReloadMisfire", false))
 		m_sounds.SetPosition("sndReloadMisfire", P);
 	if (m_sounds.FindSoundItem("sndReloadActor", false))
@@ -738,7 +740,7 @@ void CWeaponMagazined::UpdateSounds()
 	if (m_sounds.FindSoundItem("sndEmptyClickActor", false))
 		m_sounds.SetPosition("sndEmptyClickActor", P);
 	if (m_sounds.FindSoundItem("sndShowActor", false))
-		m_sounds.SetPosition("sndShowActor", P); 
+		m_sounds.SetPosition("sndShowActor", P);
 	if (m_sounds.FindSoundItem("sndHideActor", false))
 		m_sounds.SetPosition("sndHideActor", P);
 	if (m_sounds.FindSoundItem("sndClickMisfire", false))
@@ -762,6 +764,31 @@ void CWeaponMagazined::UpdateSounds()
 		m_sounds.SetPosition("sndShotMisfireIndoor", P);
 	if (m_sounds.FindSoundItem("sndShotMisfireActorIndoor", false))
 		m_sounds.SetPosition("sndShotMisfireActorIndoor", P);
+}
+
+void CWeaponMagazined::UpdateSoundsPositions()
+{
+	UpdateSoundsPositionsImpl();
+}
+
+void CWeaponMagazined::UpdateSounds()
+{
+	if (Device.dwFrame == dwUpdateSounds_Frame)
+		return;
+
+	// demonized: put updates of m_sounds into second thread
+	if (g_bootComplete && mt_UpdateWeaponSounds && dwUpdateSounds_Frame != 0 )
+	{
+		// Force update of fire dependencies and then put into second thread, fixes flickering limbs
+		get_LastFP();
+		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+	}
+	else
+	{
+		UpdateSoundsPositions();
+	}
+
+	dwUpdateSounds_Frame = Device.dwFrame;
 }
 
 // demonized: check if cycle_down is enabled and shot num below max possible burst. Adds support for arbitrary burst shot at rpm_mode_2 with cycling down to rpm after maxBurstAmount

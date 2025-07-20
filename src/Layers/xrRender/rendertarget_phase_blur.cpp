@@ -541,6 +541,7 @@ void CRenderTarget::phase_ssfx_water_waves()
 
 void CRenderTarget::phase_ssfx_sss()
 {
+	PIX_EVENT(SSFX_SSS);
 	//Constants
 	u32 Offset = 0;
 	u32 C = color_rgba(255, 255, 255, 255);
@@ -554,6 +555,9 @@ void CRenderTarget::phase_ssfx_sss()
 	p0.set(0.0f, 0.0f);
 	p1.set(1.0f, 1.0f);
 
+	// Buffer must be cleared for svp scissor hack
+	FLOAT ColorRGBA[4] = { 1.0, 1.0, 1.0, 1.0 };
+	HW.pContext->ClearRenderTargetView(rt_ssfx->pRT, ColorRGBA);
 	u_setrt(rt_ssfx, nullptr, nullptr, nullptr);
 
 	RCache.set_CullMode(CULL_NONE);
@@ -630,6 +634,7 @@ void CRenderTarget::phase_ssfx_sss()
 
 void CRenderTarget::phase_ssfx_sss_ext(light_Package& LP)
 {
+	PIX_EVENT(SSFX_SSS_EXT);
 	static shared_str strLights("lights_data");
 	static light* LightSlot[8];
 	static u32 sss_currentframe;
@@ -648,6 +653,9 @@ void CRenderTarget::phase_ssfx_sss_ext(light_Package& LP)
 	p0.set(0.0f, 0.0f);
 	p1.set(1.0f, 1.0f);
 
+	// Buffer must be cleared for svp scissor hack
+	FLOAT ColorRGBA[4] = { 1.0, 1.0, 1.0, 1.0 };
+	HW.pContext->ClearRenderTargetView(rt_ssfx_sss_tmp->pRT, ColorRGBA);
 	u_setrt(rt_ssfx_sss_tmp, nullptr, nullptr, nullptr);
 
 	RCache.set_CullMode(CULL_NONE);
@@ -685,9 +693,10 @@ void CRenderTarget::phase_ssfx_sss_ext(light_Package& LP)
 		xr_vector<light*> LightsSort;
 		bool CheckPackage = true;
 
-		if (Device.dwFrame > sss_currentframe)
+		// Shadows must render for each viewport
+		if (Device.dwViewport > sss_currentframe)
 		{
-			sss_currentframe = Device.dwFrame + 2;
+			sss_currentframe = Device.dwViewport + 2;
 
 			xr_vector<light*>& source = LP.v_shadowed;
 			for (u32 it = 0; it < source.size(); it++)

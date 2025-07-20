@@ -102,7 +102,7 @@ namespace text_editor
 			if (pInput->get_dik_name(m_dik, buff, sizeof(buff)))
 			{
 				// demonized: add extra check for russian letters
-				if (std::isalpha(buff[0], std::locale("")) || _isalpha_l(buff[0], current_locale) || buff[0] == char(-1)) // "ˇ" = -1
+				if (std::isalpha(buff[0], std::locale("")) || _isalpha_l(buff[0], current_locale) || buff[0] == char(-1)) // "—è" = -1
 				{
 					_strlwr_l(buff, current_locale);
 					c = buff[0];

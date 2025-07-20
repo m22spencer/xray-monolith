@@ -35,7 +35,7 @@ void CStateMonsterFindEnemyRunAbstract::initialize()
 	Fvector test_position;
 	test_position.mad(target_point, dir, 10.f);
 
-	// провериь возможность пробежать дальше
+	// РїСЂРѕРІРµСЂРёСЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРѕР±РµР¶Р°С‚СЊ РґР°Р»СЊС€Рµ
 	if (ai().level_graph().valid_vertex_position(test_position))
 	{
 		u32 vertex_id = ai().level_graph().vertex_id(test_position);

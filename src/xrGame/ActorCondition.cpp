@@ -98,7 +98,7 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 	m_fAccelK = pSettings->r_float(section, "accel_k");
 	m_fSprintK = pSettings->r_float(section, "sprint_k");
 
-	//порог силы и здоровья меньше которого актер начинает хромать
+	//РїРѕСЂРѕРі СЃРёР»С‹ Рё Р·РґРѕСЂРѕРІСЊСЏ РјРµРЅСЊС€Рµ РєРѕС‚РѕСЂРѕРіРѕ Р°РєС‚РµСЂ РЅР°С‡РёРЅР°РµС‚ С…СЂРѕРјР°С‚СЊ
 	m_fLimpingHealthBegin = pSettings->r_float(section, "limping_health_begin");
 	m_fLimpingHealthEnd = pSettings->r_float(section, "limping_health_end");
 	R_ASSERT(m_fLimpingHealthBegin<=m_fLimpingHealthEnd);
@@ -525,7 +525,7 @@ void CActorCondition::PowerHit(float power, bool apply_outfit)
 	clamp(m_fPower, 0.f, 1.f);
 }
 
-//weight - "удельный" вес от 0..1
+//weight - "СѓРґРµР»СЊРЅС‹Р№" РІРµСЃ РѕС‚ 0..1
 void CActorCondition::ConditionJump(float weight)
 {
 	if (GodMode())
@@ -536,10 +536,17 @@ void CActorCondition::ConditionJump(float weight)
 	clamp(m_fPower, 0.f, 1.f);
 }
 
+// demonized: Progressive increase of stamina cost depending on weight
+BOOL progressiveStaminaCost = FALSE;
 void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
 {
 	float power = m_fWalkPower;
-	power += m_fWalkWeightPower * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
+
+	if (progressiveStaminaCost)
+		power += m_fWalkWeightPower * m_fOverweightWalkK * weight;
+	else
+		power += m_fWalkWeightPower * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
+
 	power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
 	m_fPower -= HitPowerEffect(power);
 	clamp(m_fPower, 0.f, 1.f);

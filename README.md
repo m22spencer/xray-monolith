@@ -166,16 +166,25 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 
 * Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
 
+<!----><a name="script_debugger_instructions"></a>
 * Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform
-  * Type `lua_debug 1` in console and reload the save or start a new game
   * To use it, you need to install VSCode and LuaPanda extension: https://marketplace.visualstudio.com/items?itemName=stuartwang.luapanda
   * Open your `gamedata/scripts` folder in VSCode
-  * Copy `.vscode` folder from the archive into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts/.vscode
-  * Copy `LuaPanda.lua`, `dynamic_callbacks.lua`, `global.lua`, `socket.lua` into your `gamedata/scripts` folder: https://github.com/themrdemonized/xray-monolith/tree/all-in-one-vs2022-wpo/gamedata/scripts
-  * Return to VSCode, go to `Run and Debug` section and start debugging or press F5 key
-  * Open in-game console with `~` key and type `run_string debugger_attach()`. If you do everything correctly and engine is working properly too, you will get an entry breakpoint at `global.lua` file in VSCode.
+  * Download these files into your `gamedata/scripts/.vscode` folder:
+    * [`launch.json`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/.vscode/launch.json)
+    * [`settings.json`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/.vscode/settings.json)
+  * Download these files into your `gamedata/scripts` folder:
+    * [`LuaPanda.lua`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/LuaPanda.lua)
+    * [`dynamic_callbacks.lua`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/dynamic_callbacks.lua)
+    * [`global.lua`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/global.lua)
+    * [`socket.lua`](https://raw.githubusercontent.com/themrdemonized/xray-monolith/all-in-one-vs2022-wpo/gamedata/scripts/socket.lua)
+  * In VSCode, go to `Run and Debug` section and start debugging or press F5 key
+  * Return to the game and open in-game console with `~`
+  * Type console command `lua_debug 1` in console and reload the save or start a new game
+  * Type console command `run_string debugger_attach()`. If you do everything correctly and engine is working properly too, you will get an entry breakpoint at `global.lua` file in VSCode.
   * You have to re-enable the debugger every time you start a new game or load a save, so you have to type `run_string debugger_attach()` in console again.
   * Debugger is working dynamically, so you can add/remove files from your VSCode folder and it will automatically update the list of files available for debugging.
+  * Debugger doesn't support workspace with multiple folders, so you HAVE to use "File" -> "Open Folder" to make debugger work
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
@@ -200,6 +209,47 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.20**
+* Fixed flickering bones when using `mt_update_weapon_sounds`
+* VodoXleb: Callback for GAME path build fail (https://github.com/themrdemonized/xray-monolith/pull/301)
+
+**2025.07.19**
+* Optimizations
+  * Updates to weapon sound positions moved to separate frame, can be toggled with `mt_update_weapon_sounds` cvar, default on. Slight performance gain depending on the amount of weapon game objects
+  * Calculating bones optimization will be engaged only after fully loading the level
+* Gameplay
+  * Optional progressive stamina drain, stamina usage linearly depends on current weight instead of hard cutoff point, cvar `g_progressive_stamina_cost`, default off
+  * Fix crows AI fly target position (https://github.com/ixray-team/ixray-1.6-stcop/commit/4e7de9844c1906749bb519f9c6ce350f42f02dea)
+  * NPCs will turn their heads to look at actor when upclose (https://github.com/ixray-team/ixray-1.6-stcop/commit/e55a85f0d5b719e3cd9ce23ca7976b0ca2124b08)
+    * cvar `g_npcs_look_at_actor` to enable the feature, default on
+    * cvar `g_npcs_look_at_actor_min_distance` to control minimum distance when they start to look, default 3.5
+    * callback `npc_on_before_look_at_actor` to control the behaviour of npcs
+* Fixed https://github.com/themrdemonized/xray-monolith/issues/296
+* VodoXleb: Fix `_G.get_object_squad` error (https://github.com/themrdemonized/xray-monolith/pull/299)
+
+**2025.07.16**
+* Fixed crash due to not clearing pointer to deleted IRenderable in bones calculations
+
+**2025.07.15**
+* Reducing updates of bones calculations instead of disabling them, fixes issues with T-posing corpses
+
+**2025.07.14**
+* DLTX: Allow DLTX's `>` to create the property if it doesn't exist (https://github.com/themrdemonized/xray-monolith/issues/289)
+* Optimizations:
+  * Skeleton models outside of view frustum won't have bones calculations, less CPU load
+  * Additionally `r__optimize_calculate_bones` cvar allows to disable calculations for far away objects (default enabled)
+  * `ik_calc_dist` acts as a distance, over which calculations stop (default 100)
+  * `ik_always_calc_dist` is a distance, under which models will perform calculations even when not in frustum (default 20)
+  * In heavily populated maps with loads of entities expect around 2ms less frame time if you are bound by CPU
+* Sound:
+  * Added distance based delay according to the normal 343m/s speed of sound. Console variables to tweak:
+    * `snd_distance_based_delay_power` controls the delay strength. 0 will disable delay. Default 1
+    * `snd_distance_based_delay_min_distance` controls minimum distance in meters to start noticing the delay. Default 50
+  * Added optional pitch variation to sounds. Every time the sound is played it will have slightly different pitch. `snd_pitch_variation_power` controls the variation strength. Default 0
+
+**2025.07.12**
+* lulnope: expose `memory_remove_links` to lua scripts
+
 **2025.07.08**
 * Spawn antifreeze: fixed issue related to bolts, introduced in previous version: https://github.com/themrdemonized/xray-monolith/issues/287
 * SaloEater: Debug scripts with luapanda (https://github.com/themrdemonized/xray-monolith/pull/251)

@@ -360,6 +360,7 @@ void CAI_Crow::renderable_Render()
 	o_workload_rframe = Device.dwFrame;
 }
 
+collide::rq_result GetPickResult(Fvector pos, Fvector dir, float range, CObject* ignore);
 void CAI_Crow::shedule_Update(u32 DT)
 {
 	float fDT = float(DT) / 1000.F;
@@ -398,7 +399,22 @@ void CAI_Crow::shedule_Update(u32 DT)
 		if (fGoalChangeTime <= 0)
 		{
 			fGoalChangeTime += fGoalChangeDelta + fGoalChangeDelta * Random.randF(-0.5f, 0.5f);
+
 			Fvector vP = Actor()->Position();
+
+			Fvector dest_dir;
+			dest_dir.sub(Actor()->Position(), Position());
+			float range = dest_dir.magnitude();
+			dest_dir.normalize();
+
+			collide::rq_result RQ = GetPickResult(Position(), dest_dir, range, this);
+			if (RQ.element >= 0)
+				vP = Fvector(Position()).mad(dest_dir, RQ.range);
+
+			collide::rq_result RQ2 = GetPickResult(Position(), Direction(), range, this);
+			if (RQ2.element >= 0)
+				vP = Fvector(Position()).mad(Direction(), RQ2.range);
+
 			vP.y += +fMinHeight;
 			vGoalDir.x = vP.x + vVarGoal.x * Random.randF(-0.5f, 0.5f);
 			vGoalDir.y = vP.y + vVarGoal.y * Random.randF(-0.5f, 0.5f);
@@ -420,7 +436,7 @@ void CAI_Crow::shedule_Update(u32 DT)
 	if (o_workload_rframe == (Device.dwFrame - 1));
 	else UpdateWorkload(fDT);
 #ifdef DEBUG
-	VERIFY2(valid_pos( Position() ), dbg_valide_pos_string(Position(),this," CAI_Crow::shedule_Update		(u32 DT)"));
+	VERIFY2(valid_pos( Position() ), dbg_valide_pos_string(Position(),this," CAI_Crow::shedule_Update\t\t(u32 DT)"));
 #endif
 }
 

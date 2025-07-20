@@ -99,7 +99,7 @@ void CStateMonsterAttackAbstract::execute()
 	else if (can_attack_on_move) select_state(eStateAttack_Attack_On_Run);
 	else
 	{
-		// определить тип атаки
+		// РѕРїСЂРµРґРµР»РёС‚СЊ С‚РёРї Р°С‚Р°РєРё
 		bool b_melee = false;
 		if (prev_substate == eStateAttack_Melee)
 		{
@@ -113,7 +113,7 @@ void CStateMonsterAttackAbstract::execute()
 			b_melee = true;
 		}
 
-		// установить целевое состояние
+		// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С†РµР»РµРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 		select_state(b_melee ? eStateAttack_Melee : eStateAttack_Run);
 	}
 

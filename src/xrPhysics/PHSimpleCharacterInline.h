@@ -30,13 +30,17 @@ void CPHSimpleCharacter::UpdateDynamicDamage(dContact* c, u16 obj_material_idx, 
 {
 	//if(ph_world ->IsFreezed())
 	//return;
+	if (!c || !b) return;
 	const dReal* vel = dBodyGetLinearVel(m_body);
+	if (!vel) return;
 	dReal c_vel;
 	dMass m;
 	dBodyGetMass(b, &m);
 
 	const dReal* obj_vel = dBodyGetLinearVel(b);
+	if (!obj_vel) return;
 	const dReal* norm = c->geom.normal;
+	if (!norm) return;
 	dReal norm_vel = dDOT(vel, norm);
 	dReal norm_obj_vel = dDOT(obj_vel, norm);
 
@@ -66,6 +70,7 @@ void CPHSimpleCharacter::UpdateDynamicDamage(dContact* c, u16 obj_material_idx, 
 	if (accepted_energy > 0.f)
 	{
 		SGameMtl* obj_material = GMLibrary().GetMaterialByIdx(obj_material_idx);
+		if (!obj_material) return;
 		c_vel = dSqrt(accepted_energy/m_mass*2.f) * obj_material->fBounceDamageFactor;
 	}
 	else c_vel = 0.f;

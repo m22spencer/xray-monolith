@@ -303,12 +303,18 @@ body_state = {
 	move.stand,
 }
 --]]
-local csbs_flags = {}
 AddScriptCallback("npc_on_combat_set_body_state")
 function _G.CAI_Stalker__CombatSetBodyState(npc,world_operator,body_state)
-	csbs_flags.body_state = body_state
+	local csbs_flags = {body_state = body_state}
 	SendScriptCallback("npc_on_combat_set_body_state",npc,world_operator,body_state,csbs_flags)
 	return csbs_flags.body_state
+end
+
+AddScriptCallback("npc_on_before_look_at_actor")
+_G.CNPCBeforeLookAtActor = function(npc, distance)
+	local flags = {ret_value = true}
+	SendScriptCallback("npc_on_before_look_at_actor", npc, distance)
+	return flags.ret_value
 end
 
 -- actor_on_task_callback
@@ -439,6 +445,15 @@ end
 AddScriptCallback("imgui_on_render")
 function on_imgui_render(name)
 	SendScriptCallback("imgui_on_render", name)
+end
+
+--on GAME path build fail callback (can be used when npc tries to get to currently unavailable smart), 
+--can be used to intercept and redirect squad to available smart, also can suppress error message with flags.ret_value = false
+AddScriptCallback("npc_on_game_path_build_fail")
+_G.CAI_Stalker__PathBuildFailCallback = function(npc)
+	local flags = {ret_value = true}
+	SendScriptCallback("npc_on_game_path_build_fail",npc,flags)
+	return flags.ret_value
 end
 
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius

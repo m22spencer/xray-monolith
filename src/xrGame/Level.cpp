@@ -1190,7 +1190,8 @@ void CLevel::RenderSecondViewport()
 
 void CLevel::OnRender()
 {
-	if (game && Device.m_SecondViewport.IsSVPActive())
+	bool b_main_menu_is_active = (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive());
+	if (game && !b_main_menu_is_active && Device.m_SecondViewport.IsSVPActive())
 		RenderSecondViewport();
 	
 	Device.dwViewport++;

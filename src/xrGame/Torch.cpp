@@ -433,7 +433,7 @@ void CTorch::UpdateCL()
 	if (!lanim) return;
 
 	int frame;
-	// âîçâðàùàåò â ôîðìàòå BGR
+	// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ð² Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ðµ BGR
 	u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame);
 
 	Fcolor fclr;

@@ -25,7 +25,7 @@ void move_item_from_to(u16 from_id, u16 to_id, u16 what_id)
 	P.w_u16(what_id);
 	CGameObject::u_EventSend(P);
 
-	//другому инвентарю - взять вещь 
+	//РґСЂСѓРіРѕРјСѓ РёРЅРІРµРЅС‚Р°СЂСЋ - РІР·СЏС‚СЊ РІРµС‰СЊ 
 	CGameObject::u_EventGen(P, GE_TRADE_BUY, to_id);
 	P.w_u16(what_id);
 	CGameObject::u_EventSend(P);

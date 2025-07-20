@@ -18,7 +18,11 @@ void light::vis_prepare()
 	//		. perform testing				= ???,		pending
 
 	u32 frame = Device.dwFrame;
-	if (frame < vis.frame2test || Device.m_SecondViewport.IsSVPFrame()) return;
+	if (frame < vis.frame2test || Device.m_SecondViewport.IsSVPFrame())
+		return;
+	
+	if (vis.pending) 
+		return; // If a query is pending, do not overwhelm the gpu with more queries.
 
 	float safe_area = VIEWPORT_NEAR;
 	{
@@ -74,10 +78,15 @@ void light::vis_update()
 
 	if (!vis.pending) return;
 
-	u32 frame = Device.dwFrame;
-	u64 fragments = RImplementation.occq_get(vis.query_id);
+	// Non blocking vis check.
+	// Possible minor delays with light visiblity changes
+	auto query = RImplementation.occq_try_get(vis.query_id);
+	if (!query.complete)
+		return;
 
-	vis.visible = (fragments > cullfragments);
+	u32 frame = Device.dwFrame;
+
+	vis.visible = (query.fragments > cullfragments);
 	vis.pending = false;
 	if (vis.visible)
 	{

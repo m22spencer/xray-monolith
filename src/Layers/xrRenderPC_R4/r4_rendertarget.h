@@ -378,6 +378,8 @@ public:
 	ref_geom g_postprocess;
 	ref_shader s_menu;
 	ref_geom g_menu;
+
+	bool bDistort;
 private:
 	float im_noise_time;
 	u32 im_noise_shift_w;
@@ -405,6 +407,7 @@ private:
 public:
 	CRenderTarget();
 	~CRenderTarget();
+	void svp_scissor_hack(float width, float height);
 	void map_viewport_render_targets(std::function<void(ref_rt original, ref_rt views[2])> f);
 	void accum_point_geom_create();
 	void accum_point_geom_destroy();
@@ -440,6 +443,8 @@ public:
 	void phase_fakescope(); //crookr
 	void phase_heatvision(); //--DSR-- HeatVision
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
+	void phase_3DSSReticle_fixup();
+	void phase_svp_capture();
 	void phase_lut();
 	void phase_smaa();
 	void phase_scene_prepare();

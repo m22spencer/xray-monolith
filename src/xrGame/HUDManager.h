@@ -91,7 +91,7 @@ public:
 	SPickParam& GetPick() { return PP; }
 	collide::rq_result& GetRQ() { return GetPick().result; }
 
-	//устанвка внешнего вида прицела в зависимости от текущей дисперсии
+	//СѓСЃС‚Р°РЅРІРєР° РІРЅРµС€РЅРµРіРѕ РІРёРґР° РїСЂРёС†РµР»Р° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РµРєСѓС‰РµР№ РґРёСЃРїРµСЂСЃРёРё
 	void SetCrosshairDisp(float dispf, float disps = 0.f);
 #ifdef DEBUG
     void					SetFirstBulletCrosshairDisp(float fbdispf);
