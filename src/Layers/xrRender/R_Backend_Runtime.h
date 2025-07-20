@@ -186,6 +186,9 @@ IC void CBackend::set_Element(ShaderElement* S, u32 pass)
 #endif
 #endif	//	USE_DX10
 	set_Constants(P.constants);
+#if USE_DX11
+	RCache.set_c("svp_frame", Device.m_SecondViewport.IsSVPFrame());
+#endif
 	set_Textures(P.T);
 #ifdef _EDITOR
 	set_Matrices	(P.M);
