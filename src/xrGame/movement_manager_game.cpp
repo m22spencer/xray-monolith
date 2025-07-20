@@ -22,6 +22,7 @@
 #include "level_path_builder.h"
 #include "detail_path_builder.h"
 #include "mt_config.h"
+#include "../../script_game_object.h"
 
 void CMovementManager::show_game_path_info()
 {
@@ -91,7 +92,13 @@ void CMovementManager::process_game_path()
 
 				if (game_path().failed())
 				{
-					show_game_path_info();
+					::luabind::functor<bool> funct;
+					if (ai().script_engine().functor("_G.CAI_Stalker__PathBuildFailCallback", funct))
+					{
+						if (funct(object().lua_game_object()))
+							show_game_path_info();
+					}
+					
 					break;
 				}
 

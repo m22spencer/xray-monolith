@@ -447,6 +447,15 @@ function on_imgui_render(name)
 	SendScriptCallback("imgui_on_render", name)
 end
 
+--on GAME path build fail callback (can be used when npc tries to get to currently unavailable smart), 
+--can be used to intercept and redirect squad to available smart, also can suppress error message with flags.ret_value = false
+AddScriptCallback("npc_on_game_path_build_fail")
+_G.CAI_Stalker__PathBuildFailCallback = function(npc)
+	local flags = {ret_value = true}
+	SendScriptCallback("npc_on_game_path_build_fail",npc,flags)
+	return flags.ret_value
+end
+
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius
 -- Works only when npc:get_enable_anomalies_pathfinding() == true or ai_die_in_anomalies cvar is 1
 function is_outside_damage_radius(zone, obj)
