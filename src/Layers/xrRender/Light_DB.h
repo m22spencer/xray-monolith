@@ -12,6 +12,7 @@ public:
 	ref_light sun_original;
 	ref_light sun_adapted;
 	xr_vector<ref_light> sun_cascades;
+	ref_light rain_light;
 	light_Package package;
 public:
 	void add_light(light* L);

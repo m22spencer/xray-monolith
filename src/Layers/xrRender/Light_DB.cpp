@@ -21,6 +21,7 @@ void CLight_DB::Load(IReader* fs)
 	// Lights itself
 	sun_original = NULL;
 	sun_adapted = NULL;
+	rain_light = Create();
 	sun_cascades.clear();
 
 	{
@@ -173,6 +174,7 @@ void CLight_DB::Unload()
 		s.destroy();
 	sun_cascades.clear();
 	sun_adapted.destroy();
+	rain_light.destroy();
 }
 
 light* CLight_DB::Create()

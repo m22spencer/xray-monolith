@@ -2,6 +2,7 @@
 
 void CRenderTarget::draw_rain(light& RainSetup)
 {
+	PIX_EVENT(DRAW_RAIN);
 	float fRainFactor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
 
 	// Common calc for quad-rendering
