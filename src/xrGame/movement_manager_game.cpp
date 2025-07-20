@@ -98,6 +98,10 @@ void CMovementManager::process_game_path()
 						if (funct(object().lua_game_object()))
 							show_game_path_info();
 					}
+					else
+					{
+						show_game_path_info();
+					}
 					
 					break;
 				}
