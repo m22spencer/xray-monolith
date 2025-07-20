@@ -102,7 +102,7 @@ void CUICustomEdit::OnFocusLost()
 
 void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-	//кто-то другой захватил клавиатуру
+	//РєС‚Рѕ-С‚Рѕ РґСЂСѓРіРѕР№ Р·Р°С…РІР°С‚РёР» РєР»Р°РІРёР°С‚СѓСЂСѓ
 	if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && m_bInputFocus)
 	{
 		m_bInputFocus = false;

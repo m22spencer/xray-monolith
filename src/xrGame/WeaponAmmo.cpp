@@ -179,15 +179,15 @@ void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 
 bool CWeaponAmmo::Useful() const
 {
-	// Если IItem еще не полностью использованый, вернуть true
+	// Р•СЃР»Рё IItem РµС‰Рµ РЅРµ РїРѕР»РЅРѕСЃС‚СЊСЋ РёСЃРїРѕР»СЊР·РѕРІР°РЅС‹Р№, РІРµСЂРЅСѓС‚СЊ true
 	return !!m_boxCurr;
 }
 
 /*
 s32 CWeaponAmmo::Sort(PIItem pIItem) 
 {
-	// Если нужно разместить IItem после this - вернуть 1, если
-	// перед - -1. Если пофиг то 0.
+	// Р•СЃР»Рё РЅСѓР¶РЅРѕ СЂР°Р·РјРµСЃС‚РёС‚СЊ IItem РїРѕСЃР»Рµ this - РІРµСЂРЅСѓС‚СЊ 1, РµСЃР»Рё
+	// РїРµСЂРµРґ - -1. Р•СЃР»Рё РїРѕС„РёРі С‚Рѕ 0.
 	CWeaponAmmo *l_pA = smart_cast<CWeaponAmmo*>(pIItem);
 	if(!l_pA) return 0;
 	if(xr_strcmp(cNameSect(), l_pA->cNameSect())) return 0;

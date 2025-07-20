@@ -107,21 +107,21 @@ public:
 
 	virtual void OnEvent(NET_Packet& P, u16 type);
 
-	virtual bool Useful() const; // !!! ��������������. (��. � Inventory.cpp)
+	virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
 	virtual bool IsUsingCondition() const { return (m_flags.test(FUsingCondition) > 0); };
 
 	virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
 	virtual bool Detach(PIItem pIItem) { return false; }
-	//��� ������ ��������� ����� ���� ��� ������� �������� ������
+	//при детаче спаунится новая вещь при заданно названии секции
 	virtual bool Detach(const char* item_section_name, bool b_spawn_item);
 	virtual bool CanAttach(PIItem pIItem) { return false; }
 	virtual bool CanDetach(LPCSTR item_section_name) { return false; }
 
 	virtual EHandDependence HandDependence() const { return hd1Hand; };
 	virtual bool IsSingleHanded() const { return true; };
-	virtual bool ActivateItem(); // !!! ��������������. (��. � Inventory.cpp)
-	virtual void DeactivateItem(); // !!! ��������������. (��. � Inventory.cpp)
-	virtual bool Action(u16 cmd, u32 flags) { return false; } // true ���� ��������� �������, ����� false
+	virtual bool ActivateItem(); // !!! Переопределить. (см. в Inventory.cpp)
+	virtual void DeactivateItem(); // !!! Переопределить. (см. в Inventory.cpp)
+	virtual bool Action(u16 cmd, u32 flags) { return false; } // true если известная команда, иначе false
 	virtual void DiscardState()
 	{
 	};

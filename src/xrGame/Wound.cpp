@@ -1,4 +1,4 @@
-// Wound.cpp: класс описания раны
+// Wound.cpp: РєР»Р°СЃСЃ РѕРїРёСЃР°РЅРёСЏ СЂР°РЅС‹
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -67,7 +67,7 @@ float CWound::TypeSize(ALife::EHitType hit_type)
 	return m_Wounds[hit_type];
 }
 
-//кол-во кровавых ран
+//РєРѕР»-РІРѕ РєСЂРѕРІР°РІС‹С… СЂР°РЅ
 float CWound::BloodSize()
 {
 	return m_Wounds[ALife::eHitTypeWound] + m_Wounds[ALife::eHitTypeFireWound];
@@ -91,7 +91,7 @@ void CWound::Incarnation(float percent, float min_wound_size)
 		return;
 	}
 
-	//заживить все раны пропорционально их размеру
+	//Р·Р°Р¶РёРІРёС‚СЊ РІСЃРµ СЂР°РЅС‹ РїСЂРѕРїРѕСЂС†РёРѕРЅР°Р»СЊРЅРѕ РёС… СЂР°Р·РјРµСЂСѓ
 	for (int i = 0; i < ALife::eHitTypeMax; i++)
 	{
 		m_Wounds[i] -= percent/* *m_Wounds[i]*/;

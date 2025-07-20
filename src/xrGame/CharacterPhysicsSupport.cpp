@@ -50,8 +50,8 @@ extern	BOOL death_anim_debug;
 #define USE_SMART_HITS
 #define USE_IK
 
-#define IK_CALC_DIST 100.f
-#define IK_ALWAYS_CALC_DIST 20.f
+float IK_CALC_DIST = 100.f;
+float IK_ALWAYS_CALC_DIST = 20.f;
 
 //void  NodynamicsCollide( bool& do_colide, bool bo1, dContact& c, SGameMtl * /*material_1*/, SGameMtl * /*material_2*/ )
 //{
@@ -214,9 +214,9 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
 			ka->PlayCycle("death_init");
 	}
 	else if (!m_EntityAlife.animation_movement_controlled())
-		ka->PlayCycle("death_init"); ///непонятно зачем это вообще надо запускать
-									  ///этот хак нужен, потому что некоторым монстрам 
-									  ///анимация после спона, может быть вообще не назначена
+		ka->PlayCycle("death_init"); ///РЅРµРїРѕРЅСЏС‚РЅРѕ Р·Р°С‡РµРј СЌС‚Рѕ РІРѕРѕР±С‰Рµ РЅР°РґРѕ Р·Р°РїСѓСЃРєР°С‚СЊ
+									  ///СЌС‚РѕС‚ С…Р°Рє РЅСѓР¶РµРЅ, РїРѕС‚РѕРјСѓ С‡С‚Рѕ РЅРµРєРѕС‚РѕСЂС‹Рј РјРѕРЅСЃС‚СЂР°Рј 
+									  ///Р°РЅРёРјР°С†РёСЏ РїРѕСЃР»Рµ СЃРїРѕРЅР°, РјРѕР¶РµС‚ Р±С‹С‚СЊ РІРѕРѕР±С‰Рµ РЅРµ РЅР°Р·РЅР°С‡РµРЅР°
 	pK->CalculateBones_Invalidate();
 	pK->CalculateBones(TRUE);
 
@@ -630,7 +630,7 @@ void CCharacterPhysicsSupport::in_UpdateCL()
 	if (m_pPhysicsShell)
 	{
 		VERIFY(m_pPhysicsShell->isFullActive( ));
-		m_pPhysicsShell->SetRagDoll(); //Теперь шела относиться к классу объектов cbClassRagDoll
+		m_pPhysicsShell->SetRagDoll(); //РўРµРїРµСЂСЊ С€РµР»Р° РѕС‚РЅРѕСЃРёС‚СЊСЃСЏ Рє РєР»Р°СЃСЃСѓ РѕР±СЉРµРєС‚РѕРІ cbClassRagDoll
 
 		if (!is_imotion(m_interactive_motion)) //!m_flags.test(fl_use_death_motion)
 			m_pPhysicsShell->InterpolateGlobalTransform(&mXFORM);
@@ -654,11 +654,15 @@ void CCharacterPhysicsSupport::in_UpdateCL()
 
 		m_EntityAlife.XFORM().transform_tiny(p, vis.sphere.P);
 
+		// demonized: replace dist with FOV adjusted distance
 		float dist = Device.vCameraPosition.distance_to(p);
+		float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
+		float perceived_dist = dist / tanf(fov_rad * 0.5f);
+		float dist_k = perceived_dist / dist;
 
-		if (dist < IK_CALC_DIST)
+		if (dist < IK_CALC_DIST * dist_k)
 		{
-			if (view_frust.testSphere_dirty(p, vis.sphere.R) || dist < IK_ALWAYS_CALC_DIST)
+			if (view_frust.testSphere_dirty(p, vis.sphere.R) || dist < (IK_ALWAYS_CALC_DIST * dist_k))
 			{
 				update_interactive_anims();
 				ik_controller()->Update();

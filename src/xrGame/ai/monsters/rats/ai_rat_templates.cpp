@@ -304,12 +304,12 @@ Fvector CAI_Rat::calc_position()
 	Fvector position_on_plane;
 	P.project(position_on_plane, Position());
 
-	// находим проекцию точки, лежащей на векторе текущего направления
+	// РЅР°С…РѕРґРёРј РїСЂРѕРµРєС†РёСЋ С‚РѕС‡РєРё, Р»РµР¶Р°С‰РµР№ РЅР° РІРµРєС‚РѕСЂРµ С‚РµРєСѓС‰РµРіРѕ РЅР°РїСЂР°РІР»РµРЅРёСЏ
 	Fvector dir_point, proj_point;
 	dir_point.mad(position_on_plane, Direction(), 1.f);
 	P.project(proj_point, dir_point);
 
-	// получаем искомый вектор направления
+	// РїРѕР»СѓС‡Р°РµРј РёСЃРєРѕРјС‹Р№ РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ
 	Fvector target_dir;
 	target_dir.sub(proj_point, position_on_plane);
 

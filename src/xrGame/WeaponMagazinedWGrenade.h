@@ -52,7 +52,7 @@ public:
 
 	virtual bool Action(u16 cmd, u32 flags);
 
-	virtual void UpdateSounds();
+	virtual void UpdateSoundsPositionsImpl();
 
 	//переключение в режим подствольника
 	virtual bool SwitchMode(bool force = false);

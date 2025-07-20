@@ -36,19 +36,19 @@ void CStateZombieAttackRunAbstract::execute()
 
 	object->path().set_try_min_time(false);
 
-	// óñòàíîâêà ïàðàìåòðîâ ôóíêöèîíàëüíûõ áëîêîâ
+	// ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð±Ð»Ð¾ÐºÐ¾Ð²
 	object->path().set_target_point(object->EnemyMan.get_enemy_position(), object->EnemyMan.get_enemy_vertex());
 	object->path().set_rebuild_time(100 + u32(50.f * dist));
 	object->path().set_distance_to_end(2.5f);
 	object->path().set_use_covers(false);
 
 	//////////////////////////////////////////////////////////////////////////
-	// îáðàáîòàòü squad-äàííûå
+	// Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ squad-Ð´Ð°Ð½Ð½Ñ‹Ðµ
 	//////////////////////////////////////////////////////////////////////////
 	CMonsterSquad* squad = monster_squad().get_squad(object);
 	bool squad_active = squad && squad->SquadActive();
 
-	// Ïîëó÷èòü êîìàíäó
+	// ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ
 	SSquadCommand command;
 	squad->GetCommand(object, command);
 	if (!squad_active || (command.type != SC_ATTACK)) squad_active = false;
@@ -111,7 +111,7 @@ void CStateZombieAttackRunAbstract::choose_action()
 	//
 	//if ((action == ACT_RUN) && (m_time_action_change + CHANGE_ACTION_FROM_RUN > time())) return;
 
-	//// óñòàíîâêà ïàðàìåòðîâ ôóíêöèîíàëüíûõ áëîêîâ
+	//// ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð±Ð»Ð¾ÐºÐ¾Ð²
 	//if (object->HitMemory.is_hit() && (object->conditions().GetHealth() < 0.5f)) 
 	//	action = ACT_RUN;
 	//else 

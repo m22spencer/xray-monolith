@@ -88,7 +88,7 @@ void CBaseMonster::HitEntity(const CEntity* pEntity, float fDamage, float impuls
 		Fvector position_in_bone_space;
 		position_in_bone_space.set(0.f, 0.f, 0.f);
 
-		// перевод из локальных координат в мировые вектора направления импульса
+		// РїРµСЂРµРІРѕРґ РёР· Р»РѕРєР°Р»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚ РІ РјРёСЂРѕРІС‹Рµ РІРµРєС‚РѕСЂР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РёРјРїСѓР»СЊСЃР°
 		Fvector hit_dir;
 		XFORM().transform_dir(hit_dir, dir);
 		hit_dir.normalize();
@@ -218,16 +218,16 @@ bool CBaseMonster::feel_vision_isRelevant(CObject* O)
 
 	if ((O->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return false;
 
-	// если спит, то ничего не видит
+	// РµСЃР»Рё СЃРїРёС‚, С‚Рѕ РЅРёС‡РµРіРѕ РЅРµ РІРёРґРёС‚
 	if (m_bSleep) return false;
 
-	// если не враг - не видит
+	// РµСЃР»Рё РЅРµ РІСЂР°Рі - РЅРµ РІРёРґРёС‚
 	CEntityAlive* entity = smart_cast<CEntityAlive*>(O);
 	if (entity && entity->g_Alive())
 	{
 		if (!EnemyMan.is_enemy(entity))
 		{
-			// если видит друга - проверить наличие у него врагов
+			// РµСЃР»Рё РІРёРґРёС‚ РґСЂСѓРіР° - РїСЂРѕРІРµСЂРёС‚СЊ РЅР°Р»РёС‡РёРµ Сѓ РЅРµРіРѕ РІСЂР°РіРѕРІ
 			CBaseMonster* monster = smart_cast<CBaseMonster *>(entity);
 			if (monster && !m_skip_transfer_enemy) EnemyMan.transfer_enemy(monster);
 			return false;
@@ -246,7 +246,7 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16
 
 	if (element < 0) return;
 
-	// Определить направление хита (перед || зад || лево || право)
+	// РћРїСЂРµРґРµР»РёС‚СЊ РЅР°РїСЂР°РІР»РµРЅРёРµ С…РёС‚Р° (РїРµСЂРµРґ || Р·Р°Рґ || Р»РµРІРѕ || РїСЂР°РІРѕ)
 	float yaw, pitch;
 	vLocalDir.getHP(yaw, pitch);
 
@@ -271,7 +271,7 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16
 		element
 	);
 
-	// если нейтрал - добавить как врага
+	// РµСЃР»Рё РЅРµР№С‚СЂР°Р» - РґРѕР±Р°РІРёС‚СЊ РєР°Рє РІСЂР°РіР°
 	CEntityAlive* obj = smart_cast<CEntityAlive*>(who);
 	if (obj && (tfGetRelationType(obj) == ALife::eRelationTypeNeutral)) EnemyMan.add_enemy(obj);
 }

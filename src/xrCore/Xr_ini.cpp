@@ -41,7 +41,7 @@ bool item_pred(const CInifile::Item& x, LPCSTR val)
 }
 
 //------------------------------------------------------------------------------
-//Тело функций Inifile
+//РўРµР»Рѕ С„СѓРЅРєС†РёР№ Inifile
 //------------------------------------------------------------------------------
 XRCORE_API BOOL _parse(LPSTR dest, LPCSTR src)
 {
@@ -836,11 +836,13 @@ void CInifile::Load(IReader* F, LPCSTR path
 		}
 
 		//Delete entries that are still marked DLTX_DELETE
+		xr_unordered_set<xr_string> deletedItems;
 		for (auto It = CurrentSect->Data.rbegin(); It != CurrentSect->Data.rend(); ++It)
 		{
 			if (IsStringDLTXDelete(It->second))
 			{
 				CurrentSect->Data.erase(It.base() - 1);
+				deletedItems.insert(It->first.c_str());
 			}
 		}
 
@@ -849,12 +851,19 @@ void CInifile::Load(IReader* F, LPCSTR path
 			for (auto It = OverrideModifyListData[std::string(CurrentSect->Name.c_str())].begin(); It != OverrideModifyListData[std::string(CurrentSect->Name.c_str())].end(); ++It) {
 				CInifile::Item &I = *It;
 
-				// If section exists with item list, split list and perform operation
+				// Get list mode operation (add or delete)
 				char dltx_listmode = I.first[0];
 				I.first = I.first.c_str() + 1;
 
+				// Find existing item list if exists
 				CInifile::SectIt_ sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), *I.first, item_pred);
-				if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(I.first)) {
+
+				// If item list doesn't exist and wasn't deleted by previous operation, insert as is
+				if (I.second != NULL && !deletedItems.contains(I.first.c_str()) && dltx_listmode == '>' && (sect_it == CurrentSect->Data.end() || !sect_it->first.equal(I.first))) {
+					CurrentSect->Data.insert(sect_it, I);	
+
+				// If item list exists, split existing list and perform operation
+				} else if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(I.first)) {
 
 					//Msg("%s has dltx_listmode %s", I.first.c_str(), std::string(1, dltx_listmode).c_str());
 
@@ -926,7 +935,6 @@ void CInifile::Load(IReader* F, LPCSTR path
 				}
 			}
 		}
-		
 
 		//Pop from stack
 		auto LastElement = PreviousEvaluations->end();

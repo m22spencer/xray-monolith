@@ -9,7 +9,7 @@ class CTrade
 {
 	xr_vector<CObject*> m_nearest;
 
-	bool TradeState; // режим торговли. true - включен
+	bool TradeState; // СЂРµР¶РёРј С‚РѕСЂРіРѕРІР»Рё. true - РІРєР»СЋС‡РµРЅ
 	u32 m_dwLastTradeTime;
 
 	typedef enum tagTraderType
@@ -34,7 +34,7 @@ class CTrade
 		}
 	};
 
-	//если нужно провести синхронизацию с сервером для торговцев
+	//РµСЃР»Рё РЅСѓР¶РЅРѕ РїСЂРѕРІРµСЃС‚Рё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЋ СЃ СЃРµСЂРІРµСЂРѕРј РґР»СЏ С‚РѕСЂРіРѕРІС†РµРІ
 	bool m_bNeedToUpdateArtefactTasks;
 
 public:

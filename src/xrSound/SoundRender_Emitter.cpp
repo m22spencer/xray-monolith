@@ -48,6 +48,7 @@ CSoundRender_Emitter::CSoundRender_Emitter(void)
 	starting_delay = 0.f;
 	priority_scale = 1.f;
 	m_cur_handle_cursor = 0;
+	need_preplay_update = true;
 }
 
 CSoundRender_Emitter::~CSoundRender_Emitter(void)

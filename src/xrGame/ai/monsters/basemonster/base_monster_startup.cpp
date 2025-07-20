@@ -387,7 +387,7 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
 
 void CBaseMonster::net_Destroy()
 {
-	// ôóíêöèÿ äîëæåíà áûòü âûçâàíà ïåðåä inherited
+	// Ñ„ÑƒÐ½ÐºÑ†Ð¸Ñ Ð´Ð¾Ð»Ð¶ÐµÐ½Ð° Ð±Ñ‹Ñ‚ÑŒ Ð²Ñ‹Ð·Ð²Ð°Ð½Ð° Ð¿ÐµÑ€ÐµÐ´ inherited
 	if (m_controlled) m_controlled->on_destroy();
 	if (StateMan) StateMan->critical_finalize();
 

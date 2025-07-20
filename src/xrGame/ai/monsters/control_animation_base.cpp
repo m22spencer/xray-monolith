@@ -61,11 +61,11 @@ void CControlAnimationBase::reinit()
 
 	aa_time_last_attack = 0;
 
-	// обновить количество анимаций
+	// РѕР±РЅРѕРІРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РЅРёРјР°С†РёР№
 	m_anim_motion_map.clear();
 	UpdateAnimCount();
 
-	// инициализация информации о текущей анимации
+	// РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ Р°РЅРёРјР°С†РёРё
 	m_cur_anim.set_motion(eAnimStandIdle);
 	m_cur_anim.index = 0;
 	m_cur_anim.time_started = 0;
@@ -211,14 +211,14 @@ void CControlAnimationBase::select_animation(bool anim_end)
 	else m_state_attack = false;
 
 
-	// перекрыть все определения и установть анимацию
+	// РїРµСЂРµРєСЂС‹С‚СЊ РІСЃРµ РѕРїСЂРµРґРµР»РµРЅРёСЏ Рё СѓСЃС‚Р°РЅРѕРІС‚СЊ Р°РЅРёРјР°С†РёСЋ
 	m_object->ForceFinalAnimation();
 
-	// получить элемент SAnimItem, соответствующий текущей анимации
+	// РїРѕР»СѓС‡РёС‚СЊ СЌР»РµРјРµРЅС‚ SAnimItem, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ С‚РµРєСѓС‰РµР№ Р°РЅРёРјР°С†РёРё
 	SAnimItem* anim_it = m_anim_storage[cur_anim_info().get_motion()];
 	VERIFY(anim_it);
 
-	// определить необходимый индекс
+	// РѕРїСЂРµРґРµР»РёС‚СЊ РЅРµРѕР±С…РѕРґРёРјС‹Р№ РёРЅРґРµРєСЃ
 	int index;
 
 	if (m_override_animation == cur_anim_info().get_motion()
@@ -239,7 +239,7 @@ void CControlAnimationBase::select_animation(bool anim_end)
 		index = ::Random.randI(anim_it->count);
 	}
 
-	// установить анимацию	
+	// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ Р°РЅРёРјР°С†РёСЋ	
 	string128 s1, s2;
 	MotionID cur_anim = smart_cast<IKinematicsAnimated*>(m_object->Visual())->ID_Cycle_Safe(
 		strconcat(sizeof(s2), s2, *anim_it->target_name, itoa(index, s1, 10)));
@@ -251,7 +251,7 @@ void CControlAnimationBase::select_animation(bool anim_end)
 	ctrl_data->global.actual = false;
 	ctrl_data->set_speed(m_cur_anim.speed._get_target());
 
-	// Заполнить текущую анимацию
+	// Р—Р°РїРѕР»РЅРёС‚СЊ С‚РµРєСѓС‰СѓСЋ Р°РЅРёРјР°С†РёСЋ
 	string64 st, tmp;
 	strconcat(sizeof(st), st, *anim_it->target_name, itoa(index, tmp, 10));
 	//	xr_sprintf		(st, "%s%d", *anim_it->second.target_name, index);
@@ -262,12 +262,12 @@ void CControlAnimationBase::select_animation(bool anim_end)
 	m_cur_anim.speed._set_target(-1.f);
 }
 
-// проверить существует ли переход из анимации from в to
+// РїСЂРѕРІРµСЂРёС‚СЊ СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё РїРµСЂРµС…РѕРґ РёР· Р°РЅРёРјР°С†РёРё from РІ to
 bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 {
 	if (!m_man->check_start_conditions(ControlCom::eControlSequencer)) return false;
 
-	// поиск соответствующего перехода
+	// РїРѕРёСЃРє СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїРµСЂРµС…РѕРґР°
 	bool b_activated = false;
 	EMotionAnim cur_from = from;
 	EPState state_from = GetState(cur_from);
@@ -278,7 +278,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 
 	while (!bVectEmpty)
 	{
-		// вход в цикл, если вектор переходов не пустой
+		// РІС…РѕРґ РІ С†РёРєР», РµСЃР»Рё РІРµРєС‚РѕСЂ РїРµСЂРµС…РѕРґРѕРІ РЅРµ РїСѓСЃС‚РѕР№
 
 		bool from_is_good = ((I->from.state_used) ? (I->from.state == state_from) : (I->from.anim == cur_from));
 		bool target_is_good = ((I->target.state_used) ? (I->target.state == state_to) : (I->target.anim == to));
@@ -287,7 +287,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 		{
 			//if (I->skip_if_aggressive && m_object->m_bAggressive) return;
 
-			// переход годится
+			// РїРµСЂРµС…РѕРґ РіРѕРґРёС‚СЃСЏ
 			if (!b_activated)
 			{
 				m_object->com_man().seq_init();
@@ -301,7 +301,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 			{
 				cur_from = I->anim_transition;
 				state_from = GetState(cur_from);
-				I = m_tTransitions.begin(); // начать сначала
+				I = m_tTransitions.begin(); // РЅР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°
 				continue;
 			}
 			else break;
@@ -330,7 +330,7 @@ void CControlAnimationBase::CheckReplacedAnim()
 
 SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 {
-	// искать текущую анимацию в AA_VECTOR
+	// РёСЃРєР°С‚СЊ С‚РµРєСѓС‰СѓСЋ Р°РЅРёРјР°С†РёСЋ РІ AA_VECTOR
 	MotionID motion = smart_cast<IKinematicsAnimated*>(m_object->Visual())->LL_MotionID(anim_name);
 
 	for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
@@ -344,7 +344,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 
 SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
 {
-	// искать текущую анимацию в AA_VECTOR
+	// РёСЃРєР°С‚СЊ С‚РµРєСѓС‰СѓСЋ Р°РЅРёРјР°С†РёСЋ РІ AA_VECTOR
 	for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
 	{
 		if ((it->motion == motion) && (it->time == time_perc)) return (*it);
@@ -356,7 +356,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
 
 EPState CControlAnimationBase::GetState(EMotionAnim a)
 {
-	// найти анимацию 
+	// РЅР°Р№С‚Рё Р°РЅРёРјР°С†РёСЋ 
 	SAnimItem* item_it = m_anim_storage[a];
 	VERIFY2(item_it, make_string("animation not found in m_anim_storage!"));
 
@@ -531,7 +531,7 @@ void CControlAnimationBase::UpdateAnimCount()
 	{
 		if (!(*it)) continue;
 
-		// проверить, были ли уже загружены данные
+		// РїСЂРѕРІРµСЂРёС‚СЊ, Р±С‹Р»Рё Р»Рё СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅС‹ РґР°РЅРЅС‹Рµ
 		if ((*it)->count != 0) return;
 
 		string128 s, s_temp;
@@ -591,11 +591,11 @@ shared_str CControlAnimationBase::GetAnimTranslation(const MotionID& motion)
 
 MotionID CControlAnimationBase::get_motion_id(EMotionAnim a, u32 index)
 {
-	// получить элемент SAnimItem, соответствующий текущей анимации
+	// РїРѕР»СѓС‡РёС‚СЊ СЌР»РµРјРµРЅС‚ SAnimItem, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ С‚РµРєСѓС‰РµР№ Р°РЅРёРјР°С†РёРё
 	SAnimItem* anim_it = m_anim_storage[a];
 	VERIFY(anim_it);
 
-	// определить необходимый индекс
+	// РѕРїСЂРµРґРµР»РёС‚СЊ РЅРµРѕР±С…РѕРґРёРјС‹Р№ РёРЅРґРµРєСЃ
 	if (index == u32(-1))
 	{
 		if (-1 != anim_it->spec_id) index = anim_it->spec_id;
@@ -635,13 +635,13 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
 	m_object->sound().play(MonsterSound::eMonsterSoundAttackHit);
 
 	bool should_hit = true;
-	// определить дистанцию до врага
+	// РѕРїСЂРµРґРµР»РёС‚СЊ РґРёСЃС‚Р°РЅС†РёСЋ РґРѕ РІСЂР°РіР°
 	Fvector d;
 	d.sub(enemy->Position(), m_object->Position());
 	if (d.magnitude() > params.dist)
 		should_hit = false;
 
-	// проверка на  Field-Of-Hit
+	// РїСЂРѕРІРµСЂРєР° РЅР°  Field-Of-Hit
 	float my_h, my_p;
 	float h, p;
 

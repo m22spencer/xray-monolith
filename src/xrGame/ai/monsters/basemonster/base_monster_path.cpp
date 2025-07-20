@@ -14,15 +14,15 @@
 #include "../../../ai_space.h"
 #include "../control_direction_base.h"
 
-// каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
+// РєР°Р¶РґС‹Р№ РјРѕРЅСЃС‚СЂ РјРѕР¶РµС‚ РїРѕ-СЂР°Р·РЅРѕРјСѓ СЂРµР°Р»РёР·РІР°С‚СЊ СЌС‚Сѓ С„СѓРЅРє (e.g. РєСЂРѕРІРѕСЃРѕСЃ СЃ РїРѕРІРѕСЂРѕС‚РѕРј РіРѕР»РѕРІС‹ Рё С‚.Рї.)
 void CBaseMonster::LookPosition(Fvector to_point, float angular_speed)
 {
-	// по-умолчанию просто изменить movement().m_body.target.yaw
+	// РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ РїСЂРѕСЃС‚Рѕ РёР·РјРµРЅРёС‚СЊ movement().m_body.target.yaw
 	Fvector d;
 	d.set(to_point);
 	d.sub(Position());
 
-	// установить текущий угол
+	// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РµРєСѓС‰РёР№ СѓРіРѕР»
 	dir().set_heading(angle_normalize(-d.getH()));
 }
 

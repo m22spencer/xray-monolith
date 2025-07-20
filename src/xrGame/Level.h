@@ -300,7 +300,7 @@ public:
 
 	CLevel();
 	virtual ~CLevel();
-	// названияе текущего уровня
+	// РЅР°Р·РІР°РЅРёСЏРµ С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРІРЅСЏ
 	virtual shared_str name() const;
 	// this method can be used ONLY from CCC_ChangeGameType
 	// XXX nitrocaster: why c_str?
@@ -309,9 +309,9 @@ public:
 	// gets the time from the game simulation
 	ALife::_TIME_ID GetStartGameTime();
 	ALife::_TIME_ID GetGameTime();
-	// возвращает время для энвайронмента в милисекундах относительно начала игры
+	// РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ РґР»СЏ СЌРЅРІР°Р№СЂРѕРЅРјРµРЅС‚Р° РІ РјРёР»РёСЃРµРєСѓРЅРґР°С… РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РёРіСЂС‹
 	ALife::_TIME_ID GetEnvironmentGameTime();
-	// игровое время в отформатированном виде
+	// РёРіСЂРѕРІРѕРµ РІСЂРµРјСЏ РІ РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅРѕРј РІРёРґРµ
 	void GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& mins, u32& secs, u32& milisecs);
 	float GetGameTimeFactor();
 	void SetGameTimeFactor(const float fTimeFactor);

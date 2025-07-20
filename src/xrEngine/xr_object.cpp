@@ -90,6 +90,13 @@ void CObject::cNameVisual_set(shared_str N)
 		new_k->Update_Callback_Param = old_k->Update_Callback_Param;
 		}
 		*/
+
+		if (new_k)
+			new_k->renderableParent = this;
+
+		if (old_k)
+			old_k->renderableParent = nullptr;
+
 		if (old_k && new_k)
 		{
 			new_k->SetUpdateCallback(old_k->GetUpdateCallback());
@@ -100,6 +107,13 @@ void CObject::cNameVisual_set(shared_str N)
 	}
 	else
 	{
+		if (renderable.visual)
+		{
+			IKinematics* new_k = renderable.visual->dcast_PKinematics();
+			if (new_k)
+				new_k->renderableParent = nullptr;
+		}
+		
 		::Render->model_Delete(renderable.visual);
 		NameVisual = 0;
 	}
