@@ -779,6 +779,8 @@ void CWeaponMagazined::UpdateSounds()
 	// demonized: put updates of m_sounds into second thread
 	if (g_bootComplete && mt_UpdateWeaponSounds && dwUpdateSounds_Frame != 0 )
 	{
+		// Force update of fire dependencies and then put into second thread, fixes flickering limbs
+		get_LastFP();
 		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
 	}
 	else
