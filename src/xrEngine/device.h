@@ -30,6 +30,7 @@
 #ifdef INGAME_EDITOR
 # include "../Include/editor/interfaces.hpp"
 #endif // #ifdef INGAME_EDITOR
+#include "../Include/xrRender/Kinematics.h"
 
 class engine_impl;
 
@@ -166,6 +167,10 @@ public:
 		IC bool IsSVPActive() { return isActive; }
 		void SetSVPActive(bool bState);
 		bool IsSVPFrame() { return isSVPFrame; }
+
+		// Fetch the bone matrix of `v` from renderable skeleton (set in r4)
+		//    No longer required once scope calculations are moved into r4
+		std::function<bool(IKinematics* k, IRenderVisual* v, Fmatrix& m)> get_bone_matrix;
 	};	
 	
 private:

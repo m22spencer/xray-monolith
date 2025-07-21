@@ -17,6 +17,7 @@
 #include "../../xrCore/profiler.h"
 
 #include "D3DX10Core.h"
+#include "../xrRender/SkeletonX.h"
 
 CRender RImplementation;
 
@@ -937,6 +938,15 @@ CRender::CRender()
 	: m_bFirstFrameAfterReset(false)
 {
 	init_cacades();
+
+	Device.m_SecondViewport.get_bone_matrix = [](IKinematics* k, IRenderVisual* v, Fmatrix& m) -> bool {
+		auto s = dynamic_cast<CSkeletonX*>(v);
+		if (s && k) {
+			m = k->LL_GetTransform_R(s->get_RMS_boneid());
+			return true;
+		}
+		return false;
+	};
 }
 
 CRender::~CRender()
