@@ -3246,7 +3246,7 @@ void CWeapon::SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective) {
 				return NULL;
 
 			auto r = model->dcast_RenderVisual();
-
+			
 			if (r) {
 				auto children = r->get_children();
 
@@ -3284,9 +3284,13 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 				//   pull the occlusion culling bounds directly from the render data.
 				auto vis = lens.visual;
 				if (vis) {
-					auto dvis = vis->getVisData();
-					lens.transform.mul(hi->m_model->LL_GetTransform_R(0), Fmatrix().translate(dvis.sphere.P));
-					lens.radius = dvis.sphere.R;
+					Fmatrix trans; 
+					if (Device.m_SecondViewport.get_bone_matrix && Device.m_SecondViewport.get_bone_matrix(hi->m_model, lens.visual, trans)) {
+						auto dvis = vis->getVisData();
+						lens.transform.mul(trans, Fmatrix().translate(dvis.sphere.P));
+						lens.radius = dvis.sphere.R;
+					}
+					else lens.visual = nullptr;
 				}
 			}
 		};
