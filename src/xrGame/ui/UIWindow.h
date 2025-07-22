@@ -249,8 +249,10 @@ public:
 	IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
 
 protected:
+	xrCriticalSection childWndGuard;
 	IC void SafeRemoveChild(CUIWindow* child)
 	{
+		xrCriticalSectionGuard g(childWndGuard);
 		WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
 		if (it != m_ChildWndList.end())m_ChildWndList.erase(it);
 	};

@@ -236,6 +236,7 @@ void CUIWindow::AttachChild(CUIWindow* pChild)
 	R_ASSERT(pChild);
 	if (!pChild) return;
 
+	xrCriticalSectionGuard g(childWndGuard);
 	R_ASSERT(!IsChild(pChild));
 	pChild->SetParent(this);
 	m_ChildWndList.push_back(pChild);
@@ -251,6 +252,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
 		SetCapture(pChild, false);
 
 	//.	SafeRemoveChild			(pChild);
+	xrCriticalSectionGuard g(childWndGuard);
 	WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
 	R_ASSERT(it!=m_ChildWndList.end());
 	m_ChildWndList.erase(it);
@@ -263,6 +265,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
 
 void CUIWindow::DetachAll()
 {
+	xrCriticalSectionGuard g(childWndGuard);
 	while (!m_ChildWndList.empty())
 	{
 		DetachChild(m_ChildWndList.back());
