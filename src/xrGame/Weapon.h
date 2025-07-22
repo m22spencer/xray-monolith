@@ -105,9 +105,6 @@ public:
 	int last_hide_bullet;
 	bool bHasBulletsToHide;
 
-	Lens eyepieceLens;
-	Lens objectiveLens;
-
 	//--DSR-- SilencerOverheat_start
 	float temperature;
 

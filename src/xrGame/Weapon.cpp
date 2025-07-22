@@ -1386,7 +1386,7 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
 bool CWeapon::need_renderable()
 {
-	bool svp_has_objective_lens = (scope_svp_enabled > 1 && objectiveLens.radius > EPS);
+	bool svp_has_objective_lens = (scope_svp_enabled > 1 && Device.m_SecondViewport.objective.radius > EPS);
 	bool not_in_scope = !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
 
 	return svp_has_objective_lens || not_in_scope;
@@ -3235,34 +3235,22 @@ void CWeapon::UpdateSecondVP()
 
 bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 {
-	
-	eyepieceLens.transform = Device.m_SecondViewport.eyepiece.m_W;
-	eyepieceLens.radius = Device.m_SecondViewport.eyepiece.radius;
-
-	objectiveLens.transform = Device.m_SecondViewport.objective.m_W;
-	objectiveLens.radius = Device.m_SecondViewport.objective.radius;
-
-	if (eyepieceLens.radius > EPS) {
+	if (Device.m_SecondViewport.eyepiece.radius > EPS) {
 		// Many guns have had their mesh directly scaled, so the only reliable unit of
 		//    measurement is based off the only reliable mesh in the file. The lens.
-		Fvector4 o = Fvector4(scope_objective_lens_offset).mul(eyepieceLens.radius);
-		Fvector4 o2 = o;
+		Fvector4 o = Fvector4(scope_objective_lens_offset).mul(Device.m_SecondViewport.eyepiece.radius);
 
-		// Move camera
+		// Move camera to where min magnification uses full objective lens
 		auto l = o.w / tan(deg2rad(GetMinScopeZoomFactor() * 0.75) / 2.0);
-		o2.z -= l;
+		o.z -= l;
 
-		auto offset = Fmatrix().translate({ o.x, o.y, o.z });
-		auto offset2 = Fmatrix().translate({ o2.x, o2.y, o2.z });
-		auto r = o.w;
-
-		Fmatrix objectiveLensCamera;
-		objectiveLensCamera.mul(eyepieceLens.transform, offset2);
-
-		if (objectiveLens.radius < EPS)
-			return false;
-
-		camera.set(objectiveLensCamera);
+		if (Device.m_SecondViewport.objective.radius < EPS) {
+			// Can't render weapon in scope, but we can place the camera on the eyepiece lens
+			camera.set(Device.m_SecondViewport.eyepiece.m_W);
+			return true;
+		}
+		
+		camera.mul(Device.m_SecondViewport.eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
 		return true;
 	}
 

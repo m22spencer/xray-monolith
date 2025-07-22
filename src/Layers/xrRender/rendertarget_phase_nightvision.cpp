@@ -219,6 +219,12 @@ void CRenderTarget::phase_3DSSReticle()
 	// For now, we need to feed the data back to Level() svp code
 	auto distort = bDistort;
 	auto f = Device.m_SecondViewport.update_lens_params = [distort]() -> void {
+		auto p = &Device.m_SecondViewport;
+
+		// Clear so that we don't have invalid data for no lense being found
+		p->eyepiece.radius = 0.f;
+		p->objective.radius = 0.f;
+
 		for (auto N : RImplementation.mapScopeHUDSorted) {
 			RCache.set_Element(N.val.se);
 			RCache.set_c("scope_render_phase", 2);  // Draw
@@ -232,7 +238,6 @@ void CRenderTarget::phase_3DSSReticle()
 				auto m_W = RCache.get_xform_world();
 				m_W.mulB_43(Fmatrix().translate(S.P));
 							
-				auto p = &Device.m_SecondViewport;
 				p->eyepiece.m_W = m_W;
 				p->eyepiece.radius = S.R;
 
