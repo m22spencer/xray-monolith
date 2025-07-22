@@ -174,7 +174,6 @@ public:
 		// Fetch the bone matrix of `v` from renderable skeleton (set in r4)
 		//    No longer required once scope calculations are moved into r4
 		std::function<bool(IKinematics* k, IRenderVisual* v, Fmatrix& m)> get_bone_matrix;
-
 		std::function<void()> update_lens_params;
 	};	
 	
