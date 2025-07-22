@@ -1160,16 +1160,63 @@ void EnsureDeviceState(std::function<void()> f)
 	Device.m_pRender->SetCacheXform_prev(Device.matrices_previous[0].mView, Device.matrices_previous[0].mProject);
 }
 
+void debug_scope(Fmatrix scope_camera) {
+	auto draw_circle = [](Fmatrix m, u32 color, bool bHud) -> void {
+		int n = 100;
+		Fvector v0, s;
+		for (int i = 0; i < n + 1; i++) {
+			float angle = float(i) / float(n) * PI * 2.0;
+
+			Fvector v1 = { cos(angle), sin(angle), .0f };
+			m.transform(v1);
+			if (i > 0) CDebugRenderer().draw_line({}, v0, v1, color, bHud);
+			v0 = v1;
+		}
+	};
+
+	auto draw_lens = [draw_circle](CRenderDevice::CSecondVPParams::Lens lens, u32 color) -> void {
+		draw_circle(Fmatrix(lens.m_W).mulB_43(Fmatrix().scale(lens.radius, lens.radius, 0.0)), color, true);
+
+		Fvector v0 = { 0, 0, 0 };
+		Fvector v1 = { 0, 0, 100 };
+		lens.m_W.transform(v0);
+		lens.m_W.transform(v1);
+
+		CDebugRenderer().draw_line(Fmatrix().identity(), v0, v1, color, true);
+	};
+
+	auto draw_camera = [scope_camera, draw_circle](u32 color) -> void {
+		auto cm = 1.0 / 100.0;
+		draw_circle(Fmatrix(scope_camera).mulB_43(Fmatrix().scale(.25 * cm, .25 * cm, 0.0)), color, true);
+	};
+
+	auto p = Device.m_SecondViewport;
+
+	draw_lens(p.eyepiece, 0xff0000ff);
+	draw_lens(p.objective, 0xffffff00);
+	draw_camera(0xffffffff);
+}
+
 void CLevel::RenderSecondViewport()
 {
 	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
 	float _, fov, fNearPlane, fFarPlane;
 	Device.mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
+	// Render the hud to find the scope lenses
+	g_hud->Render_Last();
+
+	// Use the found lenses to update lens positioning information
+	if (Device.m_SecondViewport.update_lens_params)
+		Device.m_SecondViewport.update_lens_params();
+	
 	Fmatrix scope_camera = Fmatrix(Device.mInvView);
 	if (!Actor()->scopeCameraMatrix(scope_camera)) {
 		scope_camera = Fmatrix(Device.mInvView);
 	}
+
+	if (scope_debug >= 2)
+		debug_scope(scope_camera);
 
 	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
 		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);

@@ -36,6 +36,21 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
 void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector& Center)
 {
 	CRender& RI = RImplementation;
+	auto sh = pVisual->shader->E[0]._get();
+#if defined(USE_DX11) //  Redotix99: for 3D Shader Based Scopes 
+	if (nullptr != sh && sh->flags.iScopeLense == 3) {
+		// We must detect the lens surface immediately, ignoring all culling.
+		float distSQ;
+		float SSA = CalcSSA(distSQ, Center, pVisual);
+		mapSorted_Node* N = mapScopeHUDSorted.insertInAnyWay(distSQ);
+		N->val.ssa = 0;
+		N->val.pObject = RI.val_pObject;
+		N->val.pVisual = pVisual;
+		N->val.Matrix = *RI.val_pTransform;
+		N->val.se = pVisual->shader->E[0]._get();
+		return;
+	}
+#endif
 
 	if (pVisual->vis.marker == RI.marker) return;
 	pVisual->vis.marker = RI.marker;
@@ -66,7 +81,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 	}
 
 	// Select shader
-	ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ);
+	sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ);
 	if (0 == sh) return;
 	if (!pmask[sh->flags.iPriority / 2]) return;
 
@@ -102,16 +117,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 
 		case 2: {
 			mapHUD_Node * N = mapScopeHUD.insertInAnyWay(distSQ);
-			N->val.ssa = SSA;
-			N->val.pObject = RI.val_pObject;
-			N->val.pVisual = pVisual;
-			N->val.Matrix = *RI.val_pTransform;
-			N->val.se = sh;
-			return;
-		}
-
-		case 3: {
-			mapSorted_Node * N = mapScopeHUDSorted.insertInAnyWay(distSQ);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;
 			N->val.pVisual = pVisual;

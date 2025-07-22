@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "../../xrGame/debug_renderer.h"
+#include "FBasicVisual.h"
 
 void CRenderTarget::phase_nightvision()
 {
@@ -198,7 +200,8 @@ void CRenderTarget::phase_heatvision()
 };
 //--DSR-- HeatVision_start
 
-#if defined(USE_DX11)	//  Redotix99: for 3D Shader Based Scopes 		(sorry for using the nightvision phase file)
+#if defined(USE_DX11)	
+//  Redotix99: for 3D Shader Based Scopes 		(sorry for using the nightvision phase file)
 void CRenderTarget::phase_3DSSReticle()
 {
 	PIX_EVENT(PHASE_SCOPE_RETICLE);
@@ -213,12 +216,42 @@ void CRenderTarget::phase_3DSSReticle()
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
-	for (auto N : RImplementation.mapScopeHUDSorted) {
-		RCache.set_Element(N.val.se);
-		RCache.set_c("scope_render_phase", 2);  // Draw
-		RCache.set_c("bDistort", bDistort);
-	}
-	RImplementation.render_Reticle();
+	// For now, we need to feed the data back to Level() svp code
+	auto distort = bDistort;
+	auto f = Device.m_SecondViewport.update_lens_params = [distort]() -> void {
+		for (auto N : RImplementation.mapScopeHUDSorted) {
+			RCache.set_Element(N.val.se);
+			RCache.set_c("scope_render_phase", 2);  // Draw
+			RCache.set_c("bDistort", distort);
+
+
+			RImplementation.render_Reticle();
+
+			{   // Compute the lens information
+				auto S = N.val.pVisual->getVisData().sphere;
+				auto m_W = RCache.get_xform_world();
+				m_W.mulB_43(Fmatrix().translate(S.P));
+							
+				auto p = &Device.m_SecondViewport;
+				p->eyepiece.m_W = m_W;
+				p->eyepiece.radius = S.R;
+
+				if (p->eyepiece.radius > EPS) {
+					// Many guns have had their mesh directly scaled, so the only reliable unit of
+					//    measurement is based off the only reliable mesh in the file. The lens.
+					Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
+
+					// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
+					p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
+					p->objective.radius = o.w;
+				}
+			}
+			break;  // For now, we only handle the first lens rendered
+		}
+	};
+
+	// Make sure to actually render the reticle
+	f();
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, HW.pBaseZB);
 };

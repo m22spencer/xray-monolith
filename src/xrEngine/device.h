@@ -147,6 +147,9 @@ public:
 		bool isActive; // Oeaa aeoeaaoee ?aiaa?a ai aoi?ie au?ii?o
 
 	public:
+		struct Lens { Fmatrix m_W; float radius; };
+		Lens eyepiece;
+		Lens objective;
 		Irect clipRect;
 
 		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
@@ -171,6 +174,8 @@ public:
 		// Fetch the bone matrix of `v` from renderable skeleton (set in r4)
 		//    No longer required once scope calculations are moved into r4
 		std::function<bool(IKinematics* k, IRenderVisual* v, Fmatrix& m)> get_bone_matrix;
+
+		std::function<void()> update_lens_params;
 	};	
 	
 private:
