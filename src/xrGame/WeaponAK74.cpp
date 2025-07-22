@@ -40,8 +40,6 @@ void CWeaponAK74::script_register	(lua_State *L)
 			.def("IsZoomed", &CWeapon::IsZoomed)
 			.def("GetZoomFactor", &CWeapon::GetZoomFactor)
 			.def("SetZoomFactor", &CWeapon::SetZoomFactor)
-
-			.def("SetLensShaderNames", &CWeapon::SetLensShaderNames)
 			
 			.def("IsSingleHanded", &CWeapon::IsSingleHanded)
 			

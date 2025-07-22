@@ -186,7 +186,7 @@ extern ECORE_API int scope_3D_fake_enabled; // Redotix99: for 3D Shader Based Sc
 extern ECORE_API int scope_svp_enabled;		// Second Viewport scopes
 
 // Offset of objective lens from eyepiece lens with w representing radius
-//   the units are based off the eyepiece dimensions from HOM
+//   the units are based off the eyepiece dimensions from mesh bounding sphere
 //   which allows us to support scaling
 extern ECORE_API Fvector4 scope_objective_lens_offset;  
 
