@@ -1034,7 +1034,12 @@ void CGameObject::SetKinematicsCallback(bool set)
 
 void VisualCallback(IKinematics* tpKinematics)
 {
-	CGameObject* game_object = static_cast<CGameObject*>(static_cast<CObject*>(tpKinematics->GetUpdateCallbackParam()));
+	auto cobj = static_cast<CObject*>(tpKinematics->GetUpdateCallbackParam());
+	if (!cobj) return;
+
+	CGameObject* game_object = static_cast<CGameObject*>(cobj);
+	if (!game_object) return;
+
 	VERIFY(game_object);
 
 	CGameObject::CALLBACK_VECTOR_IT I = game_object->visual_callbacks().begin();
