@@ -82,6 +82,11 @@ void CSoundRender_TargetA::render()
 	{
 		A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, Slot, 0, AL_FILTER_NULL));
 	}
+	// demonized: explicitly disable effects by sending sounds to null slot, ie. not sending
+	else
+	{
+		A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, AL_EFFECTSLOT_NULL, 0, NULL));
+	}
 	A_CHK(alSourcePlay(pSource));
 
 	inherited::render();
