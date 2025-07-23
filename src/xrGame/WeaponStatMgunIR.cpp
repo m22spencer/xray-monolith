@@ -71,9 +71,6 @@ void CWeaponStatMgun::OnKeyboardPress(int dik)
 	case kWPN_RELOAD:
 		Action(eWpnReload, 0);
 		break;
-	case kDROP:
-		Action(eWpnUnload, 0);
-		break;
 #endif
 	};
 }
@@ -130,8 +127,7 @@ void CWeaponStatMgun::script_register(lua_State* L)
 			value("eWpnDesiredPos", int(CWeaponStatMgun::eWpnDesiredPos)),
 			value("eWpnDesiredDir", int(CWeaponStatMgun::eWpnDesiredDir)),
 			value("eWpnDesiredAng", int(CWeaponStatMgun::eWpnDesiredAng)),
-			value("eWpnReload", int(CWeaponStatMgun::eWpnReload)),
-			value("eWpnUnload", int(CWeaponStatMgun::eWpnUnload))
+			value("eWpnReload", int(CWeaponStatMgun::eWpnReload))
 		]
 		.def("Action", &CWeaponStatMgun::Action)
 		.def("SetParam", (void (CWeaponStatMgun::*)(int, Fvector))&CWeaponStatMgun::SetParam)
@@ -141,13 +137,11 @@ void CWeaponStatMgun::script_register(lua_State* L)
 		[
 			value("eStateIdle", int(CWeaponStatMgun::eStateIdle)),
 			value("eStateFire", int(CWeaponStatMgun::eStateFire)),
-			value("eStateReload", int(CWeaponStatMgun::eStateReload)),
-			value("eStateUnload", int(CWeaponStatMgun::eStateUnload))
+			value("eStateReload", int(CWeaponStatMgun::eStateReload))
 		]
 		.def("GetState", &CWeaponStatMgun::GetState)
 		.def("GetStateDelay", &CWeaponStatMgun::GetStateDelay)
 		.def("GetReloadDelay", &CWeaponStatMgun::GetReloadDelay)
-		.def("GetUnloadDelay", &CWeaponStatMgun::GetUnloadDelay)
 
 		.def("GetOwner", &CWeaponStatMgun::GetOwner)
 		.def("GetFirePos", &CWeaponStatMgun::GetFirePos)

@@ -208,7 +208,7 @@ void CWeaponStatMgun::OnShot()
 		UpdateBulletVisibility(iAmmoElapsed);
 	}
 
-	PlayAnimWeapon(eStmAnimWeapon_shot);
+	m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_shot);
 #else
 	VERIFY(Owner());
 
@@ -434,9 +434,6 @@ void CWeaponStatMgun::SwitchState(u16 state)
 	case eStateReload:
 		switch2_Reload();
 		break;
-	case eStateUnload:
-		switch2_Unload();
-		break;
 	}
 }
 
@@ -476,7 +473,9 @@ void CWeaponStatMgun::switch2_Fire()
 void CWeaponStatMgun::switch2_Reload()
 {
 	if (iAmmoElapsed == iMagazineSize && !m_next_ammoType_on_reload.valid())
+	{
 		return;
+	}
 
 	if (IsReloadConsume() && (GetAmmoCount_allType() == 0))
 	{
@@ -501,29 +500,11 @@ void CWeaponStatMgun::switch2_Reload()
 
 	if (iAmmoElapsed == 0)
 	{
-		PlayAnimWeapon(eStmAnimWeapon_reload0);
+		m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_reload0);
 	}
 	else
 	{
-
-		PlayAnimWeapon(eStmAnimWeapon_reload1);
-	}
-}
-
-void CWeaponStatMgun::switch2_Unload()
-{
-	if (iAmmoElapsed == 0)
-	{
-		return;
-	}
-
-	FireEnd();
-	m_state_index = eStateUnload;
-	m_state_delay = m_unload_delay;
-
-	{
-		Fmatrix xfm = Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_x_bone));
-		m_sounds.PlaySound("sndUnload", xfm.c, Owner(), false);
+		m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_reload1);
 	}
 }
 
@@ -536,9 +517,6 @@ void CWeaponStatMgun::UpdateState()
 		break;
 	case eStateReload:
 		UpdateReload();
-		return;
-	case eStateUnload:
-		UpdateUnload();
 		return;
 	default:
 		break;
@@ -559,19 +537,6 @@ void CWeaponStatMgun::UpdateReload()
 			m_next_ammoType_on_reload.reset();
 		}
 		ReloadMagazine();
-		switch2_Idle();
-	}
-}
-
-void CWeaponStatMgun::UpdateUnload()
-{
-	Fmatrix xfm = Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_x_bone));
-	m_sounds.SetPosition("sndUnload", xfm.c);
-
-	m_state_delay = m_state_delay - Device.fTimeDelta;
-	if (m_state_delay < 0)
-	{
-		UnloadMagazine(!IsUnlimitedAmmo());
 		switch2_Idle();
 	}
 }

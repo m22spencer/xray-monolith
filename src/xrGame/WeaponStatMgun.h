@@ -7,6 +7,7 @@
 #include "string_table.h"
 #include "PHSkeleton.h"
 #include "../xrphysics/PHUpdateObject.h"
+#include "PhysicsSkeletonObject.h"
 #endif
 
 #include "holder_custom.h"
@@ -107,7 +108,8 @@ private:
 
 private:
 #ifdef STATIONARYMGUN_NEW
-	enum EStmCamType{
+	enum EStmCamType
+	{
 		eCamFirst = 0,
 		eCamChase,
 		eCamSize,
@@ -276,23 +278,6 @@ protected:
 	virtual void net_Save(NET_Packet &P);
 	virtual BOOL net_SaveRelevant();
 
-	/*----------------------------------------------------------------------------------------------------
-		Weapon animations
-	----------------------------------------------------------------------------------------------------*/
-	enum EStmAnimWeapon
-	{
-		eStmAnimWeapon_idle = 0,
-		eStmAnimWeapon_shot,
-		eStmAnimWeapon_reload0,
-		eStmAnimWeapon_reload1,
-		eStmAnimWeapon_chamber,
-		eStmAnimWeapon_size
-	};
-	MotionID m_anim_weapon[eStmAnimWeapon_size];
-	MotionID m_anim_weapon_current;
-	void PlayAnimWeapon(u16 anim);
-	static void AnimWeaponCallback(CBlend *B);
-
 public:
 	enum
 	{
@@ -302,7 +287,6 @@ public:
 		eWpnDesiredDir,
 		eWpnDesiredAng,
 		eWpnReload,
-		eWpnUnload,
 	};
 	virtual void SetParam(int id, Fvector val);
 	IC BOOL IsWorking() { return CShootingObject::IsWorking(); }
@@ -333,6 +317,58 @@ public:
 	/* Barrels APIs */
 	SStmBarrel *Barrel(LPCSTR name);
 	float BarrelRPM(LPCSTR name);
+
+	/*----------------------------------------------------------------------------------------------------
+		Weapon animations
+	----------------------------------------------------------------------------------------------------*/
+	struct SStmAnimWeapon
+	{
+		enum EStmAnimWeapon
+		{
+			eStmAnimWeapon_idle = 0,
+			eStmAnimWeapon_shot,
+			eStmAnimWeapon_reload0,
+			eStmAnimWeapon_reload1,
+			eStmAnimWeapon_chamber,
+			eStmAnimWeapon_size
+		};
+		CWeaponStatMgun *m_stm;
+		xr_vector<MotionID> m_anims[eStmAnimWeapon_size];
+		u8 m_current_anm;
+		u8 m_current_idx;
+		MotionID m_current_mid;
+
+		SStmAnimWeapon();
+		~SStmAnimWeapon();
+		void Init(CWeaponStatMgun *stm);
+		BOOL net_Spawn(CSE_Abstract *DC);
+		void Play(u8 anim);
+		void OnAnimationEnd();
+		static void AnimationCallback(CBlend *B);
+
+		u16 m_magazine_hide_bid;
+		xr_vector<MotionID> m_magazine_hide_anm;
+		void UpdateMagazineVisibility();
+#if 0
+		/*
+		Discarded magazine. Unfinished.
+		Do something like CCustomRocket and CPhysicsSkeletonObject but create a new class instead of reusing them.
+		*/
+		u8 m_reload0_mag_idx;
+		u8 m_reload1_mag_idx;
+		shared_str m_magazine_sec;
+		Fvector m_magazine_dir;
+		float m_magazine_vel;
+		xr_vector<CCustomRocket *> m_magazine_object;
+		xr_vector<CCustomRocket *> m_magazine_launch;
+		bool IsMagazine(CObject *O);
+		void CreateMagazine();
+		void LaunchMagazine(CObject *O);
+		void AttachMagazine(u16 id, CGameObject *parent);
+		void DetachMagazine(u16 id);
+#endif
+	} m_anim_weapon;
+	virtual void OnEvent(NET_Packet &P, u16 type);
 
 	/*----------------------------------------------------------------------------------------------------
 		Sounds
@@ -380,7 +416,6 @@ public:
 		eStateIdle = 0,
 		eStateFire,
 		eStateReload,
-		eStateUnload,
 	};
 
 protected:
@@ -391,11 +426,9 @@ protected:
 	virtual void switch2_Idle();
 	virtual void switch2_Fire();
 	virtual void switch2_Reload();
-	virtual void switch2_Unload();
 
 	virtual void UpdateState();
 	virtual void UpdateReload();
-	virtual void UpdateUnload();
 
 public:
 	struct SStmNextAmmoTypeOnReload
@@ -432,7 +465,6 @@ protected:
 	CWeaponAmmo *m_pCurrentAmmo;
 	bool m_bLockType;
 	float m_reload_delay;
-	float m_unload_delay;
 	bool m_single_shot_wpn;
 
 	int GetAmmoCount(u8 ammo_type);
@@ -470,7 +502,6 @@ public:
 	float GetFireDispersionScript(bool wc = true, bool fc = false);
 
 	float GetReloadDelay() { return m_reload_delay; }
-	float GetUnloadDelay() { return m_unload_delay; }
 
 public:
 DECLARE_SCRIPT_REGISTER_FUNCTION

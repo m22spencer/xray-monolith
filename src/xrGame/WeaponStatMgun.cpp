@@ -86,7 +86,6 @@ CWeaponStatMgun::CWeaponStatMgun()
 	m_iShotNum = 0;
 
 	m_reload_delay = 0.0F;
-	m_unload_delay = 0.0F;
 	m_single_shot_wpn = FALSE;
 	m_unlimited_ammo = true;
 	m_reload_consume_callback = nullptr;
@@ -114,6 +113,7 @@ CWeaponStatMgun::CWeaponStatMgun()
 
 	OnCameraChange(eCamFirst);
 
+	m_anim_weapon.Init(this);
 	m_sound_mgr.Init(this);
 #else
 	camera = xr_new<CCameraFirstEye>(
@@ -213,12 +213,10 @@ void CWeaponStatMgun::Load(LPCSTR section)
 	m_sounds.LoadSound(section, "snd_shoot", "sndShoot", false, SOUND_TYPE_WEAPON_SHOOTING);
 	m_sounds.LoadSound(section, "snd_empty", "sndEmpty", false, SOUND_TYPE_WEAPON_EMPTY_CLICKING);
 	m_sounds.LoadSound(section, "snd_reload", "sndReload", true, SOUND_TYPE_WEAPON_RECHARGING);
-	m_sounds.LoadSound(section, "snd_unload", "sndUnload", true, SOUND_TYPE_WEAPON_RECHARGING);
 
 	m_zoom_factor_def = READ_IF_EXISTS(pSettings, r_float, section, "zoom_factor_def", 1.0F);
 	m_zoom_factor_aim = READ_IF_EXISTS(pSettings, r_float, section, "zoom_factor_aim", 1.0F);
 	m_reload_delay = READ_IF_EXISTS(pSettings, r_float, section, "reload_delay", 0.0F);
-	m_unload_delay = READ_IF_EXISTS(pSettings, r_float, section, "unload_delay", 0.0F);
 	m_single_shot_wpn = !!READ_IF_EXISTS(pSettings, r_bool, section, "is_single_shot_wpn", FALSE);
 	m_unlimited_ammo = !!READ_IF_EXISTS(pSettings, r_bool, section, "unlimited_ammo", false);
 	m_reload_consume_callback = READ_IF_EXISTS(pSettings, r_string, section, "reload_consume", nullptr);
@@ -361,52 +359,6 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 		m_animation.SetAnimation(SStmAnimActor::eAnimLegs, READ_IF_EXISTS(ini, r_string, "animation", "idle_legs", nullptr));
 	}
 
-	IKinematicsAnimated *A = Visual()->dcast_PKinematicsAnimated();
-	if (A)
-	{
-		const LPCSTR anim_weapon = "animation_weapon";
-		if (ini->section_exist(anim_weapon))
-		{
-			{
-				LPCSTR str = READ_IF_EXISTS(ini, r_string, anim_weapon, "anm_idle", nullptr);
-				if (str && strlen(str))
-				{
-					m_anim_weapon[eStmAnimWeapon_idle] = A->ID_Cycle(str);
-				}
-			}
-			{
-				LPCSTR str = READ_IF_EXISTS(ini, r_string, anim_weapon, "anm_shot", nullptr);
-				if (str && strlen(str))
-				{
-					m_anim_weapon[eStmAnimWeapon_shot] = A->ID_Cycle(str);
-				}
-			}
-			{
-				LPCSTR str = READ_IF_EXISTS(ini, r_string, anim_weapon, "anm_reload0", nullptr);
-				if (str && strlen(str))
-				{
-					m_anim_weapon[eStmAnimWeapon_reload0] = A->ID_Cycle(str);
-				}
-			}
-			{
-				LPCSTR str = READ_IF_EXISTS(ini, r_string, anim_weapon, "anm_reload1", nullptr);
-				if (str && strlen(str))
-				{
-					m_anim_weapon[eStmAnimWeapon_reload1] = A->ID_Cycle(str);
-				}
-			}
-			{
-				LPCSTR str = READ_IF_EXISTS(ini, r_string, anim_weapon, "anm_chamber", nullptr);
-				if (str && strlen(str))
-				{
-					m_anim_weapon[eStmAnimWeapon_chamber] = A->ID_Cycle(str);
-				}
-			}
-			PlayAnimWeapon(eStmAnimWeapon_idle);
-			Visual()->dcast_PKinematics()->CalculateBones();
-		}
-	}
-
 	for (auto &B : m_barrels)
 	{
 		B.net_Spawn(DC);
@@ -444,6 +396,9 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 		camera[eCamChase]->Load(custom_cam_chase);
 	}
 
+	m_anim_weapon.net_Spawn(DC);
+	m_sound_mgr.net_Spawn(DC);
+
 	{
 		/* Hack. net_spawn() of CScriptBinderObjectWrapper runs first. This allows overriding configs read in engine net_Spawn(). */
 		LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect_str(), "net_spawn_after", nullptr);
@@ -453,8 +408,6 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 			lua_function(lua_game_object());
 		}
 	}
-
-	m_sound_mgr.net_Spawn(DC);
 #endif
 
 	inheritedShooting::Light_Create();
@@ -738,7 +691,6 @@ void CWeaponStatMgun::UpdateBarrelDir()
 			m_cur_y_rot = angle_inertion_var(m_cur_y_rot, m_tgt_y_rot, m_rotate_y_speed, m_rotate_y_speed, PI, Device.fTimeDelta);
 			break;
 		case eStateReload:
-		case eStateUnload:
 			m_cur_x_rot = m_bind_x_rot;
 			break;
 		default:
@@ -924,12 +876,6 @@ void CWeaponStatMgun::Action(u16 id, u32 flags)
 			SwitchState(eStateReload);
 		}
 		break;
-	case eWpnUnload:
-		if (GetState() == eStateIdle || GetState() == eStateFire)
-		{
-			SwitchState(eStateUnload);
-		}
-		break;
 #else
 	case kWPN_FIRE:
 		{
@@ -995,7 +941,7 @@ bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 		Camera()->pitch = m_cur_x_rot;
 	}
 
-	PlayAnimWeapon(eStmAnimWeapon_idle);
+	m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_idle);
 	return true;
 #else
 	if (Owner())
@@ -1021,7 +967,7 @@ void CWeaponStatMgun::detach_Actor()
 	inheritedHolder::detach_Actor();
 	Action(eWpnActivate, 0);
 	SetFeelVisionIgnore(false);
-	PlayAnimWeapon(eStmAnimWeapon_idle);
+	m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_idle);
 #else
 	Owner()->setVisible(1);
 	inheritedHolder::detach_Actor();
@@ -1218,7 +1164,6 @@ bool CWeaponStatMgun::IsCameraZoom()
 	case eStateFire:
 		return m_zoom_status;
 	case eStateReload:
-	case eStateUnload:
 		break;
 	default:
 		break;
@@ -1342,25 +1287,6 @@ void CWeaponStatMgun::UpdateAnimation()
 	}
 }
 
-void CWeaponStatMgun::PlayAnimWeapon(u16 anim)
-{
-	if (Visual()->dcast_PKinematicsAnimated() == nullptr)
-		return;
-	if (anim >= eStmAnimWeapon_size)
-		return;
-	MotionID &mid = m_anim_weapon[anim];
-	if (mid.idx == 0xffff)
-		return;
-	m_anim_weapon_current = mid;
-	Visual()->dcast_PKinematicsAnimated()->PlayCycle(m_anim_weapon_current);
-}
-
-void CWeaponStatMgun::AnimWeaponCallback(CBlend *B)
-{
-	CWeaponStatMgun *stm = (CWeaponStatMgun *)B->CallbackParam;
-	stm->m_anim_weapon_current.invalidate();
-}
-
 Fvector2 CWeaponStatMgun::GetTraverseLimitHorz()
 {
 	return Fvector2().set(-m_lim_y_rot.y, -m_lim_y_rot.x);
@@ -1386,7 +1312,7 @@ void CWeaponStatMgun::SetTraverseLimitVert(Fvector2 vec)
 }
 
 /*----------------------------------------------------------------------------------------------------
-	Structs
+	SStmAnimActor
 ----------------------------------------------------------------------------------------------------*/
 CWeaponStatMgun::SStmAnimActor::SStmAnimActor()
 {
@@ -1412,7 +1338,7 @@ void CWeaponStatMgun::SStmAnimActor::SetAnimation(u8 id, LPCSTR anim)
 }
 
 /*----------------------------------------------------------------------------------------------------
-	Sounds
+	SStmSound
 ----------------------------------------------------------------------------------------------------*/
 CWeaponStatMgun::SStmSound::SStmSound()
 {
@@ -1438,7 +1364,7 @@ BOOL CWeaponStatMgun::SStmSound::net_Spawn(CSE_Abstract *DC)
 {
 	IKinematics *K = m_stm->Visual()->dcast_PKinematics();
 	CInifile *ini = K->LL_UserData();
-	LPCSTR snd = "sounds";
+	const LPCSTR snd = "sounds";
 	if (ini->section_exist(snd))
 	{
 		m_volume = READ_IF_EXISTS(ini, r_float, snd, "volume", 1.0f);
