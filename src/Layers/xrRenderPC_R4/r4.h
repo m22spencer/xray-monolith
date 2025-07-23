@@ -174,7 +174,9 @@ public:
 	CModelPool* Models;
 	CWallmarksEngine* Wallmarks;
 
-	CRenderTarget* Target; // Render-target
+	CRenderTarget* Target; // Active Render-target
+	CRenderTarget* TargetMain;
+	CRenderTarget* TargetSVP;
 
 	CLight_DB Lights;
 	CLight_Compute_XFORM_and_VIS LR;
@@ -304,6 +306,8 @@ public:
 	// Loading / Unloading
 	virtual void create();
 	virtual void destroy();
+	void initializeTargets();
+	void deleteTargets();
 	virtual void reset_begin();
 	virtual void reset_end();
 

@@ -41,14 +41,6 @@ void CRenderTarget::set_viewport_size(ID3DDeviceContext * dev, float w, float h)
 	custom_viewport[0].Width = w;
 	custom_viewport[0].Height = h;
 	dev->RSSetViewports(1, custom_viewport);
-
-	svp_scissor_hack(w, h);
-}
-
-// Compute a bounding box for the scopes objective lens in screen space
-void CRenderTarget::svp_scissor_hack(float width, float height)
-{
-	Device.m_SecondViewport.clipRect = Device.m_SecondViewport.computeRect(width, height);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb)
@@ -92,7 +84,6 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 3);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
-	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
@@ -134,7 +125,6 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	else RCache.set_RT(NULL, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
-	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
@@ -173,7 +163,6 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
 	else RCache.set_RT(NULL, 1);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
-	svp_scissor_hack(dwWidth, dwHeight);
 }
 
 void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -188,7 +177,6 @@ void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTa
 	RCache.set_RT(_3, 2);
 	RCache.set_ZB(zb);
 	//	RImplementation.rmNormal				();
-	svp_scissor_hack(W, H);
 }
 
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
@@ -197,8 +185,8 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 	VERIFY(RImplementation.o.nvstencil);
 	//RCache.set_ColorWriteEnable	(FALSE);
 	u32 Offset;
-	float _w = float(Device.dwWidth);
-	float _h = float(Device.dwHeight);
+	float _w = float(Width);
+	float _h = float(Height);
 	u32 C = color_rgba(255, 255, 255, 255);
 	float eps = 0;
 	float _dw = 0.5f;
@@ -264,8 +252,8 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 	m_Texgen_J.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 
 	// rescale - tile it
-	float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-	float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
+	float scale_X = float(Width) / float(TEX_jitter);
+	float scale_Y = float(Height) / float(TEX_jitter);
 	//float	offset			= (.5f / float(TEX_jitter));
 	m_TexelAdjust.scale(scale_X, scale_Y, 1.f);
 	//m_TexelAdjust.translate_over(offset,	offset,	0	);
@@ -359,9 +347,30 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 		*dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
+void CRenderTarget::SetActive() {
+	RImplementation.Target = this;
+	RCache.TextureOverrides = RenderTargetRemaps;
+
+	Device.dwWidth = Width;
+	Device.dwHeight = Height;
+
+	Device.fASPECT = (float)Height / (float)Width;
+	Device.fWidth_2 = Width >> 1;
+	Device.fHeight_2 = Height >> 1;
+}
+
 CRenderTarget::CRenderTarget()
+	: CRenderTarget(nullptr, Device.dwWidth, Device.dwHeight)
+{
+}
+
+CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
+	: Width(width), Height(height)
 {
 	u32 SampleCount = 1;
+	auto w = Width;
+	auto h = Height;
+
 
 	if (ps_r_ssao_mode != 2/*hdao*/)
 		ps_r_ssao = _min(ps_r_ssao, 3);
@@ -498,26 +507,46 @@ CRenderTarget::CRenderTarget()
 	}
 	//	NORMAL
 	{
-		u32 w = Device.dwWidth, h = Device.dwHeight;
-		rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+		auto id = name ? name : std::to_string(reinterpret_cast<std::uintptr_t>(this));
+		auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1) -> ref_rt {
+			ref_rt rt;
+			
+			ref_texture dummy_texture;
+			dummy_texture.create(Name);
+
+			auto name = Name + ("$" + id);
+			rt.create(name.c_str(), w, h, f, SampleCount);
+
+			RenderTargetDummies.push_back(dummy_texture);
+			RenderTargetRemaps.emplace(dummy_texture._get(), rt->pTexture._get());
+
+			return rt;
+		};
+
+		auto colorfmt = RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8;
+		
+		baseRT = createUnique("$user$baseRT", w, h, colorfmt);
+		baseZB = createUnique("$user$baseZB", w, h, D3DFMT_D24S8);
+
+		rt_Position = createUnique(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
 		if (RImplementation.o.dx10_msaa)
 		{
-			rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
+			rt_MSAADepth = createUnique(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 		}
 
-		rt_tempzb.create("$user$temp_zb", w, h, D3DFMT_D24S8); // Redotix99: for 3D Shader Based Scopes
+		rt_tempzb = createUnique("$user$temp_zb", w, h, D3DFMT_D24S8); // Redotix99: for 3D Shader Based Scopes
 
 		// select albedo & accum
 		if (RImplementation.o.mrtmixdepth)
 		{
 			// NV50
 			if (RImplementation.o.dx11_hdr10) {
-				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+				rt_Color = createUnique(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 			} else {
-				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount);
+				rt_Color = createUnique(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount);
 			}
-			rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+			rt_Accumulator = createUnique(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 		}
 		else
 		{
@@ -525,146 +554,146 @@ CRenderTarget::CRenderTarget()
 			if (RImplementation.o.fp16_blend)
 			{
 				// NV40
-				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount); // expand to full
-				rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+				rt_Color = createUnique(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount); // expand to full
+				rt_Accumulator = createUnique(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 			}
 			else
 			{
 				// R4xx, no-fp-blend,-> albedo_wo
 				VERIFY(RImplementation.o.albedo_wo);
-				rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount); // normal
-				rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
-				rt_Accumulator_temp.create(r2_RT_accum_temp, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+				rt_Color = createUnique(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount); // normal
+				rt_Accumulator = createUnique(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+				rt_Accumulator_temp = createUnique(r2_RT_accum_temp, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 			}
 		}
 
 		// generic(LDR) RTs
 		//LV - we should change their formats into D3DFMT_A16B16G16R16F for better HDR support.
 		if (RImplementation.o.dx11_hdr10) {
-			rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A16B16G16R16F, 1);
-			rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A16B16G16R16F, 1);
-			rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A16B16G16R16F, 1);
+			rt_Generic_0 = createUnique(r2_RT_generic0, w, h, D3DFMT_A16B16G16R16F, 1);
+			rt_Generic_1 = createUnique(r2_RT_generic1, w, h, D3DFMT_A16B16G16R16F, 1);
+			rt_Generic = createUnique(r2_RT_generic, w, h, D3DFMT_A16B16G16R16F, 1);
 		} else {
-			rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
-			rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
-			rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
+			rt_Generic_0 = createUnique(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
+			rt_Generic_1 = createUnique(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
+			rt_Generic = createUnique(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
 		}
 
-		rt_fakescope.create(r2_RT_scopert, w, h, D3DFMT_A8R8G8B8, 1); //crookr fakescope
+		rt_fakescope = createUnique(r2_RT_scopert, w, h, D3DFMT_A8R8G8B8, 1); //crookr fakescope
 
 		//--DSR-- HeatVision_start
-		rt_Heat.create(r2_RT_heat, w, h, D3DFMT_A8R8G8B8, SampleCount);
+		rt_Heat = createUnique(r2_RT_heat, w, h, D3DFMT_A8R8G8B8, SampleCount);
 		//--DSR-- HeatVision_end
 
 		if (RImplementation.o.dx11_hdr10) {
-			rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A16B16G16R16F, RImplementation.o.dx10_msaa ? SampleCount : 1);
+			rt_Generic_temp = createUnique("$user$generic_temp", w, h, D3DFMT_A16B16G16R16F, RImplementation.o.dx10_msaa ? SampleCount : 1);
 		} else {
-			rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, RImplementation.o.dx10_msaa ? SampleCount : 1);
+			rt_Generic_temp = createUnique("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, RImplementation.o.dx10_msaa ? SampleCount : 1);
 		}
 
-		rt_dof.create(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
+		rt_dof = createUnique(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
 
-		rt_secondVP.create(r2_RT_secondVP, w, h, rt_Color->fmt, 1);
+		rt_secondVP = createUnique(r2_RT_secondVP, w, h, rt_Color->fmt, 1);
 
 		if (RImplementation.o.dx11_hdr10) {
-			rt_ui_pda.create(r2_RT_ui, w, h, D3DFMT_A2R10G10B10); // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM
+			rt_ui_pda = createUnique(r2_RT_ui, w, h, D3DFMT_A2R10G10B10); // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM
 		} else {
-			rt_ui_pda.create(r2_RT_ui, w, h, D3DFMT_A8R8G8B8);
+			rt_ui_pda = createUnique(r2_RT_ui, w, h, D3DFMT_A8R8G8B8);
 		}
 
 		// TODO: R11G11B10F? needs another horrible hack + cast + update to converter function
 		if (RImplementation.o.dx11_hdr10) {
-			rt_HDR10_HalfRes[0].create(r4_RT_HDR10_halfres0, w/2,  h/2,  D3DFMT_A16B16G16R16F);
-			rt_HDR10_HalfRes[1].create(r4_RT_HDR10_halfres1, w/2,  h/2,  D3DFMT_A16B16G16R16F);
+			rt_HDR10_HalfRes[0] = createUnique(r4_RT_HDR10_halfres0, w/2,  h/2,  D3DFMT_A16B16G16R16F);
+			rt_HDR10_HalfRes[1] = createUnique(r4_RT_HDR10_halfres1, w/2,  h/2,  D3DFMT_A16B16G16R16F);
 		}
 		// PDA, probably not ideal though
 // RT - KD
-		rt_sunshafts_0.create(r2_RT_sunshafts0, w, h, D3DFMT_A8R8G8B8);
-		rt_sunshafts_1.create(r2_RT_sunshafts1, w, h, D3DFMT_A8R8G8B8);
+		rt_sunshafts_0 = createUnique(r2_RT_sunshafts0, w, h, D3DFMT_A8R8G8B8);
+		rt_sunshafts_1 = createUnique(r2_RT_sunshafts1, w, h, D3DFMT_A8R8G8B8);
 
 		// RT Blur
-		rt_blur_h_2.create(r2_RT_blur_h_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
-		rt_blur_2.create(r2_RT_blur_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
-		rt_blur_2_zb.create(r2_RT_blur_2_zb, u32(w/2), u32(h/2), D3DFMT_D24S8);
+		rt_blur_h_2 = createUnique(r2_RT_blur_h_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
+		rt_blur_2 = createUnique(r2_RT_blur_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
+		rt_blur_2_zb = createUnique(r2_RT_blur_2_zb, u32(w/2), u32(h/2), D3DFMT_D24S8);
 
-		rt_blur_h_4.create(r2_RT_blur_h_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
-		rt_blur_4.create(r2_RT_blur_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
-		rt_blur_4_zb.create(r2_RT_blur_4_zb, u32(w/4), u32(h/4), D3DFMT_D24S8);
+		rt_blur_h_4 = createUnique(r2_RT_blur_h_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
+		rt_blur_4 = createUnique(r2_RT_blur_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
+		rt_blur_4_zb = createUnique(r2_RT_blur_4_zb, u32(w/4), u32(h/4), D3DFMT_D24S8);
 
-		rt_blur_h_8.create(r2_RT_blur_h_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
-		rt_blur_8.create(r2_RT_blur_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
-		rt_blur_8_zb.create(r2_RT_blur_8_zb, u32(w/8), u32(h/8), D3DFMT_D24S8);
+		rt_blur_h_8 = createUnique(r2_RT_blur_h_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
+		rt_blur_8 = createUnique(r2_RT_blur_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
+		rt_blur_8_zb = createUnique(r2_RT_blur_8_zb, u32(w/8), u32(h/8), D3DFMT_D24S8);
 
-		rt_pp_bloom.create(r2_RT_pp_bloom, w, h, D3DFMT_A8R8G8B8);
+		rt_pp_bloom = createUnique(r2_RT_pp_bloom, w, h, D3DFMT_A8R8G8B8);
 
 		// Screen Space Shaders Stuff
-		rt_ssfx_taa.create(r2_RT_ssfx_taa, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Temp RT
+		rt_ssfx_taa = createUnique(r2_RT_ssfx_taa, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Temp RT
 
 		if (RImplementation.o.dx11_hdr10)
-			rt_ssfx_prev_frame.create(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A16B16G16R16F); // Temp RT
+			rt_ssfx_prev_frame = createUnique(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A16B16G16R16F); // Temp RT
 		else
-			rt_ssfx_prev_frame.create(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A8R8G8B8); // Temp RT
+			rt_ssfx_prev_frame = createUnique(r2_RT_ssfx_prev_frame, w, h, D3DFMT_A8R8G8B8); // Temp RT
 
-		rt_ssfx_motion_vectors.create(r2_RT_ssfx_motion_vectors, w, h, D3DFMT_A16B16G16R16F, SampleCount); // HUD mask & Velocity buffer
+		rt_ssfx_motion_vectors = createUnique(r2_RT_ssfx_motion_vectors, w, h, D3DFMT_A16B16G16R16F, SampleCount); // HUD mask & Velocity buffer
 		
-		rt_ssfx.create(r2_RT_ssfx, w, h, D3DFMT_A8R8G8B8); // Temp RT
-		rt_ssfx_temp.create(r2_RT_ssfx_temp, w, h, D3DFMT_A8R8G8B8); // Temp RT
-		rt_ssfx_temp2.create(r2_RT_ssfx_temp2, w, h, D3DFMT_A8R8G8B8); // Temp RT
-		rt_ssfx_temp3.create(r2_RT_ssfx_temp3, w, h, D3DFMT_A8R8G8B8); // Temp RT
+		rt_ssfx = createUnique(r2_RT_ssfx, w, h, D3DFMT_A8R8G8B8); // Temp RT
+		rt_ssfx_temp = createUnique(r2_RT_ssfx_temp, w, h, D3DFMT_A8R8G8B8); // Temp RT
+		rt_ssfx_temp2 = createUnique(r2_RT_ssfx_temp2, w, h, D3DFMT_A8R8G8B8); // Temp RT
+		rt_ssfx_temp3 = createUnique(r2_RT_ssfx_temp3, w, h, D3DFMT_A8R8G8B8); // Temp RT
 
-		rt_ssfx_accum.create(r2_RT_ssfx_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Volumetric Acc
-		rt_ssfx_ssr.create(r2_RT_ssfx_ssr, w, h, D3DFMT_A8R8G8B8); // SSR Acc
-		rt_ssfx_water.create(r2_RT_ssfx_water, w, h, D3DFMT_A8R8G8B8); // Water Acc
-		rt_ssfx_ao.create(r2_RT_ssfx_ao, w, h, D3DFMT_A8R8G8B8); // AO Acc
-		rt_ssfx_il.create(r2_RT_ssfx_il, w, h, D3DFMT_A8R8G8B8); // IL Acc
+		rt_ssfx_accum = createUnique(r2_RT_ssfx_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Volumetric Acc
+		rt_ssfx_ssr = createUnique(r2_RT_ssfx_ssr, w, h, D3DFMT_A8R8G8B8); // SSR Acc
+		rt_ssfx_water = createUnique(r2_RT_ssfx_water, w, h, D3DFMT_A8R8G8B8); // Water Acc
+		rt_ssfx_ao = createUnique(r2_RT_ssfx_ao, w, h, D3DFMT_A8R8G8B8); // AO Acc
+		rt_ssfx_il = createUnique(r2_RT_ssfx_il, w, h, D3DFMT_A8R8G8B8); // IL Acc
 
 		if (RImplementation.o.ssfx_sss)
 		{
-			rt_ssfx_sss.create(r2_RT_ssfx_sss, w, h, D3DFMT_A8R8G8B8); // SSS Acc
-			rt_ssfx_sss_ext.create(r2_RT_ssfx_sss_ext, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
-			rt_ssfx_sss_ext2.create(r2_RT_ssfx_sss_ext2, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
-			rt_ssfx_sss_tmp.create(r2_RT_ssfx_sss_tmp, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
+			rt_ssfx_sss = createUnique(r2_RT_ssfx_sss, w, h, D3DFMT_A8R8G8B8); // SSS Acc
+			rt_ssfx_sss_ext = createUnique(r2_RT_ssfx_sss_ext, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
+			rt_ssfx_sss_ext2 = createUnique(r2_RT_ssfx_sss_ext2, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
+			rt_ssfx_sss_tmp = createUnique(r2_RT_ssfx_sss_tmp, w, h, D3DFMT_A8R8G8B8); // SSS EXT Acc
 		}
 
 		if (RImplementation.o.ssfx_bloom)
 		{
-			rt_ssfx_bloom1.create(r2_RT_ssfx_bloom1, w / 2.0f, h / 2.0f, D3DFMT_A16B16G16R16F); // Bloom
-			rt_ssfx_bloom_emissive.create(r2_RT_ssfx_bloom_emissive, w, h, D3DFMT_A8R8G8B8, SampleCount); // Emissive
-			rt_ssfx_bloom_lens.create(r2_RT_ssfx_bloom_lens, w / 4.0f, h / 4.0f, D3DFMT_A8R8G8B8); // Lens
+			rt_ssfx_bloom1 = createUnique(r2_RT_ssfx_bloom1, w / 2.0f, h / 2.0f, D3DFMT_A16B16G16R16F); // Bloom
+			rt_ssfx_bloom_emissive = createUnique(r2_RT_ssfx_bloom_emissive, w, h, D3DFMT_A8R8G8B8, SampleCount); // Emissive
+			rt_ssfx_bloom_lens = createUnique(r2_RT_ssfx_bloom_lens, w / 4.0f, h / 4.0f, D3DFMT_A8R8G8B8); // Lens
 
-			rt_ssfx_bloom_tmp2.create(r2_RT_ssfx_bloom_tmp2, w / 2.0f, h / 2.0f, D3DFMT_A16B16G16R16F); // Bloom / 2
-			rt_ssfx_bloom_tmp4.create(r2_RT_ssfx_bloom_tmp4, w / 4.0f, h / 4.0f, D3DFMT_A16B16G16R16F); // Bloom / 4
-			rt_ssfx_bloom_tmp8.create(r2_RT_ssfx_bloom_tmp8, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Bloom / 8
-			rt_ssfx_bloom_tmp16.create(r2_RT_ssfx_bloom_tmp16, w / 16.0f, h / 16.0f, D3DFMT_A16B16G16R16F); // Bloom / 16
-			rt_ssfx_bloom_tmp32.create(r2_RT_ssfx_bloom_tmp32, w / 32.0f, h / 32.0f, D3DFMT_A16B16G16R16F); // Bloom / 32
-			rt_ssfx_bloom_tmp64.create(r2_RT_ssfx_bloom_tmp64, w / 64.0f, h / 64.0f, D3DFMT_A16B16G16R16F); // Bloom / 64
+			rt_ssfx_bloom_tmp2 = createUnique(r2_RT_ssfx_bloom_tmp2, w / 2.0f, h / 2.0f, D3DFMT_A16B16G16R16F); // Bloom / 2
+			rt_ssfx_bloom_tmp4 = createUnique(r2_RT_ssfx_bloom_tmp4, w / 4.0f, h / 4.0f, D3DFMT_A16B16G16R16F); // Bloom / 4
+			rt_ssfx_bloom_tmp8 = createUnique(r2_RT_ssfx_bloom_tmp8, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Bloom / 8
+			rt_ssfx_bloom_tmp16 = createUnique(r2_RT_ssfx_bloom_tmp16, w / 16.0f, h / 16.0f, D3DFMT_A16B16G16R16F); // Bloom / 16
+			rt_ssfx_bloom_tmp32 = createUnique(r2_RT_ssfx_bloom_tmp32, w / 32.0f, h / 32.0f, D3DFMT_A16B16G16R16F); // Bloom / 32
+			rt_ssfx_bloom_tmp64 = createUnique(r2_RT_ssfx_bloom_tmp64, w / 64.0f, h / 64.0f, D3DFMT_A16B16G16R16F); // Bloom / 64
 
-			rt_ssfx_bloom_tmp32_2.create(r2_RT_ssfx_bloom_tmp32_2, w / 32.0f, h / 32.0f, D3DFMT_A16B16G16R16F); // Bloom / 32
-			rt_ssfx_bloom_tmp16_2.create(r2_RT_ssfx_bloom_tmp16_2, w / 16.0f, h / 16.0f, D3DFMT_A16B16G16R16F); // Bloom / 16
-			rt_ssfx_bloom_tmp8_2.create(r2_RT_ssfx_bloom_tmp8_2, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Bloom / 8
-			rt_ssfx_bloom_tmp4_2.create(r2_RT_ssfx_bloom_tmp4_2, w / 4.0f, h / 4.0f, D3DFMT_A16B16G16R16F); // Bloom / 4
+			rt_ssfx_bloom_tmp32_2 = createUnique(r2_RT_ssfx_bloom_tmp32_2, w / 32.0f, h / 32.0f, D3DFMT_A16B16G16R16F); // Bloom / 32
+			rt_ssfx_bloom_tmp16_2 = createUnique(r2_RT_ssfx_bloom_tmp16_2, w / 16.0f, h / 16.0f, D3DFMT_A16B16G16R16F); // Bloom / 16
+			rt_ssfx_bloom_tmp8_2 = createUnique(r2_RT_ssfx_bloom_tmp8_2, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Bloom / 8
+			rt_ssfx_bloom_tmp4_2 = createUnique(r2_RT_ssfx_bloom_tmp4_2, w / 4.0f, h / 4.0f, D3DFMT_A16B16G16R16F); // Bloom / 4
 		}
 
-		rt_ssfx_volumetric.create(r2_RT_ssfx_volumetric, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Volumetric
-		rt_ssfx_volumetric_tmp.create(r2_RT_ssfx_volumetric_tmp, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Volumetric
-		rt_ssfx_rain.create(r2_RT_ssfx_rain, w / 8.0f, h / 8.0f, D3DFMT_A8R8G8B8); // Rain refraction buffer
-		rt_ssfx_water_waves.create(r2_RT_ssfx_water_waves, 512, 512, D3DFMT_A8R8G8B8); // Water Waves
+		rt_ssfx_volumetric = createUnique(r2_RT_ssfx_volumetric, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Volumetric
+		rt_ssfx_volumetric_tmp = createUnique(r2_RT_ssfx_volumetric_tmp, w / 8.0f, h / 8.0f, D3DFMT_A16B16G16R16F); // Volumetric
+		rt_ssfx_rain = createUnique(r2_RT_ssfx_rain, w / 8.0f, h / 8.0f, D3DFMT_A8R8G8B8); // Rain refraction buffer
+		rt_ssfx_water_waves = createUnique(r2_RT_ssfx_water_waves, 512, 512, D3DFMT_A8R8G8B8); // Water Waves
 
-		rt_ssfx_prevPos.create(r2_RT_ssfx_prevPos, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+		rt_ssfx_prevPos = createUnique(r2_RT_ssfx_prevPos, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
-		//rt_ssfx_hud.create(r2_RT_ssfx_hud, w, h, D3DFMT_A16B16G16R16F); // Deprecated
+		//rt_ssfx_hud = createUnique(r2_RT_ssfx_hud, w, h, D3DFMT_A16B16G16R16F); // Deprecated
 
 		if (RImplementation.o.dx10_msaa)
 		{
-            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, ps_r4_hdr10_on ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8, SampleCount);
-            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, ps_r4_hdr10_on ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8, SampleCount);
-			//rt_Generic.create		      (r2_RT_generic,w,h,   D3DFMT_A8R8G8B8, 1		);
+            rt_Generic_0_r = createUnique(r2_RT_generic0_r, w, h, ps_r4_hdr10_on ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8, SampleCount);
+            rt_Generic_1_r = createUnique(r2_RT_generic1_r, w, h, ps_r4_hdr10_on ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8, SampleCount);
+			//rt_Generic = createUnique		      (r2_RT_generic,w,h,   D3DFMT_A8R8G8B8, 1		);
 		}
 		//	Igor: for volumetric lights
-		//rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
+		//rt_Generic_2 = createUnique			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
 		//	temp: for higher quality blends
 		if (RImplementation.o.advancedpp)
-			rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+			rt_Generic_2 = createUnique(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 	}
 
 	s_hdr10_bloom_downsample.create(b_hdr10_bloom_downsample, "hdr10_bloom_downsample");
@@ -907,9 +936,6 @@ CRenderTarget::CRenderTarget()
 
 	//SMAA
 	{
-		u32 w = Device.dwWidth;
-		u32 h = Device.dwHeight;
-
 		rt_smaa_edgetex.create(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
 		rt_smaa_blendtex.create(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
 
@@ -937,7 +963,7 @@ CRenderTarget::CRenderTarget()
 			FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
 			HW.pContext->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
 		}
-		u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+		u_setrt(Width, Height, baseRT->pRT,NULL,NULL,baseZB->pZRT);
 	}
 
 	// HBAO
@@ -947,13 +973,13 @@ CRenderTarget::CRenderTarget()
 		u32 h = 0;
 		if (RImplementation.o.ssao_half_data)
 		{
-			w = Device.dwWidth / 2;
-			h = Device.dwHeight / 2;
+			w = Width >>1;
+			h = Height >> 1;
 		}
 		else
 		{
-			w = Device.dwWidth;
-			h = Device.dwHeight;
+			w = Width;
+			h = Height;
 		}
 
 		D3DFORMAT fmt = HW.Caps.id_vendor == 0x10DE ? D3DFMT_R32F : D3DFMT_R16F;
@@ -982,7 +1008,6 @@ CRenderTarget::CRenderTarget()
 	// HDAO
 	if (RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra)
 	{
-		u32 w = Device.dwWidth, h = Device.dwHeight;
 		rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
 		s_hdao_cs.create(b_hdao_cs, "r2\\ssao");
 		if (RImplementation.o.dx10_msaa)
@@ -1029,8 +1054,8 @@ CRenderTarget::CRenderTarget()
 		// Testure for async sreenshots
 		{
 			D3D_TEXTURE2D_DESC desc;
-			desc.Width = Device.dwWidth;
-			desc.Height = Device.dwHeight;
+			desc.Width = Width;
+			desc.Height = Height;
 			desc.MipLevels = 1;
 			desc.ArraySize = 1;
 			desc.SampleDesc.Count = 1;
@@ -1315,11 +1340,8 @@ CRenderTarget::CRenderTarget()
 	g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
 	//
-	dwWidth = Device.dwWidth;
-	dwHeight = Device.dwHeight;
-
-
-	map_viewport_render_targets([](auto _1, auto _2) -> void {});
+	dwWidth = Width;
+	dwHeight = Height;
 }
 
 CRenderTarget::~CRenderTarget()
@@ -1461,45 +1483,7 @@ CRenderTarget::~CRenderTarget()
 		xr_delete(b_hdao_msaa_cs);
 	}
 
-	// Viewport render textures must be destroyed as they are static variables
-	//    this ensures that they are recreated properly after resolution/format changes.
-	map_viewport_render_targets([](ref_rt _, ref_rt views[2]) -> void {
-		views[0].destroy();
-		views[1].destroy();
-	});
-}
-
-// Trickery to create unique buffers for each viewport
-#define VIEWPORT_RT(RT) \
-static ref_rt RT##_vp[2]; \
-if (RT) { \
-if (!RT##_vp[0]) RT##_vp[0].create("$user$" #RT "_main", RT->dwWidth, RT->dwHeight, RT->fmt); \
-if (!RT##_vp[1]) RT##_vp[1].create("$user$" #RT "_svp", RT->dwWidth, RT->dwHeight, RT->fmt); \
-f(RT, RT##_vp); }
-
-void CRenderTarget::map_viewport_render_targets(std::function<void (ref_rt original, ref_rt views[2])> f) {
-
-	// Place any render targets which must persist between frames here.
-	//   it will ensure they are duplicated when SVP is active
-	VIEWPORT_RT(rt_ssfx_accum)
-	VIEWPORT_RT(rt_ssfx_ssr)
-	VIEWPORT_RT(rt_ssfx_water)
-
-	VIEWPORT_RT(rt_ssfx_ao)
-	VIEWPORT_RT(rt_ssfx_il)
-
-	//VIEWPORT_RT(rt_ssfx)
-	//VIEWPORT_RT(rt_ssfx_temp)
-	//VIEWPORT_RT(rt_ssfx_temp2)
-	VIEWPORT_RT(rt_ssfx_sss)
-	VIEWPORT_RT(rt_ssfx_sss_ext)
-	VIEWPORT_RT(rt_ssfx_sss_ext2)
-	VIEWPORT_RT(rt_ssfx_sss_tmp)
-
-	VIEWPORT_RT(rt_ssfx_prevPos)
-	VIEWPORT_RT(rt_ssfx_prev_frame)
-	VIEWPORT_RT(rt_ssfx_motion_vectors)
-	VIEWPORT_RT(rt_ssfx_taa)
+	RenderTargetRemaps.clear();
 }
 
 void CRenderTarget::reset_light_marker(bool bResetStencil)
@@ -1508,8 +1492,8 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
 	if (bResetStencil)
 	{
 		u32 Offset;
-		float _w = float(Device.dwWidth);
-		float _h = float(Device.dwHeight);
+		float _w = float(Width);
+		float _h = float(Height);
 		u32 C = color_rgba(255, 255, 255, 255);
 		float eps = 0;
 		float _dw = 0.5f;

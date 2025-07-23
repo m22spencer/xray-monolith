@@ -1150,7 +1150,6 @@ void EnsureDeviceState(std::function<void()> f)
 	Fmatrix old_proj = Device.mProject;
 	Fmatrix old_proj_hud = Device.mProjectHud;
 
-
 	f();
 
 	Device.m_SecondViewport.isSVPFrame = false;
@@ -1219,11 +1218,12 @@ void CLevel::RenderSecondViewport()
 		debug_scope(scope_camera);
 
 	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
-		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, fNearPlane, fFarPlane);
+		auto aspect = Device.svp_width() / Device.svp_height();
+		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), aspect, fNearPlane, fFarPlane);
 
 		float _, fNearPlane_hud, fFarPlane_hud;
 		Device.mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
-		auto svp_proj_hud = Fmatrix().build_projection(deg2rad(svp_fov), Device.fASPECT, 0.001, fFarPlane_hud);
+		auto svp_proj_hud = Fmatrix().build_projection(deg2rad(svp_fov), aspect, 0.001, fFarPlane_hud);
 
 		SetMatrices(scope_camera, svp_proj, svp_proj_hud);
 		Device.matrices[1].mView.invert(scope_camera);

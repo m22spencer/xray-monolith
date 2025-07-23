@@ -191,7 +191,7 @@ void CRender::render_menu()
 	}
 
 	// Actual Display
-	Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+	Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
 	RCache.set_Shader(Target->s_menu);
 	RCache.set_Geometry(Target->g_menu);
 
@@ -220,55 +220,10 @@ void CRender::render_menu()
 
 extern u32 g_r;
 
-
-void FlipViewportTexturesIfNeeded(CRenderTarget* Target)
-{
-	static auto last_viewport = 0;
-	auto current_viewport = Device.m_SecondViewport.IsSVPFrame();
-	if (current_viewport == last_viewport)
-		return;    // Correct textures are already mapped
-
-	auto last = last_viewport;
-	Target->map_viewport_render_targets([Target, current_viewport, last](ref_rt original, ref_rt views[2]) -> void {
-		if (scope_svp_enabled == 3) {
-			// For this mode, we only want to copy the region covering the objective lens.
-			auto copy = [Target](int type, ref_rt dst, ref_rt src) -> void {
-				if (type == 0) HW.pContext->CopyResource(dst->pSurface, src->pSurface);
-				else {
-					//update clip rect
-					Target->svp_scissor_hack(dst->dwWidth, dst->dwHeight);
-					auto r = Device.m_SecondViewport.clipRect;
-					D3D11_BOX box;
-					box.left = r.left;
-					box.top = r.top;
-					box.right = r.right;
-					box.bottom = r.bottom;
-					box.front = 0;
-					box.back = 1;
-
-					const FLOAT clear[4] = { .0f, .0f, .0f, .0f };
-					// Must clear garbage from outside the clip rect, as postprocessing samples it.
-					HW.pContext->ClearRenderTargetView(dst->pRT, clear);
-					HW.pContext->CopySubresourceRegion(dst->pSurface, 0, box.left, box.top, 0, src->pSurface, 0, &box);
-
-				}
-			};
-			copy(last, views[last], original);
-			copy(current_viewport, original, views[current_viewport]);
-		}
-		else 
-		{
-			HW.pContext->CopyResource(views[last]->pSurface, original->pSurface);
-			HW.pContext->CopyResource(original->pSurface, views[current_viewport]->pSurface);
-		}		
-	});
-
-	last_viewport = current_viewport;
-}
-
 void CRender::Render()
 {
-	FlipViewportTexturesIfNeeded(Target);
+
+	//FlipViewportTexturesIfNeeded(Target);
 
 	PIX_EVENT(CRender_Render);
 
@@ -289,7 +244,7 @@ void CRender::Render()
 	if (!(g_pGameLevel && g_hud)
 		|| bMenu)
 	{
-		Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
 		return;
 	}
 
@@ -418,7 +373,7 @@ void CRender::Render()
 
 	if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS))
 	{
-		Target->u_setrt(Device.dwWidth, Device.dwHeight, NULL, NULL, NULL, !RImplementation.o.dx10_msaa ? HW.pBaseZB : Target->rt_MSAADepth->pZRT);
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, NULL, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB->pZRT : Target->rt_MSAADepth->pZRT);
 		r_dsgraph_render_landscape(0, false);
 	}
 
@@ -448,11 +403,9 @@ void CRender::Render()
 	}
 
 	//  Redotix99: for 3D Shader Based Scopes 	
-	if (scope_3D_fake_enabled)
+	if (scope_3D_fake_enabled && !scope_svp_enabled)
 	{
-		ID3D11Resource* zbuffer_res;
-		HW.pBaseZB->GetResource(&zbuffer_res);
-		HW.pContext->CopyResource(RImplementation.Target->rt_tempzb->pSurface, zbuffer_res);
+		HW.pContext->CopyResource(RImplementation.Target->rt_tempzb->pSurface, TargetMain->baseZB->pSurface);
 	}
 
 	//******* Occlusion testing of volume-limited light-sources
@@ -513,7 +466,7 @@ void CRender::Render()
 		if (0)
 		{
 			if (!RImplementation.o.dx10_msaa)
-				Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, HW.pBaseZB);
+				Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, Target->baseZB->pZRT);
 			else
 				Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1, 0,
 				                RImplementation.Target->rt_MSAADepth->pZRT);
@@ -668,7 +621,7 @@ void CRender::Render()
 		// Render Emissive on `rt_ssfx_bloom_emissive`
 		FLOAT ColorRGBA[4] = { 0,0,0,0 };
 		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_bloom_emissive->pRT, ColorRGBA);
-		Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? HW.pBaseZB : Target->rt_MSAADepth->pZRT);
+		Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB->pZRT : Target->rt_MSAADepth->pZRT);
 		RImplementation.r_dsgraph_render_emissive(true, true);
 	}
 
@@ -699,6 +652,19 @@ void CRender::Render()
 
 	if (Details)
 		Details->details_clear();
+
+	if (!Device.m_SecondViewport.IsSVPFrame()) {
+		PIX_EVENT(COPY_TO_FRAMEBUFFER);
+		TargetMain->SetActive();
+		ID3D11Resource* res;
+		HW.pBaseRT->GetResource(&res);
+		HW.pContext->CopyResource(res, TargetMain->baseRT->pSurface);
+
+		HW.pBaseZB->GetResource(&res);
+		HW.pContext->CopyResource(res, TargetMain->baseZB->pSurface);
+
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+	}
 
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
 }
