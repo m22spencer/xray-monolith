@@ -2,6 +2,7 @@
 #pragma hdrstop
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
+#include "profiler.h"
 
 // eye-params
 float r__dtex_range = 50;
@@ -45,12 +46,16 @@ struct TH_LoadTHM
 
 void CTextureDescrMngr::LoadTHMThread(void* args)
 {
+	PROF_EVENT();
+
 	TH_LoadTHM* p = (TH_LoadTHM*)args;
 	LoadTHM(p->initial, p->s_texture_details, p->s_detail_scalers);
 }
 
 void CTextureDescrMngr::LoadTHM(LPCSTR initial, map_TD& s_texture_details, map_CS& s_detail_scalers)
 {
+	PROF_EVENT();
+
 	FS_FileSet flist;
 	FS.file_list(flist, initial, FS_ListFiles, "*.thm");
 

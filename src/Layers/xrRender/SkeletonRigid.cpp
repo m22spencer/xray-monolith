@@ -10,15 +10,68 @@ extern int psSkeletonUpdate;
 void check_kinematics(CKinematics* _k, LPCSTR s);
 #endif
 
+extern float IK_CALC_DIST;
+extern float IK_ALWAYS_CALC_DIST;
+extern ENGINE_API BOOL g_bootComplete;
+BOOL r_optimize_calculate_bones = TRUE;
+
+class IRenderable;
+
 void CKinematics::CalculateBones(BOOL bForceExact)
 {
 	// early out.
 	// check if the info is still relevant
 	// skip all the computations - assume nothing changes in a small period of time :)
 	if (RDEVICE.dwTimeGlobal == UCalc_Time) return; // early out for "fast" update
+
+	// demonized: reduce calculate bones updates when the object is far away and not in frustum
+	// Available only if can get parent xform
+	// Refactor later for per object basis
+	float update_rate_k = 1.f;
+	if (g_bootComplete)
+	{
+		if (auto xForm = getXForm())
+		{
+			Fvector p;
+			xForm.value().transform_tiny(p, vis.sphere.P);
+
+			// Perceivable distance depending on FOV, so that objects will behave normal in binoculars
+			float dist = Device.vCameraPosition.distance_to(p);
+			float fov_rad = deg2rad(Device.fFOV); // Make sure Device.fFOV is in degrees
+			float perceived_dist = dist / tanf(fov_rad * 0.5f);
+			float dist_k = perceived_dist / dist;
+			update_rate_k = _max(1.f, dist / (IK_CALC_DIST * dist_k));
+
+			// Visibility check, perform always
+			bool visibleCheck = (dist < IK_ALWAYS_CALC_DIST * dist_k) || ::Render->ViewBase.testSphere_dirty(p, vis.sphere.R);
+			if (!visibleCheck)
+			{
+				bForceExact = FALSE;
+				update_rate_k = _max(2.f, update_rate_k);
+
+				/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+				{
+					Msg("CKinematics::CalculateBones, object out of frustum, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
+				}*/
+			}
+
+			// distance check, perform when cvar is enabled and can be optimized
+			if (r_optimize_calculate_bones && canBeOptimized() && (dist > IK_CALC_DIST * dist_k))
+			{
+				bForceExact = FALSE;
+
+				/*if (RDEVICE.dwTimeGlobal % 100 < 10)
+				{
+					Msg("CKinematics::CalculateBones, object canBeOptimized and dist > IK_CALC_DIST * dist_k, dist %.2f, update_rate_k %.2f", dist / dist_k, update_rate_k);
+				}*/
+			}
+		}
+	}
+	
+
 	UCalc_mtlock lock;
 	OnCalculateBones();
-	if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval))) return; // early out for "slow" update
+	if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval * update_rate_k))) return; // early out for "slow" update
 	if (Update_Visibility) Visibility_Update();
 
 	_DBG_SINGLE_USE_MARKER;
@@ -45,6 +98,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 	{
 		// mark
 		UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
+		UCalc_ThisFrame = true;
 
 		// the update itself
 		Fbox Box;
@@ -109,7 +163,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 		VERIFY3	(vis.sphere.R<1000.f,						"Invalid bones-xform in model", dbg_name.c_str());
 #endif
 	}
-
+	else
+		UCalc_ThisFrame = false;
 	//
 	if (Update_Callback) Update_Callback(this);
 }

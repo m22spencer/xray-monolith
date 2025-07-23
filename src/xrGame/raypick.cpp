@@ -29,6 +29,7 @@ CRayPick::CRayPick(const Fvector& P, const Fvector& D, float R, collide::rq_targ
 
 bool CRayPick::query()
 {
+	result.reset();
 	collide::rq_result R;
 	if (Level().ObjectSpace.RayPick(start_position, direction, range, flags, R, ignore))
 	{

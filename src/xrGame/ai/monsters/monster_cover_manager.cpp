@@ -185,7 +185,7 @@ const CCoverPoint* CMonsterCoverManager::find_cover(const Fvector& position, flo
 	return point;
 }
 
-// найти лучший ковер относительно "position"
+// РЅР°Р№С‚Рё Р»СѓС‡С€РёР№ РєРѕРІРµСЂ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ "position"
 const CCoverPoint* CMonsterCoverManager::find_cover(const Fvector& src_pos, const Fvector& dest_pos,
                                                     float min_pos_distance, float max_pos_distance, float deviation)
 {

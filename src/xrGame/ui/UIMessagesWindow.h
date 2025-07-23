@@ -22,7 +22,6 @@ public:
 	virtual ~CUIMessagesWindow();
 
 	void AddIconedPdaMessage(GAME_NEWS_DATA* news);
-
 	void AddLogMessage(const shared_str& msg);
 	void AddLogMessage(KillMessageStruct& msg);
 	void AddChatMessage(shared_str msg, shared_str author);
@@ -31,14 +30,13 @@ public:
 	CUIChatWnd* GetChatWnd() { return m_pChatWnd; }
 	virtual void Show(bool show);
 
-
 protected:
 	virtual void Init(float x, float y, float width, float height);
-
 
 	CUIGameLog* m_pChatLog;
 	CUIChatWnd* m_pChatWnd;
 	CUIGameLog* m_pGameLog;
+
 	bool m_in_pending_mode;
 
 	Frect m_pending_chat_log_rect;

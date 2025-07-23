@@ -52,7 +52,7 @@ public:
 
 	virtual bool Action(u16 cmd, u32 flags);
 
-	virtual void UpdateSounds();
+	virtual void UpdateSoundsPositionsImpl();
 
 	//переключение в режим подствольника
 	virtual bool SwitchMode(bool force = false);
@@ -75,7 +75,7 @@ public:
 
 	//Script exports
 	void SetAmmoElapsed2(int ammo_count);
-	void AmmoTypeForEach2(const luabind::functor<bool>& funct);
+	void AmmoTypeForEach2(const ::luabind::functor<bool>& funct);
 	virtual void SetAmmoType2(u8 type) { m_ammoType2 = type; };
 	u8 GetAmmoType2() { return m_ammoType2; };
 	int GetAmmoCount2(u8 ammo2_type) const;

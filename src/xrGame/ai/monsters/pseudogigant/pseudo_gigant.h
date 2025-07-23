@@ -22,8 +22,8 @@ private:
 	} step_effector;
 
 	SAttackEffector m_threaten_effector;
-	ref_sound m_sound_threaten_hit; // звук, который играется в голове у актера
-	ref_sound m_sound_start_threaten; // звук, который играется в голове у актера
+	ref_sound m_sound_threaten_hit; // Р·РІСѓРє, РєРѕС‚РѕСЂС‹Р№ РёРіСЂР°РµС‚СЃСЏ РІ РіРѕР»РѕРІРµ Сѓ Р°РєС‚РµСЂР°
+	ref_sound m_sound_start_threaten; // Р·РІСѓРє, РєРѕС‚РѕСЂС‹Р№ РёРіСЂР°РµС‚СЃСЏ РІ РіРѕР»РѕРІРµ Сѓ Р°РєС‚РµСЂР°
 
 	u32 m_time_next_threaten;
 

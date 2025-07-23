@@ -557,9 +557,9 @@ bool CScriptGameObject::is_bone_visible(u16 bone_id, bool bHud)
 }
 
 // demonized: list all bones
-luabind::object CScriptGameObject::list_bones(bool bHud)
+::luabind::object CScriptGameObject::list_bones(bool bHud)
 {
-	luabind::object result = luabind::newtable(ai().script_engine().lua());
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 	IKinematics* k = nullptr;
 
 	if (bHud)
@@ -879,7 +879,7 @@ bool CScriptGameObject::inside(const Fvector& position) const
 	return (inside(position, EPS_L));
 }
 
-void CScriptGameObject::set_patrol_extrapolate_callback(const luabind::functor<bool>& functor)
+void CScriptGameObject::set_patrol_extrapolate_callback(const ::luabind::functor<bool>& functor)
 {
 	CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
 	if (!monster)
@@ -891,8 +891,8 @@ void CScriptGameObject::set_patrol_extrapolate_callback(const luabind::functor<b
 	monster->movement().patrol().extrapolate_callback().set(functor);
 }
 
-void CScriptGameObject::set_patrol_extrapolate_callback(const luabind::functor<bool>& functor,
-                                                        const luabind::object& object)
+void CScriptGameObject::set_patrol_extrapolate_callback(const ::luabind::functor<bool>& functor,
+                                                        const ::luabind::object& object)
 {
 	CCustomMonster* monster = smart_cast<CCustomMonster*>(&this->object());
 	if (!monster)
@@ -1111,22 +1111,32 @@ void CScriptGameObject::StartUpgrade(CScriptGameObject* obj)
 		pGameSP->StartUpgrade(pActorInv, pOtherOwner);
 }
 
-script_attachment* CScriptGameObject::AddAttachment(u16 slot, LPCSTR model_name)
+script_attachment* CScriptGameObject::AddAttachment(LPCSTR name, LPCSTR model_name)
 {
-	script_attachment* att = xr_new<script_attachment>(slot, model_name);
+	script_attachment* att = xr_new<script_attachment>(name, model_name);
 	R_ASSERT(att);
 	att->SetParent(&object());
 	return att;
 }
 
-script_attachment* CScriptGameObject::GetAttachment(u16 slot)
+script_attachment* CScriptGameObject::GetAttachment(LPCSTR name)
 {
-	return object().get_attachment(slot);
+	return object().get_attachment(name);
 }
 
-void CScriptGameObject::RemoveAttachment(u16 slot)
+void CScriptGameObject::RemoveAttachment(LPCSTR name)
 {
-	object().remove_attachment(slot, true);
+	object().remove_attachment(name);
+}
+
+void CScriptGameObject::RemoveAttachment(script_attachment* child)
+{
+	object().remove_attachment(child);
+}
+
+void CScriptGameObject::IterateAttachments(::luabind::functor<bool> functor)
+{
+	object().iterate_attachments(functor);
 }
 
 CGameObject& CScriptGameObject::object() const
@@ -1149,7 +1159,7 @@ CGameObject& CScriptGameObject::object() const
 
 //////////////////////////////////////////////////////////////////////////
 // Shader / Textures Magic
-luabind::object CScriptGameObject::GetShaders(bool bHud)
+::luabind::object CScriptGameObject::GetShaders(bool bHud)
 {
 	IKinematics* k = nullptr;
 
@@ -1166,7 +1176,7 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 	if (!k)
 		k = object().Visual()->dcast_PKinematics();
 
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!k)
 	{
@@ -1179,7 +1189,7 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = vis->getDebugShader();
 		subtable["texture"] = vis->getDebugTexture();
 		table[1] = subtable;
@@ -1190,7 +1200,7 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
 		table[i] = subtable;
@@ -1200,7 +1210,7 @@ luabind::object CScriptGameObject::GetShaders(bool bHud)
 	return table;
 }
 
-luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
+::luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
 {
 	IKinematics* k = nullptr;
 
@@ -1217,7 +1227,7 @@ luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
 	if (!k)
 		k = object().Visual()->dcast_PKinematics();
 
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!k)
 	{
@@ -1230,7 +1240,7 @@ luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
 
 	if (!children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = vis->getDebugShaderDef();
 		subtable["texture"] = vis->getDebugTextureDef();
 		table[1] = subtable;
@@ -1241,7 +1251,7 @@ luabind::object CScriptGameObject::GetDefaultShaders(bool bHud)
 
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
 		table[i] = subtable;

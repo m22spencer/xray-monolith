@@ -33,6 +33,15 @@ public:
 		return *this;
 	}
 
+	IC SelfRef add(T _x, T _y, T _z, T _w = 1)
+	{
+		x += _x;
+		y += _y;
+		z += _z;
+		w += _w;
+		return *this;
+	}
+
 	IC SelfRef add(const Self& v)
 	{
 		x += v.x;
@@ -156,6 +165,15 @@ public:
 		y = a.y * s;
 		z = a.z * s;
 		w = a.w * s;
+		return *this;
+	}
+
+	IC SelfRef div(T _x, T _y, T _z, T _w = 1)
+	{
+		x /= _x;
+		y /= _y;
+		z /= _z;
+		w /= _w;
 		return *this;
 	}
 

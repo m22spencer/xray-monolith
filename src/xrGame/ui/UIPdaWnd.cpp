@@ -285,7 +285,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 		m_pActiveDialog = pUILogsWnd;
 	}
 
-	luabind::functor<CUIDialogWndEx*> funct;
+	::luabind::functor<CUIDialogWndEx*> funct;
 	if (ai().script_engine().functor("pda.set_active_subdialog", funct))
 	{
 		CUIDialogWndEx* ret = funct((LPCSTR)section.c_str());

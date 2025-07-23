@@ -70,6 +70,11 @@ public:
 		u32 ssfx_core : 1;
 		u32 ssfx_bloom : 1;
 		u32 ssfx_sss : 1;
+		u32 ssfx_fog : 1;
+		u32 ssfx_motionblur : 1;
+		u32 ssfx_taa : 1;
+		u32 ssfx_motionvectors : 1;
+		u32 ssfx_glass : 1;
 
 		u32 bug : 1;
 
@@ -367,7 +372,7 @@ public:
 	virtual void model_Delete(IRender_DetailModel* & F);
 	virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
 	virtual void models_Prefetch();
-	virtual void models_PrefetchOne(LPCSTR name);
+	virtual void models_PrefetchOne(LPCSTR name, bool assert = true);
 	virtual void models_Clear(BOOL b_complete);
 
 	// Occlusion culling

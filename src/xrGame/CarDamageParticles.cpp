@@ -64,7 +64,7 @@ void CCarDamageParticles::Play2(CCar* car)
 }
 
 /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
-// функции для выключения партиклов дыма
+// С„СѓРЅРєС†РёРё РґР»СЏ РІС‹РєР»СЋС‡РµРЅРёСЏ РїР°СЂС‚РёРєР»РѕРІ РґС‹РјР°
 void CCarDamageParticles::Stop1(CCar* car)
 {
 	if (*m_car_damage_particles1)

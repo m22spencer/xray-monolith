@@ -763,9 +763,6 @@
     <Filter Include="AI\AMonsters\monsters\Chimera\Script">
       <UniqueIdentifier>{7ce139e5-922b-4707-a14e-2ad0f6111065}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AMonsters\monsters\Chimera\states">
-      <UniqueIdentifier>{8d6475ec-c185-4ebb-9ba6-e7dc1644c4c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AMonsters\monsters\PseudoGigant">
       <UniqueIdentifier>{b63ebd95-6d63-4b98-b8a8-3587f5b69dbb}</UniqueIdentifier>
     </Filter>
@@ -2490,6 +2487,15 @@
     </Filter>
     <Filter Include="Core\Client\Effectors\monsters">
       <UniqueIdentifier>{b1a00ac3-9c32-43d4-a698-33d5f830e0d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SSRS">
+      <UniqueIdentifier>{26b73ed3-2689-4553-a924-cc3975a1d008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\monsters\Chimera\state attack">
+      <UniqueIdentifier>{8d6475ec-c185-4ebb-9ba6-e7dc1644c4c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\ImGui">
+      <UniqueIdentifier>{c14ffa0c-947d-49b9-8e01-269569b48371}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -6159,9 +6165,6 @@
     <ClInclude Include="..\xrServerEntities\object_item_single_inline.h">
       <Filter>Core\Common\ObjectFactory\object_item_single</Filter>
     </ClInclude>
-    <ClInclude Include="profiler.h">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="profiler_inline.h">
       <Filter>Core\Common\Profiler</Filter>
     </ClInclude>
@@ -7320,7 +7323,6 @@
     <ClInclude Include="AmebaZone.h">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClInclude>
-    <ClInclude Include="HolderEntityObject.h" />
     <ClInclude Include="ActorNightVision.h">
       <Filter>Core\Client\Effectors\Actor</Filter>
     </ClInclude>
@@ -7372,10 +7374,32 @@
     <ClInclude Include="script_wallmarks_manager.h">
       <Filter>Core\Client\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="NewZoomFlag.h" />
-    <ClInclude Include="new_sds.h" />
     <ClInclude Include="LevelDebugScript.h">
       <Filter>Core\Client\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="script_attachment_manager.h">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponSSRS.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SSRS</Filter>
+    </ClInclude>
+    <ClInclude Include="HolderEntityObject.h">
+      <Filter>Core\Client\Objects\vehicles</Filter>
+    </ClInclude>
+    <ClInclude Include="new_sds.h">
+      <Filter>Core\Common\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="NewZoomFlag.h">
+      <Filter>Core\Common\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="HUDRecon.h">
+      <Filter>UI\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="script_imgui.h">
+      <Filter>UI\Common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="script_imgui_inline.h">
+      <Filter>UI\Common\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -10994,18 +11018,15 @@
     <ClCompile Include="AmebaZone.cpp">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClCompile>
-    <ClCompile Include="HolderEntityObject.cpp" />
     <ClCompile Include="CustomOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
-    <ClCompile Include="medkit_script.cpp" />
     <ClCompile Include="WeaponAmmo_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Ammo</Filter>
     </ClCompile>
     <ClCompile Include="eatable_item_script.cpp">
       <Filter>Core\Client\Objects\inventory\EatableItem</Filter>
     </ClCompile>
-    <ClCompile Include="antirad_script.cpp" />
     <ClCompile Include="FoodItem_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
     </ClCompile>
@@ -11060,22 +11081,49 @@
     <ClCompile Include="LevelDebugScript.cpp">
       <Filter>Core\Client\Level</Filter>
     </ClCompile>
+    <ClCompile Include="script_attachment_script.cpp">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClCompile>
+    <ClCompile Include="script_attachment_manager.cpp">
+      <Filter>Core\Client\Objects\base</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponSSRS.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SSRS</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponSSRS_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SSRS</Filter>
+    </ClCompile>
+    <ClCompile Include="antirad_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
+    </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp">
+      <Filter>Core\Client\Objects\vehicles</Filter>
+    </ClCompile>
+    <ClCompile Include="medkit_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Food &amp; Drugs</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDRecon.cpp">
+      <Filter>UI\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="script_imgui_script.cpp">
+      <Filter>UI\Common\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state_inline.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="graph_abstract.h">
-      <Filter>AI\ANavigation\GraphAbstract</Filter>
-    </CustomBuild>
-    <CustomBuild Include="graph_abstract_inline.h">
-      <Filter>AI\ANavigation\GraphAbstract</Filter>
-    </CustomBuild>
     <CustomBuild Include="Explosive.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
+      <Filter>AI\AMonsters\monsters\Chimera\state attack</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state_inline.h">
+      <Filter>AI\AMonsters\monsters\Chimera\state attack</Filter>
+    </CustomBuild>
+    <CustomBuild Include="graph_abstract_inline.h">
+      <Filter>AI\ALife\simulator_base\registries\graph_registry</Filter>
+    </CustomBuild>
+    <CustomBuild Include="graph_abstract.h">
+      <Filter>AI\ALife\simulator_base\registries\graph_registry</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

@@ -1205,11 +1205,12 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
 	if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_FAR)) return;
 
-	float w = float(Device.dwWidth);
+// SSS : Deprecated
+/*	float w = float(Device.dwWidth);
 	float h = float(Device.dwHeight);
 
-	if (RImplementation.o.ssfx_volumetric)
-		set_viewport_size(HW.pContext, w / ps_ssfx_volumetric.w, h / ps_ssfx_volumetric.w);
+	if (RImplementation.o.ssfx_volumetric) 
+		set_viewport_size(HW.pContext, w / ps_ssfx_volumetric.w, h / ps_ssfx_volumetric.w);*/
 
 	phase_vol_accumulator();
 
@@ -1382,7 +1383,8 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 		// disable depth bounds
 		//		u_DBT_disable	();
 
-		if (RImplementation.o.ssfx_volumetric)
-			set_viewport_size(HW.pContext, w, h);
+// SSS : Deprecated
+//		if (RImplementation.o.ssfx_volumetric)
+//			set_viewport_size(HW.pContext, w, h);
 	}
 }

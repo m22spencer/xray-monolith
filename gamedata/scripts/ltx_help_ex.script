@@ -10,6 +10,7 @@
         scope_texture_alt - alternative sight crosshair
         scope_zoom_factor_alt - alternative sight zoom factor
         scope_dynamic_zoom_alt - enable adjustable scope for alt. sight
+        min_scope_zoom_factor - Minimal zoom factor
         snd_shoot_actor_first - custom sound for the first shot
         snd_silncer_shoot_actor_first - custom sound for the first shot with silencer
         base_hud_offset_pos - Editable variables that allow weapon position adjustements that don't require aim tweaks
@@ -19,6 +20,8 @@
         silenced_tracers - Option to disable silencers hiding the tracer on a per weapon basis
         fire_point_silencer - Adjust fire point when silencer is attached, defaults to the value of fire_point. Supports both HUD and world models
 		nearwall_zoomed_range - Maximum offset toward camera when aiming down sight close to a wall.
+        firepos - Disables g_firepos / g_firepos_zoom for this weapon if set to false.
+        aimpos - Disables g_aimpos / g_aimpos_zoom for this weapon if set to false.
         ai_rpm - Set RPM of weapon for AI (only for SSRS)
         modular_attachments - enable modular attachments (https://github.com/themrdemonized/xray-monolith/pull/135)
         modular_scope_group - section which is used to define available scopes (modular attachments)

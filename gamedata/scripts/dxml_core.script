@@ -155,7 +155,7 @@ end
 -- Manipulate xml nodes through modxml_...script files
 -- Gather all files
 do
-	printf("init gathering modxml_... scripts")
+	printf_me("init gathering modxml_... scripts")
 	local ignore = { 
 		["_g.script"] = true,
 	}
@@ -168,11 +168,11 @@ do
 	for	it=0, f_cnt-1 do
 		local file = flist:GetAt(it)
 		local file_name = file:NameShort()
-		--printf("%s size=%s",file_name,file:Size())
+		--printf_me("%s size=%s",file_name,file:Size())
 		if (file:Size() > 0 and ignore[file_name] ~= true) then
 			file_name = file_name:sub(0,file_name:len()-7)
 			if (_G[file_name] and _G[file_name].on_xml_read) then
-				printf("gathering %s.script", file_name)
+				printf_me("gathering %s.script", file_name)
 				size_t = size_t + 1 
 				t[size_t] = file_name -- load all scripts first
 			end
@@ -204,15 +204,15 @@ local xml_string_debug_enabled = false
 local xml_string_cache = {}
 
 local function print_xml_error(xml_file_name, s, ...)
-	return printf("!DXML Error, file " .. xml_file_name .. " : " .. s, ...)
+	return printf_me("!DXML Error, file " .. xml_file_name .. " : " .. s, ...)
 end
 
 local function print_parser_msg(xml_file_name, s, ...)
-	return printf("DXML Parser, file " .. xml_file_name .. " : " .. s, ...)
+	return printf_me("DXML Parser, file " .. xml_file_name .. " : " .. s, ...)
 end
 
 local function print_parser_error(xml_file_name, s, ...)
-	return printf("!DXML Parser Error, file " .. xml_file_name .. " : " .. s, ...)
+	return printf_me("!DXML Parser Error, file " .. xml_file_name .. " : " .. s, ...)
 end
 
 local function print_r_xml(...)
@@ -1014,7 +1014,7 @@ function openXMLFile(xml_file_name)
 
 	local xml_string = loadFile(xml_file_name)
 	if not xml_string then
-		printf("error opening file %s", xml_file_name)
+		printf_me("error opening file %s", xml_file_name)
 		return 
 	end
 
@@ -1023,13 +1023,13 @@ function openXMLFile(xml_file_name)
 
 	local xml_table = try(parser.simple_dom, parser, xml_string, parser_options)
 	if not xml_table then
-		printf("error parsing file %s", xml_file_name)
+		printf_me("error parsing file %s", xml_file_name)
 		return
 	end
 
 	local xml_obj = try(xml_object, xml_file_name, xml_string, xml_table)
 	if not xml_obj then
-		printf("error creating xml_obj for file %s", xml_file_name)
+		printf_me("error creating xml_obj for file %s", xml_file_name)
 		return
 	end
 	xmlDispatch(xml_file_name, xml_obj, {})

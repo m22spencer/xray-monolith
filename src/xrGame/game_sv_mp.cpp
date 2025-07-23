@@ -677,13 +677,13 @@ void game_sv_mp::SetSkin(CSE_Abstract* E, u16 Team, u16 ID)
 	//-------------------------------------------
 	string256 SkinName;
 	xr_strcpy(SkinName, pSettings->r_string("mp_skins_path", "skin_path"));
-	//çàãðóæåíû ëè ñêèíû äëÿ ýòîé êîììàíäû
+	//Ð·Ð°Ð³Ñ€ÑƒÐ¶ÐµÐ½Ñ‹ Ð»Ð¸ ÑÐºÐ¸Ð½Ñ‹ Ð´Ð»Ñ ÑÑ‚Ð¾Ð¹ ÐºÐ¾Ð¼Ð¼Ð°Ð½Ð´Ñ‹
 
 	if (!TeamList.empty() &&
 		TeamList.size() > Team &&
 		!TeamList[Team].aSkins.empty())
 	{
-		//çàãðóæåíî ëè äîñòàòî÷íî ñêèíîâ äëÿ ýòîé êîììàíäû
+		//Ð·Ð°Ð³Ñ€ÑƒÐ¶ÐµÐ½Ð¾ Ð»Ð¸ Ð´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ ÑÐºÐ¸Ð½Ð¾Ð² Ð´Ð»Ñ ÑÑ‚Ð¾Ð¹ ÐºÐ¾Ð¼Ð¼Ð°Ð½Ð´Ñ‹
 		if (TeamList[Team].aSkins.size() > ID)
 		{
 			xr_strcat(SkinName, TeamList[Team].aSkins[ID].c_str());

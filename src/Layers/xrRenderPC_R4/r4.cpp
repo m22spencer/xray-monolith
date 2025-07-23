@@ -14,6 +14,8 @@
 #include "../xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "../xrRender/ShaderResourceTraits.h"
 
+#include "../../xrCore/profiler.h"
+
 #include "D3DX10Core.h"
 
 CRender RImplementation;
@@ -475,7 +477,7 @@ void CRender::create()
 	o.ssfx_core = FS.exist(fn, "$game_shaders$", "r3\\screenspace_common", ".h") ? 1 : 0;
 	o.ssfx_rain = FS.exist(fn, "$game_shaders$", "r3\\effects_rain_splash", ".ps") ? 1 : 0;
 	o.ssfx_blood = FS.exist(fn, "$game_shaders$", "r3\\effects_wallmark_blood", ".ps") ? 1 : 0;
-	o.ssfx_branches = FS.exist(fn, "$game_shaders$", "r3\\deffer_tree_branch_bump-hq", ".vs") ? 1 : 0;
+	o.ssfx_branches = FS.exist(fn, "$game_shaders$", "r3\\deffer_tree_branch_aref_bump-hq", ".ps") ? 1 : 0;
 	o.ssfx_hud_raindrops = FS.exist(fn, "$game_shaders$", "r3\\deffer_base_hud_bump", ".ps") ? 1 : 0;
 	o.ssfx_ssr = FS.exist(fn, "$game_shaders$", "r3\\ssfx_ssr", ".ps") ? 1 : 0;
 	o.ssfx_terrain = FS.exist(fn, "$game_shaders$", "r3\\deffer_terrain_high_flat_d", ".ps") ? 1 : 0;
@@ -485,10 +487,16 @@ void CRender::create()
 	o.ssfx_il = FS.exist(fn, "$game_shaders$", "r3\\ssfx_il", ".ps") ? 1 : 0;
 	o.ssfx_sss = FS.exist(fn, "$game_shaders$", "r3\\ssfx_sss", ".ps") ? 1 : 0;
 	o.ssfx_bloom = FS.exist(fn, "$game_shaders$", "r3\\ssfx_bloom", ".ps") ? 1 : 0;
+	o.ssfx_taa = FS.exist(fn, "$game_shaders$", "r3\\ssfx_taa", ".ps") ? 1 : 0;
+	o.ssfx_fog = FS.exist(fn, "$game_shaders$", "r3\\ssfx_fog_scattering", ".ps") ? 1 : 0;
+	o.ssfx_motionblur = FS.exist(fn, "$game_shaders$", "r3\\ssfx_motion_blur", ".ps") ? 1 : 0;
+	o.ssfx_motionvectors = FS.exist(fn, "$game_shaders$", "r3\\screenspace_mvectors", ".h") ? 1 : 0;
+	o.ssfx_glass = FS.exist(fn, "$game_shaders$", "r3\\ssfx_glass", ".ps") ? 1 : 0; 
 
-	Msg("- Supports SSS UPDATE 22");
+	Msg("- Supports SSS UPDATE 23");
 	Msg("- SSS CORE INSTALLED %i", o.ssfx_core);
-	Msg("- SSS HUD RAINDROPS SHADER INSTALLED %i", o.ssfx_hud_raindrops);
+	Msg("- SSS HUD SHADER INSTALLED %i", o.ssfx_hud_raindrops);
+	Msg("- SSS MOTION VECTORS SHADER INSTALLED %i", o.ssfx_motionvectors);
 	Msg("- SSS RAIN SHADER INSTALLED %i", o.ssfx_rain);
 	Msg("- SSS BLOOD SHADER INSTALLED %i", o.ssfx_blood);
 	Msg("- SSS BRANCHES SHADER INSTALLED %i", o.ssfx_branches);
@@ -500,6 +508,10 @@ void CRender::create()
 	Msg("- SSS IL SHADER INSTALLED %i", o.ssfx_il);
 	Msg("- SSS SSS SHADER INSTALLED %i", o.ssfx_sss);
 	Msg("- SSS BLOOM SHADER INSTALLED %i", o.ssfx_bloom);
+	Msg("- SSS FOG SHADER INSTALLED %i", o.ssfx_fog);
+	Msg("- SSS GLASS SHADER INSTALLED %i", o.ssfx_glass);
+	Msg("- SSS MOTION BLUR SHADER INSTALLED %i", o.ssfx_motionblur);
+	Msg("- SSS TAA SHADER INSTALLED %i", o.ssfx_taa);
 
 	// constants
 	CResourceManager* RM = dxRenderDeviceRender::Instance().Resources;
@@ -647,6 +659,7 @@ fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
 }*/
 void CRender::OnFrame()
 {
+	PROF_EVENT("CRender::OnFrame()");
 	Models->DeleteQueue();
 	if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
 	{
@@ -734,7 +747,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 }
 
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_PrefetchOne(LPCSTR name) { Models->Prefetch_One(name); }
+void CRender::models_PrefetchOne(LPCSTR name, bool assert) { Models->Prefetch_One(name, assert); }
 void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
 
 ref_shader CRender::getShader(int id)

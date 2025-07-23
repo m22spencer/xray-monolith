@@ -55,7 +55,7 @@ struct SStateDataMoveToPoint
 //////////////////////////////////////////////////////////////////////////
 struct SStateDataMoveToPointEx : public SStateDataMoveToPoint
 {
-	u32 time_to_rebuild; //u32(-1) - не перестраивать, 0-по-умолчанию, ...
+	u32 time_to_rebuild; //u32(-1) - РЅРµ РїРµСЂРµСЃС‚СЂР°РёРІР°С‚СЊ, 0-РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ, ...
 
 	SStateDataMoveToPointEx()
 	{

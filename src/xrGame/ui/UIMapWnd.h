@@ -111,7 +111,7 @@ public:
 
 protected:
 	void init_xml_nav(CUIXml& xml);
-	void ShowHint(bool extra = false);
+	void ShowHint();
 	void Activated();
 	CUIPropertiesBox* m_UIPropertiesBox;
 public:

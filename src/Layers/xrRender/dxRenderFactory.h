@@ -31,6 +31,7 @@ public:
 	RENDER_FACTORY_DECLARE(ThunderboltDescRender)
 	RENDER_FACTORY_DECLARE(RainRender)
 	RENDER_FACTORY_DECLARE(LensFlareRender)
+	RENDER_FACTORY_DECLARE(ImGuiRender)
 	RENDER_FACTORY_DECLARE(EnvironmentRender)
 	RENDER_FACTORY_DECLARE(EnvDescriptorMixerRender)
 	RENDER_FACTORY_DECLARE(EnvDescriptorRender)

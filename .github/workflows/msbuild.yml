@@ -90,6 +90,9 @@ jobs:
       uses: actions/checkout@v4
       # with:
       #   ref: all-in-one-vs2022
+      
+    - name: Init submodules
+      uses: snickerbockers/submodules-init@v4
 
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1.3.1
@@ -225,17 +228,16 @@ jobs:
         mv ${{env.DX10AVX}}_pdb/*.zip pdb
         mv ${{env.DX9AVX}}_pdb/*.zip pdb
         mv ${{env.DX8AVX}}_pdb/*.zip pdb
-        
+
     - name: Publish
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: softprops/action-gh-release@v2.3.2
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "${{steps.datetime.outputs.today}}"
-        title: "${{steps.datetime.outputs.today}}"
-        prerelease: false
         files: |
           *.zip
           pdb/*.zip
+        tag_name: "${{steps.datetime.outputs.today}}"
+        generate_release_notes: true
+        token: "${{ secrets.GITHUB_TOKEN }}"
     
     - name: Remove artifacts
       # You may pin to the exact commit or the version.

@@ -56,8 +56,8 @@ public:
 
 	void Load(LPCSTR section);
 
-	virtual Fmatrix RayTransform();
-	virtual void g_fireParams(SPickParam& pp) {};
+	virtual bool NeedBlendAnm();
+	virtual bool MovingAnimAllowedNow();
 
 	virtual bool IsZoomEnabled() const { return false; }
 

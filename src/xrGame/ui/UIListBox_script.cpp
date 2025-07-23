@@ -11,14 +11,14 @@
 using namespace luabind;
 
 
-struct CUIListBoxItemWrapper : public CUIListBoxItem, public luabind::wrap_base
+struct CUIListBoxItemWrapper : public CUIListBoxItem, public ::luabind::wrap_base
 {
 	CUIListBoxItemWrapper(float h): CUIListBoxItem(h)
 	{
 	}
 };
 
-struct CUIListBoxItemMsgChainWrapper : public CUIListBoxItemMsgChain, public luabind::wrap_base
+struct CUIListBoxItemMsgChainWrapper : public CUIListBoxItemMsgChain, public ::luabind::wrap_base
 {
 	CUIListBoxItemMsgChainWrapper(float h) : CUIListBoxItemMsgChain(h)
 	{

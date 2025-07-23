@@ -19,10 +19,6 @@
 #include "step_manager.h"
 #include "script_export_space.h"
 
-#ifdef STATIONARYMGUN_NEW
-#include "WeaponStatMgun.h"
-#endif
-
 using namespace ACTOR_DEFS;
 
 class CInfoPortion;
@@ -216,13 +212,13 @@ public:
 
 public:
 
-	//�������� ����������
+	//свойства артефактов
 	virtual void UpdateArtefactsOnBeltAndOutfit();
 	float HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type);
 	float GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type);
 
 protected:
-	//���� �������� �������
+	//звук тяжелого дыхания
 	ref_sound m_HeavyBreathSnd;
 	ref_sound m_BloodSnd;
 	ref_sound m_DangerSnd;
@@ -248,13 +244,13 @@ protected:
 	BOOL b_DropActivated;
 	float f_DropPower;
 
-	//random seed ��� Zoom mode
+	//random seed для Zoom mode
 	s32 m_ZoomRndSeed;
-	//random seed ��� Weapon Effector Shot
+	//random seed для Weapon Effector Shot
 	s32 m_ShotRndSeed;
 
 	bool m_bOutBorder;
-	//��������� ������� �������� � feel_touch, ��� ������� ���������� ��������� ������ �������� � ������� 
+	//сохраняет счетчик объектов в feel_touch, для которых необходимо обновлять размер колижена с актером 
 	u32 m_feel_touch_characters;
 private:
 	void SwitchOutBorder(bool new_border_state);
@@ -267,15 +263,9 @@ public:
 	s32 GetShotRndSeed() { return m_ShotRndSeed; };
 
 public:
-#ifdef HOLDERCUSTOM_NEW
-	void detach_Vehicle(bool bForce);
-	void steer_Vehicle(float angle);
-	bool attach_Vehicle(CHolderCustom *object, bool bForce);
-#else
 	void detach_Vehicle();
 	void steer_Vehicle(float angle);
 	void attach_Vehicle(CHolderCustom* vehicle);
-#endif
 	bool use_HolderEx(CHolderCustom* object, bool bForce);
 
 	virtual bool can_attach(const CInventoryItem* inventory_item) const;
@@ -292,10 +282,10 @@ protected:
 	// Rotation
 	SRotation r_torso;
 	float r_torso_tgt_roll;
-	//��������� ����� ��� ����������� ������� ������ ������
+	//положение торса без воздействия эффекта отдачи оружия
 	SRotation unaffected_r_torso;
 
-	//���������� ������
+	//ориентация модели
 	float r_model_yaw_dest;
 	float r_model_yaw; // orientation of model
 	float r_model_yaw_delta; // effect on multiple "strafe"+"something"
@@ -314,7 +304,7 @@ public:
 	MotionID m_current_torso;
 	MotionID m_current_head;
 
-	// callback �� �������� ������ ������
+	// callback на анимации модели актера
 	void SetCallbacks();
 	void ResetCallbacks();
 	static void _BCL Spin0Callback(CBoneInstance*);
@@ -379,7 +369,7 @@ protected:
 	CEffectorBobbing* pCamBobbing;
 
 
-	//�������� ����������, ���� � ������� �������
+	//менеджер эффекторов, есть у каждого актрера
 	CActorCameraManager* m_pActorEffector;
 	static float f_Ladder_cam_limit;
 public: //--#SM+#--
@@ -432,7 +422,7 @@ public:
 	bool m_bDelayDrawPickupItems;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Motions (������������ �������)
+	// Motions (передвижения актрера)
 	//////////////////////////////////////////////////////////////////////////
 public:
 	void g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Jump, float dt);
@@ -512,41 +502,38 @@ public:
 	virtual float MaxCarryWeight() const;
 	float MaxWalkWeight() const;
 	float get_additional_weight() const;
-	
-#ifdef STATIONARYMGUN_NEW
-	virtual float GetWeaponAccuracyStm();
-#endif
 
 protected:
 	CFireDispertionController m_fdisp_controller;
-	//���� ����� ������� � ������
+	//если актер целится в прицел
 	void SetZoomAimingMode(bool val) { m_bZoomAimingMode = val; }
 	bool m_bZoomAimingMode;
 
-	//��������� ������������ ��������
-	//������� ��������� (����� ����� ����� �� �����)
+	//настройки аккуратности стрельбы
+	//базовая дисперсия (когда игрок стоит на месте)
 	float m_fDispBase;
 	float m_fDispAim;
-	//������������ �� ������� ��������� ���������� ������� ���������
-	//��������� �������� ������ 
+	//коэффициенты на сколько процентов увеличится базовая дисперсия
+	//учитывает скорость актера 
 	float m_fDispVelFactor;
-	//���� ����� �����
+	//если актер бежит
 	float m_fDispAccelFactor;
-	//���� ����� �����
+	//если актер сидит
 	float m_fDispCrouchFactor;
 	//crouch+no acceleration
 	float m_fDispCrouchNoAccelFactor;
 	Fvector m_vMissileOffset;
 public:
-	// ���������, � ������ �������� ��� ������
+	// Получение, и запись смещения для гранат
 	Fvector GetMissileOffset() const;
 	void SetMissileOffset(const Fvector& vNewOffset);
+
+	int m_head;
 protected:
-	//�������� ������������ ��� ��������
+	//косточки используемые при стрельбе
 	int m_r_hand;
 	int m_l_finger1;
 	int m_r_finger2;
-	int m_head;
 	int m_eye_left;
 	int m_eye_right;
 
@@ -593,15 +580,15 @@ protected:
 	////////////////////////////////////////////////////////////////////////////
 	virtual bool can_validate_position_on_spawn() { return false; }
 	///////////////////////////////////////////////////////
-	// ������ � ������� ������
+	// апдайт с данными физики
 	xr_deque<net_update_A> NET_A;
 
 	//---------------------------------------------
 	//	bool					m_bHasUpdate;	
 	/// spline coeff /////////////////////
-	float SCoeff[3][4]; //������������ ��� ������� �����
-	float HCoeff[3][4]; //������������ ��� ������� ������
-	Fvector IPosS, IPosH, IPosL; //��������� ������ ����� ������������ �����, ������, ��������
+	float SCoeff[3][4]; //коэффициэнты для сплайна Бизье
+	float HCoeff[3][4]; //коэффициэнты для сплайна Эрмита
+	Fvector IPosS, IPosH, IPosL; //положение актера после интерполяции Бизье, Эрмита, линейной
 
 #ifdef DEBUG
     DEF_DEQUE		(VIS_POSITION, Fvector);

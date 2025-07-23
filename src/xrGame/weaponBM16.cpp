@@ -203,44 +203,46 @@ void CWeaponBM16::PlayAnimIdle()
 			return;
 		}
 
-		if (st.bSprint)
-		{
-			PlayAnimIdleSprint();
-			return;
-		}
-		else if (!st.bCrouch)
-		{
-			PlayAnimIdleMoving();
-			return;
-		}
-		else if (st.bCrouch)
-		{
-			switch (m_magazine.size())
+		if (MovingAnimAllowedNow()) {
+			if (st.bSprint)
 			{
-			case 0:
-			{
-				HudAnimationExist("anm_idle_moving_crouch_0")
-					? PlayHUDMotion("anm_idle_moving_crouch_0", TRUE, NULL, GetState())
-					: PlayHUDMotion("anm_idle_moving_0", TRUE, NULL, GetState(), .7f);
+				PlayAnimIdleSprint();
+				return;
 			}
-			break;
-			case 1:
+			else if (!st.bCrouch)
 			{
-				HudAnimationExist("anm_idle_moving_crouch_1")
-					? PlayHUDMotion("anm_idle_moving_crouch_1", TRUE, NULL, GetState())
-					: PlayHUDMotion("anm_idle_moving_1", TRUE, NULL, GetState(), .7f);
+				PlayAnimIdleMoving();
+				return;
 			}
-			break;
-			case 2:
+			else if (st.bCrouch)
 			{
-				HudAnimationExist("anm_idle_moving_crouch_2")
-					? PlayHUDMotion("anm_idle_moving_crouch_2", TRUE, NULL, GetState())
-					: PlayHUDMotion("anm_idle_moving_2", TRUE, NULL, GetState(), .7f);
-			}
-			break;
-			};
+				switch (m_magazine.size())
+				{
+				case 0:
+				{
+					HudAnimationExist("anm_idle_moving_crouch_0")
+						? PlayHUDMotion("anm_idle_moving_crouch_0", TRUE, NULL, GetState())
+						: PlayHUDMotion("anm_idle_moving_0", TRUE, NULL, GetState(), .7f);
+				}
+				break;
+				case 1:
+				{
+					HudAnimationExist("anm_idle_moving_crouch_1")
+						? PlayHUDMotion("anm_idle_moving_crouch_1", TRUE, NULL, GetState())
+						: PlayHUDMotion("anm_idle_moving_1", TRUE, NULL, GetState(), .7f);
+				}
+				break;
+				case 2:
+				{
+					HudAnimationExist("anm_idle_moving_crouch_2")
+						? PlayHUDMotion("anm_idle_moving_crouch_2", TRUE, NULL, GetState())
+						: PlayHUDMotion("anm_idle_moving_2", TRUE, NULL, GetState(), .7f);
+				}
+				break;
+				};
 
-			return;
+				return;
+			}
 		}
 	}
 	

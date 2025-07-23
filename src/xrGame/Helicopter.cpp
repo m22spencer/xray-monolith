@@ -224,10 +224,8 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
 
 	CShootingObject::Light_Create();
 
-
 	setVisible(TRUE);
 	setEnabled(TRUE);
-
 
 	m_stepRemains = 0.0f;
 
@@ -245,6 +243,18 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG
 	Device.seqRender.Add(this,REG_PRIORITY_LOW-1);
 #endif
+
+	renderable.visual->flags.set(IRenderVisualFlags::eIgnoreOptimization, TRUE);
+
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+
+	if (children)
+	{
+		for (auto* child : *children)
+		{
+			child->flags.set(IRenderVisualFlags::eIgnoreOptimization, TRUE);
+		}
+	}
 
 	return TRUE;
 }

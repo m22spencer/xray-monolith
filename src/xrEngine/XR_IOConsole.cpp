@@ -222,7 +222,7 @@ void CConsole::OutFont(LPCSTR text, float& pos_y)
 		int ln = 0;
 		PSTR one_line = (PSTR)_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
 
-		while (text[sz] && (ln + sz < CONSOLE_BUF_SIZE - 5)) // перенос строк
+		while (text[sz] && (ln + sz < CONSOLE_BUF_SIZE - 5)) // РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРє
 		{
 			one_line[ln + sz] = text[sz];
 			one_line[ln + sz + 1] = 0;

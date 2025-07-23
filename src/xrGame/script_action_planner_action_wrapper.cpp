@@ -12,7 +12,7 @@
 
 void CScriptActionPlannerActionWrapper::setup(CScriptGameObject* object, CPropertyStorage* storage)
 {
-	luabind::call_member<void>(this, "setup", object, storage);
+	::luabind::call_member<void>(this, "setup", object, storage);
 }
 
 void CScriptActionPlannerActionWrapper::setup_static(CScriptActionPlannerAction* planner, CScriptGameObject* object,
@@ -23,7 +23,7 @@ void CScriptActionPlannerActionWrapper::setup_static(CScriptActionPlannerAction*
 
 void CScriptActionPlannerActionWrapper::initialize()
 {
-	luabind::call_member<void>(this, "initialize");
+	::luabind::call_member<void>(this, "initialize");
 }
 
 void CScriptActionPlannerActionWrapper::initialize_static(CScriptActionPlannerAction* action)
@@ -33,7 +33,7 @@ void CScriptActionPlannerActionWrapper::initialize_static(CScriptActionPlannerAc
 
 void CScriptActionPlannerActionWrapper::execute()
 {
-	luabind::call_member<void>(this, "execute");
+	::luabind::call_member<void>(this, "execute");
 }
 
 void CScriptActionPlannerActionWrapper::execute_static(CScriptActionPlannerAction* action)
@@ -43,7 +43,7 @@ void CScriptActionPlannerActionWrapper::execute_static(CScriptActionPlannerActio
 
 void CScriptActionPlannerActionWrapper::finalize()
 {
-	luabind::call_member<void>(this, "finalize");
+	::luabind::call_member<void>(this, "finalize");
 }
 
 void CScriptActionPlannerActionWrapper::finalize_static(CScriptActionPlannerAction* action)
@@ -54,7 +54,7 @@ void CScriptActionPlannerActionWrapper::finalize_static(CScriptActionPlannerActi
 CScriptActionPlannerActionWrapper::_edge_value_type CScriptActionPlannerActionWrapper::weight(
 	const CSConditionState& condition0, const CSConditionState& condition1) const
 {
-	return (luabind::call_member<_edge_value_type>(const_cast<CScriptActionPlannerActionWrapper*>(this), "weight",
+	return (::luabind::call_member<_edge_value_type>(const_cast<CScriptActionPlannerActionWrapper*>(this), "weight",
 	                                               condition0, condition1));
 }
 

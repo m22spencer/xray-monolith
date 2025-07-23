@@ -125,7 +125,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
 	CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
 	VERIFY(dynamic_object);
 
-	//оружие спавним с полным магазинои
+	//РѕСЂСѓР¶РёРµ СЃРїР°РІРЅРёРј СЃ РїРѕР»РЅС‹Рј РјР°РіР°Р·РёРЅРѕРё
 	CSE_ALifeItemWeapon* weapon = smart_cast<CSE_ALifeItemWeapon*>(dynamic_object);
 	if (weapon)
 		weapon->a_elapsed = weapon->get_ammo_magsize();

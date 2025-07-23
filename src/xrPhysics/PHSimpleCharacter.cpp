@@ -30,6 +30,8 @@
 #include "../xrengine/xr_object.h"
 #include "ph_valid_ode.h"
 
+BOOL fun_allowed = FALSE;
+
 IC bool PhOutOfBoundaries(const Fvector& v)
 {
 	return v.y < phBoundaries.y1;
@@ -815,7 +817,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
 			if (proj < 0.f) 
 			{
 				dReal vmag = chVel[0] * chVel[0] + chVel[2] * chVel[2];
-				if (vmag > 0.f) 
+				if (fun_allowed || vmag > 0.f) 
 				{
 					Fvector jump_fv = cast_fv(chVel);
 					jump_fv.mul(3000.f * air_factor / vmag / amag * proj);
@@ -1590,7 +1592,7 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
 	b_on_object = b_on_object || object;
 
 
-	////////////////////////нужно сместить колижен!!
+	////////////////////////РЅСѓР¶РЅРѕ СЃРјРµСЃС‚РёС‚СЊ РєРѕР»РёР¶РµРЅ!!
 	//////////////
 	FootProcess(c, do_collide, bo1);
 	if (!do_collide) return;

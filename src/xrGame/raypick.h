@@ -21,21 +21,44 @@ struct script_rq_result
 	float fPHBounceStartVelocity; // ?
 	float fPHBouncing; // ?
 					   // shoot&bounce&visibility&flotation
-	float fFlotationFactor; // 0.f - 1.f (1.f-полностью проходимый)
-	float fShootFactor; // 0.f - 1.f (1.f-полностью простреливаемый)
-	float fShootFactorMP; // 0.f - 1.f (1.f-полностью простреливаемый)
+	float fFlotationFactor; // 0.f - 1.f (1.f-РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕС…РѕРґРёРјС‹Р№)
+	float fShootFactor; // 0.f - 1.f (1.f-РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕСЃС‚СЂРµР»РёРІР°РµРјС‹Р№)
+	float fShootFactorMP; // 0.f - 1.f (1.f-РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕСЃС‚СЂРµР»РёРІР°РµРјС‹Р№)
 	float fBounceDamageFactor; // 0.f - 100.f
-	float fInjuriousSpeed; // 0.f - ... (0.f-не отбирает здоровье (скорость уменьшения здоровья))
-	float fVisTransparencyFactor; // 0.f - 1.f (1.f-полностью прозрачный)
-	float fSndOcclusionFactor; // 0.f - 1.f (1.f-полностью слышен)
+	float fInjuriousSpeed; // 0.f - ... (0.f-РЅРµ РѕС‚Р±РёСЂР°РµС‚ Р·РґРѕСЂРѕРІСЊРµ (СЃРєРѕСЂРѕСЃС‚СЊ СѓРјРµРЅСЊС€РµРЅРёСЏ Р·РґРѕСЂРѕРІСЊСЏ))
+	float fVisTransparencyFactor; // 0.f - 1.f (1.f-РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕР·СЂР°С‡РЅС‹Р№)
+	float fSndOcclusionFactor; // 0.f - 1.f (1.f-РїРѕР»РЅРѕСЃС‚СЊСЋ СЃР»С‹С€РµРЅ)
 	float fDensityFactor;
 
 	script_rq_result()
 	{
-		O = 0;
+		O = nullptr;
 		range = 0;
 		element = 0;
 	};
+
+	void reset() {
+		O = nullptr;
+		range = 0;
+		element = 0;
+
+		pMaterialName = nullptr;
+		pMaterialFlags = 0;
+
+		fPHFriction = 0;
+		fPHDamping = 0;
+		fPHSpring = 0;
+		fPHBounceStartVelocity = 0;
+		fPHBouncing = 0;
+		fFlotationFactor = 0;
+		fShootFactor = 0;
+		fShootFactorMP = 0;
+		fBounceDamageFactor = 0;
+		fInjuriousSpeed = 0;
+		fVisTransparencyFactor = 0;
+		fSndOcclusionFactor = 0;
+		fDensityFactor = 0;
+	}
 
 	void set(collide::rq_result& R)
 	{
@@ -94,7 +117,7 @@ struct CRayPick
 	void set_ignore_object(CScriptGameObject* I) { 
 		if (I) {
 			CObject* obj = smart_cast<CObject*>(&(I->object()));
-			if (obj) {
+			if (obj && std::find(ignore.begin(), ignore.end(), obj) == ignore.end()) {
 				ignore.push_back(obj);
 			}
 		}

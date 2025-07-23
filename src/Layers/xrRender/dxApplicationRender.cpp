@@ -21,8 +21,9 @@ void dxApplicationRender::LoadBegin()
 	//Discord
 	discord_gameinfo.loadscreen = true;
 
-	if (psDeviceFlags2.test(rsDiscord))
-		updateDiscordPresence();
+	// demonized: handled in separate thread
+	/*if (psDeviceFlags2.test(rsDiscord))
+		updateDiscordPresence();*/
 }
 
 void dxApplicationRender::destroy_loading_shaders()
@@ -33,12 +34,14 @@ void dxApplicationRender::destroy_loading_shaders()
 
 	//Discord
 	discord_gameinfo.loadscreen = false;
+	discord_gameinfo.ex_update = true;
 
-	if (psDeviceFlags2.test(rsDiscord))
+	// demonized: handled in separate thread
+	/*if (psDeviceFlags2.test(rsDiscord))
 	{
 		discord_gameinfo.ex_update = true;
 		updateDiscordPresence();
-	}
+	}*/
 }
 
 void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName)

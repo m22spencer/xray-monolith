@@ -93,7 +93,7 @@ bool CEatableItem::Useful() const
 {
 	if (!inherited::Useful()) return false;
 
-	//проверить не все ли еще съедено
+	//РїСЂРѕРІРµСЂРёС‚СЊ РЅРµ РІСЃРµ Р»Рё РµС‰Рµ СЃСЉРµРґРµРЅРѕ
 	if (m_iRemainingUses == 0 && CanDelete()) return false;
 
 	return true;

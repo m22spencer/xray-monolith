@@ -5,6 +5,7 @@
 #pragma hdrstop
 
 #include "xrCDB.h"
+#include "profiler.h"
 
 #ifdef USE_ARENA_ALLOCATOR
 static const u32	s_arena_size = (128+16)*1024*1024;
@@ -75,6 +76,8 @@ struct BTHREAD_params
 
 void MODEL::build_thread(void* params)
 {
+	PROF_EVENT();
+
 	_initialize_cpu_thread();
 	FPU::m64r();
 	BTHREAD_params P = *((BTHREAD_params*)params);
@@ -115,6 +118,8 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
 
 void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
 {
+	PROF_EVENT();
+
 	// verts
 	verts_count = Vcnt;
 	verts = CALLOC(Fvector, verts_count);

@@ -34,7 +34,7 @@ namespace smart_cover
 			Animations m_animations;
 
 		public:
-			action(luabind::object const& table);
+			action(::luabind::object const& table);
 			~action();
 			bool applicable() const;
 			animation_action const& animation() const;
@@ -42,7 +42,7 @@ namespace smart_cover
 			IC Animations const& animations() const { return m_animations; };
 
 		private:
-			void load_animations(luabind::object const& table);
+			void load_animations(::luabind::object const& table);
 		};
 	} // namespace transitions
 } // namespace smart_cover

@@ -164,9 +164,8 @@ void CHUDManager::OnFrame()
 		pUIGame->OnFrame();
 
 	PP.CameraPick();
-	DoPick(PP);
-
 	g_player_hud->OnFrame();
+	DoPick(PP);
 }
 
 //--------------------------------------------------------------------
@@ -243,12 +242,10 @@ bool CHUDManager::RenderCamAttachedUIQuery()
 {
 	if (!g_actor) return false;
 
-	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-	for (; it != it_e; ++it)
+	for (auto& pair : *g_actor->GetAttachments())
 	{
-		script_attachment* att = (*it).second;
-		if (att->GetFFlags().test(eSA_CamAttached))
+		script_attachment* att = pair.second;
+		if (att->GetType() == eSA_CamAttached)
 			return true;
 	}
 	return false;
@@ -264,18 +261,16 @@ void CHUDManager::RenderActiveItemUI()
 
 void CHUDManager::RenderCamAttachedUI()
 {
-	xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-	xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-	for (; it != it_e; ++it)
+	for (auto& pair : *g_actor->GetAttachments())
 	{
-		script_attachment* att = (*it).second;
-		if (att->GetFFlags().test(eSA_CamAttached))
-			att->RenderUI(false);
+		script_attachment* att = pair.second;
+		if (att->GetType() == eSA_CamAttached)
+			att->RenderUI();
 	}
 }
 
 extern ENGINE_API BOOL bShowPauseString;
-//îòðèñîâêà ýëåìåíòîâ èíòåðôåéñà
+//Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ° ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð¾Ð² Ð¸Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹ÑÐ°
 void CHUDManager::RenderUI()
 {
 	if (!psHUD_Flags.is(HUD_DRAW_RT2))
@@ -325,10 +320,34 @@ bool CHUDManager::FireposActive()
 	if (!pWeapon)
 		return psActorFlags.test(AF_FIREPOS);
 
+	if (!pWeapon->GetFirepos())
+		return false;
+
 	// Firepos is active if a setting matches its respective zoom state
 	float zFac = pWeapon->GetZRotatingFactor();
 	return (psActorFlags.test(AF_FIREPOS) && zFac < 1.f)
 		|| (psActorFlags.test(AF_FIREPOS_ZOOM) && zFac >= 1.f);
+}
+
+bool CHUDManager::AimposActive()
+{
+	// If we have an actor...
+	CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
+	if (!pActor)
+		return psActorFlags.test(AF_AIMPOS);
+
+	// And a weapon...
+	CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
+	if (!pWeapon)
+		return psActorFlags.test(AF_AIMPOS);
+
+	if (!pWeapon->GetAimpos())
+		return false;
+
+	// Firepos is active if a setting matches its respective zoom state
+	float zFac = pWeapon->GetZRotatingFactor();
+	return (psActorFlags.test(AF_AIMPOS) && zFac < 1.f)
+		|| (psActorFlags.test(AF_AIMPOS_ZOOM) && zFac >= 1.f);
 }
 
 ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
@@ -344,7 +363,7 @@ ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
 	}
 	else
 	{
-		//ïîëó÷èòü òðåóãîëüíèê è óçíàòü åãî ìàòåðèàë
+		//Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ‚Ñ€ÐµÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸Ðº Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ ÐµÐ³Ð¾ Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð°Ð»
 		CDB::TRI* T = Level().ObjectSpace.GetStaticTris() + result.element;
 
 		SGameMtl* mtl = GMLib.GetMaterialByIdx(T->material);
@@ -382,7 +401,7 @@ bool CHUDManager::DoPick(SPickParam& pp)
 
 void CHUDManager::SetCrosshairDisp(float dispf, float disps)
 {
-	m_pHUDTarget->GetHUDCrosshair().SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
+	m_pHUDTarget->SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
 }
 
 #ifdef DEBUG
@@ -457,7 +476,7 @@ void CHUDManager::OnScreenResolutionChanged()
 
 	pUIGame->OnConnected();
 
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (ai().script_engine().functor("_G.CHUDManager_OnScreenResolutionChanged", funct))
 		funct();
 }

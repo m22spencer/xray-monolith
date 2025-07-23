@@ -139,11 +139,12 @@ void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
 	pItem->addNews(news);
 
 	// demonized: on news received callback
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.CUIMessagesWindow__AddIconedPdaMessage", funct))
 	{
 		CUIWindow* CUIWindowPItem = pItem;
-		funct(CUIWindowPItem, &pItem->UITimeText, &pItem->UICaptionText, &pItem->UIMsgText, &pItem->UIIcon);
+		CUIScrollView* CUIScrollViewPItem = m_pGameLog;
+		funct(CUIWindowPItem, &pItem->UITimeText, &pItem->UICaptionText, &pItem->UIMsgText, &pItem->UIIcon, CUIScrollViewPItem);
 	}
 
 	m_pGameLog->SendMessage(pItem, CHILD_CHANGED_SIZE);

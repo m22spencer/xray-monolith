@@ -86,15 +86,20 @@
     }
 
     globals {
+        string dik_to_keyname(number dik, boolean localize)
         int get_modded_exes_version() // Returns modded exes version in integer format
         table get_string_table() // Returns all translated strings in [string id] = string text format 
     }
 
-    namespace alife() {
+    get_console() {
+        table get_variable_bounds(cmd)   
+    }
+
+    alife() {
         void iterate_objects(function(se_obj))
     }
 
-    namespace game {
+    game {
         Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
         function ui2world(Fvector2 pos) -> Fvector result, u16 object_id
         function ui2world_offscreen(Fvector2 pos) -> Fvector result, u16 object_id
@@ -126,13 +131,27 @@
         void reset_hands()
     }
 
+    class CUIProgressBar {
+        CUIStatic GetProgressStatic()
+    }
+
+    class CUIStatic {
+    	void SetColorAnimation(string name, number flags, float delay)
+		void ResetColorAnimation()
+		void RemoveColorAnimation()
+    }
+
+    class particles_object {
+        void set_hud_mode(bool hud_mode)
+    }
+
     // Debug shapes
     enum DebugRenderType {
         line,
         sphere,
         box,
     }
-    namespace debug_render {
+    debug_render {
         DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
         void remove_object(u16 id)
         DBG_ScriptObject* get_object(u16 id)
@@ -184,7 +203,7 @@
 		Actor       = 3,
 	}
 		
-    namespace level {
+    level {
         float get_music_volume()
         void set_music_volume(float)
 
@@ -234,6 +253,14 @@
         //        air_resistance = 0.2,
         //    }
         //    level.add_bullet(t)
+    }
+
+    class CUIMessagesWindow : CUIWindow {
+        // no extra exports yet
+    }
+
+    namespace ActorMenu {
+        function get_messages_menu()
     }
 
     // obj:get_physics_shell()
@@ -373,6 +400,7 @@
         function get_actor_person_looking_at()
         function get_actor_default_action_for_object()
 		function set_actor_box_y_offset(u32 box_num, float offset) --box_num:0 for stand, 1 for crouch, 2 for prone;
+
         // Stalker NPCs
         function get_enable_anomalies_pathfinding()
         function set_enable_anomalies_pathfinding(bool)
@@ -382,6 +410,7 @@
         function force_set_angle(Fvector angle, bool bActivate)
         function set_enable_movement_collision(bool)
         function character_dialogs()
+        function memory_remove_links(game_object)
 
         // Artefact
         function get_artefact_additional_inventory_weight()
@@ -431,9 +460,11 @@
         function update_torch()
         
         // Script Attachments
-        function add_attachment(number, string);
-        function get_attachment(number);
-        function remove_attachment(number);
+        function add_attachment(string, string)
+        function get_attachment(string)
+        function remove_attachment(string)
+        function remove_attachment(script_attachment)
+        function iterate_attachments(function)
 		
 		// Shader/Textures
 		function get_shaders(bool)
@@ -660,139 +691,116 @@
         function set_position(number, number, number);
     }
     
+    enum script_attachment_type {
+        Hud         = 0,
+        World       = 1,
+        CamAttached = 2,
+    }
+
     class ScriptAttachment {
-        function add_attachment(number, string);
-        function attach_light(attachment_script_light*);
-        function bone_callback(number, number, boolean);
-        function bone_callback(number, const function<matrix>&, boolean);
-        function detach_light();
-        function get_attachment(number);
-        function get_bone_matrix(number);
-        function get_bone_visible(number);
-        function get_center();
-        function get_flags();
-        function get_light();
-        function get_model();
-        function get_origin();
-        function get_parent();
-        function get_parent_bone();
-        function get_position();
-        function get_rotation();
-        function get_scale();
-        function get_transform();
-        function get_ui();
-        function get_ui_bone();
-        function get_ui_rotation();
-        function play_motion(string, boolean, number);
-        function remove_attachment(number);
-        function remove_bone_callback(number);
-        function set_bone_visible(number, boolean);
-        function set_flags(number);
-        function set_model(string, boolean);
-        function set_origin(vector);
-        function set_origin(number, number, number);
+        -- Parent
         function set_parent(ScriptAttachment*);
         function set_parent(game_object*);
-        function set_parent_bone(number);
+        function get_parent();
+
+        -- Child
+        function add_attachment(string, string);
+        function get_attachment(string);
+        function remove_attachment(string);
+        function remove_attachment(script_attachment);
+        function iterate_attachments(function<boolean>);
+
+        -- Offset
         function set_position(vector);
         function set_position(number, number, number);
+        function get_position();
         function set_rotation(vector);
         function set_rotation(number, number, number);
+        function get_rotation();
+        function set_origin(vector);
+        function set_origin(number, number, number);
+        function get_origin();
         function set_scale(vector);
         function set_scale(number, number, number);
         function set_scale(number);
+        function get_scale();
+        function get_transform();
+        function get_center();
+
+        -- Bones
+        function bone_id(string)
+        function bone_name(number)
+        function bone_visible(number)
+        function bone_visible(string)
+        function set_bone_visible(number, boolean, boolean)
+        function set_bone_visible(string, boolean, boolean)
+        function bone_transform(number)
+        function bone_transform(string)
+        function bone_position(number)
+        function bone_position(string)
+        function bone_direction(number)
+        function bone_direction(string)
+        function bone_parent(number)
+        function bone_parent(string)
+        function set_parent_bone(number);
+        function set_parent_bone(string);
+        function get_parent_bone();
+        function list_bones()
+
+        -- Bone Callbacks
+        function bone_callback(number, number, boolean);
+        function bone_callback(string, string, boolean);
+        function bone_callback(number, string, boolean);
+        function bone_callback(string, number, boolean);
+        function bone_callback(number, function<matrix>, boolean);
+        function bone_callback(string, function<matrix>, boolean);
+        function remove_bone_callback(number);
+        function remove_bone_callback(string);
+
+        -- Other
+        function set_type(number); -- ex. script_attachment_type.Hud
+        function get_type();
+        function set_model(string, boolean);
+        function get_model();
+        function set_name();
+        function get_name();
+        function play_motion(string, boolean, number);
+
+        -- Script 3D UI
         function set_ui(string);
+        function get_ui();
         function set_ui_bone(number);
+        function get_ui_bone();
         function set_ui_position(vector);
         function set_ui_position(number, number, number);
-        function set_ui_position();
+        function get_ui_position();
         function set_ui_rotation(vector);
         function set_ui_rotation(number, number, number);
+        function get_ui_rotation();
+        function set_ui_scale(vector);
+        function set_ui_scale(number, number, number);
+        function get_ui_scale();
+        function set_ui_origin(vector);
+        function set_ui_origin(number, number, number);
+        function get_ui_origin();
+
+        -- Script Light
+        function attach_light(attachment_script_light*);
+        function detach_light();
+        function get_light();
+        function set_light_bone(number);
+        function set_light_bone(string);
+        function get_light_bone();
+
+        -- Shader and Texture
 		function get_shaders()
 		function get_default_shaders()
 		function set_shader(number, string, string)
 		function reset_shader(number)
+
+        -- Userdata
+        property userdata
     }
     
-    flags:
-    ["eSA_RenderHUD"] = 1,
-    ["eSA_RenderWorld"] = 2,
-    ["eSA_CamAttached"] = 4,
-    
-    Script Attachment examples:
-    
-    -- adds script attachment with model gamedata\meshes\test\box.ogf to the actor's current active item in slot 1 (slots range from 0 to 65535)
-    local att = db.actor:active_item():add_attachment(1, "test\\box")
-    
-    -- setting attachment parameters
-    
-    -- functions accept both vectors or three values, scale even accepts one value
-    att:set_position(0,1,2)
-    att:set_rotation(vector():set(0,90,0))
-    att:set_scale(0.9)
-    
-    -- render both on hud and world model (default is 2 -> only on world model)
-    att:set_flags(3)
-    
-    -- create an attachment_script_light (can use script_light functions and properties)
-    -- ! make sure to keep a reference to the script light or it will be garbage collected !
-    att_light = attachment_script_light()
-    att_light.type = 2
-    att_light.hud_mode = true
-    
-    -- attachment_script_light position and direction work as an offset to the attachment position/direction
-    att_light:set_position(0,0,2)
-    att_light:set_direction(0,90,0)
-    att_light:set_cone(math.rad(0.5))
-    att_light.color = fcolor():set(1,0,0,1)
-    
-    -- attach it to the script attachment
-    att:attach_light(att_light)
-    
-    
-    -- attach the model to the actor instead of their active item
-    att:set_parent(db.actor)
-    
-    -- make it a camera attachment
-    att:set_flags(4)
-    
-    -- you can attach attachments to other attachments
-    att2 = att:add_attachment(0, "test\\box2")
-    att3 = att2:add_attachment(0, "test\\box2")
-    
-    -- and transfer the whole chain of attachments to another parent
-    -- this will transfer att and its child attachments to the new parent
-    att:set_parent(db.actor:active_item())
-    
-    -- same for child attachments
-    att3:set_parent(npc)
-    
-    -- it's also possible to change the model at any time
-    -- the boolean tells the engine if existing bone callbacks should be kept in place or if they should be removed
-    att3:set_model("armor\\boots", false)
-    
-    -- bone callbacks can be added like this
-    -- there are two types of bone callbacks
-    -- this makes the bone 1 of the attachment model follow the position of bone 6 of its parent object, the boolean tells the engine to overwrite any animation positions
-    -- same with bone 2 of the attachment model to bone 10 of the parent object
-    att3:bone_callback(1, 6, false)
-    att3:bone_callback(2, 10, false)
-    
-    -- the second type of bone callbacks uses a script callback to change the position of a bone in real time
-    local lock = db.actor:add_attachment(1234, "interface\\lockpick\\lock3")
-    lock:set_flags(4)
-    lock:set_rotation(90,0,0)
-    lock:set_position(0,0,0.09)
-    -- the callback function "cylinder_callback" will be used to adjust the position of bone 1
-    lock:bone_callback(1, cylinder_callback, false)
-    
-    -- example callback function
-    -- this will adjust the rotation of the bone
-    function cylinder_callback(mat)
-        local temp = mat.c
-        local hpb = mat:getHPB()
-        mat:setHPB(hpb.x, hpb.y + cylinder_rotation, hpb.z)
-        mat.c = temp
-        return mat
-    end
+    Script Attachment Guide: https://igigog.github.io/anomaly-modding-book/tutorials/scripting/script-attachments.html
 --]]

@@ -37,6 +37,9 @@ void CUIStatic::script_register(lua_State* L)
 		.def("SetHeading", &CUIStatic::SetHeading)
 		.def("SetConstHeading", &CUIStatic::SetConstHeading)
 		.def("GetConstHeading", &CUIStatic::GetConstHeading)
+		.def("SetColorAnimation", &CUIStatic::SetColorAnimation)
+		.def("ResetColorAnimation", &CUIStatic::ResetColorAnimation)
+		.def("RemoveColorAnimation", &CUIStatic::RemoveColorAnimation)
 		,
 
 		class_<CUITextWnd, CUIWindow>("CUITextWnd")

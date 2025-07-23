@@ -82,7 +82,7 @@ void CGameFont::Initialize(LPCSTR cShader, LPCSTR cTextureName)
 		xr_strcpy(cTexture, sizeof(cTexture), cTextureName);
 
 	uFlags &= ~fsValid;
-	vTS.set(1.f, 1.f); // обязательно !!!
+	vTS.set(1.f, 1.f); // РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ !!!
 
 	eCurrentAlignment = alLeft;
 	vInterval.set(1.f, 1.f);

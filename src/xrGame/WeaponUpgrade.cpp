@@ -253,6 +253,7 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
 			{
 				if (m_modular_attachments)
 				{
+					m_scopes.clear();
 					LPCSTR scope_group = pSettings->r_string(section, "modular_scope_group");
 					LPCSTR scopes = pSettings->r_string(scope_group, "scopes");
 
@@ -263,7 +264,7 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
 						m_scopes.push_back(scope);
 					}
 				}
-				if (pSettings->line_exist(section, "scopes_sect"))
+				else if (pSettings->line_exist(section, "scopes_sect"))
 				{
 					LPCSTR str = pSettings->r_string(section, "scopes_sect");
 					for (int i = 0, count = _GetItemCount(str); i < count; ++i)

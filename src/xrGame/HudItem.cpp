@@ -515,11 +515,10 @@ float CHudItem::GetTargetNearWallOffset()
 	return 0.f;
 }
 
-void CHudItem::UpdateCL()
+void CHudItem::UpdateNearWall()
 {
 	if (g_nearwall && ParentIsActor() && Level().CurrentViewEntity() == object().H_Parent())
 	{
-		// If firepos is active
 		if (g_nearwall_trace == NT_CAM)
 		{
 			// Use the HUD trace, and lerp between min and max distances
@@ -535,17 +534,12 @@ void CHudItem::UpdateCL()
 			collide::rq_result& rq = GetRQ();
 			m_nearwall_factor = -rq.range;
 			clamp(m_nearwall_factor, 0.f, m_nearwall_factor);
-;		}
+		}
 	}
+}
 
-	float t = m_nearwall_speed_mod * Device.fTimeDelta;
-	
-	float target_fov = GetTargetHudFov();
-	m_hud_fov = lerp(m_hud_fov, target_fov, t);
-
-	float target_ofs = GetTargetNearWallOffset();
-	m_nearwall_ofs = lerp(m_nearwall_ofs, target_ofs, t);
-
+void CHudItem::UpdateCL()
+{
 	if (m_current_motion_def)
 	{
 		if (m_bStopAtEndAnimIsRunning)
@@ -592,7 +586,7 @@ void CHudItem::UpdateCL()
 
 void CHudItem::OnMotionMark(u32 state, const motion_marks& M)
 {
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (ai().script_engine().functor("_G.CHudItem__OnMotionMark", funct))
 		funct(state, *M.name, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
 }
@@ -649,7 +643,7 @@ void CHudItem::on_a_hud_attach()
 {
 	if (script_ui_funct && nullptr == script_ui)
 	{
-		luabind::functor<CUIDialogWndEx*> funct;
+		::luabind::functor<CUIDialogWndEx*> funct;
 		if (ai().script_engine().functor(script_ui_funct, funct))
 		{
 			CUIDialogWndEx* ret = funct();
@@ -699,11 +693,11 @@ u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, f
 {
 	if (IsAttachedToHUD())
 	{
-		luabind::functor<luabind::object> funct;
+		::luabind::functor<::luabind::object> funct;
 		if (ai().script_engine().functor("_G.CHudItem__PlayHUDMotion", funct))
 		{
 			
-			luabind::object table = luabind::newtable(ai().script_engine().lua());
+			::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 			table["anm_name"] = *M;
 			table["anm_mixin"] = !!bMixIn;
 			table["anm_mixin2"] = bMixIn2;
@@ -711,15 +705,15 @@ u32 CHudItem::PlayHUDMotion(shared_str M, BOOL bMixIn, CHudItem* W, u32 state, f
 			table["anm_speed"] = speed;
 			table["anm_end"] = end;
 
-			luabind::object const& output = funct(table, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
+			::luabind::object const& output = funct(table, object().lua_game_object(), object().lua_game_object() ? object().lua_game_object()->Parent() : nullptr);
 			if (output && output.type() == LUA_TTABLE)
 			{
-				M = luabind::object_cast<LPCSTR>(output["anm_name"]);
-				bMixIn = luabind::object_cast<bool>(output["anm_mixin"]);
-				bMixIn2 = luabind::object_cast<bool>(output["anm_mixin2"]);
-				state = luabind::object_cast<u32>(output["anm_state"]);
-				speed = luabind::object_cast<float>(output["anm_speed"]);
-				end = luabind::object_cast<float>(output["anm_end"]);
+				M = ::luabind::object_cast<LPCSTR>(output["anm_name"]);
+				bMixIn = ::luabind::object_cast<bool>(output["anm_mixin"]);
+				bMixIn2 = ::luabind::object_cast<bool>(output["anm_mixin2"]);
+				state = ::luabind::object_cast<u32>(output["anm_state"]);
+				speed = ::luabind::object_cast<float>(output["anm_speed"]);
+				end = ::luabind::object_cast<float>(output["anm_end"]);
 			}
 
 			if (M == "$cancel")
@@ -990,35 +984,80 @@ bool CHudItem::ParentIsActor()
 	return !!EA->cast_actor();
 }
 
+void CHudItem::ApplyAimModifiers(Fmatrix& matrix)
+{
+	// Fetch actor
+	const CActor* pActor = Actor();
+
+	// Fetch HUD pick
+	const SPickParam& hud_pick = HUD().GetPick();
+
+	// If firepos is disabled, use the eye position
+	bool firepos = HUD().FireposActive();
+	if (!firepos)
+	{
+		if (pActor->HUDview())
+		{
+			// If we're in first-person, use the HUD pick start position
+			matrix.c = hud_pick.defs.start;
+		}
+		else
+		{
+			// If we're in third-person, project the actor position onto the HUD pick vector
+			matrix.c = Fvector().mad(hud_pick.defs.start, hud_pick.defs.dir, Fvector().sub(pActor->Position(), hud_pick.defs.start).dotproduct(hud_pick.defs.dir));
+		}
+	}
+
+	// If aim position is disabled...
+	bool aimpos = HUD().AimposActive();
+	if (!aimpos)
+	{
+		// Cache position
+		Fvector pos = matrix.c;
+
+		// Aim toward the hud pick's endpoint
+		Fvector target = Fvector().mad(
+			hud_pick.defs.start,
+			hud_pick.defs.dir,
+			hud_pick.defs.range
+		);
+		Fvector delta = Fvector().sub(target, pos).normalize();
+
+		float h, p, b;
+		delta.getHP(h, p);
+		float _h, _p;
+		Device.mInvView.getHPB(_h, _p, b);
+
+		// Account for freelook offset
+		if (pActor && pActor->cam_freelook != eflDisabled)
+		{
+			float cam_h, cam_p, cam_b;
+			Device.mView.getHPB(cam_h, cam_p, cam_b);
+
+			float pc = p;
+			clamp(pc, 0.f, pc);
+
+			h -= angle_normalize_signed(pActor->old_torso_yaw) - cam_h;
+			p -= pc;
+		}
+
+		// Apply rotation
+		matrix.setHPB(h, p, b);
+
+		// Restore position
+		matrix.c = pos;
+	}
+}
+
 Fmatrix CHudItem::RayTransform()
 {
 	const attachable_hud_item* hi = HudItemData();
 	Fmatrix matrix = hi->m_item_transform;
 	matrix.mulB_43(hi->m_model->LL_GetTransform(0));
-	return matrix;
-}
 
-void CHudItem::g_fireParams(SPickParam& pp)
-{
-	// If we're in free-look mode, apply rotation offsets
-	const CActor* pActor = Actor();
-	if (pActor && pActor->cam_freelook != eflDisabled)
-	{
-		CWeapon* pWeapon = smart_cast<CWeapon*>(pActor->inventory().ActiveItem());
-		if (pWeapon)
-		{
-			Fvector d = Fvector();
-			const Fmatrix& fire_mat = pWeapon->get_ParticlesXFORM();
-			float pitch = fire_mat.k.getP();
-			d.setHP(
-				-angle_normalize_signed(pActor->old_torso_yaw),
-				pitch > 0.f ? (
-					(pWeapon->GetState() == CWeapon::eFire || pActor->cam_freelook == eflDisabling)
-					? pitch : pitch * .6f
-				) : pitch * .8f);
-			pp.defs.dir = d;
-		}
-	}
+	ApplyAimModifiers(matrix);
+
+	return matrix;
 }
 
 void CHudItem::Ray(SPickParam& pp)
@@ -1052,21 +1091,21 @@ void CHudItem::Ray(SPickParam& pp)
 	Fvector eye_pos;
 
 	// Start by choosing an eye position
-	if (GetHUDmode())
+	if (!GetHUDmode() && HUD().FireposActive())
 	{
-		// In first-person, use the camera
-		eye_pos = Device.vCameraPosition;
-	}
-	else
-	{
-		// In third-person, use the actor's head bone
+		// If we're in third-person with firepos active, use the actor's head bone
 		eye_pos = pActor->XFORM().c;
 		auto model = pActor->Visual()->dcast_PKinematics();
 		eye_pos.add(model->LL_GetTransform(model->LL_BoneID("bip01_head")).c);
 	}
+	else
+	{
+		// Otherwise, use the camera
+		eye_pos = Device.vCameraPosition;
+	}
 
 	// Trace from eye -> barrel
-	SPickParam pn;
+	SPickParam pn = SPickParam(CDB::OPT_CULL | CDB::OPT_ONLYFIRST);
 	pn.defs.start = eye_pos;
 	pn.defs.dir = Fvector3().sub(matrix.c, eye_pos);
 	pn.defs.range = pn.defs.dir.magnitude();
@@ -1103,12 +1142,13 @@ void CHudItem::Ray(SPickParam& pp)
 			pp.defs.dir.sub(matrix.c, pp.defs.start);
 			pp.defs.range = pp.defs.dir.magnitude();
 			pp.defs.dir.normalize();
+			pp.barrel_dist = pp.defs.range;
 		}
 
 		return;
 	}
 
-	// And trace from it
+	// Trace from the resulting transform
 	pp.defs.start = matrix.c;
 	pp.defs.dir = matrix.k;
 }
@@ -1124,6 +1164,17 @@ void CHudItem::UpdatePick()
 void CHudItem::OnFrame()
 {
 	UpdatePick();
+
+	if (g_nearwall)
+		UpdateNearWall();
+
+	float t = m_nearwall_speed_mod * Device.fTimeDelta;
+
+	float target_fov = GetTargetHudFov();
+	m_hud_fov = lerp(m_hud_fov, target_fov, t);
+
+	float target_ofs = GetTargetNearWallOffset();
+	m_nearwall_ofs = lerp(m_nearwall_ofs, target_ofs, t);
 }
 
 void CHudItem::net_Relcase(CObject* O)

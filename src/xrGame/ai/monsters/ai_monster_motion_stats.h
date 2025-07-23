@@ -17,7 +17,7 @@ class CMotionStats
 	enum { MAX_ELEMS = 10 };
 
 	elem _data[MAX_ELEMS];
-	u32 index; // индекс всегда указывает на подготовленное место в массиве
+	u32 index; // РёРЅРґРµРєСЃ РІСЃРµРіРґР° СѓРєР°Р·С‹РІР°РµС‚ РЅР° РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅРѕРµ РјРµСЃС‚Рѕ РІ РјР°СЃСЃРёРІРµ
 
 public:
 	CMotionStats(CBaseMonster* pM) : pMonster(pM), index(0)

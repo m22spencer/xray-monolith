@@ -18,8 +18,8 @@ ObjectFactory::CLIENT_BASE_CLASS* CObjectItemScript::client_object() const
 	ObjectFactory::CLIENT_SCRIPT_BASE_CLASS* object;
 	try
 	{
-		object = luabind::object_cast<ObjectFactory::CLIENT_SCRIPT_BASE_CLASS*>(
-			m_client_creator(), luabind::adopt(luabind::result));
+		object = ::luabind::object_cast<ObjectFactory::CLIENT_SCRIPT_BASE_CLASS*>(
+			m_client_creator(), ::luabind::adopt(::luabind::result));
 	}
 	catch (...)
 	{
@@ -39,10 +39,10 @@ ObjectFactory::SERVER_BASE_CLASS* CObjectItemScript::server_object(LPCSTR sectio
 
 	try
 	{
-		luabind::object* instance = 0;
+		::luabind::object* instance = 0;
 		try
 		{
-			instance = xr_new<luabind::object>((luabind::object)(m_server_creator(section)));
+			instance = xr_new<::luabind::object>((::luabind::object)(m_server_creator(section)));
 		}
 		catch (const std::exception& e)
 		{
@@ -54,8 +54,8 @@ ObjectFactory::SERVER_BASE_CLASS* CObjectItemScript::server_object(LPCSTR sectio
 			Msg("Exception raised while creating server object from section [%s]", section);
 			return (0);
 		}
-		object = luabind::object_cast<ObjectFactory::SERVER_SCRIPT_BASE_CLASS*>(
-			*instance, luabind::adopt(luabind::result));
+		object = ::luabind::object_cast<ObjectFactory::SERVER_SCRIPT_BASE_CLASS*>(
+			*instance, ::luabind::adopt(::luabind::result));
 		xr_delete(instance);
 	}
 	catch (const std::exception& e)
@@ -78,9 +78,9 @@ ObjectFactory::SERVER_BASE_CLASS* CObjectItemScript::server_object(LPCSTR sectio
 
 CObjectItemScript::CObjectItemScript(
 #ifndef NO_XR_GAME
-	luabind::object client_creator,
+	::luabind::object client_creator,
 #endif
-	luabind::object server_creator,
+	::luabind::object server_creator,
 	const CLASS_ID& clsid,
 	LPCSTR script_clsid
 ) :
@@ -95,7 +95,7 @@ CObjectItemScript::CObjectItemScript(
 #ifndef NO_XR_GAME
 
 CObjectItemScript::CObjectItemScript(
-	luabind::object unknown_creator,
+	::luabind::object unknown_creator,
 	const CLASS_ID& clsid,
 	LPCSTR script_clsid
 ) :

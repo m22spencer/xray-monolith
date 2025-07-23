@@ -5,6 +5,8 @@
 #include		"fhierrarhyvisual.h"
 #include		"../../xrEngine/bone.h"
 #include		"../../Include/xrRender/Kinematics.h"
+#include "../../xrEngine/IRenderable.h"
+#include <optional>
 
 // consts
 extern xrCriticalSection UCalc_Mutex;
@@ -15,6 +17,7 @@ class CInifile;
 class CBoneData;
 struct SEnumVerticesCallback;
 
+class IRenderable;
 // MT-locker
 struct UCalc_mtlock
 {
@@ -120,11 +123,22 @@ public:
 
 public:
 	dxRender_Visual* m_lod;
+
+	IC bool canBeOptimized()
+	{
+		return renderableParent && renderableParent->canOptimizeCalculateBones();
+	}
+
+	IC auto getXForm()
+	{
+		return renderableParent ? std::optional<const Fmatrix>(renderableParent->renderable.xform) : std::nullopt;
+	}
 protected:
 	SkeletonWMVec wallmarks;
 	u32 wm_frame;
 	u32 CurrentFrame;
-
+	Fmatrix	Matrix_Prev;
+	Fmatrix Matrix_Temp;
 	xr_vector<dxRender_Visual*> children_invisible;
 
 	// Globals
@@ -140,6 +154,7 @@ protected:
 	BOOL Update_Visibility;
 	u32 UCalc_Time;
 	s32 UCalc_Visibox;
+	bool UCalc_ThisFrame;
 
 	Flags64 visimask;
 	Flags64 hidden_bones;
@@ -290,6 +305,8 @@ public:
 
 	virtual UpdateCallback GetUpdateCallback() { return Update_Callback; }
 	virtual void* GetUpdateCallbackParam() { return Update_Callback_Param; }
+
+	virtual bool NeedUCalc() { return UCalc_ThisFrame; }
 
 	// debug
 #ifdef DEBUG

@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\vs2022\xrEngine.vcxproj", "{2578C6D8-660D-48AE-9322-7422F8664F06}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\xrEngine.vcxproj", "{2578C6D8-660D-48AE-9322-7422F8664F06}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6} = {0BDF3377-F84E-4B42-A605-B45AAA244CB6}
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {3A214E06-B95E-4D61-A291-1F8DF2EC10FD}
@@ -10,41 +10,42 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\vs2022
 		{893887A1-3ABF-40A0-B931-CD0867010785} = {893887A1-3ABF-40A0-B931-CD0867010785}
 		{9646DBF8-1A5E-41F0-9328-F65910706666} = {9646DBF8-1A5E-41F0-9328-F65910706666}
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC} = {CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}
+		{D0843040-7706-4FBF-A931-582748BAFBB1} = {D0843040-7706-4FBF-A931-582748BAFBB1}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party", "3rd party", "{2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ode", "3rd party\ode\contrib\msvc7\ode_default\vs2022\default.vcxproj", "{1BF75FEB-87DD-486C-880B-227987D191C2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ode", "3rd party\ode\contrib\msvc7\ode_default\default.vcxproj", "{1BF75FEB-87DD-486C-880B-227987D191C2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenAL32", "3rd party\openal\OpenAL-Windows\Router\vs2022\Router.vcxproj", "{566551F4-4EF1-4CB4-A131-F982E7606907}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenAL32", "3rd party\openal\OpenAL-Windows\Router\Router.vcxproj", "{566551F4-4EF1-4CB4-A131-F982E7606907}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCDB", "xrCDB\vs2022\xrCDB.vcxproj", "{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCDB", "xrCDB\xrCDB.vcxproj", "{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCore", "xrCore\vs2022\xrCore.vcxproj", "{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCore", "xrCore\xrCore.vcxproj", "{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{772FE450-F4F3-4687-A2A7-5624825089D7} = {772FE450-F4F3-4687-A2A7-5624825089D7}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCPU_Pipe", "xrCPU_Pipe\vs2022\xrCPU_Pipe.vcxproj", "{CA0649DD-D089-423A-981C-46B57A884EB9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCPU_Pipe", "xrCPU_Pipe\xrCPU_Pipe.vcxproj", "{CA0649DD-D089-423A-981C-46B57A884EB9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrGame", "xrGame\vs2022\xrGame.vcxproj", "{200652A6-043E-4634-8837-87983B3BD5E0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrGame", "xrGame\xrGame.vcxproj", "{200652A6-043E-4634-8837-87983B3BD5E0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4} = {880CD250-BA77-4DAF-A8D4-552F12DD3AE4}
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8} = {938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrNetServer", "xrNetServer\vs2022\xrNetServer.vcxproj", "{435BAC9A-B225-457D-AB40-C9BD0CC8838C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrNetServer", "xrNetServer\xrNetServer.vcxproj", "{435BAC9A-B225-457D-AB40-C9BD0CC8838C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{772FE450-F4F3-4687-A2A7-5624825089D7} = {772FE450-F4F3-4687-A2A7-5624825089D7}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrParticles", "xrParticles\vs2022\xrParticles.vcxproj", "{94A1C366-3D19-48E6-8170-4ADC2E70DF97}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrParticles", "xrParticles\xrParticles.vcxproj", "{94A1C366-3D19-48E6-8170-4ADC2E70DF97}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1", "Layers\xrRenderPC_R1\vs2022\xrRender_R1.vcxproj", "{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1", "Layers\xrRenderPC_R1\xrRender_R1.vcxproj", "{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R2", "Layers\xrRenderPC_R2\vs2022\xrRender_R2.vcxproj", "{963BA4E5-499A-454D-B002-1D5ECE0527A6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R2", "Layers\xrRenderPC_R2\xrRender_R2.vcxproj", "{963BA4E5-499A-454D-B002-1D5ECE0527A6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrSound", "xrSound\vs2022\xrSound.vcxproj", "{CCCA7859-EB86-493E-9B53-C4235F45B3C5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrSound", "xrSound\xrSound.vcxproj", "{CCCA7859-EB86-493E-9B53-C4235F45B3C5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {3A214E06-B95E-4D61-A291-1F8DF2EC10FD}
 		{566551F4-4EF1-4CB4-A131-F982E7606907} = {566551F4-4EF1-4CB4-A131-F982E7606907}
@@ -52,39 +53,39 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrSound", "xrSound\vs2022\x
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC} = {CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrXMLParser", "xrXMLParser\vs2022\xrXMLParser.vcxproj", "{94A1C366-3D19-48E6-8170-4ADC2E70DF98}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrXMLParser", "xrXMLParser\xrXMLParser.vcxproj", "{94A1C366-3D19-48E6-8170-4ADC2E70DF98}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrAPI", "Layers\xrAPI\vs2022\xrAPI.vcxproj", "{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrAPI", "Layers\xrAPI\xrAPI.vcxproj", "{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R3", "Layers\xrRenderPC_R3\vs2022\xrRender_R3.vcxproj", "{3F383D3C-FCD8-4170-990B-EB4833F09248}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R3", "Layers\xrRenderPC_R3\xrRender_R3.vcxproj", "{3F383D3C-FCD8-4170-990B-EB4833F09248}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luabind.beta7-devel.rc4", "3rd party\luabind\vs2022\luabind.beta7-devel.rc4.vcxproj", "{CC52E0B3-CC35-4934-9302-035B748F3F2C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luabind.beta7-devel.rc4", "3rd party\luabind\luabind.beta7-devel.rc4.vcxproj", "{CC52E0B3-CC35-4934-9302-035B748F3F2C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5} = {632AEEB6-DC06-4E15-9551-B2B09A4B73C5}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrPhysics", "xrPhysics\vs2022\xrPhysics.vcxproj", "{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrPhysics", "xrPhysics\xrPhysics.vcxproj", "{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crypto", "3rd party\crypto\vs2022\crypto.vcxproj", "{FA169092-EA3E-40C1-8E5A-A2B575700FE8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crypto", "3rd party\crypto\crypto.vcxproj", "{FA169092-EA3E-40C1-8E5A-A2B575700FE8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R4", "Layers\xrRenderPC_R4\vs2022\xrRender_R4.vcxproj", "{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R4", "Layers\xrRenderPC_R4\xrRender_R4.vcxproj", "{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CxImage", "3rd party\cximage\vs2022\cximage.vcxproj", "{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CxImage", "3rd party\cximage\cximage.vcxproj", "{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_extensions", "3rd party\lua-extensions\vs2022\lua_extensions.vcxproj", "{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_extensions", "3rd party\lua-extensions\lua_extensions.vcxproj", "{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5} = {632AEEB6-DC06-4E15-9551-B2B09A4B73C5}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\sdk\include\jpeg\vs2022\libjpeg.vcxproj", "{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\sdk\include\jpeg\libjpeg.vcxproj", "{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "..\sdk\include\ogg\vs2022\libogg_static.vcxproj", "{893887A1-3ABF-40A0-B931-CD0867010785}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "..\sdk\include\ogg\libogg_static.vcxproj", "{893887A1-3ABF-40A0-B931-CD0867010785}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtheora_static", "..\sdk\include\theora\vs2022\libtheora_static.vcxproj", "{0BDF3377-F84E-4B42-A605-B45AAA244CB6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtheora_static", "..\sdk\include\theora\libtheora_static.vcxproj", "{0BDF3377-F84E-4B42-A605-B45AAA244CB6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "..\sdk\include\vorbis\vs2022\libvorbis_static.vcxproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "..\sdk\include\vorbis\libvorbis_static.vcxproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbisfile_static", "..\sdk\include\vorbis\vs2022\libvorbisfile_static.vcxproj", "{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbisfile_static", "..\sdk\include\vorbis\libvorbisfile_static.vcxproj", "{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaJIT-2", "3rd party\luajit-2\src\luajit.vcxproj", "{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -94,11 +95,172 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaJIT-2", "3rd party\luaji
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8} = {AC9B12ED-A2D7-4337-A981-5BD8430E96D8}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXERR", "3rd party\DXERR\vs2022\DXERR.vcxproj", "{772FE450-F4F3-4687-A2A7-5624825089D7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXERR", "3rd party\DXERR\DXERR.vcxproj", "{772FE450-F4F3-4687-A2A7-5624825089D7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NVTT", "3rd party\NVTT\vs2022\NVTT.vcxproj", "{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NVTT", "3rd party\NVTT\NVTT.vcxproj", "{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReShadeCompat", "ReShadeCompat\ReShadeCompat.vcxproj", "{9646DBF8-1A5E-41F0-9328-F65910706666}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\scripts\aaaa_script_fixes_mp.script = ..\gamedata\scripts\aaaa_script_fixes_mp.script
+		..\gamedata\scripts\aaa_sound_object_patch.script = ..\gamedata\scripts\aaa_sound_object_patch.script
+		..\gamedata\scripts\axr_beh_patches.script = ..\gamedata\scripts\axr_beh_patches.script
+		..\gamedata\scripts\callbacks_gameobject.script = ..\gamedata\scripts\callbacks_gameobject.script
+		..\gamedata\scripts\class_registrator_modded_exes.script = ..\gamedata\scripts\class_registrator_modded_exes.script
+		..\gamedata\scripts\dxml_core.script = ..\gamedata\scripts\dxml_core.script
+		..\gamedata\scripts\dynamic_callbacks.lua = ..\gamedata\scripts\dynamic_callbacks.lua
+		..\gamedata\scripts\fakelens.script = ..\gamedata\scripts\fakelens.script
+		..\gamedata\scripts\global.lua = ..\gamedata\scripts\global.lua
+		..\gamedata\scripts\ltx_help_ex.script = ..\gamedata\scripts\ltx_help_ex.script
+		..\gamedata\scripts\LuaPanda.lua = ..\gamedata\scripts\LuaPanda.lua
+		..\gamedata\scripts\lua_help_ex.script = ..\gamedata\scripts\lua_help_ex.script
+		..\gamedata\scripts\modded_exes_migration.script = ..\gamedata\scripts\modded_exes_migration.script
+		..\gamedata\scripts\modxml_inject_keybinds.script = ..\gamedata\scripts\modxml_inject_keybinds.script
+		..\gamedata\scripts\modxml_test.script = ..\gamedata\scripts\modxml_test.script
+		..\gamedata\scripts\options_builder.script = ..\gamedata\scripts\options_builder.script
+		..\gamedata\scripts\options_modded_exes.script = ..\gamedata\scripts\options_modded_exes.script
+		..\gamedata\scripts\options_modded_exes_3d_ballistics.script = ..\gamedata\scripts\options_modded_exes_3d_ballistics.script
+		..\gamedata\scripts\options_modded_exes_3d_scopes.script = ..\gamedata\scripts\options_modded_exes_3d_scopes.script
+		..\gamedata\scripts\options_modded_exes_aim.script = ..\gamedata\scripts\options_modded_exes_aim.script
+		..\gamedata\scripts\options_modded_exes_camera.script = ..\gamedata\scripts\options_modded_exes_camera.script
+		..\gamedata\scripts\options_modded_exes_control.script = ..\gamedata\scripts\options_modded_exes_control.script
+		..\gamedata\scripts\options_modded_exes_crash_saves.script = ..\gamedata\scripts\options_modded_exes_crash_saves.script
+		..\gamedata\scripts\options_modded_exes_crosshair.script = ..\gamedata\scripts\options_modded_exes_crosshair.script
+		..\gamedata\scripts\options_modded_exes_debug.script = ..\gamedata\scripts\options_modded_exes_debug.script
+		..\gamedata\scripts\options_modded_exes_doppler.script = ..\gamedata\scripts\options_modded_exes_doppler.script
+		..\gamedata\scripts\options_modded_exes_first_person_death.script = ..\gamedata\scripts\options_modded_exes_first_person_death.script
+		..\gamedata\scripts\options_modded_exes_gameplay.script = ..\gamedata\scripts\options_modded_exes_gameplay.script
+		..\gamedata\scripts\options_modded_exes_gameplay_general.script = ..\gamedata\scripts\options_modded_exes_gameplay_general.script
+		..\gamedata\scripts\options_modded_exes_hdr10.script = ..\gamedata\scripts\options_modded_exes_hdr10.script
+		..\gamedata\scripts\options_modded_exes_keyboard.script = ..\gamedata\scripts\options_modded_exes_keyboard.script
+		..\gamedata\scripts\options_modded_exes_logging.script = ..\gamedata\scripts\options_modded_exes_logging.script
+		..\gamedata\scripts\options_modded_exes_monsters.script = ..\gamedata\scripts\options_modded_exes_monsters.script
+		..\gamedata\scripts\options_modded_exes_mouse.script = ..\gamedata\scripts\options_modded_exes_mouse.script
+		..\gamedata\scripts\options_modded_exes_optimizations.script = ..\gamedata\scripts\options_modded_exes_optimizations.script
+		..\gamedata\scripts\options_modded_exes_particles.script = ..\gamedata\scripts\options_modded_exes_particles.script
+		..\gamedata\scripts\options_modded_exes_pda.script = ..\gamedata\scripts\options_modded_exes_pda.script
+		..\gamedata\scripts\options_modded_exes_saves.script = ..\gamedata\scripts\options_modded_exes_saves.script
+		..\gamedata\scripts\options_modded_exes_sound.script = ..\gamedata\scripts\options_modded_exes_sound.script
+		..\gamedata\scripts\options_modded_exes_sound_delay.script = ..\gamedata\scripts\options_modded_exes_sound_delay.script
+		..\gamedata\scripts\options_modded_exes_stalkers.script = ..\gamedata\scripts\options_modded_exes_stalkers.script
+		..\gamedata\scripts\options_modded_exes_ui_hud.script = ..\gamedata\scripts\options_modded_exes_ui_hud.script
+		..\gamedata\scripts\options_modded_exes_visual.script = ..\gamedata\scripts\options_modded_exes_visual.script
+		..\gamedata\scripts\options_modded_exes_wallmarks.script = ..\gamedata\scripts\options_modded_exes_wallmarks.script
+		..\gamedata\scripts\scopeRadii.script = ..\gamedata\scripts\scopeRadii.script
+		..\gamedata\scripts\slaxml.script = ..\gamedata\scripts\slaxml.script
+		..\gamedata\scripts\socket.lua = ..\gamedata\scripts\socket.lua
+		..\gamedata\scripts\true_first_person_death.script = ..\gamedata\scripts\true_first_person_death.script
+		..\gamedata\scripts\ui_options_modded_exes.script = ..\gamedata\scripts\ui_options_modded_exes.script
+		..\gamedata\scripts\_g_patches.script = ..\gamedata\scripts\_g_patches.script
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{369CB01D-A1A7-72D2-AABC-3F0945D148A2}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\configs\mod_script_dxml.ltx = ..\gamedata\configs\mod_script_dxml.ltx
+		..\gamedata\configs\mod_system_base_hud.ltx = ..\gamedata\configs\mod_system_base_hud.ltx
+		..\gamedata\configs\mod_system_flashlight_definition.ltx = ..\gamedata\configs\mod_system_flashlight_definition.ltx
+		..\gamedata\configs\mod_system_shader_crosshair.ltx = ..\gamedata\configs\mod_system_shader_crosshair.ltx
+		..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx = ..\gamedata\configs\mod_system_spawn_antifreeze_ignore.ltx
+		..\gamedata\configs\patrol_paths.ltx = ..\gamedata\configs\patrol_paths.ltx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "text", "text", "{ED17A420-A16D-4EC7-B2F7-129FE3802785}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{97F45CC7-E2B1-4009-9A2F-DA95F0706422}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\configs\text\eng\ui_mm_modded_exes.xml = ..\gamedata\configs\text\eng\ui_mm_modded_exes.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rus", "rus", "{E6E5CF29-669C-4721-B691-A7F73967CA75}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\configs\text\rus\ui_mm_modded_exes.xml = ..\gamedata\configs\text\rus\ui_mm_modded_exes.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gamedata", "gamedata", "{8537520E-5391-4DA0-A369-D7B22852C696}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ui", "ui", "{49227983-5036-4EC4-B070-4EC3900DCEDE}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\configs\ui\ui_ctrl_hdr.xml = ..\gamedata\configs\ui\ui_ctrl_hdr.xml
+		..\gamedata\configs\ui\ui_ctrl_hdr_16.xml = ..\gamedata\configs\ui\ui_ctrl_hdr_16.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unlocalizers", "unlocalizers", "{A03C1231-B3A2-4F63-BF7D-9DF4BA9AA0F9}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_axr_trade_manager.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_axr_trade_manager.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_global.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_global.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_item_device_script_fixes.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_item_device_script_fixes.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_item_weapon.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_item_weapon.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_pda.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_pda.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_utils_item.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_utils_item.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_xrs_facer_script_fixes.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_modded_exes_xrs_facer_script_fixes.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_test.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_test.ltx
+		..\gamedata\configs\unlocalizers\unlocalizer_ui_options.ltx = ..\gamedata\configs\unlocalizers\unlocalizer_ui_options.ltx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shaders", "shaders", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "r2", "r2", "{DC223170-1570-4855-ABFD-7E221F867A96}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\shaders\r2\combine_2_naa.ps = ..\gamedata\shaders\r2\combine_2_naa.ps
+		..\gamedata\shaders\r2\fakescope.ps = ..\gamedata\shaders\r2\fakescope.ps
+		..\gamedata\shaders\r2\heatvision.ps = ..\gamedata\shaders\r2\heatvision.ps
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "r3", "r3", "{AAE035C4-0F51-435B-A0E0-9FC62D070877}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\shaders\r3\combine_2_naa.ps = ..\gamedata\shaders\r3\combine_2_naa.ps
+		..\gamedata\shaders\r3\common_functions.h = ..\gamedata\shaders\r3\common_functions.h
+		..\gamedata\shaders\r3\deffer_tree_branch_bump-hq.vs = ..\gamedata\shaders\r3\deffer_tree_branch_bump-hq.vs
+		..\gamedata\shaders\r3\deffer_tree_branch_bump_d-hq.vs = ..\gamedata\shaders\r3\deffer_tree_branch_bump_d-hq.vs
+		..\gamedata\shaders\r3\deffer_tree_branch_flat.vs = ..\gamedata\shaders\r3\deffer_tree_branch_flat.vs
+		..\gamedata\shaders\r3\editor.vs = ..\gamedata\shaders\r3\editor.vs
+		..\gamedata\shaders\r3\effects_sun.ps = ..\gamedata\shaders\r3\effects_sun.ps
+		..\gamedata\shaders\r3\effects_sun.s = ..\gamedata\shaders\r3\effects_sun.s
+		..\gamedata\shaders\r3\fakescope.ps = ..\gamedata\shaders\r3\fakescope.ps
+		..\gamedata\shaders\r3\hdr10.h = ..\gamedata\shaders\r3\hdr10.h
+		..\gamedata\shaders\r3\hdr10_bloom.h = ..\gamedata\shaders\r3\hdr10_bloom.h
+		..\gamedata\shaders\r3\hdr10_bloom_blur.ps = ..\gamedata\shaders\r3\hdr10_bloom_blur.ps
+		..\gamedata\shaders\r3\hdr10_bloom_downsample.ps = ..\gamedata\shaders\r3\hdr10_bloom_downsample.ps
+		..\gamedata\shaders\r3\hdr10_bloom_upsample.ps = ..\gamedata\shaders\r3\hdr10_bloom_upsample.ps
+		..\gamedata\shaders\r3\hdr10_lens_flare.h = ..\gamedata\shaders\r3\hdr10_lens_flare.h
+		..\gamedata\shaders\r3\hdr10_lens_flare_blur.ps = ..\gamedata\shaders\r3\hdr10_lens_flare_blur.ps
+		..\gamedata\shaders\r3\hdr10_lens_flare_downsample.ps = ..\gamedata\shaders\r3\hdr10_lens_flare_downsample.ps
+		..\gamedata\shaders\r3\hdr10_lens_flare_fgen.ps = ..\gamedata\shaders\r3\hdr10_lens_flare_fgen.ps
+		..\gamedata\shaders\r3\hdr10_lens_flare_upsample.ps = ..\gamedata\shaders\r3\hdr10_lens_flare_upsample.ps
+		..\gamedata\shaders\r3\hud_cursor.s = ..\gamedata\shaders\r3\hud_cursor.s
+		..\gamedata\shaders\r3\hud_default.ps = ..\gamedata\shaders\r3\hud_default.ps
+		..\gamedata\shaders\r3\hud_default.s = ..\gamedata\shaders\r3\hud_default.s
+		..\gamedata\shaders\r3\hud_font.ps = ..\gamedata\shaders\r3\hud_font.ps
+		..\gamedata\shaders\r3\models_selflight_det.s = ..\gamedata\shaders\r3\models_selflight_det.s
+		..\gamedata\shaders\r3\night_vision.h = ..\gamedata\shaders\r3\night_vision.h
+		..\gamedata\shaders\r3\postprocess.ps = ..\gamedata\shaders\r3\postprocess.ps
+		..\gamedata\shaders\r3\postprocess_cm.ps = ..\gamedata\shaders\r3\postprocess_cm.ps
+		..\gamedata\shaders\r3\simple_color.ps = ..\gamedata\shaders\r3\simple_color.ps
+		..\gamedata\shaders\r3\yuv2rgb.ps = ..\gamedata\shaders\r3\yuv2rgb.ps
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "materials", "materials", "{5768CC9B-FEF6-4F20-B5D6-2E22E8A6D962}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\materials\materials.ltx = ..\gamedata\materials\materials.ltx
+		..\gamedata\materials\material_pairs.ltx = ..\gamedata\materials\material_pairs.ltx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "textures", "textures", "{44A08F7F-E393-4E0B-B9E6-94AF30774CE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ui", "ui", "{91413BC1-731E-470B-AA8C-8C1F6290D8D7}"
+	ProjectSection(SolutionItems) = preProject
+		..\gamedata\textures\ui\cursor_cross.dds = ..\gamedata\textures\ui\cursor_cross.dds
+		..\gamedata\textures\ui\cursor_dot.dds = ..\gamedata\textures\ui\cursor_dot.dds
+		..\gamedata\textures\ui\cursor_plus.dds = ..\gamedata\textures\ui\cursor_plus.dds
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "3rd party\imgui\imgui.vcxproj", "{D0843040-7706-4FBF-A931-582748BAFBB1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E} = {A0F7D1FB-59A7-4717-A7E4-96F37E91998E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optick", "3rd party\optick\optick.vcxproj", "{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,11 +268,11 @@ Global
 		DX10-AVX|x64 = DX10-AVX|x64
 		DX11|x64 = DX11|x64
 		DX11-AVX|x64 = DX11-AVX|x64
-		DX11-AVX-NOWPO|x64 = DX11-AVX-NOWPO|x64
 		DX8|x64 = DX8|x64
 		DX8-AVX|x64 = DX8-AVX|x64
 		DX9|x64 = DX9|x64
 		DX9-AVX|x64 = DX9-AVX|x64
+		ProfiledDX11|x64 = ProfiledDX11|x64
 		Release|x64 = Release|x64
 		Release-AVX|x64 = Release-AVX|x64
 		Verified|x64 = Verified|x64
@@ -129,8 +291,6 @@ Global
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX11-AVX|x64.ActiveCfg = ReleaseR4-AVX|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX11-AVX|x64.Build.0 = ReleaseR4-AVX|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX11-AVX|x64.Deploy.0 = ReleaseR4-AVX|x64
-		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX8|x64.ActiveCfg = ReleaseR1|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX8|x64.Build.0 = ReleaseR1|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX8|x64.Deploy.0 = ReleaseR1|x64
@@ -143,6 +303,8 @@ Global
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX9-AVX|x64.ActiveCfg = ReleaseR2-AVX|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX9-AVX|x64.Build.0 = ReleaseR2-AVX|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.DX9-AVX|x64.Deploy.0 = ReleaseR2-AVX|x64
+		{2578C6D8-660D-48AE-9322-7422F8664F06}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{2578C6D8-660D-48AE-9322-7422F8664F06}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.Release|x64.ActiveCfg = ReleaseR2|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.Release|x64.Build.0 = ReleaseR2|x64
 		{2578C6D8-660D-48AE-9322-7422F8664F06}.Release-AVX|x64.ActiveCfg = ReleaseR2-AVX|x64
@@ -159,8 +321,6 @@ Global
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX11|x64.Build.0 = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX8|x64.ActiveCfg = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX8|x64.Build.0 = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -169,6 +329,8 @@ Global
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX9|x64.Build.0 = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{1BF75FEB-87DD-486C-880B-227987D191C2}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{1BF75FEB-87DD-486C-880B-227987D191C2}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Release|x64.ActiveCfg = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Release|x64.Build.0 = Release|x64
 		{1BF75FEB-87DD-486C-880B-227987D191C2}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -185,8 +347,6 @@ Global
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX11|x64.Build.0 = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX8|x64.ActiveCfg = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX8|x64.Build.0 = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -195,6 +355,8 @@ Global
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX9|x64.Build.0 = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{566551F4-4EF1-4CB4-A131-F982E7606907}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{566551F4-4EF1-4CB4-A131-F982E7606907}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Release|x64.ActiveCfg = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Release|x64.Build.0 = Release|x64
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -211,8 +373,6 @@ Global
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX11|x64.Build.0 = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX8|x64.ActiveCfg = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX8|x64.Build.0 = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -221,6 +381,8 @@ Global
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX9|x64.Build.0 = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.Release|x64.ActiveCfg = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.Release|x64.Build.0 = Release|x64
 		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -237,8 +399,6 @@ Global
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX11|x64.Build.0 = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX8|x64.ActiveCfg = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX8|x64.Build.0 = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -247,6 +407,8 @@ Global
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX9|x64.Build.0 = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.Release|x64.ActiveCfg = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.Release|x64.Build.0 = Release|x64
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -263,8 +425,6 @@ Global
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX11|x64.Build.0 = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX8|x64.ActiveCfg = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX8|x64.Build.0 = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -273,6 +433,8 @@ Global
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX9|x64.Build.0 = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{CA0649DD-D089-423A-981C-46B57A884EB9}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{CA0649DD-D089-423A-981C-46B57A884EB9}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.Release|x64.ActiveCfg = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.Release|x64.Build.0 = Release|x64
 		{CA0649DD-D089-423A-981C-46B57A884EB9}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -289,8 +451,6 @@ Global
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX11|x64.Build.0 = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{200652A6-043E-4634-8837-87983B3BD5E0}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{200652A6-043E-4634-8837-87983B3BD5E0}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX8|x64.ActiveCfg = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX8|x64.Build.0 = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -299,6 +459,8 @@ Global
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX9|x64.Build.0 = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{200652A6-043E-4634-8837-87983B3BD5E0}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{200652A6-043E-4634-8837-87983B3BD5E0}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.Release|x64.ActiveCfg = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.Release|x64.Build.0 = Release|x64
 		{200652A6-043E-4634-8837-87983B3BD5E0}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -315,8 +477,6 @@ Global
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX11|x64.Build.0 = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX8|x64.ActiveCfg = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX8|x64.Build.0 = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -325,6 +485,8 @@ Global
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX9|x64.Build.0 = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.Release|x64.ActiveCfg = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.Release|x64.Build.0 = Release|x64
 		{435BAC9A-B225-457D-AB40-C9BD0CC8838C}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -341,8 +503,6 @@ Global
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX11|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX8|x64.ActiveCfg = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX8|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -351,6 +511,8 @@ Global
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX9|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.Release|x64.ActiveCfg = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.Release|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF97}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -367,8 +529,6 @@ Global
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX11|x64.Build.0 = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX8|x64.ActiveCfg = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX8|x64.Build.0 = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -377,6 +537,8 @@ Global
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX9|x64.Build.0 = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|x64.ActiveCfg = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|x64.Build.0 = Release|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -393,8 +555,6 @@ Global
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX11|x64.Build.0 = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX8|x64.ActiveCfg = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX8|x64.Build.0 = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -403,6 +563,8 @@ Global
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX9|x64.Build.0 = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release|x64.ActiveCfg = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release|x64.Build.0 = Release|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -419,8 +581,6 @@ Global
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX11|x64.Build.0 = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX8|x64.ActiveCfg = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX8|x64.Build.0 = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -429,6 +589,8 @@ Global
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX9|x64.Build.0 = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.Release|x64.ActiveCfg = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.Release|x64.Build.0 = Release|x64
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -445,8 +607,6 @@ Global
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX11|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX8|x64.ActiveCfg = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX8|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -455,6 +615,8 @@ Global
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX9|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.Release|x64.ActiveCfg = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.Release|x64.Build.0 = Release|x64
 		{94A1C366-3D19-48E6-8170-4ADC2E70DF98}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -471,8 +633,6 @@ Global
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX11|x64.Build.0 = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX8|x64.ActiveCfg = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX8|x64.Build.0 = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -481,6 +641,8 @@ Global
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX9|x64.Build.0 = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Release|x64.ActiveCfg = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Release|x64.Build.0 = Release|x64
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -497,8 +659,6 @@ Global
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX11|x64.Build.0 = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX8|x64.ActiveCfg = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX8|x64.Build.0 = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -507,6 +667,8 @@ Global
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX9|x64.Build.0 = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{3F383D3C-FCD8-4170-990B-EB4833F09248}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{3F383D3C-FCD8-4170-990B-EB4833F09248}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.Release|x64.ActiveCfg = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.Release|x64.Build.0 = Release|x64
 		{3F383D3C-FCD8-4170-990B-EB4833F09248}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -523,8 +685,6 @@ Global
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX11|x64.Build.0 = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX8|x64.ActiveCfg = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX8|x64.Build.0 = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -533,6 +693,8 @@ Global
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX9|x64.Build.0 = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Release|x64.ActiveCfg = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Release|x64.Build.0 = Release|x64
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -549,8 +711,6 @@ Global
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX11|x64.Build.0 = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX8|x64.ActiveCfg = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX8|x64.Build.0 = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -559,6 +719,8 @@ Global
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX9|x64.Build.0 = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.ProfiledDX11|x64.ActiveCfg = Release|x64
+		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.ProfiledDX11|x64.Build.0 = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.Release|x64.ActiveCfg = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.Release|x64.Build.0 = Release|x64
 		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -575,8 +737,6 @@ Global
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX11|x64.Build.0 = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX8|x64.ActiveCfg = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX8|x64.Build.0 = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -585,6 +745,8 @@ Global
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX9|x64.Build.0 = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.Release|x64.ActiveCfg = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.Release|x64.Build.0 = Release|x64
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -601,8 +763,6 @@ Global
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX11|x64.Build.0 = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX8|x64.ActiveCfg = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX8|x64.Build.0 = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -611,6 +771,8 @@ Global
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX9|x64.Build.0 = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release|x64.ActiveCfg = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release|x64.Build.0 = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -627,8 +789,6 @@ Global
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX11|x64.Build.0 = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX8|x64.ActiveCfg = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX8|x64.Build.0 = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -637,6 +797,8 @@ Global
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX9|x64.Build.0 = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.Release|x64.ActiveCfg = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.Release|x64.Build.0 = Release|x64
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -653,8 +815,6 @@ Global
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX11|x64.Build.0 = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX8|x64.ActiveCfg = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX8|x64.Build.0 = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -663,6 +823,8 @@ Global
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX9|x64.Build.0 = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|x64.ActiveCfg = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|x64.Build.0 = Release|x64
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -679,8 +841,6 @@ Global
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX11|x64.Build.0 = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX8|x64.ActiveCfg = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX8|x64.Build.0 = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -689,6 +849,8 @@ Global
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX9|x64.Build.0 = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release|x64.ActiveCfg = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release|x64.Build.0 = Release|x64
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -705,8 +867,6 @@ Global
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX11|x64.Build.0 = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{893887A1-3ABF-40A0-B931-CD0867010785}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{893887A1-3ABF-40A0-B931-CD0867010785}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX8|x64.ActiveCfg = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX8|x64.Build.0 = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -715,6 +875,8 @@ Global
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX9|x64.Build.0 = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{893887A1-3ABF-40A0-B931-CD0867010785}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{893887A1-3ABF-40A0-B931-CD0867010785}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.Release|x64.ActiveCfg = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.Release|x64.Build.0 = Release|x64
 		{893887A1-3ABF-40A0-B931-CD0867010785}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -731,8 +893,6 @@ Global
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX11|x64.Build.0 = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX8|x64.ActiveCfg = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX8|x64.Build.0 = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -741,6 +901,8 @@ Global
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX9|x64.Build.0 = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.Release|x64.ActiveCfg = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.Release|x64.Build.0 = Release|x64
 		{0BDF3377-F84E-4B42-A605-B45AAA244CB6}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -757,8 +919,6 @@ Global
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX11|x64.Build.0 = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX8|x64.ActiveCfg = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX8|x64.Build.0 = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -767,6 +927,8 @@ Global
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX9|x64.Build.0 = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.ActiveCfg = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.Build.0 = Release|x64
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -783,8 +945,6 @@ Global
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX11|x64.Build.0 = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX8|x64.ActiveCfg = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX8|x64.Build.0 = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -793,6 +953,8 @@ Global
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX9|x64.Build.0 = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release|x64.ActiveCfg = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release|x64.Build.0 = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -809,8 +971,6 @@ Global
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX11|x64.Build.0 = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX11-AVX|x64.ActiveCfg = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX11-AVX|x64.Build.0 = Release|x64
-		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX8|x64.ActiveCfg = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX8|x64.Build.0 = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX8-AVX|x64.ActiveCfg = Release|x64
@@ -819,6 +979,8 @@ Global
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX9|x64.Build.0 = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX9-AVX|x64.ActiveCfg = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.DX9-AVX|x64.Build.0 = Release|x64
+		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.Release|x64.ActiveCfg = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.Release|x64.Build.0 = Release|x64
 		{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}.Release-AVX|x64.ActiveCfg = Release|x64
@@ -835,8 +997,6 @@ Global
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX11|x64.Build.0 = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX8|x64.ActiveCfg = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX8|x64.Build.0 = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -845,6 +1005,8 @@ Global
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX9|x64.Build.0 = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{772FE450-F4F3-4687-A2A7-5624825089D7}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{772FE450-F4F3-4687-A2A7-5624825089D7}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.Release|x64.ActiveCfg = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.Release|x64.Build.0 = Release|x64
 		{772FE450-F4F3-4687-A2A7-5624825089D7}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -861,8 +1023,6 @@ Global
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX11|x64.Build.0 = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX8|x64.ActiveCfg = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX8|x64.Build.0 = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -871,6 +1031,8 @@ Global
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX9|x64.Build.0 = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.Release|x64.ActiveCfg = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.Release|x64.Build.0 = Release|x64
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -887,8 +1049,6 @@ Global
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX11|x64.Build.0 = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX11-AVX|x64.Build.0 = Release-AVX|x64
-		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX11-AVX-NOWPO|x64.ActiveCfg = DX11-AVX-NOWPO|x64
-		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX11-AVX-NOWPO|x64.Build.0 = DX11-AVX-NOWPO|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX8|x64.ActiveCfg = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX8|x64.Build.0 = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -897,6 +1057,8 @@ Global
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX9|x64.Build.0 = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{9646DBF8-1A5E-41F0-9328-F65910706666}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{9646DBF8-1A5E-41F0-9328-F65910706666}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.Release|x64.ActiveCfg = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.Release|x64.Build.0 = Release|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
@@ -905,6 +1067,58 @@ Global
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.Verified|x64.Build.0 = Verified|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.VerifiedDX11|x64.ActiveCfg = Verified|x64
 		{9646DBF8-1A5E-41F0-9328-F65910706666}.VerifiedDX11|x64.Build.0 = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX10-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX11-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX8-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release|x64.ActiveCfg = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release|x64.Build.0 = Release|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Release-AVX|x64.Build.0 = Release-AVX|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Verified|x64.ActiveCfg = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.Verified|x64.Build.0 = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.VerifiedDX11|x64.ActiveCfg = Verified|x64
+		{D0843040-7706-4FBF-A931-582748BAFBB1}.VerifiedDX11|x64.Build.0 = Verified|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX10|x64.ActiveCfg = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX10|x64.Build.0 = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX10-AVX|x64.ActiveCfg = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX10-AVX|x64.Build.0 = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX11|x64.ActiveCfg = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX11|x64.Build.0 = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX11-AVX|x64.ActiveCfg = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX11-AVX|x64.Build.0 = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX8|x64.ActiveCfg = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX8|x64.Build.0 = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX8-AVX|x64.ActiveCfg = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX8-AVX|x64.Build.0 = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX9|x64.ActiveCfg = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX9|x64.Build.0 = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX9-AVX|x64.ActiveCfg = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.DX9-AVX|x64.Build.0 = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.ProfiledDX11|x64.ActiveCfg = ProfiledDX11|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.ProfiledDX11|x64.Build.0 = ProfiledDX11|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Release|x64.ActiveCfg = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Release|x64.Build.0 = Release|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Release-AVX|x64.ActiveCfg = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Release-AVX|x64.Build.0 = Release-AVX|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Verified|x64.ActiveCfg = Verified|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.Verified|x64.Build.0 = Verified|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.VerifiedDX11|x64.ActiveCfg = Verified|x64
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78}.VerifiedDX11|x64.Build.0 = Verified|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -925,6 +1139,21 @@ Global
 		{772FE450-F4F3-4687-A2A7-5624825089D7} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{9646DBF8-1A5E-41F0-9328-F65910706666} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D} = {8537520E-5391-4DA0-A369-D7B22852C696}
+		{369CB01D-A1A7-72D2-AABC-3F0945D148A2} = {8537520E-5391-4DA0-A369-D7B22852C696}
+		{ED17A420-A16D-4EC7-B2F7-129FE3802785} = {369CB01D-A1A7-72D2-AABC-3F0945D148A2}
+		{97F45CC7-E2B1-4009-9A2F-DA95F0706422} = {ED17A420-A16D-4EC7-B2F7-129FE3802785}
+		{E6E5CF29-669C-4721-B691-A7F73967CA75} = {ED17A420-A16D-4EC7-B2F7-129FE3802785}
+		{49227983-5036-4EC4-B070-4EC3900DCEDE} = {369CB01D-A1A7-72D2-AABC-3F0945D148A2}
+		{A03C1231-B3A2-4F63-BF7D-9DF4BA9AA0F9} = {369CB01D-A1A7-72D2-AABC-3F0945D148A2}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {8537520E-5391-4DA0-A369-D7B22852C696}
+		{DC223170-1570-4855-ABFD-7E221F867A96} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{AAE035C4-0F51-435B-A0E0-9FC62D070877} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{5768CC9B-FEF6-4F20-B5D6-2E22E8A6D962} = {8537520E-5391-4DA0-A369-D7B22852C696}
+		{44A08F7F-E393-4E0B-B9E6-94AF30774CE7} = {8537520E-5391-4DA0-A369-D7B22852C696}
+		{91413BC1-731E-470B-AA8C-8C1F6290D8D7} = {44A08F7F-E393-4E0B-B9E6-94AF30774CE7}
+		{D0843040-7706-4FBF-A931-582748BAFBB1} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76CF157A-A169-443B-AE3A-F17AD29325C6}

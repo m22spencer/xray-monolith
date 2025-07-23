@@ -14,13 +14,15 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
-#include <D3D11.h>
+#include <d3d11.h>
+#include <d3d11_1.h>
+#include <d3d11_2.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
 #include "../xrRender/xrD3DDefs.h"
 
-#include "../xrRender/Debug/dxPixEventWrapper.h"
+#include "../xrRenderDX10/dx10EventWrapper.h"
 
 #define		R_R1	1
 #define		R_R2	2

@@ -1,6 +1,9 @@
 #include "pch_script.h"
 #include "console_registrator.h"
 #include "../xrEngine/xr_ioconsole.h"
+#include "../xrEngine/xr_ioc_cmd.h"
+#include "ai_space.h"
+#include "script_engine.h"
 
 using namespace luabind;
 
@@ -33,6 +36,34 @@ void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
 	Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));
 }
 
+::luabind::object get_console_bounds(CConsole* c, LPCSTR cmd)
+{
+	IConsole_Command* command = c->GetCommand(cmd);
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
+	if (command)
+	{
+		CCC_Float* float_command = smart_cast<CCC_Float*>(command);
+		if (float_command)
+		{
+			float min, max;
+			float_command->GetBounds(min, max);
+			table["min"] = min;
+			table["max"] = max;
+			return table;
+		}
+
+		CCC_Integer* integer_command = smart_cast<CCC_Integer*>(command);
+		if (integer_command) {
+			int min, max;
+			integer_command->GetBounds(min, max);
+			table["min"] = min;
+			table["max"] = max;
+			return table;
+		}
+	}
+	return table;
+}
+
 #pragma optimize("s",on)
 void console_registrator::script_register(lua_State* L)
 {
@@ -48,6 +79,7 @@ void console_registrator::script_register(lua_State* L)
 
 		.def("get_string", &CConsole::GetString)
 		.def("get_integer", &get_console_integer)
+		.def("get_variable_bounds", &get_console_bounds)
 		.def("get_bool", &get_console_bool)
 		.def("get_float", &get_console_float)
 		.def("get_token", &CConsole::GetToken)

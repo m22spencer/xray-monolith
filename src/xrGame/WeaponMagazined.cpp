@@ -72,6 +72,9 @@ CWeaponMagazined::~CWeaponMagazined()
 	}
 
 	// sounds
+	auto I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+	if (I != Device.seqParallel.end())
+		Device.seqParallel.erase(I);
 }
 
 void CWeaponMagazined::net_Destroy()
@@ -188,8 +191,12 @@ void CWeaponMagazined::Load(LPCSTR section)
 			m_sounds.LoadSound(section, "snd_silncer_shot_misfire_actor", "sndSilencerShotMisfireActor", false, m_eSoundShot);
 
 		// Indoor
-		if (WeaponSoundExist(section, "snd_silncer_shoot_indoor"))
+		if (WeaponSoundExist(section, "snd_silncer_shot_indoor")) {
+			m_sounds.LoadSound(section, "snd_silncer_shot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
+		} else if (WeaponSoundExist(section, "snd_silncer_shoot_indoor")) {
 			m_sounds.LoadSound(section, "snd_silncer_shoot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
+		} // Change section name from "shoot" to "shot" for consistency while keeping the old one for compatibility
+		
 		if (WeaponSoundExist(section, "snd_silncer_shot_actor_indoor"))
 			m_sounds.LoadSound(section, "snd_silncer_shot_actor_indoor", "sndSilencerShotActorIndoor", false, m_eSoundShot);
 		if (WeaponSoundExist(section, "snd_silncer_shoot_actor_first_indoor"))
@@ -676,6 +683,7 @@ void CWeaponMagazined::on_b_hud_detach()
 	}
 }
 
+extern ENGINE_API BOOL g_bootComplete;
 void CWeaponMagazined::UpdateCL()
 {
 	inherited::UpdateCL();
@@ -708,21 +716,19 @@ void CWeaponMagazined::UpdateCL()
 	UpdateSounds();
 }
 
-void CWeaponMagazined::UpdateSounds()
+BOOL mt_UpdateWeaponSounds = TRUE;
+void CWeaponMagazined::UpdateSoundsPositionsImpl()
 {
-	if (Device.dwFrame == dwUpdateSounds_Frame)
-		return;
+	PROF_EVENT();
 
-	dwUpdateSounds_Frame = Device.dwFrame;
-
-	Fvector P = get_LastFP();
+	auto& P = get_LastFP();
 	m_sounds.SetPosition("sndShow", P);
 	m_sounds.SetPosition("sndHide", P);
 	m_sounds.SetPosition("sndReload", P);
 
 	// New Sounds
 	if (m_sounds.FindSoundItem("sndReloadEmpty", false))
-		m_sounds.SetPosition("sndReloadEmpty", P); 
+		m_sounds.SetPosition("sndReloadEmpty", P);
 	if (m_sounds.FindSoundItem("sndReloadMisfire", false))
 		m_sounds.SetPosition("sndReloadMisfire", P);
 	if (m_sounds.FindSoundItem("sndReloadActor", false))
@@ -734,7 +740,7 @@ void CWeaponMagazined::UpdateSounds()
 	if (m_sounds.FindSoundItem("sndEmptyClickActor", false))
 		m_sounds.SetPosition("sndEmptyClickActor", P);
 	if (m_sounds.FindSoundItem("sndShowActor", false))
-		m_sounds.SetPosition("sndShowActor", P); 
+		m_sounds.SetPosition("sndShowActor", P);
 	if (m_sounds.FindSoundItem("sndHideActor", false))
 		m_sounds.SetPosition("sndHideActor", P);
 	if (m_sounds.FindSoundItem("sndClickMisfire", false))
@@ -758,6 +764,31 @@ void CWeaponMagazined::UpdateSounds()
 		m_sounds.SetPosition("sndShotMisfireIndoor", P);
 	if (m_sounds.FindSoundItem("sndShotMisfireActorIndoor", false))
 		m_sounds.SetPosition("sndShotMisfireActorIndoor", P);
+}
+
+void CWeaponMagazined::UpdateSoundsPositions()
+{
+	UpdateSoundsPositionsImpl();
+}
+
+void CWeaponMagazined::UpdateSounds()
+{
+	if (Device.dwFrame == dwUpdateSounds_Frame)
+		return;
+
+	// demonized: put updates of m_sounds into second thread
+	if (g_bootComplete && mt_UpdateWeaponSounds && dwUpdateSounds_Frame != 0 )
+	{
+		// Force update of fire dependencies and then put into second thread, fixes flickering limbs
+		get_LastFP();
+		Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+	}
+	else
+	{
+		UpdateSoundsPositions();
+	}
+
+	dwUpdateSounds_Frame = Device.dwFrame;
 }
 
 // demonized: check if cycle_down is enabled and shot num below max possible burst. Adds support for arbitrary burst shot at rpm_mode_2 with cycling down to rpm after maxBurstAmount
@@ -909,7 +940,7 @@ void CWeaponMagazined::PlaySoundShot()
 
 				string128 sndNameFirst;
 				strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
-				if (m_sounds.FindSoundItem(sndNameFirst, false))
+				if (m_sounds.FindSoundItem(sndNameFirst, false) && g_gunsnd_indoor < 1.f)
 				{
 					m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
 				}
@@ -924,7 +955,7 @@ void CWeaponMagazined::PlaySoundShot()
 
 				string128 sndName;
 				strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
-				if (m_sounds.FindSoundItem(sndName, false))
+				if (m_sounds.FindSoundItem(sndName, false) && g_gunsnd_indoor < 1.f)
 				{
 					m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
 				}
@@ -962,32 +993,11 @@ void CWeaponMagazined::PlaySoundShot()
 
 	if (bMisfire)
 	{
-		if (g_gunsnd_indoor>0.75f) {
-			string128 sndNameMisfireIndoor;
-			strconcat(sizeof(sndNameMisfireIndoor), sndNameMisfireIndoor, m_sSndShotCurrent.c_str(), "MisfireIndoor");
-			if (m_sounds.FindSoundItem(sndNameMisfireIndoor, false))
-			{
-				m_sounds.PlaySound(sndNameMisfireIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor_volume);
-				return;
-			}
-		}
-
 		string128 sndNameMisfire;
 		strconcat(sizeof(sndNameMisfire), sndNameMisfire, m_sSndShotCurrent.c_str(), "Misfire");
 		if (m_sounds.FindSoundItem(sndNameMisfire, false))
 		{
 			m_sounds.PlaySound(sndNameMisfire, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
-			return;
-		}
-	}
-
-	if (g_gunsnd_indoor>0.75f)
-	{
-		string128 sndNameIndoor;
-		strconcat(sizeof(sndNameIndoor), sndNameIndoor, m_sSndShotCurrent.c_str(), "Indoor");
-		if (m_sounds.FindSoundItem(sndNameIndoor, false))
-		{
-			m_sounds.PlaySound(sndNameIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor_volume);
 			return;
 		}
 	}

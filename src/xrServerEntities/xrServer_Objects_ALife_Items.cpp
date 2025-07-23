@@ -31,7 +31,7 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
 	m_self = NULL;
 	prev_freezed = false;
 	m_u8NumItems = 0;
-	//òåêóùåå ñîñòîÿíèå âåùè
+	//Ñ‚ÐµÐºÑƒÑ‰ÐµÐµ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð²ÐµÑ‰Ð¸
 	m_fCondition = 1.0f;
 
 	m_fMass = pSettings->r_float(caSection, "inv_weight");

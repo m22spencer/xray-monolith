@@ -13,25 +13,13 @@
 CScriptParticlesCustom::CScriptParticlesCustom(CScriptParticles* owner, LPCSTR caParticlesName): CParticlesObject(
 	caParticlesName,FALSE, true)
 {
-	//	CScriptParticlesCustom* self = this;
-	//	Msg							("CScriptParticlesCustom: 0x%08x",*(int*)&self);
 	m_owner = owner;
 	m_animator = 0;
 }
 
-//XRCORE_API		fastdelegate::FastDelegate< void () >	g_verify_stalkers;
-
 CScriptParticlesCustom::~CScriptParticlesCustom()
 {
-	//	CScriptParticlesCustom* self = this;
-	//	Msg							("~CScriptParticlesCustom: 0x%08x",*(int*)&self);
-	//	if ( g_verify_stalkers )
-	//		g_verify_stalkers		();
-
 	xr_delete(m_animator);
-
-	//	if ( g_verify_stalkers )
-	//		g_verify_stalkers		();
 }
 
 void CScriptParticlesCustom::PSI_internal_delete()
@@ -143,10 +131,6 @@ void CScriptParticles::StopDeffered()
 
 void CScriptParticles::MoveTo(const Fvector& pos, const Fvector& vel)
 {
-	//VERIFY						(m_particles);
-	//Fmatrix						XF;
-	//XF.translate				(pos);
-	//m_particles->UpdateParent	(XF,vel);
 	VERIFY(m_particles);
 	m_transform.translate_over(pos);
 	m_particles->UpdateParent(m_transform, vel);
@@ -177,6 +161,11 @@ void CScriptParticles::SetOrientation(float yaw, float pitch, float roll)
 	matrix.translate_over(m_transform.c);
 	m_transform.set(matrix);
 	m_particles->SetXFORM(m_transform);
+}
+
+void CScriptParticles::SetHudMode(bool bHudMode)
+{
+	m_particles->SetHudMode(bHudMode);
 }
 
 bool CScriptParticles::IsPlaying() const

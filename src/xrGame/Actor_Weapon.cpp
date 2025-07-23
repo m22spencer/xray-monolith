@@ -1,4 +1,4 @@
-// Actor_Weapon.cpp:	 для работы с оружием
+// Actor_Weapon.cpp:	 РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РѕСЂСѓР¶РёРµРј
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -29,7 +29,7 @@ static const float VEL_A_MAX = 10.f;
 BOOL g_fix_avelocity_spread = 0;
 BOOL g_apply_pdm_to_ads = 0;
 BOOL g_smooth_ads_transition = 0;
-//возвращает текуший разброс стрельбы (в радианах)с учетом движения
+//РІРѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСѓС€РёР№ СЂР°Р·Р±СЂРѕСЃ СЃС‚СЂРµР»СЊР±С‹ (РІ СЂР°РґРёР°РЅР°С…)СЃ СѓС‡РµС‚РѕРј РґРІРёР¶РµРЅРёСЏ
 float CActor::GetWeaponAccuracy() const
 {
 	CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
@@ -102,20 +102,11 @@ float CActor::GetWeaponAccuracy() const
 
 SPickParam& CActor::GetPick()
 {
-	if (HUD().FireposActive())
-	{
-		auto item_0 = g_player_hud->attached_item(0);
-		if (item_0)
-		{
-			return item_0->m_parent_hud_item->GetPick();
-		}
-
-		auto item_1 = g_player_hud->attached_item(1);
-		if (item_1)
-		{
-			return item_1->m_parent_hud_item->GetPick();
-		}
-	}
+	// Find a HUD item, if one exists
+	if (g_player_hud->attached_item(0))
+		return g_player_hud->attached_item(0)->m_parent_hud_item->GetPick();
+	else if (g_player_hud->attached_item(1))
+		return g_player_hud->attached_item(1)->m_parent_hud_item->GetPick();
 
 	return HUD().GetPick();
 }
@@ -125,11 +116,11 @@ void CActor::g_fireParams(const CHudItem* pHudItem, Fvector& fire_pos, Fvector& 
 	SPickParam& pp = GetPick();
 
 	attachable_hud_item* item_0 = g_player_hud->attached_item(0);
+	attachable_hud_item* item_1 = g_player_hud->attached_item(1);
+
 	if (item_0)
 		item_0->m_parent_hud_item->g_fireParams(pp);
-
-	attachable_hud_item* item_1 = g_player_hud->attached_item(1);
-	if (item_1)
+	else if (item_1)
 		item_1->m_parent_hud_item->g_fireParams(pp);
 
 	fire_pos = pp.defs.start;
@@ -377,9 +368,9 @@ void CActor::RemoveAmmoForWeapon(CInventoryItem* pIItem)
 
 	CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(inventory().GetAny(pWM->m_ammoTypes[0].c_str()));
 	if (!pAmmo) return;
-	//--- мы нашли патроны к текущему оружию	
+	//--- РјС‹ РЅР°С€Р»Рё РїР°С‚СЂРѕРЅС‹ Рє С‚РµРєСѓС‰РµРјСѓ РѕСЂСѓР¶РёСЋ	
 	/*
-	//--- проверяем не подходят ли они к чему-то еще
+	//--- РїСЂРѕРІРµСЂСЏРµРј РЅРµ РїРѕРґС…РѕРґСЏС‚ Р»Рё РѕРЅРё Рє С‡РµРјСѓ-С‚Рѕ РµС‰Рµ
 	bool CanRemove = true;
 	TIItemContainer::const_iterator I = inventory().m_all.begin();//, B = I;
 	TIItemContainer::const_iterator E = inventory().m_all.end();

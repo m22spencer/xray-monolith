@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
-// CustomRocket.cpp:	ðàêåòà, êîòîðîé ñòðåëÿåò RocketLauncher 
-//						(óìååò ëåòåòü, ñâåòèòüñÿ è îòûãðûâàòü ïàðòèêëû)
+// CustomRocket.cpp:	Ñ€Ð°ÐºÐµÑ‚Ð°, ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ ÑÑ‚Ñ€ÐµÐ»ÑÐµÑ‚ RocketLauncher 
+//						(ÑƒÐ¼ÐµÐµÑ‚ Ð»ÐµÑ‚ÐµÑ‚ÑŒ, ÑÐ²ÐµÑ‚Ð¸Ñ‚ÑŒÑÑ Ð¸ Ð¾Ñ‚Ñ‹Ð³Ñ€Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¿Ð°Ñ€Ñ‚Ð¸ÐºÐ»Ñ‹)
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -359,7 +359,7 @@ void CCustomRocket::PlayContact()
 
 	m_eState = eCollide;
 
-	//äåêòèâèðîâàòü ôèçè÷åñêóþ îáîëî÷êó,÷òîá ðàêåòà íå ëåòåëà äàëüøå
+	//Ð´ÐµÐºÑ‚Ð¸Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ñ„Ð¸Ð·Ð¸Ñ‡ÐµÑÐºÑƒÑŽ Ð¾Ð±Ð¾Ð»Ð¾Ñ‡ÐºÑƒ,Ñ‡Ñ‚Ð¾Ð± Ñ€Ð°ÐºÐµÑ‚Ð° Ð½Ðµ Ð»ÐµÑ‚ÐµÐ»Ð° Ð´Ð°Ð»ÑŒÑˆÐµ
 	if (m_pPhysicsShell)
 	{
 		m_pPhysicsShell->set_LinearVel(zero_vel);
@@ -419,9 +419,9 @@ void CCustomRocket::UpdateCL()
 	{
 	case eInactive:
 		break;
-		//ñîñòîÿíèÿ eEngine è eFlying îòëè÷àþòñÿ, òåì
-		//÷òî âûçûâàåòñÿ UpdateEngine ó eEngine, îñòàëüíûå
-		//ôóíêöèè îáùèå
+		//ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ñ eEngine Ð¸ eFlying Ð¾Ñ‚Ð»Ð¸Ñ‡Ð°ÑŽÑ‚ÑÑ, Ñ‚ÐµÐ¼
+		//Ñ‡Ñ‚Ð¾ Ð²Ñ‹Ð·Ñ‹Ð²Ð°ÐµÑ‚ÑÑ UpdateEngine Ñƒ eEngine, Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ
+		//Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸ Ð¾Ð±Ñ‰Ð¸Ðµ
 	case eEngine:
 		UpdateEngine();
 	case eFlying:
@@ -527,7 +527,7 @@ void CCustomRocket::StartLights()
 {
 	if (!m_bLightsEnabled) return;
 
-	//âêëþ÷èòü ñâåòîâóþ ïîäñâåòêó îò äâèãàòåëÿ
+	//Ð²ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ ÑÐ²ÐµÑ‚Ð¾Ð²ÑƒÑŽ Ð¿Ð¾Ð´ÑÐ²ÐµÑ‚ÐºÑƒ Ð¾Ñ‚ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÐµÐ»Ñ
 	m_pTrailLight->set_color(m_TrailLightColor.r,
 	                         m_TrailLightColor.g,
 	                         m_TrailLightColor.b);

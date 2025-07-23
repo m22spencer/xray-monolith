@@ -236,6 +236,7 @@ void CUIWindow::AttachChild(CUIWindow* pChild)
 	R_ASSERT(pChild);
 	if (!pChild) return;
 
+	xrCriticalSectionGuard g(childWndGuard);
 	R_ASSERT(!IsChild(pChild));
 	pChild->SetParent(this);
 	m_ChildWndList.push_back(pChild);
@@ -251,6 +252,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
 		SetCapture(pChild, false);
 
 	//.	SafeRemoveChild			(pChild);
+	xrCriticalSectionGuard g(childWndGuard);
 	WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
 	R_ASSERT(it!=m_ChildWndList.end());
 	m_ChildWndList.erase(it);
@@ -263,6 +265,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
 
 void CUIWindow::DetachAll()
 {
+	xrCriticalSectionGuard g(childWndGuard);
 	while (!m_ChildWndList.empty())
 	{
 		DetachChild(m_ChildWndList.back());
@@ -286,9 +289,9 @@ void CUIWindow::GetAbsoluteRect(Frect& r)
 	r.bottom = r.top + GetHeight();
 }
 
-//реакция на мышь
-//координаты курсора всегда, кроме начального вызова 
-//задаются относительно текущего окна
+//СЂРµР°РєС†РёСЏ РЅР° РјС‹С€СЊ
+//РєРѕРѕСЂРґРёРЅР°С‚С‹ РєСѓСЂСЃРѕСЂР° РІСЃРµРіРґР°, РєСЂРѕРјРµ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ РІС‹Р·РѕРІР° 
+//Р·Р°РґР°СЋС‚СЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С‚РµРєСѓС‰РµРіРѕ РѕРєРЅР°
 
 #define DOUBLE_CLICK_TIME 250
 
@@ -318,14 +321,14 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
 	{
 		if (!wndRect.in(cursor_pos))
 			return false;
-		//получить координаты относительно окна
+		//РїРѕР»СѓС‡РёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РѕРєРЅР°
 		cursor_pos.x -= wndRect.left;
 		cursor_pos.y -= wndRect.top;
 	}
 
 
-	//если есть дочернее окно,захватившее мышь, то
-	//сообщение направляем ему сразу
+	//РµСЃР»Рё РµСЃС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ,Р·Р°С…РІР°С‚РёРІС€РµРµ РјС‹С€СЊ, С‚Рѕ
+	//СЃРѕРѕР±С‰РµРЅРёРµ РЅР°РїСЂР°РІР»СЏРµРј РµРјСѓ СЃСЂР°Р·Сѓ
 	if (m_pMouseCapturer)
 	{
 		m_pMouseCapturer->OnMouseAction(cursor_pos.x - m_pMouseCapturer->GetWndRect().left,
@@ -362,9 +365,9 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
 		break;
 	}
 
-	//Проверка на попадание мыши в окно,
-	//происходит в обратном порядке, чем рисование окон
-	//(последние в списке имеют высший приоритет)
+	//РџСЂРѕРІРµСЂРєР° РЅР° РїРѕРїР°РґР°РЅРёРµ РјС‹С€Рё РІ РѕРєРЅРѕ,
+	//РїСЂРѕРёСЃС…РѕРґРёС‚ РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ, С‡РµРј СЂРёСЃРѕРІР°РЅРёРµ РѕРєРѕРЅ
+	//(РїРѕСЃР»РµРґРЅРёРµ РІ СЃРїРёСЃРєРµ РёРјРµСЋС‚ РІС‹СЃС€РёР№ РїСЂРёРѕСЂРёС‚РµС‚)
 	WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
 
 	for (; it != m_ChildWndList.rend(); ++it)
@@ -441,10 +444,10 @@ void CUIWindow::OnFocusLost()
 }
 
 
-//Сообщение, посылаемое дочерним окном,
-//о том, что окно хочет захватить мышь,
-//все сообщения от нее будут направляться только
-//ему в независимости от того где мышь
+//РЎРѕРѕР±С‰РµРЅРёРµ, РїРѕСЃС‹Р»Р°РµРјРѕРµ РґРѕС‡РµСЂРЅРёРј РѕРєРЅРѕРј,
+//Рѕ С‚РѕРј, С‡С‚Рѕ РѕРєРЅРѕ С…РѕС‡РµС‚ Р·Р°С…РІР°С‚РёС‚СЊ РјС‹С€СЊ,
+//РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ РЅРµРµ Р±СѓРґСѓС‚ РЅР°РїСЂР°РІР»СЏС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ
+//РµРјСѓ РІ РЅРµР·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РіРґРµ РјС‹С€СЊ
 void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 {
 	if (GetParent())
@@ -454,7 +457,7 @@ void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 
 	if (capture_status)
 	{
-		//оповестить дочернее окно о потере фокуса мыши
+		//РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ Рѕ РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР° РјС‹С€Рё
 		if (NULL != m_pMouseCapturer)
 			m_pMouseCapturer->SendMessage(this, WINDOW_MOUSE_CAPTURE_LOST);
 
@@ -467,13 +470,13 @@ void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 }
 
 
-//реакция на клавиатуру
+//СЂРµР°РєС†РёСЏ РЅР° РєР»Р°РІРёР°С‚СѓСЂСѓ
 bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 	bool result;
 
-	//если есть дочернее окно,захватившее клавиатуру, то
-	//сообщение направляем ему сразу
+	//РµСЃР»Рё РµСЃС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ,Р·Р°С…РІР°С‚РёРІС€РµРµ РєР»Р°РІРёР°С‚СѓСЂСѓ, С‚Рѕ
+	//СЃРѕРѕР±С‰РµРЅРёРµ РЅР°РїСЂР°РІР»СЏРµРј РµРјСѓ СЃСЂР°Р·Сѓ
 	if (NULL != m_pKeyboardCapturer)
 	{
 		result = m_pKeyboardCapturer->OnKeyboardAction(dik, keyboard_action);
@@ -528,7 +531,7 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 
 	if (capture_status)
 	{
-		//оповестить дочернее окно о потере фокуса клавиатуры
+		//РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ Рѕ РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР° РєР»Р°РІРёР°С‚СѓСЂС‹
 		if (NULL != m_pKeyboardCapturer)
 			m_pKeyboardCapturer->SendMessage(this, WINDOW_KEYBOARD_CAPTURE_LOST);
 
@@ -539,10 +542,10 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 }
 
 
-//обработка сообщений 
+//РѕР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№ 
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-	//оповестить дочерние окна
+	//РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРёРµ РѕРєРЅР°
 	for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
 	{
 		if ((*it)->IsEnabled())
@@ -581,7 +584,7 @@ CUIWindow* CUIWindow::GetChildMouseHandler()
 	return this;
 }
 
-//для перевода окна и потомков в исходное состояние
+//РґР»СЏ РїРµСЂРµРІРѕРґР° РѕРєРЅР° Рё РїРѕС‚РѕРјРєРѕРІ РІ РёСЃС…РѕРґРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 void CUIWindow::Reset()
 {
 	m_pMouseCapturer = NULL;
@@ -641,6 +644,8 @@ static bool is_in(Frect const& a, Frect const& b) //b in a
 	return (a.x1 < b.x1) && (a.x2 > b.x2) && (a.y1 < b.y1) && (a.y2 > b.y2);
 }
 
+
+
 bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16pos) //this = hint wnd
 {
 	float const cursor_height = 43.0f;
@@ -667,6 +672,69 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
 	float yn = rect.top - vis_rect.height() + rect.height() - border + cursor_height;
 	if (!is_in(vis_rect, rect)) { rect.sub(0.0f, yn); }
 	if (!is_in(vis_rect, rect)) { rect.sub(rect.width() - border, 0.0f); }
+
+	w->SetWndPos(rect.lt);
+	return true;
+}
+
+bool fit_in_rect2(CUIWindow* w, Frect const& vis_rect, float border, float dx16pos) //this = hint wnd
+{
+	float const cursor_size = 21.0f;
+	Fvector2 cursor_pos = GetUICursor().GetCursorPosition();
+	if (UI().is_widescreen())
+	{
+		cursor_pos.x -= dx16pos;
+	}
+
+	if (!vis_rect.in(cursor_pos))
+	{
+		return false;
+	}
+
+	Frect rect;
+	rect.set(-border, -border, w->GetWidth() - 2.0f * border, w->GetHeight() - 2.0f * border);
+
+	float const cursor_x_in_vis_rect = cursor_pos.x - vis_rect.x1;
+	bool const cursor_is_left_of_center = cursor_x_in_vis_rect < (vis_rect.width() / 2) - cursor_size;
+	if (cursor_is_left_of_center)
+	{
+		// show hint window to the right of the cursor
+		rect.add(cursor_pos.x + cursor_size, 0.0f);
+	}
+	else
+	{
+		// show hint window to the left of the cursor
+		rect.add(cursor_pos.x - w->GetWidth() - border, 0.0f);
+	}
+
+	float const cursor_y_in_vis_rect = cursor_pos.y - vis_rect.y1;
+	bool const cursor_is_top_of_center = cursor_y_in_vis_rect < (vis_rect.height() / 2) - cursor_size;
+	if (cursor_is_top_of_center)
+	{
+		// show hint window under the cursor
+		rect.add(0.0f, cursor_pos.y + cursor_size);
+	}
+	else
+	{
+		// show hint window over the cursor
+		rect.add(0.0f, cursor_pos.y - w->GetHeight() - border);
+	}
+
+	if (rect.top < vis_rect.top)
+	{
+		// hint window sticks out of parent at the top, correct that by moving it down
+		float const y_correction = vis_rect.top - rect.top;
+		rect.add(0.0f, y_correction);
+	}
+
+	if (rect.bottom > vis_rect.bottom)
+	{
+		// hint window sticks out of parent at the bottom, correct that by moving it up
+		float const y_correction = vis_rect.bottom - rect.bottom;
+		rect.add(0.0f, y_correction);
+	}
+	// TODO: #1 if hint window taller than parent, consider increasing width by const step and the looping the logic until hint_window_width >= vis_rect.width
+	// TODO: #2 correct horizontally (only important if first todo implemented)
 
 	w->SetWndPos(rect.lt);
 	return true;

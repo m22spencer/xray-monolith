@@ -72,7 +72,6 @@ void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 	mt_dt = 0;
 }
 
-//----------------------------------------------------
 CParticlesObject::~CParticlesObject()
 {
 	VERIFY(0==mt_dt);
@@ -123,7 +122,6 @@ const shared_str CParticlesObject::Name()
 	return (V) ? V->Name() : "";
 }
 
-//----------------------------------------------------
 void CParticlesObject::Play(bool bHudMode)
 {
 	if (g_dedicated_server) return;
@@ -290,8 +288,17 @@ void CParticlesObject::SetAutoRemove(bool auto_remove)
 	m_bAutoRemove = auto_remove;
 }
 
-//играются ли партиклы, отличается от PSI_Alive, тем что после
-//остановки Stop партиклы могут еще доигрывать анимацию IsPlaying = true
+void CParticlesObject::SetHudMode(bool bHudMode)
+{
+	if (g_dedicated_server) return;
+
+	IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
+	VERIFY(V);
+	V->SetHudMode(bHudMode);
+}
+
+//РёРіСЂР°СЋС‚СЃСЏ Р»Рё РїР°СЂС‚РёРєР»С‹, РѕС‚Р»РёС‡Р°РµС‚СЃСЏ РѕС‚ PSI_Alive, С‚РµРј С‡С‚Рѕ РїРѕСЃР»Рµ
+//РѕСЃС‚Р°РЅРѕРІРєРё Stop РїР°СЂС‚РёРєР»С‹ РјРѕРіСѓС‚ РµС‰Рµ РґРѕРёРіСЂС‹РІР°С‚СЊ Р°РЅРёРјР°С†РёСЋ IsPlaying = true
 bool CParticlesObject::IsPlaying()
 {
 	if (g_dedicated_server) return false;

@@ -61,6 +61,16 @@ public:
 		R_ASSERT((m_lanim_clr.m_lanim==NULL) || m_lanim_clr.m_lanimFlags.test(LA_TEXTCOLOR|LA_TEXTURECOLOR));
 	}
 
+	virtual void RemoveColorAnimation()
+	{
+		m_lanim_clr.m_lanim = nullptr;
+		m_lanim_clr.m_lanim_start_time = -1.0f;
+		m_lanim_clr.m_lanim_delay_time = 0.0f;
+		m_lanim_clr.m_lanimFlags.zero();
+		// Reset texture color
+		ColorAnimationSetTextureColor(color_rgba(255, 255, 255, 255), false);
+	}
+
 	virtual void ResetColorAnimation()
 	{
 		m_lanim_clr.m_lanim_start_time = Device.dwTimeContinual / 1000.0f + m_lanim_clr.m_lanim_delay_time / 1000.0f;
@@ -91,8 +101,7 @@ public:
 		if (t < m_lanim_clr.m_lanim_start_time) // consider animation delay
 			return;
 
-		if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) || t - m_lanim_clr.m_lanim_start_time < m_lanim_clr
-		                                                                                     .m_lanim->Length_sec())
+		if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) || t - m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec())
 		{
 			int frame;
 			u32 clr = m_lanim_clr.m_lanim->CalculateRGB(t - m_lanim_clr.m_lanim_start_time, frame);

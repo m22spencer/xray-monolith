@@ -1,10 +1,11 @@
-// HUDCrosshair.cpp:  êðåñòèê ïðèöåëà, îòîáðàæàþùèé òåêóùóþ äèñïåðñèþ
+// HUDCrosshair.cpp:  ÐºÑ€ÐµÑÑ‚Ð¸Ðº Ð¿Ñ€Ð¸Ñ†ÐµÐ»Ð°, Ð¾Ñ‚Ð¾Ð±Ñ€Ð°Ð¶Ð°ÑŽÑ‰Ð¸Ð¹ Ñ‚ÐµÐºÑƒÑ‰ÑƒÑŽ Ð´Ð¸ÑÐ¿ÐµÑ€ÑÐ¸ÑŽ
 // 
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-
 #include "HUDCrosshair.h"
+#include "HUDTarget.h"
+
 #include "../xrEngine/CustomHUD.h"
 #include "../xrEngine/igame_persistent.h"
 #include "ui_base.h"
@@ -13,16 +14,21 @@ string32 crosshair_shader = "hud\\cursor";
 string32 crosshair_texture = "ui\\cursor";
 float crosshair_near_size = 1.f;
 float crosshair_far_size = 1.f;
+float crosshair_depth_begin = 0.f;
+float crosshair_depth_end = 100.f;
+
+u32 C_CROSS D3DCOLOR_RGBA(0xff, 0xff, 0xff, 0xff);
 
 CHUDCrosshair::CHUDCrosshair()
 {
+	crosshairShader = NULL;
+	crosshairTexture = NULL;
 	strcpy(lastCrosshairShader, "");
 	strcpy(lastCrosshairTexture, "");
-	shaderWire->create("hud\\crosshair");
 	transform = Fmatrix().identity();
 	minRadius = 0.001f;
 	maxRadius = 0.004f;
-	crossColor = 0;
+	crossColor = C_CROSS;
 	dispersionRadius = 0.f;
 }
 
@@ -42,6 +48,11 @@ void CHUDCrosshair::SetTransform(const Fmatrix& m)
 	transform.set(m);
 }
 
+void CHUDCrosshair::SetScale(float s)
+{
+	scale = s;
+}
+
 void CHUDCrosshair::SetColor(u32 c)
 {
 	crossColor = c;
@@ -56,7 +67,14 @@ extern ENGINE_API BOOL g_bRendering;
 
 static float lerp(float a, float b, float t)
 {
+	clamp(t, 0.f, 1.f);
 	return a * (1 - t) + b * t;
+}
+
+void CHUDCrosshair::InitShaderWire()
+{
+	if (!shaderWire->inited())
+		shaderWire->create("hud\\crosshair");
 }
 
 void CHUDCrosshair::DeinitShaderCrosshair()
@@ -71,29 +89,53 @@ void CHUDCrosshair::DeinitShaderCrosshair()
 
 bool CHUDCrosshair::InitShaderCrosshair()
 {
-	if (strcmp(lastCrosshairShader, crosshair_shader) || strcmp(lastCrosshairTexture, crosshair_texture))
+	if (!crosshairShader || !crosshairTexture)
+		return false;
+
+	if (strcmp(lastCrosshairShader, *crosshairShader) || strcmp(lastCrosshairTexture, *crosshairTexture))
 	{
 		DeinitShaderCrosshair();
 
-		shaderCrosshair->create(crosshair_shader, crosshair_texture);
-		strcpy(lastCrosshairShader, crosshair_shader);
-		strcpy(lastCrosshairTexture, crosshair_texture);
+		shaderCrosshair->create(*crosshairShader, *crosshairTexture);
+		strcpy(lastCrosshairShader, *crosshairShader);
+		strcpy(lastCrosshairTexture, *crosshairTexture);
 	}
 
 	return shaderCrosshair->inited();
 }
 
+void CHUDCrosshair::PushVerts(Fvector* verts, Fvector* uvs, int count, Fmatrix mat, Fvector4 pos) const
+{
+	Fvector2 scr_size = {
+		float(::Render->getTarget()->get_width()),
+		float(::Render->getTarget()->get_height())
+	};
+
+	for (int i = 0; i < count; i++)
+	{
+		Fvector vert = verts[i];
+		Fvector uv = Fvector();
+		if (uvs)
+			uv = uvs[i];
+
+		vert.mul(scale);
+		mat.transform(vert);
+		vert.x *= scr_size.x / scr_size.y;
+		vert.y *= -1;
+		vert.x += pos.x;
+		vert.y += pos.y;
+		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, uv.x, uv.y);
+	}
+}
+
 void CHUDCrosshair::RenderShaderCrosshair()
 {
-	UIRender->StartPrimitive(4, IUIRender::ptTriStrip, UI().m_currentPointType);
+	// Fetch the render target size
+	Fvector2 scr_size = {
+		float(::Render->getTarget()->get_width()),
+		float(::Render->getTarget()->get_height())
+	};
 
-	Fvector4 pt;
-	Device.mFullTransform.transform(pt, transform.c);
-	pt.y = -pt.y;
-
-	Fvector2 scr_size = { float(Device.dwWidth), float(Device.dwHeight) };
-
-	float min = minRadius;
 	float max = maxRadius;
 
 	Fvector verts[4] = {
@@ -103,41 +145,22 @@ void CHUDCrosshair::RenderShaderCrosshair()
 		{max, max},
 	};
 
-	Fvector2 uvs[4] = {
+	Fvector uvs[4] = {
 		{0, 1},
 		{0, 0},
 		{1, 1},
 		{1, 0},
 	};
 
-	// Bring our transform into view space
-	Fvector pos = Fvector();
-	transform.transform_tiny(pos);
-	Device.mView.transform_tiny(pos);
+	Fmatrix mat = Fmatrix().mul(Device.mFullTransform, transform);
+	Fvector4 pos = Fvector4().set(mat._41, mat._42, mat._43, mat._44);
 
-	// Project without W-divide to retrieve linear depth
-	Fvector pos_ = Fvector().set(pos);
-	Device.mProject.transform_tiny(pos_);
+	// Apply perspective divide to aim point and transform into screen space
+	pos.x = ((pos.x / pos.w) + 1.f) * 0.5f * scr_size.x;
+	pos.y = (-(pos.y / pos.w) + 1.f) * 0.5f * scr_size.y;
 
-	// Calculate size from linear depth
-	float zNear = Device.ViewportNear;
-	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float t = (pos_.z - zNear - 1) / (zFar - zNear);
-	float size = lerp(crosshair_near_size, crosshair_far_size * zFar, t);
-
-	// Transform and push vertices
-	for (int i = 0; i < 4; i++)
-	{
-		Fvector vert = verts[i];
-		vert.mul(size);
-		transform.transform_tiny(vert);
-		Device.mView.transform_tiny(vert);
-		Device.mProject.transform(vert);
-		vert.x = (vert.x + 1.f) * 0.5f * scr_size.x;
-		vert.y = (-vert.y + 1.f) * 0.5f * scr_size.y;
-		Fvector2 uv = uvs[i];
-		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, uv.x, uv.y);
-	}
+	UIRender->StartPrimitive(4, IUIRender::ptTriStrip, UI().m_currentPointType);
+	PushVerts(verts, uvs, 4, mat, pos);
 
 	// Draw
 	UIRender->SetShader(*shaderCrosshair);
@@ -167,41 +190,16 @@ void CHUDCrosshair::RenderWireCrosshair()
 		{ 0, -max },
 	};
 
-	// Transform into view space
-	Fvector pos = Fvector();
-	transform.transform_tiny(pos);
-	Device.mView.transform_tiny(pos);
+	Fmatrix mat = Fmatrix().mul(Device.mFullTransform, transform);
+	Fvector4 pos = Fvector4().set(mat._41, mat._42, mat._43, mat._44);
 
-	// Project without W-divide to retrieve linear depth
-	Fvector pos_ = Fvector().set(pos);
-	Device.mProject.transform_tiny(pos_);
-
-	// Calculate size from linear depth
-	float zNear = Device.ViewportNear;
-	float zFar = g_pGamePersistent->Environment().CurrentEnv->far_plane;
-	float t = (pos_.z - zNear - 1) / (zFar - zNear);
-	float size = lerp(crosshair_near_size, crosshair_far_size * zFar, t);
-
-	// Project into NDC with W-divide
-	Device.mProject.transform(pos);
+	// Apply perspective divide to aim point and transform into screen space
+	pos.x = ((pos.x / pos.w) + 1.f) * 0.5f * scr_size.x;
+	pos.y = (-(pos.y / pos.w) + 1.f) * 0.5f * scr_size.y;
 
 	// Project vertices for accurate scaling
 	UIRender->StartPrimitive(8, IUIRender::ptLineList, UI().m_currentPointType);
-	for (int i = 0; i < 8; i++)
-	{
-		Fvector vert = verts[i];
-		vert.mul(size);
-		transform.transform_tiny(vert);
-		Device.mView.transform_tiny(vert);
-		Device.mProject.transform(vert);
-		vert.x = (vert.x + 1.f) * 0.5f * scr_size.x;
-		vert.y = (-vert.y + 1.f) * 0.5f * scr_size.y;
-		UIRender->PushPoint(vert.x, vert.y, 0, crossColor, 0, 0);
-	}
-
-	// Apply perspective divide to aim point and transform into screen space
-	pos.x = (pos.x + 1.f) * 0.5f * scr_size.x;
-	pos.y = (-pos.y + 1.f) * 0.5f * scr_size.y;
+	PushVerts(verts, NULL, 8, mat, pos);
 
 	// Render a 1px wide line  for the center dot
 	UIRender->PushPoint(pos.x - 0.5f, pos.y, 0, crossColor, 0, 0);
@@ -211,11 +209,11 @@ void CHUDCrosshair::RenderWireCrosshair()
 	UIRender->FlushPrimitive();
 }
 
-void CHUDCrosshair::OnRender()
+void CHUDCrosshair::OnRender(bool use_shader)
 {
 	VERIFY(g_bRendering);
 
-	if (psHUD_Flags.is(HUD_SHADER_CROSSHAIR))
+	if (use_shader)
 	{
 		if (InitShaderCrosshair())
 			RenderShaderCrosshair();
@@ -223,6 +221,7 @@ void CHUDCrosshair::OnRender()
 	else
 	{
 		DeinitShaderCrosshair();
+		InitShaderWire();
 		RenderWireCrosshair();
 	}
 }

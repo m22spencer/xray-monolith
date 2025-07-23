@@ -141,8 +141,8 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
 	{
 		PIItem pItem = *it;
 		Ivector2 iWH = pItem->GetInvGridRect().rb;
-		//проверить можно ли разместить элемент,
-		//проверяем последовательно каждую клеточку
+		//РїСЂРѕРІРµСЂРёС‚СЊ РјРѕР¶РЅРѕ Р»Рё СЂР°Р·РјРµСЃС‚РёС‚СЊ СЌР»РµРјРµРЅС‚,
+		//РїСЂРѕРІРµСЂСЏРµРј РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ РєР°Р¶РґСѓСЋ РєР»РµС‚РѕС‡РєСѓ
 		found_place = false;
 
 		for (i = 0; (i < height - iWH.y + 1) && !found_place; ++i)
@@ -169,7 +169,7 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
 			}
 		}
 
-		//разместить элемент на найденном месте
+		//СЂР°Р·РјРµСЃС‚РёС‚СЊ СЌР»РµРјРµРЅС‚ РЅР° РЅР°Р№РґРµРЅРЅРѕРј РјРµСЃС‚Рµ
 		if (found_place)
 		{
 			for (k = 0; k < iWH.y; ++k)
@@ -185,7 +185,7 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
 	// remove
 	item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
 
-	//для какого-то элемента места не нашлось
+	//РґР»СЏ РєР°РєРѕРіРѕ-С‚Рѕ СЌР»РµРјРµРЅС‚Р° РјРµСЃС‚Р° РЅРµ РЅР°С€Р»РѕСЃСЊ
 	if (!found_place) return false;
 
 	return true;
@@ -543,8 +543,8 @@ LPCSTR InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
 
 
 //////////////////////////////////////////////////////////////////////////
-// специальная функция для передачи info_portions при нажатии кнопок UI 
-// (для tutorial)
+// СЃРїРµС†РёР°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РїРµСЂРµРґР°С‡Рё info_portions РїСЂРё РЅР°Р¶Р°С‚РёРё РєРЅРѕРїРѕРє UI 
+// (РґР»СЏ tutorial)
 void InventoryUtilities::SendInfoToActor(LPCSTR info_id)
 {
 	if (GameID() != eGameIDSingle) return;
@@ -562,14 +562,14 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
 	if (info == shared_str("ui_talk_show"))
 	{
 		int mode = 10; // now Menu is Talk Dialog (show)
-		luabind::functor<void> funct;
+		::luabind::functor<void> funct;
 		R_ASSERT(ai().script_engine().functor( "pda.actor_menu_mode", funct ));
 		funct(mode);
 	}
 	if (info == shared_str("ui_talk_hide"))
 	{
 		int mode = 11; // Talk Dialog hide
-		luabind::functor<void> funct;
+		::luabind::functor<void> funct;
 		R_ASSERT(ai().script_engine().functor( "pda.actor_menu_mode", funct ));
 		funct(mode);
 	}

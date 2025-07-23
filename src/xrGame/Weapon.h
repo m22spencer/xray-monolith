@@ -169,6 +169,8 @@ protected:
 	virtual bool IsHudModeNow();
 	virtual bool SOParentIsActor() { return ParentIsActor(); }
 	u8 last_idx;
+
+	CAnonHudItem* m_scopeItem = NULL;
 public:
 	void signal_HideComplete();
 	virtual bool Action(u16 cmd, u32 flags);
@@ -437,7 +439,7 @@ public:
 	virtual u8 GetCurrentHudOffsetIdx();
 
 	// Tronex script exports
-	void AmmoTypeForEach(const luabind::functor<bool>& funct);
+	void AmmoTypeForEach(const ::luabind::functor<bool>& funct);
 	float GetMagazineWeightScript() const { return GetMagazineWeight(m_magazine); }
 	int GetAmmoCount_forType_Script(LPCSTR type) const { return GetAmmoCount_forType(type); }
 	LPCSTR GetGrenadeLauncherNameScript() const { return *GetGrenadeLauncherName(); }
@@ -530,14 +532,17 @@ public:
 
 private:
 	float m_nearwall_zoomed_range;
+	bool m_firepos;
+	bool m_aimpos;
 
 public:
+	bool GetFirepos() { return m_firepos; }
+	bool GetAimpos() { return m_aimpos; }
 	float GetTargetNearWallOffset();
 	float GetTargetHudFov();
 
 public:
 	Fmatrix RayTransform();
-	void g_fireParams(SPickParam& pp);
 
 protected:
 	virtual void UpdateFireDependencies_internal();

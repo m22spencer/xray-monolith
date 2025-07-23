@@ -242,7 +242,7 @@ void CUIActorMenu::DeInitTradeMode()
 
 	if (!CurrentGameUI())
 		return;
-	//только если находимся в режиме single
+	//С‚РѕР»СЊРєРѕ РµСЃР»Рё РЅР°С…РѕРґРёРјСЃСЏ РІ СЂРµР¶РёРјРµ single
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
 	if (!pGameSP) return;
 
@@ -709,7 +709,7 @@ void CUIActorMenu::DonateCurrentItem(CUICellItem* cell_item)
 		return;
 
 	//Alundaio: 
-	luabind::functor<bool> funct;
+	::luabind::functor<bool> funct;
 	if (ai().script_engine().functor("actor_menu_inventory.CUIActorMenu_DonateCurrentItem", funct))
 	{
 		if (funct(m_pPartnerInvOwner->cast_game_object()->lua_game_object(), item->object().lua_game_object()) == false)

@@ -1,0 +1,14 @@
+--- Sound options tree
+
+local page_doppler = options_modded_exes_doppler.PAGE
+local page_sound_delay = options_modded_exes_sound_delay.PAGE
+
+-- Import smart constructors
+options_builder.import_into(this)
+
+-- Options group
+GROUP = group {
+	{ id = "sound" },
+	page_doppler,
+	page_sound_delay
+}

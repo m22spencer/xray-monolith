@@ -205,11 +205,25 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 		case 0:
 		case 1:
 			vsname = psname = "model_env_lq";
+
+#if RENDER==R_R4
+			if (RImplementation.o.ssfx_glass && !C.HudElement)
+				vsname = psname = "ssfx_glass";
+#endif
 			C.r_Pass(vsname, psname,TRUE,TRUE,FALSE,TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, 0);
 			//C.r_Sampler			("s_base",	C.L_textures[0]);
 			//C.r_Sampler			("s_env",	oT2_Name,false,D3DTADDRESS_CLAMP);
 			C.r_dx10Texture("s_base", C.L_textures[0]);
 			C.r_dx10Texture("s_env", oT2_Name);
+
+#if RENDER==R_R4
+			if (RImplementation.o.ssfx_glass)
+			{
+				C.r_dx10Texture("s_accumulator", r2_RT_accum);
+				C.r_dx10Texture("s_screen", "$user$generic_temp"); // r2_RT_ssfx_temp3
+				C.r_dx10Texture("s_glass", "fx\\glass_normal");
+			}
+#endif
 
 			C.r_dx10Sampler("smp_base");
 			C.r_dx10Sampler("smp_rtlinear");

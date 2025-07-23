@@ -188,9 +188,9 @@ u16 CKinematicsAnimated::LL_PartID(LPCSTR B)
 	if (0 == m_Partition) return BI_NONE;
 	for (u16 id = 0; id < MAX_PARTS; id++)
 	{
-		CPartDef& P = (*m_Partition)[id];
-		if (0 == P.Name) continue;
-		if (0 == stricmp(B, *P.Name)) return id;
+		CPartDef* P = (*m_Partition)[id];
+		if (nullptr == P) continue;
+		if (0 == stricmp(B, *P->Name)) return id;
 	}
 	return BI_NONE;
 }
@@ -255,7 +255,7 @@ void CKinematicsAnimated::LL_FadeCycle(u16 part, float falloff, u8 mask_channel 
 		B.set_falloff_state();
 		B.blendFalloff = falloff;
 		//B.blendAccrue		= B.timeCurrent;
-		if (B.stop_at_end) B.stop_at_end_callback = FALSE; // callback не должен приходить!
+		if (B.stop_at_end) B.stop_at_end_callback = FALSE; // callback РЅРµ РґРѕР»Р¶РµРЅ РїСЂРёС…РѕРґРёС‚СЊ!
 	}
 }
 
@@ -274,9 +274,10 @@ void CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)
 		//B.blend = CBlend::eFREE_SLOT;
 		B.set_free_state();
 
-		CPartDef& P = (*m_Partition)[B.bone_or_part];
-		for (u32 i = 0; i < P.bones.size(); i++)
-			Bone_Motion_Stop_IM((*bones)[P.bones[i]], *I);
+		CPartDef* P = (*m_Partition)[B.bone_or_part];
+		if (nullptr == P) return;
+		for (u32 i = 0; i < P->bones.size(); i++)
+			Bone_Motion_Stop_IM((*bones)[P->bones[i]], *I);
 
 		blend_cycles[part].erase(I); // ?
 		E = blend_cycles[part].end();
@@ -381,7 +382,7 @@ CBlend* CKinematicsAnimated::LL_PlayCycle(u16 part, MotionID motion_ID, BOOL bMi
 		return 0;
 	}
 	if (part >= MAX_PARTS) return 0;
-	if (0 == m_Partition->part(part).Name) return 0;
+	if (0 == m_Partition->part(part)) return 0;
 
 	//	shared_motions* s_mots	= &m_Motions[motion.slot];
 	//	CMotionDef* m_def		= s_mots->motion_def(motion.idx);
@@ -393,19 +394,19 @@ CBlend* CKinematicsAnimated::LL_PlayCycle(u16 part, MotionID motion_ID, BOOL bMi
 		if (bMixing) LL_FadeCycle(part, blendFalloff, 1 << channel);
 		else LL_CloseCycle(part, 1 << channel);
 	}
-	CPartDef& P = (*m_Partition)[part];
+	CPartDef* P = (*m_Partition)[part];
 	CBlend* B = IBlend_Create();
 	if (!B) return 0;
 
 	_DBG_SINGLE_USE_MARKER;
 	IBlendSetup(*B, part, channel, motion_ID, bMixing, blendAccrue, blendFalloff, Speed, noloop, Callback,
 	            CallbackParam);
-	for (u32 i = 0; i < P.bones.size(); i++)
+	for (u32 i = 0; i < P->bones.size(); i++)
 	{
-		if (!(*bones)[P.bones[i]])
+		if (!(*bones)[P->bones[i]])
 			Debug.fatal(DEBUG_INFO, "! MODEL: missing bone/wrong armature? : %s", *getDebugName());
 
-		Bone_Motion_Start_IM((*bones)[P.bones[i]], B);
+		Bone_Motion_Start_IM((*bones)[P->bones[i]], B);
 	}
 	blend_cycles[part].push_back(B);
 	return B;
@@ -526,9 +527,10 @@ void CKinematicsAnimated::DestroyCycle(CBlend& B)
 		GetBlendDestroyCallback()->BlendDestroy(B);
 	//B.blend 		= CBlend::eFREE_SLOT;
 	B.set_free_state();
-	const CPartDef& P = m_Partition->part(B.bone_or_part);
-	for (u32 i = 0; i < P.bones.size(); i++)
-		Bone_Motion_Stop_IM((*bones)[P.bones[i]], &B);
+	const CPartDef* P = m_Partition->part(B.bone_or_part);
+	if (nullptr == P) return;
+	for (u32 i = 0; i < P->bones.size(); i++)
+		Bone_Motion_Stop_IM((*bones)[P->bones[i]], &B);
 }
 
 
@@ -540,7 +542,7 @@ void CKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_ble
 	// Cycles
 	for (u16 part = 0; part < MAX_PARTS; part++)
 	{
-		if (0 == m_Partition->part(part).Name)
+		if (nullptr == m_Partition->part(part))
 			continue;
 		I = blend_cycles[part].begin();
 		E = blend_cycles[part].end();

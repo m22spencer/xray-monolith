@@ -3,6 +3,7 @@
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrNetServer/NET_Client.h"
+#include "NET_Queue.h"
 #include "script_export_space.h"
 #include "xrEngine/StatGraph.h"
 #include "xrMessages.h"
@@ -49,6 +50,14 @@ namespace file_transfer
 {
 	class client_site;
 }
+
+using models_set = xr_unordered_set<xr_string>;
+struct prefetch_event  
+{  
+    NET_Packet p;  
+	models_set models;
+};
+using prefetch_event_queue = xr_vector<prefetch_event>;
 
 class CLevel :
 	public IGame_Level,
@@ -154,11 +163,6 @@ public:
 	bool m_bGameConfigStarted = false;
 	bool game_configured = false;
 	NET_Queue_Event* game_events = nullptr;
-	//AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
-#ifdef SPAWN_ANTIFREEZE
-    NET_Queue_Event* spawn_events = nullptr;
-#endif
-	//-AVO
 	xr_deque<CSE_Abstract*> game_spawn_queue;
 	xrServer* Server = nullptr;
 	GlobalFeelTouch m_feel_deny;
@@ -234,10 +238,26 @@ public:
 	virtual void net_StartPlayDemo();
 	void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
 	void cl_Process_Spawn(NET_Packet& P);
-	//AVO: used by SPAWN_ANTIFREEZE (by alpet)
+
+//AVO: used by SPAWN_ANTIFREEZE (by alpet)
 #ifdef SPAWN_ANTIFREEZE
+public:
+	NET_Queue_Event* spawn_events = nullptr;
+	prefetch_event_queue* prefetch_events = nullptr;
+	models_set* prefetched_models = nullptr;
     bool PostponedSpawn(u16 id);
-#endif
+	void ProcessSpawnEvents();
+	static void ProcessPrefetchEvents(void* args);
+	void SortSpawnEventsQueue();
+private:
+	bool closeSignal = false;
+	int GetSpawnEventPriority(const NET_Event& e) const;
+	bool PostponedSpawnFind(u16 id, const NET_Event& E) const;
+	bool PostponedSpawnFind(u16 id, NET_Packet& P) const;
+	bool SpawnEventCompare(const NET_Event& a, const NET_Event& b) const;
+#endif	
+
+public:
 	//-AVO
 	void ProcessGameEvents();
 	void ProcessGameSpawns();
@@ -279,7 +299,7 @@ public:
 
 	CLevel();
 	virtual ~CLevel();
-	// названияе текущего уровня
+	// РЅР°Р·РІР°РЅРёСЏРµ С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРІРЅСЏ
 	virtual shared_str name() const;
 	// this method can be used ONLY from CCC_ChangeGameType
 	// XXX nitrocaster: why c_str?
@@ -288,9 +308,9 @@ public:
 	// gets the time from the game simulation
 	ALife::_TIME_ID GetStartGameTime();
 	ALife::_TIME_ID GetGameTime();
-	// возвращает время для энвайронмента в милисекундах относительно начала игры
+	// РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ РґР»СЏ СЌРЅРІР°Р№СЂРѕРЅРјРµРЅС‚Р° РІ РјРёР»РёСЃРµРєСѓРЅРґР°С… РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РёРіСЂС‹
 	ALife::_TIME_ID GetEnvironmentGameTime();
-	// игровое время в отформатированном виде
+	// РёРіСЂРѕРІРѕРµ РІСЂРµРјСЏ РІ РѕС‚С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅРѕРј РІРёРґРµ
 	void GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& mins, u32& secs, u32& milisecs);
 	float GetGameTimeFactor();
 	void SetGameTimeFactor(const float fTimeFactor);

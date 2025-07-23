@@ -287,6 +287,15 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		                                               fd.m_FireParticlesXForm.i);
 
 		VERIFY(_valid(fd.m_FireParticlesXForm));
+		
+		// demonized: transforms for fire bone/point silencer, they should be identical to above if they dont exist
+		{
+			Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
+			fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
+			m_item_transform.transform_tiny(fd.vLastFPSilencer);
+			fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
+			VERIFY(_valid(fd.vLastFPSilencer));
+		}
 	}
 
 	if (m_measures.m_prop_flags.test(hud_item_measures::e_fire_point2))
@@ -305,12 +314,6 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		m_item_transform.transform_tiny(fd.vLastSP);
 		VERIFY(_valid(fd.vLastSP));
 	}
-
-	Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
-	fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
-	m_item_transform.transform_tiny(fd.vLastFPSilencer);
-	fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
-	VERIFY(_valid(fd.vLastFPSilencer));
 }
 
 bool attachable_hud_item::need_renderable()
@@ -327,12 +330,10 @@ void attachable_hud_item::render()
 
 	if (m_parent_hud_item->has_object() && m_parent_hud_item->object().GetAttachments()->size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
-		for (; it != it_e; ++it)
+		for (auto& pair : *m_parent_hud_item->object().GetAttachments())
 		{
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->Render(m_model, &m_item_transform, true);
+			if (pair.second->GetType() == eSA_HUD)
+				pair.second->Render(m_model, &m_item_transform);
 		}
 	}
 }
@@ -346,13 +347,12 @@ void attachable_hud_item::render_item_ui()
 {
 	m_parent_hud_item->render_item_3d_ui();
 
-	if (m_parent_hud_item->has_object()) {
-		xr_map<u16, script_attachment*>::iterator it = m_parent_hud_item->object().GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = m_parent_hud_item->object().GetAttachments()->end();
-		for (; it != it_e; ++it)
+	if (m_parent_hud_item->has_object() && m_parent_hud_item->object().GetAttachments()->size())
+	{
+		for (auto& pair : *m_parent_hud_item->object().GetAttachments())
 		{
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->RenderUI(true);
+			if (pair.second->GetType() == eSA_HUD)
+				pair.second->RenderUI();
 		}
 	}
 }
@@ -712,16 +712,20 @@ player_hud::player_hud()
 		char temp[20];
 		string512 tmp;
 		strconcat(sizeof(temp), temp, "movement_layer_", std::to_string(i).c_str());
-		R_ASSERT2(pSettings->line_exist("hud_movement_layers", temp), make_string("Missing definition for [hud_movement_layers] %s", temp));
-		LPCSTR layer_def = pSettings->r_string("hud_movement_layers", temp);
-		R_ASSERT2(_GetItemCount(layer_def) > 0, make_string("Wrong definition for [hud_movement_layers] %s", temp));
 		
-		_GetItem(layer_def, 0, tmp);
-		anm->Load(tmp);
-		_GetItem(layer_def, 1, tmp);
-		anm->anm->Speed() = (atof(tmp) ? atof(tmp) : 1.f);
-		_GetItem(layer_def, 2, tmp);
-		anm->m_power = (atof(tmp) ? atof(tmp) : 1.f);
+		if (pSettings->line_exist("hud_movement_layers", temp))
+		{
+			LPCSTR layer_def = pSettings->r_string("hud_movement_layers", temp);
+			R_ASSERT2(_GetItemCount(layer_def) > 0, make_string("Wrong definition for [hud_movement_layers] %s", temp));
+
+			_GetItem(layer_def, 0, tmp);
+			anm->Load(tmp);
+			_GetItem(layer_def, 1, tmp);
+			anm->anm->Speed() = (atof(tmp) ? atof(tmp) : 1.f);
+			_GetItem(layer_def, 2, tmp);
+			anm->m_power = (atof(tmp) ? atof(tmp) : 1.f);
+		}
+
 		m_movement_layers.push_back(anm);
 	}
 }
@@ -899,17 +903,15 @@ void player_hud::render_item_ui()
 	if (m_attached_items[SCOPE_ATTACH_IDX])
 		m_attached_items[SCOPE_ATTACH_IDX]->render_item_ui();
 
-	if (g_actor->GetAttachments()->size())
-	{
-		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-		for (; it != it_e; ++it)
-			if ((*it).second->GetFFlags().test(eSA_RenderHUD))
-				(*it).second->RenderUI(true);
-	}
-
 	UIRender->CacheSetCullMode(IUIRender::cmCCW);
 	UI().m_currentPointType = bk;
+
+	if (g_actor->GetAttachments()->size())
+	{
+		for (auto& pair : *g_actor->GetAttachments())
+			if (pair.second->GetType() == eSA_HUD)
+				pair.second->RenderUI();
+	}
 }
 
 void player_hud::render_hud()
@@ -941,21 +943,19 @@ void player_hud::render_hud()
 
 	if (g_actor->GetAttachments()->size())
 	{
-		xr_map<u16, script_attachment*>::iterator it = g_actor->GetAttachments()->begin();
-		xr_map<u16, script_attachment*>::iterator it_e = g_actor->GetAttachments()->end();
-		for (; it != it_e; ++it)
+		for (auto& pair : *g_actor->GetAttachments())
 		{
-			script_attachment* att = (*it).second;
+			script_attachment* att = pair.second;
 
-			if (att->GetFFlags().test(eSA_RenderHUD))
+			if (att->GetType() == eSA_HUD)
 			{
 				// Left arm
 				if (att->GetParentBone() < 21)
-					att->Render(m_model_2->dcast_PKinematics(), &m_transform_2, true);
+					att->Render(m_model_2->dcast_PKinematics(), &m_transform_2);
 
 				// Right arm
 				else
-					att->Render(m_model->dcast_PKinematics(), &m_transform, true);
+					att->Render(m_model->dcast_PKinematics(), &m_transform);
 			}
 		}
 	}
@@ -1313,30 +1313,39 @@ void player_hud::updateMovementLayerState()
 
 	bool need_blend = (script_anim_part != u8(-1) || (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->NeedBlendAnm()) || (m_attached_items[1] && m_attached_items[1]->m_parent_hud_item->NeedBlendAnm()));
 
-	if (pActor->AnyMove() && need_blend)
+	if (need_blend)
 	{
-		CEntity::SEntityState state;
-		pActor->g_State(state);
-
 		CWeapon* wep = nullptr;
 
 		if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->has_object() && m_attached_items[0]->m_parent_hud_item->object().cast_weapon())
 			wep = m_attached_items[0]->m_parent_hud_item->object().cast_weapon();
 
 		if (wep && wep->IsZoomed()) {
-			state.bCrouch ? m_movement_layers[eAimCrouch]->Play() : m_movement_layers[eAimWalk]->Play();
+			m_movement_layers[eAimIdle]->Play();
+		} else {
+			m_movement_layers[eIdle]->Play();
 		}
-		else if (state.bCrouch) {
-			m_movement_layers[eCrouch]->Play();
-		}
-		else if (state.bSprint) {
-			m_movement_layers[eSprint]->Play();
-		}
-		else if (!isActorAccelerated(pActor->MovingState(), false)) {
-			m_movement_layers[eWalk]->Play();
-		}
-		else {
-			m_movement_layers[eRun]->Play();
+
+		if (pActor->AnyMove())
+		{
+			CEntity::SEntityState state;
+			pActor->g_State(state);
+
+			if (wep && wep->IsZoomed()) {
+				state.bCrouch ? m_movement_layers[eAimCrouch]->Play() : m_movement_layers[eAimWalk]->Play();
+			}
+			else if (state.bCrouch) {
+				m_movement_layers[eCrouch]->Play();
+			}
+			else if (state.bSprint) {
+				m_movement_layers[eSprint]->Play();
+			}
+			else if (!isActorAccelerated(pActor->MovingState(), false)) {
+				m_movement_layers[eWalk]->Play();
+			}
+			else {
+				m_movement_layers[eRun]->Play();
+			}
 		}
 	}
 }
@@ -1829,7 +1838,7 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 			m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->OnMovementChanged(cmd);
 	}
 
-	luabind::functor<void> func;
+	::luabind::functor<void> func;
 	if (ai().script_engine().functor("_g.player_hud__OnMovementChanged", func))
 	{
 		func(cmd);
@@ -1840,21 +1849,21 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 
 bool nearwall_callback(int target, float ofs, const Fvector& dir, Fmatrix& mat)
 {
-	luabind::functor<void> on_nearwall;
+	::luabind::functor<void> on_nearwall;
 	if (!ai().script_engine().functor("_G.CActorHudOnNearWall", on_nearwall))
 	{
 		return false;
 	}
 
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["target"] = target;
 	table["offset"] = ofs;
 	table["direction"] = dir;
 	table["matrix"] = mat;
 	table["override"] = false;
 	on_nearwall(table);
-	mat = luabind::object_cast<Fmatrix>(table["matrix"]);
-	return luabind::object_cast<bool>(table["override"]);
+	mat = ::luabind::object_cast<Fmatrix>(table["matrix"]);
+	return ::luabind::object_cast<bool>(table["override"]);
 }
 
 void update_nearwall(int target, const attachable_hud_item* item, Fmatrix& nearwall)

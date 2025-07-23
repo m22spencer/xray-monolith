@@ -136,7 +136,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
 			if (current_items > desired_items) current_items--; // Out of life ( invalidated, never hit something, etc. )
 		}
 
-		// последняя дельта ??
+		// РїРѕСЃР»РµРґРЅСЏСЏ РґРµР»СЊС‚Р° ??
 		//.		float xdt		= float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;
 		//.		float dt		= Device.fTimeDelta;//xdt<Device.fTimeDelta?xdt:Device.fTimeDelta;
 		float dt = Device.fTimeDelta;

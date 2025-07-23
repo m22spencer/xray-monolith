@@ -131,6 +131,11 @@ private:
 private:
 	float m_power_fx_factor;
 
+    // LookAtActor feature
+    Fvector savedOrientation;
+    u32 dTimeFSeen;
+    u32 dTimeNfSeen;
+
 private:
 	float m_fRankDisperison;
 	float m_fRankVisibility;
@@ -192,6 +197,9 @@ public:
 	virtual void reload(LPCSTR section);
 	virtual void LoadSounds(LPCSTR section);
 
+	static void BoneCallback(CBoneInstance* B);
+	void LookAtActor(CBoneInstance* headBone);
+
 	virtual BOOL net_Spawn(CSE_Abstract* DC);
 	virtual void net_Export(NET_Packet& P);
 	virtual void net_Import(NET_Packet& P);
@@ -227,6 +235,10 @@ public:
 	virtual float Radius() const;
 
 	virtual void ChangeVisual(shared_str NewVisual);
+
+	void AdjustHeadOrientation(float targetPitch, float targetYaw, float targetRoll);
+	void LookAtActorSoftReset(CBoneInstance* headBone);
+	bool LookAtActorLuaResult = true;
 
 #ifdef DEBUG
 	virtual void						OnHUDDraw							(CCustomHUD* hud);
@@ -323,8 +335,8 @@ public:
 	virtual bool feel_touch_contact(CObject* O);
 	virtual bool feel_touch_on_contact(CObject* O);
 
-	//флаги, какие действия совершал актер по отношению к сталкеру
-	//(помог, атаковал и т.д.)
+	//С„Р»Р°РіРё, РєР°РєРёРµ РґРµР№СЃС‚РІРёСЏ СЃРѕРІРµСЂС€Р°Р» Р°РєС‚РµСЂ РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє СЃС‚Р°Р»РєРµСЂСѓ
+	//(РїРѕРјРѕРі, Р°С‚Р°РєРѕРІР°Р» Рё С‚.Рґ.)
 	Flags32 m_actor_relation_flags;
 
 	// ALife

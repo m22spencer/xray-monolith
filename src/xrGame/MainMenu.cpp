@@ -5,6 +5,7 @@
 #include "../xrEngine/xr_IOConsole.h"
 #include "../xrEngine/IGame_Level.h"
 #include "../xrEngine/CameraManager.h"
+#include "../xrEngine/xr_input.h"
 #include "xr_Level_controller.h"
 #include "ui\UITextureMaster.h"
 #include "ui\UIXmlInit.h"
@@ -187,8 +188,10 @@ void CMainMenu::Activate(bool bActivate)
 
 	//Discord
 	discord_gameinfo.mainmenu = bActivate;
-	if (bActivate && psDeviceFlags2.test(rsDiscord))
-		updateDiscordPresence();
+
+	// demonized: handled in separate thread
+	/*if (bActivate && psDeviceFlags2.test(rsDiscord))
+		updateDiscordPresence();*/
 
 	if (bActivate)
 	{
@@ -356,14 +359,30 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
 {
 	if (!IsActive()) return;
 
-	if (is_binded(kCONSOLE, dik))
+	switch (get_binded_action(dik))
 	{
+	case kCONSOLE:
 		Console->Show();
 		return;
-	}
-	if (is_binded(kSCREENSHOT, dik))
-	{
+
+	case kSCREENSHOT:
 		Render->Screenshot();
+		return;
+
+	case kEDITOR:
+		if (!Device.imgui_shown())
+		{
+			Device.imgui().Show();
+			return;
+		}
+
+		if (!Device.imgui().is_input())
+		{
+			Device.imgui().EnableInput();
+			return;
+		}
+
+		Device.imgui().Show(false);
 		return;
 	}
 

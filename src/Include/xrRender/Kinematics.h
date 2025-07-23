@@ -10,6 +10,7 @@ class CBoneData;
 class IBoneData;
 class IKinematicsAnimated;
 class IRenderVisual;
+class IRenderable;
 class CBoneInstance;
 struct SEnumVerticesCallback;
 
@@ -29,6 +30,7 @@ public:
 	};
 
 public:
+	IRenderable* renderableParent = nullptr;
 	virtual void Bone_Calculate(CBoneData* bd, Fmatrix* parent) = 0;
 	virtual void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) = 0;
 
@@ -85,6 +87,7 @@ public:
 	//	Callback: data manipulation
 	virtual void SetUpdateCallback(UpdateCallback pCallback) = 0;
 	virtual void SetUpdateCallbackParam(void* pCallbackParam) = 0;
+	virtual bool NeedUCalc() = 0;
 
 	virtual UpdateCallback GetUpdateCallback() = 0;
 	virtual void* GetUpdateCallbackParam() = 0;

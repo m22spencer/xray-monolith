@@ -294,7 +294,7 @@ void CHangingLamp::UpdateCL()
 		if (lanim)
 		{
 			int frame;
-			u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame); // âîçâðàùàåò â ôîðìàòå BGR
+			u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame); // Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ð² Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ðµ BGR
 			Fcolor fclr;
 			fclr.set((float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f);
 			fclr.mul_rgb(fBrightness / 255.f);
@@ -552,10 +552,10 @@ BOOL CHangingLamp::UsedAI_Locations()
 #pragma optimize("s",on)
 void CHangingLamp::script_register(lua_State* L)
 {
-	luabind::module(L)
+	::luabind::module(L)
 	[
-		luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
-		.def(luabind::constructor<>())
+		::luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
+		.def(::luabind::constructor<>())
 		.def("turn_on", &CHangingLamp::TurnOn)
 		.def("turn_off", &CHangingLamp::TurnOff)
 		.def("set_color_animator", &CHangingLamp::SetLanim)

@@ -58,8 +58,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="xrCPU_Pipe.rc">
-      <Filter>Resources</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="xrCPU_Pipe.rc" />
   </ItemGroup>
 </Project>

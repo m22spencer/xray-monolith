@@ -96,7 +96,7 @@ void CBlender_ssfx_ssr::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Texture("ssr_image", r2_RT_ssfx_ssr); // Prev Frame
 		C.r_dx10Texture("s_rimage", "$user$generic_temp");
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 		C.r_dx10Texture("s_prev_pos", r2_RT_ssfx_prevPos);
 		C.r_dx10Texture("s_gloss_data", r2_RT_ssfx_temp3);
 
@@ -158,7 +158,7 @@ void CBlender_ssfx_ssr::Compile(CBlender_Compile& C)
 
 		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Texture("s_diffuse", r2_RT_albedo);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Texture("env_s0", r2_T_envs0);
 		C.r_dx10Texture("env_s1", r2_T_envs1);
@@ -259,7 +259,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_ao", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("s_position", r2_RT_P);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 		C.r_dx10Texture("ssfx_ao", r2_RT_ssfx_ao);
 
 		C.r_dx10Texture("s_prev_pos", r2_RT_ssfx_prevPos);
@@ -279,7 +279,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_ao_blur", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -291,7 +291,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_ao_blur", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp3);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -305,7 +305,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 
 		C.r_dx10Texture("s_accumulator", r2_RT_accum);
 		C.r_dx10Texture("s_position", r2_RT_P);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Texture("ssfx_ao", r2_RT_ssfx_il);
 
@@ -327,7 +327,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_il_blur", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp2);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -339,7 +339,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_il_blur", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp3);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -366,7 +366,7 @@ void CBlender_ssfx_sss::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_sss", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("s_position", r2_RT_P);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 		C.r_dx10Texture("sss_image", r2_RT_ssfx_sss);
 
 		C.r_dx10Texture("s_prev_pos", r2_RT_ssfx_prevPos);
@@ -425,7 +425,7 @@ void CBlender_ssfx_sss_ext::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_sss_ext", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("s_position", r2_RT_P);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 		C.r_dx10Texture("sss_image", r2_RT_ssfx_sss_ext);
 
 		C.r_dx10Texture("s_prev_pos", r2_RT_ssfx_prevPos);
@@ -441,7 +441,7 @@ void CBlender_ssfx_sss_ext::Compile(CBlender_Compile& C)
 		C.r_Pass("stub_screen_space", "ssfx_sss_ext", FALSE, FALSE, FALSE);
 
 		C.r_dx10Texture("s_position", r2_RT_P);
-		C.r_dx10Texture("s_hud_mask", r2_RT_ssfx_hud);
+		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
 		C.r_dx10Texture("sss_image", r2_RT_ssfx_sss_ext2);
 
 		C.r_dx10Texture("s_prev_pos", r2_RT_ssfx_prevPos);
@@ -486,6 +486,7 @@ void CBlender_ssfx_rain::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Texture("ssfx_color_buffer", r2_RT_generic0);
 		C.r_dx10Texture("volumetric_buffer", r2_RT_ssfx_volumetric);
+		C.r_dx10Texture("bloom_buffer", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -499,6 +500,7 @@ void CBlender_ssfx_rain::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Texture("ssfx_color_buffer", r2_RT_generic0_r);
 		C.r_dx10Texture("volumetric_buffer", r2_RT_ssfx_volumetric);
+		C.r_dx10Texture("bloom_buffer", r2_RT_ssfx_bloom1);
 
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
@@ -556,6 +558,91 @@ void CBlender_ssfx_water_blur::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("water_waves", "fx\\water_height");
 
 		C.r_dx10Sampler("smp_linear");
+		C.r_End();
+		break;
+	}
+}
+
+CBlender_ssfx_motion_blur::CBlender_ssfx_motion_blur() { description.CLS = 0; }
+
+CBlender_ssfx_motion_blur::~CBlender_ssfx_motion_blur()
+{
+}
+
+void CBlender_ssfx_motion_blur::Compile(CBlender_Compile& C)
+{
+	IBlender::Compile(C);
+
+	switch (C.iElement)
+	{
+	case 0:
+		C.r_Pass("stub_screen_space", "ssfx_motion_blur", FALSE, FALSE, FALSE);
+
+		C.r_dx10Texture("s_position", r2_RT_P);
+		C.r_dx10Texture("s_image", r2_RT_generic0);
+		
+		C.r_dx10Texture("ssfx_motion_vectors", r2_RT_ssfx_motion_vectors);
+
+		C.r_dx10Sampler("smp_nofilter");
+		C.r_dx10Sampler("smp_linear");
+		C.r_End();
+		break;
+
+	case 1:
+		C.r_Pass("stub_screen_space", "ssfx_motion_blur", FALSE, FALSE, FALSE);
+
+		C.r_dx10Texture("s_position", r2_RT_P);
+		C.r_dx10Texture("s_image", r2_RT_ssfx_temp);
+		
+		C.r_dx10Texture("ssfx_motion_vectors", r2_RT_ssfx_motion_vectors);
+
+		C.r_dx10Sampler("smp_nofilter");
+		C.r_dx10Sampler("smp_rtlinear");
+		C.r_dx10Sampler("smp_linear");
+		C.r_End();
+		break;
+	}
+}
+
+
+CBlender_ssfx_fog_scattering::CBlender_ssfx_fog_scattering() { description.CLS = 0; }
+
+CBlender_ssfx_fog_scattering::~CBlender_ssfx_fog_scattering()
+{
+}
+
+void CBlender_ssfx_fog_scattering::Compile(CBlender_Compile& C)
+{
+	IBlender::Compile(C);
+
+	switch (C.iElement)
+	{
+	case 0:
+		C.r_Pass("stub_screen_space", "ssfx_fog_scattering", FALSE, FALSE, FALSE);
+
+		C.r_dx10Texture("s_position", r2_RT_P);
+		C.r_dx10Texture("s_image", r2_RT_generic0);
+		C.r_dx10Texture("s_blur_2", r2_RT_blur_2);
+		//C.r_dx10Texture("ssfx_motionvectors", r2_RT_ssfx_motion_vectors);
+
+		C.r_dx10Sampler("smp_nofilter");
+		C.r_dx10Sampler("smp_linear");
+		C.r_End();
+		break;
+	
+
+	case 2:
+		C.r_Pass("stub_screen_space", "ssfx_fog_scattering_blur", FALSE, FALSE, FALSE);
+		C.r_dx10Texture("s_image", r2_RT_generic0);
+
+		C.r_dx10Sampler("smp_rtlinear");
+		C.r_End();
+		break;
+	case 3:
+		C.r_Pass("stub_screen_space", "ssfx_fog_scattering_blur", FALSE, FALSE, FALSE);
+		C.r_dx10Texture("s_image", r2_RT_blur_4);
+
+		C.r_dx10Sampler("smp_rtlinear");
 		C.r_End();
 		break;
 	}

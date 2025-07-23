@@ -11,7 +11,7 @@
 #include "actor.h"
 
 
-//Á‡„ÛÁÍ‡ ËÁ XML Ù‡ÈÎ‡
+//–∑–∞–≥—Ä—É–∑–∫–∞ –∏–∑ XML —Ñ–∞–π–ª–∞
 void CDialogScriptHelper::Load(CUIXml* uiXml, XML_NODE* phrase_node)
 {
 	LoadSequence(uiXml, phrase_node, "precondition", m_Preconditions);
@@ -85,9 +85,9 @@ LPCSTR CDialogScriptHelper::GetScriptText(LPCSTR str_to_translate, const CGameOb
 	if (!m_sScriptTextFunc.size())
 		return str_to_translate;
 
-	luabind::functor<LPCSTR> lua_function;
+	::luabind::functor<LPCSTR> lua_function;
 #ifdef DIALOG_UPGRADE
-	luabind::object parameters_table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object parameters_table = ::luabind::newtable(ai().script_engine().lua());
 	string256 str = {0};
 	xr_sprintf(str, sizeof(str), m_sScriptTextFunc.c_str());
 	LPCSTR v1 = strchr(str, '(');
@@ -136,7 +136,7 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO, LPCSTR dia
 
 	for (u32 i = 0; i < Preconditions().size(); ++i)
 	{
-		luabind::functor<bool> lua_function;
+		::luabind::functor<bool> lua_function;
 		THROW(*Preconditions()[i]);
 		bool functor_exists = ai().script_engine().functor(*Preconditions()[i], lua_function);
 		THROW3(functor_exists, "Cannot find precondition", *Preconditions()[i]);
@@ -157,7 +157,7 @@ void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO, LPCSTR dialog_id
 {
 	for (u32 i = 0; i < Actions().size(); ++i)
 	{
-		luabind::functor<void> lua_function;
+		::luabind::functor<void> lua_function;
 		THROW(*Actions()[i]);
 		bool functor_exists = ai().script_engine().functor(*Actions()[i], lua_function);
 		THROW3(functor_exists, "Cannot find phrase dialog script function", *Actions()[i]);
@@ -184,11 +184,11 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO1,
 	}
 	for (u32 i = 0; i < Preconditions().size(); ++i)
 	{
-		luabind::functor<bool> lua_function;
+		::luabind::functor<bool> lua_function;
 		THROW(*Preconditions()[i]);
 
 #ifdef DIALOG_UPGRADE
-		luabind::object parameters_table = luabind::newtable(ai().script_engine().lua());
+		::luabind::object parameters_table = ::luabind::newtable(ai().script_engine().lua());
 		string256 str = {0};
 		xr_sprintf(str, sizeof(str), Preconditions()[i].c_str());
 		LPCSTR v1 = strchr(str, '(');
@@ -238,11 +238,11 @@ void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO1, const CGameObje
 
 	for (u32 i = 0; i < Actions().size(); ++i)
 	{
-		luabind::functor<void> lua_function;
+		::luabind::functor<void> lua_function;
 		THROW(*Actions()[i]);
 
 #ifdef DIALOG_UPGRADE
-		luabind::object parameters_table = luabind::newtable(ai().script_engine().lua());
+		::luabind::object parameters_table = ::luabind::newtable(ai().script_engine().lua());
 		string256 str = {0};
 		xr_sprintf(str, sizeof(str), Actions()[i].c_str());
 		LPCSTR v1 = strchr(str, '(');

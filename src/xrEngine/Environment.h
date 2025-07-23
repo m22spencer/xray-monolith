@@ -253,7 +253,7 @@ class ENGINE_API CEnvironment
 {
 	friend class dxEnvironmentRender;
 
-	struct str_pred : public std::binary_function<shared_str, shared_str, bool>
+	struct str_pred
 	{
 		IC bool operator()(const shared_str& x, const shared_str& y) const
 		{
@@ -357,7 +357,7 @@ public:
 	void OnFrame();
 	void lerp(float& current_weight);
 
-	void RenderSky();
+	void RenderSky(bool only_MV = false);
 	void RenderClouds();
 	void RenderFlares();
 	void RenderLast();

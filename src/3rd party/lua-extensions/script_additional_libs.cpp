@@ -1,4 +1,4 @@
-//RvP, 11.05.2014	Функционал из xrLuaFix
+//RvP, 11.05.2014	Р¤СѓРЅРєС†РёРѕРЅР°Р» РёР· xrLuaFix
 //#include "StdAfx.h"
 #include "script_additional_libs.h"
 #include <random>

@@ -110,7 +110,7 @@ static bool RemovePred(CTelekineticObject* tele_object)
 
 void CTeleWhirlwind::clear_notrelevant()
 {
-	//óáðàòü âñå îáúåòû ñî ñòàðûìè ïàðàìåòðàìè
+	//ÑƒÐ±Ñ€Ð°Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ð±ÑŠÐµÑ‚Ñ‹ ÑÐ¾ ÑÑ‚Ð°Ñ€Ñ‹Ð¼Ð¸ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°Ð¼Ð¸
 	objects.erase(
 		std::remove_if(
 			objects.begin(),
@@ -166,7 +166,7 @@ void CTeleWhirlwindObject::release()
 	dir_inv.sub(object->Position(), m_pTelekinesis->GetCenter());
 	float magnitude = dir_inv.magnitude();
 
-	// âêëþ÷èòü ãðàâèòàöèþ 
+	// Ð²ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ Ð³Ñ€Ð°Ð²Ð¸Ñ‚Ð°Ñ†Ð¸ÑŽ 
 	object->m_pPhysicsShell->set_ApplyByGravity(TRUE);
 
 	float impulse = 0.f;

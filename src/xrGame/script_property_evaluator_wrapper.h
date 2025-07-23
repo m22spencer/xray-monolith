@@ -14,7 +14,7 @@ class CScriptGameObject;
 
 typedef CPropertyEvaluator<CScriptGameObject> CScriptPropertyEvaluator;
 
-class CScriptPropertyEvaluatorWrapper : public CScriptPropertyEvaluator, public luabind::wrap_base
+class CScriptPropertyEvaluatorWrapper : public CScriptPropertyEvaluator, public ::luabind::wrap_base
 {
 public:
 	IC CScriptPropertyEvaluatorWrapper(CScriptGameObject* object = 0, LPCSTR evaluator_name = "");

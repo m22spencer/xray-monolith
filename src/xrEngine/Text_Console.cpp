@@ -195,7 +195,7 @@ void CTextConsole::Destroy()
 
 void CTextConsole::OnRender()
 {
-} //disable ÑConsole::OnRender()
+} //disable Ð¡Console::OnRender()
 
 void CTextConsole::OnPaint()
 {
