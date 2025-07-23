@@ -4246,6 +4246,7 @@
     <ClCompile Include="..\WeaponStatMgunBarrel.cpp" />
     <ClCompile Include="..\WeaponStatMgunFire.cpp" />
     <ClCompile Include="..\WeaponStatMgunIR.cpp" />
+    <ClCompile Include="..\WeaponStatMgunMisc.cpp" />
     <ClCompile Include="..\WeaponSVD.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
