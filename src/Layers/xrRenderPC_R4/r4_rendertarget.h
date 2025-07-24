@@ -238,9 +238,6 @@ public:
 		return &Previous[Device.m_SecondViewport.IsSVPFrame()];
 	}
 	
-
-	ref_rt rt_tempzb; // Redotix99: for 3D Shader Based Scopes
-
 	ref_shader s_ssfx_dumb;
 
 	//	Igor: for async screenshots

@@ -535,8 +535,6 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 			rt_MSAADepth = createUnique(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 		}
 
-		rt_tempzb = createUnique("$user$temp_zb", w, h, D3DFMT_D24S8); // Redotix99: for 3D Shader Based Scopes
-
 		// select albedo & accum
 		if (RImplementation.o.mrtmixdepth)
 		{

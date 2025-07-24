@@ -280,36 +280,6 @@ void CRenderTarget::phase_3DSSReticle()
 				}
 			}
 		});
-		/*
-		for (auto N : RImplementation.mapScopeHUDSorted) {
-			RCache.set_Element(N.val.se);
-			RCache.set_c("scope_render_phase", 2);  // Draw
-			RCache.set_c("bDistort", distort);
-
-
-			RImplementation.render_Reticle();
-
-			{   // Compute the lens information
-				auto S = N.val.pVisual->getVisData().sphere;
-				auto m_W = RCache.get_xform_world();
-				m_W.mulB_43(Fmatrix().translate(S.P));
-							
-				p->eyepiece.m_W = m_W;
-				p->eyepiece.radius = S.R;
-
-				if (p->eyepiece.radius > EPS) {
-					// Many guns have had their mesh directly scaled, so the only reliable unit of
-					//    measurement is based off the only reliable mesh in the file. The lens.
-					Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
-
-					// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
-					p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
-					p->objective.radius = o.w;
-				}
-			}
-			break;  // For now, we only handle the first lens rendered
-		}
-		*/
 	};
 
 	// Make sure to actually render the reticle
@@ -322,6 +292,7 @@ void CRenderTarget::phase_3DSSReticle()
   */
 void CRenderTarget::phase_3DSSReticle_fixup()
 {
+	return;
 	PIX_EVENT(PHASE_SCOPE_FIXUP);
 	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
 	auto mvec = RImplementation.Target->rt_ssfx_motion_vectors;
@@ -339,7 +310,6 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 		RCache.set_c("scope_render_phase", 3);  // Fixup
 		RCache.set_c("bDistort", bDistort);
 	}
-	RImplementation.render_Reticle();
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, HW.pBaseZB);
 };
