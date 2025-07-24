@@ -1132,7 +1132,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 	Lights.sun_adapted = Lights.sun_cascades[cascade_ind];
 	light* fuckingsun = (light*)Lights.sun_adapted._get();
 
-	auto skip_shadow_maps = Device.m_SecondViewport.IsSVPFrame() && scope_svp_enabled == 3;
+	auto skip_shadow_maps = Device.m_SecondViewport.IsSVPFrame() && scope_svp_enabled >= 3;
 	if (!skip_shadow_maps) {
 		// calculate view-frustum bounds in world space
 		Fmatrix ex_project, ex_full, ex_full_inverse;

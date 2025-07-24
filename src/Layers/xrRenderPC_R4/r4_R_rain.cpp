@@ -47,7 +47,7 @@ void CRender::render_rain()
 	if (!RainLight)
 		return;
 
-	auto skip_smap = Device.m_SecondViewport.IsSVPFrame() && scope_svp_enabled == 3;
+	auto skip_smap = Device.m_SecondViewport.IsSVPFrame() && scope_svp_enabled >= 3;
 	if (!skip_smap) {
 		PIX_EVENT(RENDER_RAIN_SMAP);
 		//static const float	source_offset		= 40.f;
