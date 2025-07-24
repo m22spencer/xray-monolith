@@ -1,0 +1,18 @@
+#include "common.h"
+
+uniform float scope_depth_value;
+
+struct PSOutput
+{
+	float depth : SV_Depth;
+};
+
+PSOutput main(float4 hpos : SV_Position)
+{
+	PSOutput output;
+
+    output.depth = scope_depth_value < 0 
+        ? hpos.z+0.01
+        : scope_depth_value;
+	return output;
+}

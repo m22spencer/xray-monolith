@@ -528,8 +528,6 @@ void CRenderTarget::phase_combine()
 		phase_dof();
 	}
 
-	RImplementation.mapScopeHUDSorted.clear();
-
 	if (!Device.m_SecondViewport.IsSVPFrame())
 		phase_lut();
 

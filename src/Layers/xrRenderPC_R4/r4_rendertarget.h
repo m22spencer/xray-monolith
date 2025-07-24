@@ -254,6 +254,9 @@ public:
 	ref_texture t_noise [TEX_jitter_count];
 	ID3DTexture2D* t_noise_surf_mipped;
 	ref_texture t_noise_mipped;
+
+
+	ref_shader s_scope_color_write;
 private:
 	// OCCq
 

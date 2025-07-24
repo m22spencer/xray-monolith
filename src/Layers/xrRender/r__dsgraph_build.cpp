@@ -42,12 +42,16 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 		// We must detect the lens surface immediately, ignoring all culling.
 		float distSQ;
 		float SSA = CalcSSA(distSQ, Center, pVisual);
+		mapScopeHUDSorted.clear();
 		mapSorted_Node* N = mapScopeHUDSorted.insertInAnyWay(distSQ);
 		N->val.ssa = 0;
 		N->val.pObject = RI.val_pObject;
 		N->val.pVisual = pVisual;
 		N->val.Matrix = *RI.val_pTransform;
-		N->val.se = pVisual->shader->E[0]._get();
+		
+		N->val.se = RImplementation.Target->s_scope_color_write->E[0]._get();
+
+		//N->val.se =   pVisual->shader->E[0]._get();
 		return;
 	}
 #endif
