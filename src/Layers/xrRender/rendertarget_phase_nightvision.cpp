@@ -203,9 +203,6 @@ void CRenderTarget::phase_heatvision()
 #if defined(USE_DX11)	
 void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
 {
-	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
-	RImplementation.o.distortion = RImplementation.o.distortion_enabled;
-
 	Fmatrix FTold = Device.mFullTransform;
 
 	Device.mFullTransform = Device.mFullTransformHud;
@@ -215,9 +212,7 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 	RImplementation.rmNear();
 
 	for (auto N : RImplementation.mapScopeHUDSorted) {
-		VERIFY(N);
 		dxRender_Visual* V = N.val.pVisual;
-		VERIFY(V && V.shader._get());
 		RCache.set_Element(se->E[0]._get());
 		RCache.set_xform_world(N.val.Matrix);
 		RImplementation.apply_object(N.val.pObject);

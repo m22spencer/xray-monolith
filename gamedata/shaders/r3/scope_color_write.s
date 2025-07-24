@@ -1,5 +1,5 @@
 function normal(shader, t_base, t_second, t_detail)
-	shader:begin("deffer_model_flat", "scope_color_write")
+	shader:begin("scope_vertex", "scope_color_write")
 	: zb(true, false)
 	: blend(true, blend.srcalpha, blend.invsrcalpha)
 	: scopelense(3)

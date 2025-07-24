@@ -17,10 +17,16 @@ float3 scope_color(float2 tc) {
         : s_3dss_tex.Sample(smp_base, tc);
 }
 
-float4 main(v2p_flat I) : SV_Target 
+struct vf {
+    float4 hpos : SV_Position;
+    float2 tc0  : TEXCOORD0;
+};
+
+
+float4 main(vf I) : SV_Target 
 {
     float2 tc = isSVPActive() 
-        ? I.tcdh.xy
+        ? I.tc0.xy
         : ((I.hpos * screen_res.zw) - 0.5) / zoomFactor() + 0.5;
     return float4(scope_color(tc), 1.0);
 }
