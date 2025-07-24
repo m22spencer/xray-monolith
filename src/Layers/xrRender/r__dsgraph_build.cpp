@@ -95,6 +95,8 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 			break;
 
 		case 1: {
+			if (scope_svp_enabled)
+				return;
 			mapHUD_Node* N = mapHUD.insertInAnyWay(EPS);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;
@@ -116,6 +118,8 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 		}
 
 		case 2: {
+			if (scope_svp_enabled)
+				return;
 			mapHUD_Node * N = mapScopeHUD.insertInAnyWay(distSQ);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;

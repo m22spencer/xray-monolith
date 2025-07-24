@@ -530,8 +530,8 @@ void CRender::create()
 
 	m_bMakeAsyncSS = false;
 
-	Target = xr_new<CRenderTarget>(); // Main target
-
+	initializeTargets();
+	
 	Models = xr_new<CModelPool>();
 	PSLibrary.OnCreate();
 	HWOCC.occq_create(occq_size);
@@ -569,12 +569,27 @@ void CRender::destroy()
 	for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
 	_RELEASE(q_sync_point[i]);
 
+	deleteTargets();
 	HWOCC.occq_destroy();
 	xr_delete(Models);
-	xr_delete(Target);
 	PSLibrary.OnDestroy();
 	Device.seqFrame.Remove(this);
 	r_dsgraph_destroy();
+
+}
+
+void CRender::initializeTargets()
+{
+	TargetMain = xr_new<CRenderTarget>("main", Device.dwWidth, Device.dwHeight);
+	TargetSVP = xr_new<CRenderTarget>("svp", Device.svp_width(), Device.svp_height());
+	TargetMain->SetActive();
+}
+
+void CRender::deleteTargets()
+{
+	Target = nullptr;
+	xr_delete(TargetMain);
+	xr_delete(TargetSVP);
 }
 
 void CRender::reset_begin()
@@ -607,7 +622,7 @@ void CRender::reset_begin()
 	}
 	//-AVO
 
-	xr_delete(Target);
+	deleteTargets();
 	HWOCC.occq_destroy();
 	//_RELEASE					(q_sync_point[1]);
 	//_RELEASE					(q_sync_point[0]);
@@ -631,7 +646,7 @@ void CRender::reset_end()
 	//R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
 	HWOCC.occq_create(occq_size);
 
-	Target = xr_new<CRenderTarget>();
+	initializeTargets();
 
 	//AVO: let's reload details while changed details options on vid_restart
 	if (b_loaded && ((dm_current_size != dm_size) || (ps_r__Detail_density != ps_current_detail_density) || (

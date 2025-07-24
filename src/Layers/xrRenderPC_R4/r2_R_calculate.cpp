@@ -13,6 +13,10 @@ extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
 void CRender::Calculate()
 {
+	Device.m_SecondViewport.IsSVPFrame()
+		? TargetSVP->SetActive()
+		: TargetMain->SetActive();
+
 	// Transfer to global space to avoid deep pointer access
 	IRender_Target* T = getTarget();
 	float fov_factor = _sqr(90.f / Device.fFOV);

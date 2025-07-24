@@ -114,7 +114,7 @@ void CRenderTarget::phase_combine()
 	{
 		HW.pContext->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
 		HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-		u_setrt(rt_Generic_0, rt_Generic_1, rt_Heat, HW.pBaseZB);	//--DSR-- HeatVision
+		u_setrt(rt_Generic_0, rt_Generic_1, rt_Heat, baseZB->pZRT);	//--DSR-- HeatVision
 	}
 	else
 	{
@@ -354,7 +354,7 @@ void CRenderTarget::phase_combine()
 	}
 
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB);
+		u_setrt(rt_Generic_0, 0, 0, baseZB->pZRT);
 	else
 		u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT);
 
@@ -368,7 +368,7 @@ void CRenderTarget::phase_combine()
 			phase_ssfx_rain(); // Render a small color buffer to do the refraction and more
 
 			if (!RImplementation.o.dx10_msaa)
-				u_setrt(rt_Generic_0, 0, rt_ssfx_motion_vectors, HW.pBaseZB);
+				u_setrt(rt_Generic_0, 0, rt_ssfx_motion_vectors, baseZB->pZRT);
 			else
 				u_setrt(rt_Generic_0_r, 0, rt_ssfx_motion_vectors, rt_MSAADepth->pZRT);
 		}
@@ -394,7 +394,7 @@ void CRenderTarget::phase_combine()
 
 		//--DSR-- HeatVision_start
 		if (!RImplementation.o.dx10_msaa)
-			u_setrt(rt_Generic_0, rt_Heat, rt_ssfx_motion_vectors, HW.pBaseZB); // LDR RT
+			u_setrt(rt_Generic_0, rt_Heat, rt_ssfx_motion_vectors, baseZB->pZRT); // LDR RT
 		else
 			u_setrt(rt_Generic_0_r, rt_Heat, rt_ssfx_motion_vectors, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
 		//--DSR-- HeatVision_end
@@ -454,7 +454,7 @@ void CRenderTarget::phase_combine()
 			FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
 			if (!RImplementation.o.dx10_msaa)
 			{
-				u_setrt(rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
+				u_setrt(rt_Generic_1, 0, 0, baseZB->pZRT); // Now RT is a distortion mask
 				HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
 			}
 			else
@@ -590,13 +590,13 @@ void CRenderTarget::phase_combine()
 	// Combine everything + perform AA
 	if (RImplementation.o.dx10_msaa)
 	{
-		if (PP_Complex) u_setrt(rt_Generic, 0, 0, HW.pBaseZB); // LDR RT
-		else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+		if (PP_Complex) u_setrt(rt_Generic, 0, 0, baseZB->pZRT); // LDR RT
+		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT->pRT,NULL,NULL, baseZB->pZRT);
 	}
 	else
 	{
-		if (PP_Complex) u_setrt(rt_Color, 0, 0, HW.pBaseZB); // LDR RT
-		else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+		if (PP_Complex) u_setrt(rt_Color, 0, 0, baseZB->pZRT); // LDR RT
+		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT->pRT, NULL, NULL, baseZB->pZRT);
 	}
 	//. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
 	RCache.set_CullMode(CULL_NONE);
@@ -892,7 +892,7 @@ void CRenderTarget::phase_wallmarks()
 	RCache.set_RT(NULL, 2);
 	RCache.set_RT(NULL, 1);
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Color,NULL,NULL, HW.pBaseZB);
+		u_setrt(rt_Color,NULL,NULL, baseZB->pZRT);
 	else
 		u_setrt(rt_Color,NULL,NULL, rt_MSAADepth->pZRT);
 	// Stencil	- draw only where stencil >= 0x1
@@ -911,7 +911,7 @@ void CRenderTarget::phase_combine_volumetric()
 
 	//u_setrt(rt_Generic_0,0,0,HW.pBaseZB );			// LDR RT
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+		u_setrt(rt_Generic_0, rt_Generic_1, 0, baseZB->pZRT);
 	else
 		u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
 	//	Sets limits to both render targets

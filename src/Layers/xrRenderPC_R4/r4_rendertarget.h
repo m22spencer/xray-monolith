@@ -101,6 +101,10 @@ public:
 	xr_vector<Fplane>												dbg_planes;
 #endif
 
+	// HW baseRT/baseZB
+	ref_rt baseRT;
+	ref_rt baseZB;
+
 	// MRT-path
 	ref_rt rt_Depth; // Z-buffer like - initial depth
 	ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
@@ -380,6 +384,10 @@ public:
 	ref_geom g_menu;
 
 	bool bDistort;
+
+	// The size at creation
+	const u32 Width;
+	const u32 Height;
 private:
 	float im_noise_time;
 	u32 im_noise_shift_w;
@@ -404,11 +412,14 @@ private:
 	//	Igor: used for volumetric lights
 	bool m_bHasActiveVolumetric;
 	bool m_bHasActiveVolumetric_spot;
+
+	xr_list<ref_texture> RenderTargetDummies;
+	xr_map<CTexture*, CTexture*> RenderTargetRemaps;
 public:
 	CRenderTarget();
+	CRenderTarget(LPCSTR name, u32 width, u32 height);
 	~CRenderTarget();
-	void svp_scissor_hack(float width, float height);
-	void map_viewport_render_targets(std::function<void(ref_rt original, ref_rt views[2])> f);
+	void SetActive();
 	void accum_point_geom_create();
 	void accum_point_geom_destroy();
 	void accum_omnip_geom_create();

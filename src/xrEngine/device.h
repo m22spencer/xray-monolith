@@ -150,7 +150,6 @@ public:
 		struct Lens { Fmatrix m_W; float radius; };
 		Lens eyepiece;
 		Lens objective;
-		Irect clipRect;
 
 		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
 		Irect computeRect(float width, float height) {
@@ -271,6 +270,10 @@ public:
 	Fmatrix mInvFullTransform;
 
 	CSecondVPParams m_SecondViewport;	//--#SM+#-- +SecondVP+
+
+	// FIXME: Use chaindesc (Macro)
+	u32 svp_width() { return svp_height(); }
+	u32 svp_height() { return dwHeight >> 1; }
 
 	//float fFOV;
 	//float fASPECT;

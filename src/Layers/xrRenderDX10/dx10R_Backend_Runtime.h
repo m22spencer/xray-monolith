@@ -280,42 +280,12 @@ IC void CBackend::Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT T
 }
 #endif
 
-// If we are currently rendering from the SVP Camera, use the scissor to limit the rendering to the scope.
-IC void svp_scissor_hack()
-{
-	if (Device.m_SecondViewport.IsSVPFrame() && scope_svp_enabled == 3) {
-		bool isScopeEye = RCache.get_xform_view().c.distance_to(Device.matrices[1].mView.c) < EPS;
-
-		if (isScopeEye) {
-			UINT num = 1;
-#if USE_DX11
-			D3D11_VIEWPORT vp;
-			// Passes frequently set viewports directly, so we must fetch them immediately before render
-			HW.pContext->RSGetViewports(&num, &vp);
-
-			Irect r = Device.m_SecondViewport.computeRect(vp.Width, vp.Height);
-			RCache.set_Scissor(&r);
-#endif
-		}
-		else RCache.set_Scissor(nullptr);
-	}
-}
-
-IC void svp_scissor_hack_end()
-{
-	if (Device.m_SecondViewport.IsSVPFrame()) {
-		RCache.set_Scissor(nullptr);
-	}
-}
-
 IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
 {
 	//VERIFY(vs);
 	//HW.pDevice->VSSetShader(vs);
 	//HW.pDevice->GSSetShader(0);
 	
-	svp_scissor_hack();
-
 	D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
 	u32 iIndexCount = GetIndexCount(T, PC);
 
@@ -357,8 +327,6 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
 	//	Msg("DrawIndexed: End\n");
 
 	PGO(Msg("PGO:DIP:%dv/%df",countV,PC));
-
-	svp_scissor_hack_end();
 }
 
 IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
@@ -366,8 +334,6 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 	//	TODO: DX10: Remove triangle fan usage from the engine
 	if (T == D3DPT_TRIANGLEFAN)
 		return;
-
-	svp_scissor_hack();
 
 	//VERIFY(vs);
 	//HW.pDevice->VSSetShader(vs);
@@ -392,8 +358,6 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 	HW.pContext->Draw(iVertexCount, startV);
 	//	Msg("Draw: End\n");
 	PGO(Msg("PGO:DIP:%dv/%df",3*PC,PC));
-
-	svp_scissor_hack_end();
 }
 
 IC void CBackend::set_Geometry(SGeometry* _geom)
