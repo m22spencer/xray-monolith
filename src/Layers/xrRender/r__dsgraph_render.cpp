@@ -597,22 +597,6 @@ void R_dsgraph_structure::r_dsgraph_render_hud(bool NoPS)
 		mapHUD.clear();
 
 		rmNormal();
-		
-#if defined(USE_DX11) //  Redotix99: for 3D Shader Based Scopes 		
-
-		if (scope_3D_fake_enabled)
-		{
-			RCache.set_RT(RImplementation.Target->rt_ssfx_temp->pRT, 3); // Render scope_3D to any buffer
-			
-			mapScopeHUD.traverseLR(sorted_L1);
-
-			if (!RImplementation.o.ssfx_motionvectors)
-				RCache.set_RT(NULL, 3);
-			else
-				RCache.set_RT(RImplementation.Target->rt_ssfx_motion_vectors->pRT, 3);
-		}
-		mapScopeHUD.clear();
-#endif
 
 		if (mapCamAttached.size())
 		{

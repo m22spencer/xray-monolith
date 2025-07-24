@@ -5,6 +5,7 @@
 #include "../../xrEngine/xr_object.h"
 
 #include "../xrRender/QueryHelper.h"
+#include "../xrRender/r__dsgraph_build.cpp"
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
@@ -398,6 +399,12 @@ void CRender::Render()
 		PIX_EVENT(DEFER_PART0_SPLIT);
 		// level, SPLIT
 		Target->phase_scene_begin();
+		if (scope_svp_enabled) {
+			PIX_EVENT(RENDER_HUD_EARLY);
+			RImplementation.marker++;
+			g_hud->Render_Last(); // HUD
+			r_dsgraph_render_hud();
+		}
 		r_dsgraph_render_graph(0);
 		Target->disable_aniso();
 	}
@@ -484,7 +491,8 @@ void CRender::Render()
 
 		// level
 		Target->phase_scene_begin();
-		r_dsgraph_render_hud();
+		if (!scope_svp_enabled)
+			r_dsgraph_render_hud();
 		r_dsgraph_render_lods(true, true);
 		if (Details) Details->Render();
 		if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS)) r_dsgraph_render_landscape(1, true);

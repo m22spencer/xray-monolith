@@ -38,7 +38,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 	CRender& RI = RImplementation;
 	auto sh = pVisual->shader->E[0]._get();
 #if defined(USE_DX11) //  Redotix99: for 3D Shader Based Scopes 
-	if (nullptr != sh && sh->flags.iScopeLense == 3) {
+	if (nullptr != sh && sh->flags.iScopeLense == 3 && !Device.m_SecondViewport.IsSVPFrame()) {
 		// We must detect the lens surface immediately, ignoring all culling.
 		float distSQ;
 		float SSA = CalcSSA(distSQ, Center, pVisual);
@@ -118,8 +118,11 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 		}
 
 		case 2: {
-			if (scope_svp_enabled)
+
+			if (scope_svp_enabled >= 4)
 				return;
+
+			/*
 			mapHUD_Node * N = mapScopeHUD.insertInAnyWay(distSQ);
 			N->val.ssa = SSA;
 			N->val.pObject = RI.val_pObject;
@@ -127,6 +130,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 			N->val.Matrix = *RI.val_pTransform;
 			N->val.se = sh;
 			return;
+			*/
 		}
 	}
 #endif
