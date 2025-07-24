@@ -524,13 +524,21 @@ function actor_on_first_update_prefetch()
 	end, db.actor)
 end
 
+-- Force update close enough traders
+function npc_on_update(npc)
+	if npc:position():distance_to_sqr(db.actor:position()) < 100*100 then
+		trade_manager.update(npc)
+	end
+end
+
 function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 
 	-- Prefetch callbacks. Disabled for now, conflict with SSS
 	-- RegisterScriptCallback("actor_item_to_slot", actor_item_to_slot_prefetch)
 	-- RegisterScriptCallback("actor_on_first_update", actor_on_first_update_prefetch)
-
+	
+	RegisterScriptCallback("npc_on_update", npc_on_update)
 	RegisterScriptCallback("ActorMenu_on_item_after_move", ActorMenu_on_item_after_move)
 	RegisterScriptCallback("anomaly_on_before_activate", anomaly_on_before_activate)
 	RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)
