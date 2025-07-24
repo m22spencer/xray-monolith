@@ -222,6 +222,9 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 		RCache.set_xform_world(N.val.Matrix);
 		RImplementation.apply_object(N.val.pObject);
 		RImplementation.apply_lmaterial();
+
+		RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
+
 		bind(&N);
 		V->Render(0);
 	}

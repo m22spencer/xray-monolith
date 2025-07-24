@@ -3,8 +3,8 @@
 Texture2D s_pip_tex;
 Texture2D s_3dss_tex;
 
-uniform float4 shader_scope_params;
-float isSVPActive() { return shader_scope_params.w < 0; }
+uniform int scope_svp;
+float isSVPActive() { return scope_svp; }
 
 uniform float4 s3ds_param_2;
 float zoomFactor() {
