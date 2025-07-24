@@ -397,13 +397,42 @@ void CRender::Render()
 	else
 	{
 		PIX_EVENT(DEFER_PART0_SPLIT);
+
+		// Make sure the HUD is in the scenegraph
+		RImplementation.mapScopeHUDSorted.clear();
+		RImplementation.marker++;
+		g_hud->Render_Last(); // HUD
+
 		// level, SPLIT
 		Target->phase_scene_begin();
-		if (scope_svp_enabled) {
+
+		{
 			PIX_EVENT(RENDER_HUD_EARLY);
-			RImplementation.marker++;
-			g_hud->Render_Last(); // HUD
-			r_dsgraph_render_hud();
+
+			PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
+			// Write lens depth
+			Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
+				RCache.set_c("scope_depth_value", -1.f);
+			});
+
+			{
+				PIX_EVENT(RENDER_HUD);
+				RCache.set_ZFunc(D3DCMP_LESS);
+				r_dsgraph_render_hud();
+				RCache.set_ZFunc(D3DCMP_LESSEQUAL);
+			}
+
+			if (!scope_svp_enabled) 
+			{
+				PIX_EVENT(SCOPE_WRITE_FAR_DEPTH);
+				// Write far plane depth
+				Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
+
+					// Write far plane as depth
+					RImplementation.rmNormal();
+					RCache.set_c("scope_depth_value", 1.f);
+				});
+			}
 		}
 		r_dsgraph_render_graph(0);
 		Target->disable_aniso();
@@ -491,8 +520,6 @@ void CRender::Render()
 
 		// level
 		Target->phase_scene_begin();
-		if (!scope_svp_enabled)
-			r_dsgraph_render_hud();
 		r_dsgraph_render_lods(true, true);
 		if (Details) Details->Render();
 		if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS)) r_dsgraph_render_landscape(1, true);

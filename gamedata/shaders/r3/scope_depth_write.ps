@@ -1,10 +1,15 @@
 #include "common.h"
 
+// Add to surface depth to handle precision issues
+#define EPSILON 0.001f
+
+// If >= 0, write a specific fixed depth
+//   used for setting near and far rendering distance
 uniform float scope_depth_value;
 
 struct PSOutput
 {
-	float depth : SV_Depth;
+	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
 PSOutput main(float4 hpos : SV_Position)
@@ -12,7 +17,7 @@ PSOutput main(float4 hpos : SV_Position)
 	PSOutput output;
 
     output.depth = scope_depth_value < 0 
-        ? hpos.z+0.01
+        ? hpos.z + EPSILON
         : scope_depth_value;
 	return output;
 }

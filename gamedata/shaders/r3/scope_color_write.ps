@@ -1,10 +1,16 @@
 #include "common.h"
 
 Texture2D s_pip_tex;
+Texture2D s_3dss_tex;
+
+uniform float4 shader_scope_params;
+float isSVPActive() { return shader_scope_params.w < 0; }
 
 
 float3 scope_color(float2 tc) {
-    return s_pip_tex.Sample(smp_base, tc);
+    return isSVPActive() 
+        ? s_pip_tex.Sample(smp_base, tc)
+        : s_3dss_tex.Sample(smp_base, tc);
 }
 
 float4 main(v2p_flat I) : SV_Target 

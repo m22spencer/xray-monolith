@@ -97,45 +97,8 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 	switch (sh->flags.iScopeLense) {	
 		case 0:
 			break;
-
-		case 1: {
-			if (scope_svp_enabled)
-				return;
-			mapHUD_Node* N = mapHUD.insertInAnyWay(EPS);
-			N->val.ssa = SSA;
-			N->val.pObject = RI.val_pObject;
-			N->val.pVisual = pVisual;
-			N->val.Matrix = *RI.val_pTransform;
-			N->val.se = sh;
-
-			// SSS: Deprecated
-			/*if (!sh->passes[0]->ps->hud_disabled)
-			{
-				HUDMask_Node* N2 = HUDMask.insertInAnyWay(EPS);
-				N2->val.ssa = SSA;
-				N2->val.pObject = RI.val_pObject;
-				N2->val.pVisual = pVisual;
-				N2->val.Matrix = *RI.val_pTransform;
-				N2->val.se = sh;
-			}*/
+		default:
 			return;
-		}
-
-		case 2: {
-
-			if (scope_svp_enabled >= 4)
-				return;
-
-			/*
-			mapHUD_Node * N = mapScopeHUD.insertInAnyWay(distSQ);
-			N->val.ssa = SSA;
-			N->val.pObject = RI.val_pObject;
-			N->val.pVisual = pVisual;
-			N->val.Matrix = *RI.val_pTransform;
-			N->val.se = sh;
-			return;
-			*/
-		}
 	}
 #endif
 

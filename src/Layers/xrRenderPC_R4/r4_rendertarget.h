@@ -257,6 +257,7 @@ public:
 
 
 	ref_shader s_scope_color_write;
+	ref_shader s_scope_depth_write;
 private:
 	// OCCq
 
@@ -456,6 +457,7 @@ public:
 	void phase_nightvision();
 	void phase_fakescope(); //crookr
 	void phase_heatvision(); //--DSR-- HeatVision
+	void draw_scope(ref_shader e, std::function<void(R_dsgraph::mapSorted_Node* N)> bind);
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
 	void phase_3DSSReticle_fixup();
 	void phase_svp_capture();
