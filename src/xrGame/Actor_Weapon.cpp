@@ -21,6 +21,10 @@
 #include "HUDManager.h"
 #include "WeaponKnife.h"
 
+#ifdef STATIONARYMGUN_NEW
+#include "WeaponStatMgun.h"
+#endif
+
 static const float VEL_MAX = 10.f;
 static const float VEL_A_MAX = 10.f;
 

@@ -269,6 +269,11 @@ public:
 	bool use_HolderEx(CHolderCustom* object, bool bForce);
 
 	virtual bool can_attach(const CInventoryItem* inventory_item) const;
+
+#ifdef STATIONARYMGUN_NEW
+	float GetWeaponAccuracyStm();
+#endif
+
 protected:
 	CHolderCustom* m_holder;
 	u16 m_holderID;
