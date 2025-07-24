@@ -1209,14 +1209,8 @@ void CLevel::RenderSecondViewport()
 	// Use the found lenses to update lens positioning information
 	if (Device.m_SecondViewport.update_lens_params)
 		Device.m_SecondViewport.update_lens_params();
-	
-	Fmatrix scope_camera = Fmatrix(Device.mInvView);
-	if (!Actor()->scopeCameraMatrix(scope_camera)) {
-		scope_camera = Fmatrix(Device.mInvView);
-	}
 
-
-	EnsureDeviceState([this, scope_camera, fov, svp_fov, fNearPlane, fFarPlane]() -> void {
+	EnsureDeviceState([this, fov, svp_fov, fNearPlane, fFarPlane]() -> void {
 		auto aspect = Device.svp_width() / Device.svp_height();
 
 		auto eye_camera = Fmatrix(Device.mInvView);
@@ -1228,7 +1222,7 @@ void CLevel::RenderSecondViewport()
 		p.m_W.transform(p_W);
 		CDebugRenderer().draw_line(Fmatrix(), { 0,0,0 }, p_W, 0xffffffff, true);
 
-		float dist = p_W.distance_to(Device.vCameraPosition);
+		float dist = p_W.distance_to(Device.mInvView.c);
 		float eye_lens_fov = atan(p.radius / dist) * 2.0;
 
 		float magnification = fov / deg2rad(svp_fov);
@@ -1237,7 +1231,7 @@ void CLevel::RenderSecondViewport()
 
 		// -----------------------------------------
 		// Correct for hud fov
-		float hud_fov, _;
+		float hud_fov, _;	
 		Device.mProjectHud.decompose_projection(hud_fov, _, _, _);
 		float corrected_eye_lens_fov = eye_lens_fov / hud_fov;
 
