@@ -1196,6 +1196,7 @@ void debug_scope(Fmatrix scope_camera) {
 	draw_camera(0xffffffff);
 }
 
+#pragma optimize("", off)
 void CLevel::RenderSecondViewport()
 {
 	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
@@ -1214,19 +1215,50 @@ void CLevel::RenderSecondViewport()
 		scope_camera = Fmatrix(Device.mInvView);
 	}
 
-	if (scope_debug >= 2)
-		debug_scope(scope_camera);
 
 	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
 		auto aspect = Device.svp_width() / Device.svp_height();
-		auto svp_proj = Fmatrix().build_projection(deg2rad(svp_fov), aspect, fNearPlane, fFarPlane);
 
-		float _, fNearPlane_hud, fFarPlane_hud;
+		auto eye_camera = Fmatrix(Device.mInvView);
+
+		// ------------------------------------------
+		// Find FOV of full screen eyepiece lens
+		auto p = Device.m_SecondViewport.eyepiece;
+		Fvector p_W = { 0, 0, 0 };
+		p.m_W.transform(p_W);
+		CDebugRenderer().draw_line(Fmatrix(), { 0,0,0 }, p_W, 0xffffffff, true);
+
+		float dist = p_W.distance_to(Device.vCameraPosition);
+		float eye_lens_fov = atan(p.radius / dist) * 2.0;
+
+		// -----------------------------------------
+		// Correct for hud fov
+		float hud_fov, _;
+		Device.mProjectHud.decompose_projection(hud_fov, _, _, _);
+		float corrected_eye_lens_fov = eye_lens_fov / hud_fov;
+
+		// -----------------------------------------
+		// Compute camera offset
+		auto lens_obj = Device.m_SecondViewport.objective;
+		auto offset = lens_obj.radius * tan(eye_lens_fov * 0.5);
+
+
+		auto svp_proj = Fmatrix().build_projection(corrected_eye_lens_fov, aspect, fNearPlane, fFarPlane);
+
+		float fNearPlane_hud, fFarPlane_hud;
 		Device.mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
-		auto svp_proj_hud = Fmatrix().build_projection(deg2rad(svp_fov), aspect, 0.001, fFarPlane_hud);
 
-		SetMatrices(scope_camera, svp_proj, svp_proj_hud);
-		Device.matrices[1].mView.invert(scope_camera);
+		auto svp_proj_hud = Fmatrix().build_projection(eye_lens_fov, aspect, 0.001, fFarPlane_hud);
+		auto scope_camera2 = Fmatrix().mul(lens_obj.m_W, Fmatrix().translate(0, 0, -offset));
+
+
+		auto use_camera = scope_svp_enabled >= 2 ? scope_camera2 : eye_camera;
+
+		if (scope_debug >= 2)
+			debug_scope(use_camera);
+
+		SetMatrices(use_camera, svp_proj, svp_proj_hud);
+		Device.matrices[1].mView.invert(use_camera);
 		Device.matrices[1].mProject = svp_proj;
 		Device.matrices[1].mProjectHud = svp_proj_hud;
 		Device.m_pRender->SetCacheXform_prev(Device.matrices_previous[1].mView, Device.matrices_previous[1].mProject);
@@ -1234,6 +1266,7 @@ void CLevel::RenderSecondViewport()
 		inherited::OnRender();
 	});
 }
+#pragma optimize("", on)
 
 void CLevel::OnRender()
 {
