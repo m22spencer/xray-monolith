@@ -6,6 +6,10 @@ Texture2D s_3dss_tex;
 uniform float4 shader_scope_params;
 float isSVPActive() { return shader_scope_params.w < 0; }
 
+uniform float4 s3ds_param_2;
+float zoomFactor() {
+    return s3ds_param_2.w;
+}
 
 float3 scope_color(float2 tc) {
     return isSVPActive() 
@@ -15,5 +19,8 @@ float3 scope_color(float2 tc) {
 
 float4 main(v2p_flat I) : SV_Target 
 {
-    return float4(scope_color(I.tcdh.xy), 1.0);
+    float2 tc = isSVPActive() 
+        ? I.tcdh.xy
+        : ((I.hpos * screen_res.zw) - 0.5) / zoomFactor() + 0.5;
+    return float4(scope_color(tc), 1.0);
 }
