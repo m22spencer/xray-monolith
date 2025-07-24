@@ -1216,7 +1216,7 @@ void CLevel::RenderSecondViewport()
 	}
 
 
-	EnsureDeviceState([this, scope_camera, svp_fov, fNearPlane, fFarPlane]() -> void {
+	EnsureDeviceState([this, scope_camera, fov, svp_fov, fNearPlane, fFarPlane]() -> void {
 		auto aspect = Device.svp_width() / Device.svp_height();
 
 		auto eye_camera = Fmatrix(Device.mInvView);
@@ -1231,6 +1231,10 @@ void CLevel::RenderSecondViewport()
 		float dist = p_W.distance_to(Device.vCameraPosition);
 		float eye_lens_fov = atan(p.radius / dist) * 2.0;
 
+		float magnification = fov / deg2rad(svp_fov);
+
+		
+
 		// -----------------------------------------
 		// Correct for hud fov
 		float hud_fov, _;
@@ -1243,11 +1247,13 @@ void CLevel::RenderSecondViewport()
 		auto offset = lens_obj.radius * tan(eye_lens_fov * 0.5);
 
 
-		auto svp_proj = Fmatrix().build_projection(corrected_eye_lens_fov, aspect, fNearPlane, fFarPlane);
 
 		float fNearPlane_hud, fFarPlane_hud;
 		Device.mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
-
+		
+		eye_lens_fov /= magnification;
+		corrected_eye_lens_fov /= magnification;
+		auto svp_proj = Fmatrix().build_projection(corrected_eye_lens_fov, aspect, fNearPlane, fFarPlane);
 		auto svp_proj_hud = Fmatrix().build_projection(eye_lens_fov, aspect, 0.001, fFarPlane_hud);
 		auto scope_camera2 = Fmatrix().mul(lens_obj.m_W, Fmatrix().translate(0, 0, -offset));
 
