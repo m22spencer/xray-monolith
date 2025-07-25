@@ -478,9 +478,6 @@ void CDetailManager::details_clear()
 	// Disable fade, next render will be scene
 	fade_distance = 99999;
 
-	if (ps_ssfx_grass_shadows.x <= 0)
-		return;
-
 	for (u32 x = 0; x < 3; x++)
 	{
 		vis_list& list = m_visibles[x];
