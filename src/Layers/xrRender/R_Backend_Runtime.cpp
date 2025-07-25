@@ -22,6 +22,7 @@ void CBackend::OnFrameEnd()
 	{	
 #if defined(USE_DX11)
 		RImplementation.RenderToTarget(RImplementation.rtScreen);
+		RImplementation.Target->u_setrt(Device.dwWidth, Device.dwHeight, (HW).pBaseRT, NULL, NULL, (HW).pBaseZB);
 #endif
 
 #if defined(USE_DX10) || defined(USE_DX11)

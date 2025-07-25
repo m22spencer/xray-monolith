@@ -11,11 +11,54 @@ extern float r_ssaLOD_B;
 extern float r_ssaHZBvsTEX;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
+
+void CRender::SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud)
+{
+	Device.mView.set(view);
+	Device.mProject.set(projection);
+	Device.mProjectHud.set(projection_hud);
+	Device.mFullTransform.mul(Device.mProject, Device.mView);
+	Device.mFullTransformHud.mul(Device.mProjectHud, Device.mView);
+
+	Device.mInvView.invert(view);
+	Device.mInvProject.invert(projection);
+	Device.mInvProjectHud.invert(projection_hud);
+	D3DXMatrixInverse((D3DXMATRIX*)&Device.mInvFullTransform, 0, (D3DXMATRIX*)&Device.mFullTransform);
+
+	Device.mInvView.transform(Device.vCameraPosition.set(0, 0, 0));
+	Device.mInvView.transform_dir(Device.vCameraDirection.set(0, 0, 1));
+	Device.mInvView.transform_dir(Device.vCameraTop.set(0, 1, 0));
+	Device.mInvView.transform_dir(Device.vCameraRight.set(1, 0, 0));
+
+	Device.vCameraPosition_saved.set(Device.vCameraPosition);
+	Device.mView_saved.set(Device.mView);
+	Device.mProject_saved.set(Device.mProject);
+	Device.mFullTransform_saved.set(Device.mFullTransform);
+
+	float fFov, fAspect, _;
+	projection.decompose_projection(fFov, fAspect, _, _);
+	Device.fFOV = rad2deg(fFov);
+	Device.fASPECT = fAspect;
+
+	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
+	Device.prepare_matrices();
+}
+
 void CRender::Calculate()
 {
-	Device.m_SecondViewport.IsSVPFrame()
-		? TargetSVP->SetActive()
-		: TargetMain->SetActive();
+	Device.matrices[0].mView = Device.mView;
+	Device.matrices[0].mProject = Device.mProject;
+	Device.matrices[0].mProjectHud = Device.mProjectHud;
+
+	Device.matrices_previous[0].mView = Device.matrices[0].mView;
+	Device.matrices_previous[0].mProject = Device.matrices[0].mProject;
+	Device.matrices_previous[0].mProjectHud = Device.matrices[0].mProjectHud;
+
+	Device.matrices_previous[1].mView = Device.matrices[1].mView;
+	Device.matrices_previous[1].mProject = Device.matrices[1].mProject;
+	Device.matrices_previous[1].mProjectHud = Device.matrices[1].mProjectHud;
+
+	SetMatrices(Device.matrices_previous[0].mView, Device.matrices_previous[0].mProject, Device.matrices_previous[0].mProjectHud);
 
 	// Transfer to global space to avoid deep pointer access
 	IRender_Target* T = getTarget();

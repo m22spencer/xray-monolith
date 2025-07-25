@@ -259,13 +259,64 @@ void debug_scope(Fmatrix scope_camera) {
 	draw_camera(0xffffffff);
 }
 
+void svpCamera() {
+	float svp_fov = g_pGamePersistent->m_pGShaderConstants->hud_params.y * 0.75;
+	float _, fov, fNearPlane, fFarPlane;
+	Device.matrices[0].mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
+
+	auto aspect = Device.svp_width() / Device.svp_height();
+
+	Fmatrix eye_camera; 
+	eye_camera.invert(Device.matrices[0].mView);
+
+	// ------------------------------------------
+	// Find FOV of full screen eyepiece lens
+	auto p = Device.m_SecondViewport.eyepiece;
+	Fvector p_W = { 0, 0, 0 };
+	p.m_W.transform(p_W);
+
+	float dist = p_W.distance_to(Device.mInvView.c);
+	float eye_lens_fov = atan(p.radius / dist) * 2.0;
+
+	float magnification = fov / deg2rad(svp_fov);
+
+
+
+	// -----------------------------------------
+	// Correct for hud fov
+	float hud_fov;
+	Device.matrices[0].mProjectHud.decompose_projection(hud_fov, _, _, _);
+	float corrected_eye_lens_fov = eye_lens_fov / hud_fov;
+
+	// -----------------------------------------
+	// Compute camera offset
+	auto lens_obj = Device.m_SecondViewport.objective;
+	auto offset = lens_obj.radius * tan(eye_lens_fov * 0.5);
+
+
+
+	float fNearPlane_hud, fFarPlane_hud;
+	Device.matrices[0].mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
+
+	eye_lens_fov /= magnification;
+	corrected_eye_lens_fov /= magnification;
+	auto svp_proj = Fmatrix().build_projection(corrected_eye_lens_fov, aspect, fNearPlane, fFarPlane);
+	auto svp_proj_hud = Fmatrix().build_projection(eye_lens_fov, aspect, 0.001, fFarPlane_hud);
+	auto scope_camera2 = Fmatrix().mul(lens_obj.m_W, Fmatrix().translate(0, 0, -offset));
+
+
+	auto use_camera = scope_svp_enabled >= 2 ? scope_camera2 : eye_camera;
+
+	if (scope_debug >= 2)
+		debug_scope(use_camera);
+
+	Device.matrices[1].mView.invert(use_camera);
+	Device.matrices[1].mProject = svp_proj;
+	Device.matrices[1].mProjectHud = svp_proj_hud;
+}
+
 void CRender::Render()
 {
-
-	//FlipViewportTexturesIfNeeded(Target);
-
-	PIX_EVENT(CRender_Render);
-
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
 
 	rmNormal();
@@ -430,8 +481,7 @@ void CRender::Render()
 							});
 					}
 
-					if (scope_debug >= 2)
-						debug_scope(Fmatrix());
+					svpCamera();
 				}
 
 				{
@@ -537,7 +587,10 @@ void CRender::Render()
 			// level
 			Target->phase_scene_begin();
 			r_dsgraph_render_lods(true, true);
-			if (Details) Details->Render();
+			if (Details) {
+				PIX_EVENT(CDETAILMANAGER_RENDER);
+				Details->Render();
+			}
 			if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS)) r_dsgraph_render_landscape(1, true);
 			Target->phase_scene_end();
 		}
@@ -588,6 +641,7 @@ void CRender::Render()
 
 	auto combineGBuffer = [this, bSUN]() -> void {
 		PIX_EVENT(COMBINE_GBUFFER);
+		Device.dwViewport++;
 		// Save previus and current matrices
 		{
 			static Fmatrix mm_saved_viewproj[2];
@@ -703,22 +757,34 @@ void CRender::Render()
 			PIX_EVENT(DEFER_LIGHT_COMBINE);
 			Target->phase_combine();
 		}
-
-		if (Details)
-			Details->details_clear();
 	};
 
 	{
 		PIX_EVENT(DRAW_MAIN);
 		TargetMain->SetActive();
+		auto m = Device.matrices[0];
+		SetMatrices(m.mView, m.mProject, m.mProjectHud);
 		Device.m_SecondViewport.isSVPFrame = false;
 		renderGBuffer();
 	}
 
+	{
+		PIX_EVENT(COMBINE_MAIN);
+		TargetMain->SetActive();
+		auto m = Device.matrices[0];
+		SetMatrices(m.mView, m.mProject, m.mProjectHud);
+		Device.m_SecondViewport.isSVPFrame = false;
+		combineGBuffer();
+	}
 
-	if (scope_svp_enabled) {
+	/*
+	if (Device.m_SecondViewport.IsSVPActive()) {
 		TargetSVP->SetActive();
-		Device.m_SecondViewport.isSVPFrame = true;
+		auto m = Device.matrices[1];
+		SetMatrices(m.mView, m.mProject, m.mProjectHud);
+		g_pGamePersistent->m_pGShaderConstants->hud_params.w
+			= Device.m_SecondViewport.isSVPFrame
+			= true;
 		{
 			PIX_EVENT(DRAW_SVP);
 			renderGBuffer();
@@ -727,16 +793,27 @@ void CRender::Render()
 			PIX_EVENT(COMBINE_SVP);
 			combineGBuffer();
 		}
+		m = Device.matrices[0];
+		SetMatrices(m.mView, m.mProject, m.mProjectHud);
+		g_pGamePersistent->m_pGShaderConstants->hud_params.w
+			= Device.m_SecondViewport.isSVPFrame
+			= false;
 	}
 
 	TargetMain->SetActive();
+	auto m = Device.matrices[0];
+	SetMatrices(m.mView, m.mProject, m.mProjectHud);
 	Device.m_SecondViewport.isSVPFrame = false;
 	{
 		PIX_EVENT(COMBINE_MAIN);
 		combineGBuffer();
 	}
 
-	Target->phase_scope_debug();
+	//Target->phase_scope_debug();
+	*/
+
+	if (Details)
+		Details->details_clear();
 
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
 }

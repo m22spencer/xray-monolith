@@ -385,6 +385,7 @@ public:
 	virtual BOOL occ_visible(sPoly& P);
 
 	// Main
+	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
 	virtual void Render();
 	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
