@@ -279,20 +279,15 @@ public:
 	//float fFOV;
 	//float fASPECT;
 
-	void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud)
+	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud)
 	{
-		worldCamera.transform(vCameraPosition.set(0, 0, 0));
-		worldCamera.transform_dir(vCameraDirection.set(0, 0, 1));
-		worldCamera.transform_dir(vCameraTop.set(0, 1, 0));
-		worldCamera.transform_dir(vCameraRight.set(1, 0, 0));
-
-		mView.invert(worldCamera);
+		mView.set(view);
 		mProject.set(projection);
 		mProjectHud.set(projection_hud);
 		mFullTransform.mul(mProject, mView);
 		mFullTransformHud.mul(mProjectHud, mView);
 
-		mInvView.set(worldCamera);
+		mInvView.invert(view);
 		mInvProject.invert(projection);
 		mInvProjectHud.invert(projection_hud);
 		mInvFullTransform.mul(mInvProject, mInvView);
@@ -301,6 +296,11 @@ public:
 		mView_saved.set(mView);
 		mProject_saved.set(mProject);
 		mFullTransform_saved.set(mFullTransform);
+
+		mInvView.transform(vCameraPosition.set(0, 0, 0));
+		mInvView.transform_dir(vCameraDirection.set(0, 0, 1));
+		mInvView.transform_dir(vCameraTop.set(0, 1, 0));
+		mInvView.transform_dir(vCameraRight.set(1, 0, 0));
 
 		float fFov, fAspect, _;
 		projection.decompose_projection(fFov, fAspect, _, _);
