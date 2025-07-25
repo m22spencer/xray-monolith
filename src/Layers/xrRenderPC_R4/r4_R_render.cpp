@@ -455,7 +455,10 @@ void CRender::Render()
 			r_dsgraph_render_hud();
 			r_dsgraph_render_graph(0);
 			r_dsgraph_render_lods(true, true);
-			if (Details) Details->Render();
+			if (Details) {
+				PIX_EVENT(CDETAILMANAGER_RENDER);
+				Details->Render();
+			}
 			if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS)) r_dsgraph_render_landscape(1, true);
 			Target->phase_scene_end();
 		}
