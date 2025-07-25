@@ -1190,7 +1190,6 @@ void CLevel::RenderSecondViewport()
 		auto p = Device.m_SecondViewport.eyepiece;
 		Fvector p_W = { 0, 0, 0 };
 		p.m_W.transform(p_W);
-		CDebugRenderer().draw_line(Fmatrix(), { 0,0,0 }, p_W, 0xffffffff, true);
 
 		float dist = p_W.distance_to(Device.mInvView.c);
 		float eye_lens_fov = atan(p.radius / dist) * 2.0;
