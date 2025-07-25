@@ -105,6 +105,7 @@ public:
 
 	MatrixData matrices[2];
 	MatrixData matrices_previous[2];
+
 protected:
 
 	u32 Timer_MM_Delta;
@@ -277,6 +278,38 @@ public:
 
 	//float fFOV;
 	//float fASPECT;
+
+	void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud)
+	{
+		worldCamera.transform(vCameraPosition.set(0, 0, 0));
+		worldCamera.transform_dir(vCameraDirection.set(0, 0, 1));
+		worldCamera.transform_dir(vCameraTop.set(0, 1, 0));
+		worldCamera.transform_dir(vCameraRight.set(1, 0, 0));
+
+		mView.invert(worldCamera);
+		mProject.set(projection);
+		mProjectHud.set(projection_hud);
+		mFullTransform.mul(mProject, mView);
+		mFullTransformHud.mul(mProjectHud, mView);
+
+		mInvView.set(worldCamera);
+		mInvProject.invert(projection);
+		mInvProjectHud.invert(projection_hud);
+		mInvFullTransform.mul(mInvProject, mInvView);
+
+		vCameraPosition_saved.set(vCameraPosition);
+		mView_saved.set(mView);
+		mProject_saved.set(mProject);
+		mFullTransform_saved.set(mFullTransform);
+
+		float fFov, fAspect, _;
+		projection.decompose_projection(fFov, fAspect, _, _);
+		fFOV = rad2deg(fFov);
+		fASPECT = fAspect;
+
+		m_pRender->SetCacheXform(mView, mProject);
+		prepare_matrices();
+	}
 
 	CRenderDevice()
 		:

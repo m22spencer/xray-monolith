@@ -1109,37 +1109,7 @@ extern void render_reshade_effects();
 
 extern int ps_r4_hdr10_pda; // NOTE: this is a hack to avoid double HDR tonemapping the PDA
 
-void SetMatrices(Fmatrix worldCamera, Fmatrix projection, Fmatrix projection_hud)
-{
-	worldCamera.transform(Device.vCameraPosition.set(0, 0, 0));
-	worldCamera.transform_dir(Device.vCameraDirection.set(0, 0, 1));
-	worldCamera.transform_dir(Device.vCameraTop.set(0, 1, 0));
-	worldCamera.transform_dir(Device.vCameraRight.set(1, 0, 0));
 
-	Device.mView.invert(worldCamera);
-	Device.mProject.set(projection);
-	Device.mProjectHud.set(projection_hud);
-	Device.mFullTransform.mul(Device.mProject, Device.mView);
-	Device.mFullTransformHud.mul(Device.mProjectHud, Device.mView);
-
-	Device.mInvView.set(worldCamera);
-	Device.mInvProject.invert(projection);
-	Device.mInvProjectHud.invert(projection_hud);
-	Device.mInvFullTransform.mul(Device.mInvProject, Device.mInvView);
-
-	Device.vCameraPosition_saved.set(Device.vCameraPosition);
-	Device.mView_saved.set(Device.mView);
-	Device.mProject_saved.set(Device.mProject);
-	Device.mFullTransform_saved.set(Device.mFullTransform);
-
-	float fFov, fAspect, _;
-	projection.decompose_projection(fFov, fAspect, _, _);
-	Device.fFOV = rad2deg(fFov);
-	Device.fASPECT = fAspect;
-
-	Device.m_pRender->SetCacheXform(Device.mView, Device.mProject);
-	Device.prepare_matrices();
-}
 
 void EnsureDeviceState(std::function<void()> f)
 {
@@ -1155,7 +1125,7 @@ void EnsureDeviceState(std::function<void()> f)
 	Device.m_SecondViewport.isSVPFrame = false;
 	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
 
-	SetMatrices(old_cam, old_proj, old_proj_hud);
+	Device.SetMatrices(old_cam, old_proj, old_proj_hud);
 	Device.m_pRender->SetCacheXform_prev(Device.matrices_previous[0].mView, Device.matrices_previous[0].mProject);
 }
 
@@ -1257,7 +1227,7 @@ void CLevel::RenderSecondViewport()
 		if (scope_debug >= 2)
 			debug_scope(use_camera);
 
-		SetMatrices(use_camera, svp_proj, svp_proj_hud);
+		Device.SetMatrices(use_camera, svp_proj, svp_proj_hud);
 		Device.matrices[1].mView.invert(use_camera);
 		Device.matrices[1].mProject = svp_proj;
 		Device.matrices[1].mProjectHud = svp_proj_hud;
