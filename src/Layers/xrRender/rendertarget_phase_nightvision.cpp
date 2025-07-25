@@ -232,6 +232,35 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 
 		bind(&N);
 		V->Render(0);
+
+		auto p = &Device.m_SecondViewport;
+		// Clear so that we don't have invalid data for no lense being found
+
+		static u32 dwFrame = 0;
+		if (Device.dwFrame > dwFrame)
+		{   // Compute the lens information
+			dwFrame = Device.dwFrame;
+
+			p->eyepiece.radius = 0.f;
+			p->objective.radius = 0.f;
+
+			auto S = N.val.pVisual->getVisData().sphere;
+			auto m_W = RCache.get_xform_world();
+			m_W.mulB_43(Fmatrix().translate(S.P));
+
+			p->eyepiece.m_W = m_W;
+			p->eyepiece.radius = S.R;
+
+			if (p->eyepiece.radius > EPS) {
+				// Many guns have had their mesh directly scaled, so the only reliable unit of
+				//    measurement is based off the only reliable mesh in the file. The lens.
+				Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
+
+				// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
+				p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
+				p->objective.radius = o.w;
+			}
+		}
 	}
 
 	RImplementation.rmNormal();
@@ -261,47 +290,23 @@ void CRenderTarget::phase_3DSSReticle()
 
 	// For now, we need to feed the data back to Level() svp code
 	auto distort = bDistort;
-	auto f = Device.m_SecondViewport.update_lens_params = [this, distort]() -> void {
-		auto p = &Device.m_SecondViewport;
+	auto f = [this, distort]() -> void {
 
-		// Clear so that we don't have invalid data for no lense being found
-		p->eyepiece.radius = 0.f;
-		p->objective.radius = 0.f;
-
-		draw_scope(s_scope_color_write, [p](auto N) -> void {
+		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 8); //PHASE_SCOPE_IMAGE
 		});
 
-		draw_scope(s_scope_color_write, [p](auto N) -> void {
+		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 16); //PHASE_SCOPE_RETICLE
 		});
 
-		draw_scope(s_scope_color_write, [p](auto N) -> void {
+		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 0); //Discard
-
-			{   // Compute the lens information
-				auto S = N->val.pVisual->getVisData().sphere;
-				auto m_W = RCache.get_xform_world();
-				m_W.mulB_43(Fmatrix().translate(S.P));
-
-				p->eyepiece.m_W = m_W;
-				p->eyepiece.radius = S.R;
-
-				if (p->eyepiece.radius > EPS) {
-					// Many guns have had their mesh directly scaled, so the only reliable unit of
-					//    measurement is based off the only reliable mesh in the file. The lens.
-					Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
-
-					// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
-					p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
-					p->objective.radius = o.w;
-				}
-			}
 		});
 
 
 		// write far plane
-		draw_scope(s_scope_depth_write, [p](auto _) -> void {
+		draw_scope(s_scope_depth_write, [](auto _) -> void {
 			RCache.set_c("scope_phase", 2); //DEPTHWRITE
 			RCache.set_c("scope_depth_value", 1);
 		});

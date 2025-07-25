@@ -742,7 +742,6 @@ void CRenderTarget::phase_combine()
 		t_LUM_dest->surface_set(NULL);
 	}
 
-	phase_scope_debug();
 
 #ifdef DEBUG
 	RCache.set_CullMode	( CULL_CCW );
