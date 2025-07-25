@@ -64,12 +64,10 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 	if (RImplementation.o.ssfx_motionvectors)
 	{
 		auto svp = Device.m_SecondViewport.IsSVPFrame();
-		if (Device.dwFrame > Parent->CurrentFrame)
+		if (Device.dwViewport > Parent->CurrentFrame)
 		{
 			// Save current frame
-			if (!svp)
-				Parent->CurrentFrame = Device.dwFrame;
-
+			Parent->CurrentFrame = Device.dwViewport;
 
 			// Save prev m_W and save current m_W for the next frame
 			Parent->Matrix_Prev[svp].set(Parent->Matrix_Temp[svp]);
@@ -90,14 +88,14 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 			// RM_SINGLE
 			Fmatrix Bone_Prev;
 			Bone_Prev.mul_43(Parent->Matrix_Prev[svp], Parent->LL_GetBoneInstance(u16(RMS_boneid)).mRenderTransform_prev[svp]);
-			p_WV.mul_43(RCache.xforms.m_v_prev, Bone_Prev);
-			p_WVP.mul(RCache.xforms.m_p_prev, p_WV);
+			p_WV.mul_43(RCache.xforms.m_v_prev[Device.m_SecondViewport.IsSVPFrame()], Bone_Prev);
+			p_WVP.mul(RCache.xforms.m_p_prev[Device.m_SecondViewport.IsSVPFrame()], p_WV);
 		}
 		else
 		{
 			// RM_SKINNING_1B ~ RM_SKINNING_4B
-			p_WV.mul_43(RCache.xforms.m_v_prev, Parent->Matrix_Prev[svp]);
-			p_WVP.mul(RCache.xforms.m_p_prev, p_WV);
+			p_WV.mul_43(RCache.xforms.m_v_prev[Device.m_SecondViewport.IsSVPFrame()], Parent->Matrix_Prev[svp]);
+			p_WVP.mul(RCache.xforms.m_p_prev[Device.m_SecondViewport.IsSVPFrame()], p_WV);
 		}
 
 		RCache.set_c("m_wvp_prev", p_WVP); // Apply prev matrix
