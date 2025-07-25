@@ -764,20 +764,10 @@ void CRender::Render()
 		TargetMain->SetActive();
 		auto m = Device.matrices[0];
 		SetMatrices(m.mView, m.mProject, m.mProjectHud);
-		Device.m_SecondViewport.isSVPFrame = false;
 		renderGBuffer();
 	}
 
-	{
-		PIX_EVENT(COMBINE_MAIN);
-		TargetMain->SetActive();
-		auto m = Device.matrices[0];
-		SetMatrices(m.mView, m.mProject, m.mProjectHud);
-		Device.m_SecondViewport.isSVPFrame = false;
-		combineGBuffer();
-	}
 
-	/*
 	if (Device.m_SecondViewport.IsSVPActive()) {
 		TargetSVP->SetActive();
 		auto m = Device.matrices[1];
@@ -803,14 +793,12 @@ void CRender::Render()
 	TargetMain->SetActive();
 	auto m = Device.matrices[0];
 	SetMatrices(m.mView, m.mProject, m.mProjectHud);
-	Device.m_SecondViewport.isSVPFrame = false;
 	{
 		PIX_EVENT(COMBINE_MAIN);
 		combineGBuffer();
 	}
 
-	//Target->phase_scope_debug();
-	*/
+	Target->phase_scope_debug();
 
 	if (Details)
 		Details->details_clear();
