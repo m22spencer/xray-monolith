@@ -19,8 +19,13 @@ void CBackend::OnFrameEnd()
 #ifndef _EDITOR
 	if (!g_dedicated_server)
 #endif
-	{
+	{	
+#if defined(USE_DX11)
+		RImplementation.RenderToTarget(RImplementation.rtScreen);
+#endif
+
 #if defined(USE_DX10) || defined(USE_DX11)
+
 		HW.pContext->ClearState();
 		Invalidate();
 #else	//	USE_DX10
@@ -54,8 +59,8 @@ void CBackend::OnFrameBegin()
 		set_RT(RImplementation.Target->baseRT->pRT);
 		set_ZB(RImplementation.Target->baseRT->pZRT);
 #else
-		set_RT(HW.pBaseRT);
-		set_ZB(HW.pBaseZB);
+		set_RT(HWpBaseRT);
+		set_ZB(HWpBaseZB);
 #endif
 #endif	//	USE_DX10
 		Memory.mem_fill(&stat, 0, sizeof(stat));

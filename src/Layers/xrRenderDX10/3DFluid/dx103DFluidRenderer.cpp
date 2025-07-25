@@ -469,7 +469,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
 	//	Restore render state
 	if (!RImplementation.o.dx10_msaa)
-       pTarget->u_setrt(pTarget->rt_Generic_0, nullptr, nullptr, HW.pBaseZB); // LDR RT
+       pTarget->u_setrt(pTarget->rt_Generic_0, nullptr, nullptr, HWpBaseZB); // LDR RT
  	else
       pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
 

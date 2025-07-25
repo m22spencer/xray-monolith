@@ -23,12 +23,11 @@ void CRenderTarget::phase_pp_bloom()
 	p0.set(0.5f / w, 0.5f / h);
 	p1.set((w + 0.5f) / w, (h + 0.5f) / h);
 #endif
-	
-	
+		
 ///////////////////////////////////////////////////////////////////////////////////
 ////Bloom pass
 ///////////////////////////////////////////////////////////////////////////////////
-	u_setrt(rt_pp_bloom, 0, 0, HW.pBaseZB);
+	u_setrt(rt_pp_bloom, 0, 0, HWpBaseZB);
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
 

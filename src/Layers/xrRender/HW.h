@@ -19,6 +19,15 @@
 #include "stats_manager.h"
 #endif
 
+#if defined(USE_DX11)
+#define HWpBaseRT RImplementation.Target->baseRT->pRT
+#define HWpBaseZB RImplementation.Target->baseZB->pZRT
+#else
+#define HWpBaseRT HW.pBaseRT
+#define HWpBaseZB HW.pBaseZB
+#endif
+
+
 class CHW
 #if defined(USE_DX10) || defined(USE_DX11)
 	:	public pureAppActivate,

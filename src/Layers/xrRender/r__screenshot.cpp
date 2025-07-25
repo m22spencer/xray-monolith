@@ -54,7 +54,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 	}
 
 	ID3DResource* pSrcTexture;
-	HW.pBaseRT->GetResource(&pSrcTexture);
+	HWpBaseRT->GetResource(&pSrcTexture);
 
 	VERIFY(pSrcTexture);
 
@@ -253,7 +253,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 	                                                     D3DPOOL_SYSTEMMEM, &pFB, nullptr);
 	if (FAILED(hr)) return;
 
-	hr = HW.pDevice->GetRenderTargetData(HW.pBaseRT, pFB);
+	hr = HW.pDevice->GetRenderTargetData(HWpBaseRT, pFB);
 	if (FAILED(hr)) goto _end_;
 
 	hr = pFB->LockRect(&D, 0, D3DLOCK_NOSYSLOCK);

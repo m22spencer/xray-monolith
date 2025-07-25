@@ -204,7 +204,7 @@ void CRenderTarget::phase_ssfx_ssr()
 
 
 	// GLOSS /////////////////////////////////////////////////////////////////
-	u_setrt(rt_ssfx_temp3, 0, 0, HW.pBaseZB);
+	u_setrt(rt_ssfx_temp3, 0, 0, baseZB->pZRT);
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
 
@@ -229,7 +229,7 @@ void CRenderTarget::phase_ssfx_ssr()
 	float scale_Y = h / ScaleFactor;
 
 	// SSR ///////////////////////////////////////////////////////////
-	u_setrt(rt_ssfx, 0, 0, HW.pBaseZB);
+	u_setrt(rt_ssfx, 0, 0, baseZB->pZRT);
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
 
@@ -261,7 +261,7 @@ void CRenderTarget::phase_ssfx_ssr()
 	//if (ps_ssfx_ssr.y > 0 || ps_ssfx_ssr.x > 1.0)
 	{
 		// BLUR PHASE 1 //////////////////////////////////////////////////////////
-		u_setrt(rt_ssfx_temp, 0, 0, HW.pBaseZB);
+		u_setrt(rt_ssfx_temp, 0, 0, baseZB->pZRT);
 		RCache.set_CullMode(CULL_NONE);
 		RCache.set_Stencil(FALSE);
 
@@ -282,7 +282,7 @@ void CRenderTarget::phase_ssfx_ssr()
 
 
 		// BLUR PHASE 2 //////////////////////////////////////////////////////////
-		u_setrt(rt_ssfx_temp2, 0, 0, HW.pBaseZB);
+		u_setrt(rt_ssfx_temp2, 0, 0, baseZB->pZRT);
 		RCache.set_CullMode(CULL_NONE);
 		RCache.set_Stencil(FALSE);
 

@@ -20,8 +20,8 @@ void r_pixel_calculator::end()
 {
 	Device.End();
 
-	RCache.set_RT(HW.pBaseRT);
-	RCache.set_ZB(HW.pBaseZB);
+	RCache.set_RT(HWpBaseRT);
+	RCache.set_ZB(HWpBaseZB);
 
 	_RELEASE(zb);
 	rt = 0;

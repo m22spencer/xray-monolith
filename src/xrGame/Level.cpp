@@ -1383,8 +1383,6 @@ void CLevel::OnRender()
         }
     }
 #endif
-
-	Render->RenderToTarget(Render->rtScreen);
 }
 
 void CLevel::ScriptDebugRender()
