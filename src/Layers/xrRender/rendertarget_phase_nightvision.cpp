@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "../../xrGame/debug_renderer.h"
 #include "FBasicVisual.h"
+#include "xrRender_console.h"
 
 void CRenderTarget::phase_nightvision()
 {
@@ -213,7 +214,16 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 
 	for (auto N : RImplementation.mapScopeHUDSorted) {
 		dxRender_Visual* V = N.val.pVisual;
-		RCache.set_Element(se->E[0]._get());
+
+		// FIXME: Bit of a hack here to remap t_base -> "$user$reticle"
+		//    just for this shader invocation
+		{
+			ref_texture t; t.create("$user$reticle");
+			auto remap = RCache.TextureOverrides.emplace(t._get(), V->GetTexture());
+			RCache.set_Element(se->E[0]._get());
+			RCache.TextureOverrides.erase(t._get());
+		}
+
 		RCache.set_xform_world(N.val.Matrix);
 		RImplementation.apply_object(N.val.pObject);
 		RImplementation.apply_lmaterial();
@@ -259,6 +269,16 @@ void CRenderTarget::phase_3DSSReticle()
 		p->objective.radius = 0.f;
 
 		draw_scope(s_scope_color_write, [p](auto N) -> void {
+			RCache.set_c("scope_phase", 8); //PHASE_SCOPE_IMAGE
+		});
+
+		draw_scope(s_scope_color_write, [p](auto N) -> void {
+			RCache.set_c("scope_phase", 16); //PHASE_SCOPE_RETICLE
+		});
+
+		draw_scope(s_scope_color_write, [p](auto N) -> void {
+			RCache.set_c("scope_phase", 0); //Discard
+
 			{   // Compute the lens information
 				auto S = N->val.pVisual->getVisData().sphere;
 				auto m_W = RCache.get_xform_world();
@@ -277,6 +297,13 @@ void CRenderTarget::phase_3DSSReticle()
 					p->objective.radius = o.w;
 				}
 			}
+		});
+
+
+		// write far plane
+		draw_scope(s_scope_depth_write, [p](auto _) -> void {
+			RCache.set_c("scope_phase", 2); //DEPTHWRITE
+			RCache.set_c("scope_depth_value", 1);
 		});
 	};
 

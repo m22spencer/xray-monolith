@@ -7,6 +7,12 @@
 //   used for setting near and far rendering distance
 uniform float scope_depth_value;
 
+#define SCOPE_PHASE_GBUFFER 1
+#define SCOPE_PHASE_DEPTHWRITE 2
+#define SCOPE_PHASE_DISTORTION 4
+
+int scope_phase;
+
 struct vf {
     float4 hpos : SV_Position;
     float2 tc0  : TEXCOORD0;
@@ -14,15 +20,30 @@ struct vf {
 
 struct PSOutput
 {
+    float4 target0 : SV_Target0;
+    float4 target1 : SV_Target1;
+    float4 target2 : SV_Target2;
+    float4 target3 : SV_Target3;
 	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
 PSOutput main(vf i)
 {
 	PSOutput output;
+    output.depth = i.hpos.z + EPSILON;
+ 
+    if (scope_phase == 0) {
+        discard;
+    }
+    if (scope_phase & SCOPE_PHASE_GBUFFER) {
+        output.target3 = float4(0, 0, 1, 1); //velocity and masking
+    }
+    if (scope_phase & SCOPE_PHASE_DEPTHWRITE) {
+        output.depth = scope_depth_value;
+    }
+    if (scope_phase & SCOPE_PHASE_DISTORTION) {
+        //NYI
+    }
 
-    output.depth = scope_depth_value < 0 
-        ? i.hpos.z + EPSILON
-        : scope_depth_value;
 	return output;
 }

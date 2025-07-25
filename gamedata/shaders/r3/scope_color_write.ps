@@ -2,6 +2,11 @@
 
 Texture2D s_pip_tex;
 Texture2D s_3dss_tex;
+Texture2D s_reticle;
+
+#define PHASE_SCOPE_IMAGE 8
+#define PHASE_SCOPE_RETICLE 16
+int scope_phase;
 
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
@@ -22,11 +27,24 @@ struct vf {
     float2 tc0  : TEXCOORD0;
 };
 
-
 float4 main(vf I) : SV_Target 
 {
     float2 tc = isSVPActive() 
         ? I.tc0.xy
         : ((I.hpos * screen_res.zw) - 0.5) / zoomFactor() + 0.5;
-    return float4(scope_color(tc), 1.0);
+
+    float4 o;
+    if (scope_phase == 0) {
+        discard;
+    }
+
+    if (scope_phase & PHASE_SCOPE_IMAGE) {
+        o =  float4(scope_color(tc), 1.0);
+    }
+
+    if (scope_phase & PHASE_SCOPE_RETICLE) {
+        o = s_reticle.Sample(smp_base, I.tc0.xy);
+    }
+
+    return o;
 }

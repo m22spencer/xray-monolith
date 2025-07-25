@@ -413,8 +413,9 @@ void CRender::Render()
 				PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
 				// Write lens depth
 				Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
+					RCache.set_c("scope_phase", 1); //GBUFFER
 					RCache.set_c("scope_depth_value", -1.f);
-					});
+				});
 			}
 
 			{
@@ -432,6 +433,7 @@ void CRender::Render()
 
 					// Write far plane as depth
 					RImplementation.rmNormal();
+					RCache.set_c("scope_phase", 2); //DEPTHWRITE
 					RCache.set_c("scope_depth_value", 1.f);
 				});
 			}
