@@ -44,6 +44,9 @@ float4 main(vf I) : SV_Target
 
     if (scope_phase & PHASE_SCOPE_RETICLE) {
         o = s_reticle.Sample(smp_base, I.tc0.xy);
+        bool opaque = s_reticle.SampleLevel(smp_base, I.tc0.xy, 10).a > .99;
+        if (opaque)
+            o.a = length(o.xyz);
     }
 
     return o;
