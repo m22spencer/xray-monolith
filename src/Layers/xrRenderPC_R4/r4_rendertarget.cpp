@@ -1348,6 +1348,8 @@ CRenderTarget::~CRenderTarget()
 {
 	_RELEASE(t_ss_async);
 
+	Device.m_SecondViewport.update_lens_params = nullptr;
+
 	// Textures
 	t_material->surface_set(NULL);
 
