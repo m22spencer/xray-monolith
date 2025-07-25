@@ -697,6 +697,7 @@ void CRender::Render()
 		HW.pContext->CopyResource(res, TargetMain->baseZB->pSurface);
 
 		Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+		res->Release();
 	}
 
 	VERIFY(0 == mapDistort.size() + mapHUDDistort.size());
@@ -732,18 +733,10 @@ void CRender::RenderToTarget(RRT target)
 	switch (target)
 	{
 	case rtPDA:
-		RT = &Target->rt_ui_pda;
-		break;
-	case rtSVP:
-		RT = &Target->rt_secondVP;
+		HW.pContext->CopyResource(Target->rt_ui_pda->pSurface, Target->baseRT->pSurface);
 		break;
 	default:
 		Debug.fatal(DEBUG_INFO, "None or wrong Target specified: %i", target);
 		break;
 	}
-
-	ID3DTexture2D* pBuffer = nullptr;
-	HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBuffer);
-	HW.pContext->CopyResource((*RT)->pSurface, pBuffer);
-	pBuffer->Release();
 }
