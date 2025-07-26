@@ -750,8 +750,8 @@ void CRenderTarget::accum_direct_blend()
 		// Common calc for quad-rendering
 		u32 Offset;
 		u32 C = color_rgba(255, 255, 255, 255);
-		float _w = float(Device.dwWidth);
-		float _h = float(Device.dwHeight);
+		float _w = float(Width);
+		float _h = float(Height);
 		
 		Fvector2 p0, p1;
 		p0.set(0.0f, 0.0f);

@@ -643,9 +643,14 @@ void CRender::Render()
 			render_rain();
 		}
 
-		};
+	};
 
-	auto combineGBuffer = [this, bSUN]() -> void {
+	auto renderShadowmaps = [&]() -> void {
+		PIX_EVENT(RENDER_SHADOWMAPS);
+		
+	};
+
+	auto combineGBuffer = [&]() -> void {
 		PIX_EVENT(COMBINE_GBUFFER);
 		Device.dwViewport++;
 		// Save previus and current matrices
@@ -697,17 +702,10 @@ void CRender::Render()
 		// Directional light - fucking sun
 		if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
 		{
-			;
 			RImplementation.stats.l_visible++;
-			if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
-				render_sun_cascades();
-			else
-			{
-				PIX_EVENT(RENDER_SUN_OLD);
-				render_sun_near();
-				render_sun();
-				render_sun_filtered();
-			}
+			if (!Device.m_SecondViewport.IsSVPFrame())
+				shadowmap_sun_cascades();
+			render_sun_cascades();
 			Target->accum_direct_blend();
 		}
 
@@ -770,6 +768,9 @@ void CRender::Render()
 		renderGBuffer();
 	}
 
+	{
+		renderShadowmaps();
+	}
 
 	if (Device.m_SecondViewport.IsSVPActive()) {
 		auto m = Device.matrices[1];

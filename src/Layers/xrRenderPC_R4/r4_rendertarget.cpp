@@ -372,6 +372,23 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	auto h = Height;
 
 
+	auto id = name ? name : std::to_string(reinterpret_cast<std::uintptr_t>(this));
+	auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false) -> ref_rt {
+		ref_rt rt;
+
+		ref_texture dummy_texture;
+		dummy_texture.create(Name);
+
+		auto name = Name + ("$" + id);
+		rt.create(name.c_str(), w, h, f, SampleCount, useUAV);
+
+		RenderTargetDummies.push_back(dummy_texture);
+		RenderTargetRemaps.emplace(dummy_texture._get(), rt->pTexture._get());
+
+		return rt;
+	};
+
+
 	if (ps_r_ssao_mode != 2/*hdao*/)
 		ps_r_ssao = _min(ps_r_ssao, 3);
 
@@ -507,21 +524,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	}
 	//	NORMAL
 	{
-		auto id = name ? name : std::to_string(reinterpret_cast<std::uintptr_t>(this));
-		auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1) -> ref_rt {
-			ref_rt rt;
-			
-			ref_texture dummy_texture;
-			dummy_texture.create(Name);
-
-			auto name = Name + ("$" + id);
-			rt.create(name.c_str(), w, h, f, SampleCount);
-
-			RenderTargetDummies.push_back(dummy_texture);
-			RenderTargetRemaps.emplace(dummy_texture._get(), rt->pTexture._get());
-
-			return rt;
-		};
+		
 
 		auto colorfmt = RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8;
 		
@@ -763,7 +766,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 		if (RImplementation.o.dx10_minmax_sm)
 		{
-			rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, size / 4, size / 4, D3DFMT_R32F);
+			rt_smap_depth_minmax = createUnique(r2_RT_smap_depth_minmax, size / 4, size / 4, D3DFMT_R32F);
 			CBlender_createminmax TempBlender;
 			s_create_minmax_sm.create(&TempBlender, "null");
 		}
@@ -919,8 +922,8 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		u32 fvf_filter = (u32)D3DFVF_XYZRHW | D3DFVF_TEX8 | D3DFVF_TEXCOORDSIZE4(0) | D3DFVF_TEXCOORDSIZE4(1) |
 			D3DFVF_TEXCOORDSIZE4(2) | D3DFVF_TEXCOORDSIZE4(3) | D3DFVF_TEXCOORDSIZE4(4) | D3DFVF_TEXCOORDSIZE4(5) |
 			D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
-		rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
-		rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
+		rt_Bloom_1 = createUnique(r2_RT_bloom1, w, h, fmt);
+		rt_Bloom_2 = createUnique(r2_RT_bloom2, w, h, fmt);
 		g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RCache.QuadIB);
 		g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
 		s_bloom_dbg_1.create("effects\\screen_set", r2_RT_bloom1);
@@ -936,8 +939,8 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 	//SMAA
 	{
-		rt_smaa_edgetex.create(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
-		rt_smaa_blendtex.create(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
+		rt_smaa_edgetex = createUnique(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
+		rt_smaa_blendtex = createUnique(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
 
 		s_smaa.create(b_smaa, "r3\\smaa");
 	}
@@ -1553,8 +1556,8 @@ bool CRenderTarget::use_minmax_sm_this_frame()
 	case CRender::MMSM_AUTODETECT:
 		{
 			u32 dwScreenArea =
-				HW.m_ChainDesc.Width *
-				HW.m_ChainDesc.Height;
+				Width *
+				Height;
 
 			if ((dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold))
 				return need_to_render_sunshafts();

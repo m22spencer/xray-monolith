@@ -229,7 +229,11 @@ public:
 
 	void render_sun_cascade(u32 cascade_ind);
 	void init_cacades();
+	void shadowmap_sun_cascades();
 	void render_sun_cascades();
+
+	void shadowmap_sun_cascade(u32 cascade_ind);
+	void shadowmap_sun_cascades(u32 cascade_ind);
 
 public:
 	ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
