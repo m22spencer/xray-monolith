@@ -1,7 +1,6 @@
-#include "night_vision.h"
 #include "common.h"
 
-float4 main(p_screen I,  float4 pos2d : SV_POSITION) : SV_Target
+float4 main(v2p_TL I) : SV_Target
 {
-	return float4(s_image.Sample(smp_base, I.tc0).rgb, 1.0);
+	return float4(s_image.Sample(smp_base, I.Tex0).rgb, 1.0);
 } 
