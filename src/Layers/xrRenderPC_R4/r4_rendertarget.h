@@ -233,11 +233,27 @@ public:
 		Fmatrix Matrix_previous, Matrix_current;
 		Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
 		Fvector3 Position_previous;
-		float RVelocity;
 	} Previous[2];	
 
 	PreviousData* GetPrevious() {
-		return &Previous[Device.m_SecondViewport.IsSVPFrame()];
+
+		auto p = &Previous[0];
+
+		auto svp = Device.m_SecondViewport.IsSVPFrame();
+		
+		auto curr = Device.matrices[svp];
+		auto prev = Device.matrices_previous[svp];
+
+		p->Matrix_current = curr.mProject;
+		p->Matrix_HUD_current = curr.mProjectHud;
+		
+		p->Matrix_previous = prev.mProject;
+		p->Matrix_HUD_previous = prev.mProjectHud;
+
+		p->Position_previous = {0, 0, 0};
+		prev.mView.invert().transform(p->Position_previous);
+
+		return p;
 	}
 	
 	ref_shader s_ssfx_dumb;
