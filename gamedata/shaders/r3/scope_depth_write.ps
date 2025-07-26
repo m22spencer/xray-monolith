@@ -36,7 +36,13 @@ PSOutput main(vf i)
         discard;
     }
     if (scope_phase & SCOPE_PHASE_GBUFFER) {
-        output.target3 = float4(0, 0, 1, 1); //velocity and masking
+        // Temporary hack for fixing blur in scope
+        //     we write some garbage to g-buffer position
+        // FIXME: output the correct information here
+        const float4 NO_BLUR = float4(100.0, 100.0, 100.0, 1.0);
+ 
+        output.target2 = NO_BLUR;            // gbuffer-position
+        output.target3 = float4(0, 0, 1, 1); // gbuffer-motionvectors
     }
     if (scope_phase & SCOPE_PHASE_DEPTHWRITE) {
         output.depth = scope_depth_value;

@@ -281,7 +281,7 @@ void CRenderTarget::phase_3DSSReticle()
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB->pZRT);
+	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB->pZRT);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
@@ -299,17 +299,11 @@ void CRenderTarget::phase_3DSSReticle()
 		});
 	}
 
-	{   PIX_EVENT(SCOPE_PHASE_DISCARD);
-		draw_scope(s_scope_color_write, [](auto N) -> void {
-			RCache.set_c("scope_phase", 0); //Discard
-		});
-	}
-
 	{   PIX_EVENT(SCOPE_PHASE_DEPTHWRITE);
 	// write far plane
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
-			RCache.set_c("scope_phase", 2); //DEPTHWRITE
-			RCache.set_c("scope_depth_value", 1);
+			RCache.set_c("scope_phase", 2 | 1); //DEPTHWRITE + GBUFFER
+			RCache.set_c("scope_depth_value", -1);
 		});
 	}
 
