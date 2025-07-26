@@ -299,10 +299,10 @@ void CRenderTarget::phase_3DSSReticle()
 		});
 	}
 
-	{   PIX_EVENT(SCOPE_PHASE_DEPTHWRITE);
+	{   PIX_EVENT(SCOPE_PHASE_CUSTOM_DEPTH);
 	// write far plane
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
-			RCache.set_c("scope_phase", 2 | 1); //DEPTHWRITE + GBUFFER
+			RCache.set_c("scope_phase", 2 | 32); //DEPTHWRITE + CUSTOM_DEPTH
 			RCache.set_c("scope_depth_value", -1);
 		});
 	}

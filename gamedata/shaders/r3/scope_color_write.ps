@@ -1,22 +1,11 @@
 #include "scope_common.h"
 
-Texture2D s_pip_tex;
-Texture2D s_3dss_tex;
-Texture2D s_reticle;
+// Forward declare functions for better error messages
+float3 scope_custom_image(float2 tc);
+#include "scope_custom_image.h"
 
-uniform int scope_svp;
-float isSVPActive() { return scope_svp; }
-
-uniform float4 s3ds_param_2;
-float zoomFactor() {
-    return s3ds_param_2.w;
-}
-
-float3 scope_color(float2 tc) {
-    return isSVPActive() 
-        ? s_pip_tex.Sample(smp_base, tc)
-        : s_3dss_tex.Sample(smp_base, tc);
-}
+float4 scope_custom_reticle(float2 tc);
+#include "scope_custom_reticle.h"
 
 float4 main(vf I) : SV_Target 
 {
@@ -29,15 +18,12 @@ float4 main(vf I) : SV_Target
         discard;
     }
 
-    if (scope_phase & PHASE_SCOPE_IMAGE) {
-        o =  float4(scope_color(tc), 1.0);
+    if (scope_phase & SCOPE_PHASE_IMAGE) {
+        o =  float4(scope_custom_image(tc), 1.0);
     }
 
-    if (scope_phase & PHASE_SCOPE_RETICLE) {
-        o = s_reticle.Sample(smp_base, I.tc0.xy);
-        bool opaque = s_reticle.SampleLevel(smp_base, I.tc0.xy, 10).a > .99;
-        if (opaque)
-            o.a = length(o.xyz);
+    if (scope_phase & SCOPE_PHASE_RETICLE) {
+        o = scope_custom_reticle(I.tc0);
     }
 
     return o;

@@ -2,38 +2,12 @@
 #define SCOPE_DEFINES_H
 
 
-
-
-
 #define SCOPE_PHASE_GBUFFER 1
 #define SCOPE_PHASE_DEPTHWRITE 2
 #define SCOPE_PHASE_DISTORTION 4
-#define PHASE_SCOPE_IMAGE 8
-#define PHASE_SCOPE_RETICLE 16
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#define SCOPE_PHASE_IMAGE 8
+#define SCOPE_PHASE_RETICLE 16
+#define SCOPE_PHASE_CUSTOM_DEPTH 32
 
 
 #endif
