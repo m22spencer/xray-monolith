@@ -167,6 +167,8 @@ public:
 	// HDR10
 	ref_rt rt_HDR10_HalfRes[2];
 
+	ref_texture t_reticle;
+
 	// env
 	ref_texture t_envmap_0; // env-0
 	ref_texture t_envmap_1; // env-1

@@ -616,6 +616,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		rt_dof = createUnique(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
 
 		rt_secondVP = createUnique(r2_RT_secondVP, w, h, rt_Color->fmt, 1);
+		t_reticle.create("$user$reticle");
 
 		if (RImplementation.o.dx11_hdr10) {
 			rt_ui_pda = createUnique(r2_RT_ui, w, h, D3DFMT_A2R10G10B10); // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM

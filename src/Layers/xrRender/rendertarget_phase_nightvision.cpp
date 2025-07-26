@@ -204,6 +204,9 @@ void CRenderTarget::phase_heatvision()
 #if defined(USE_DX11)	
 void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
 {
+	auto elem = se ? se->E[0] : nullptr;
+	if (!elem)
+		return;
 	Fmatrix FTold = Device.mFullTransform;
 
 	Device.mFullTransform = Device.mFullTransformHud;
@@ -215,14 +218,10 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 	for (auto N : RImplementation.mapScopeHUDSorted) {
 		dxRender_Visual* V = N.val.pVisual;
 
-		// FIXME: Bit of a hack here to remap t_base -> "$user$reticle"
-		//    just for this shader invocation
-		{
-			ref_texture t; t.create("$user$reticle");
-			auto remap = RCache.TextureOverrides.emplace(t._get(), V->GetTexture());
-			RCache.set_Element(se->E[0]._get());
-			RCache.TextureOverrides.erase(t._get());
-		}
+		auto tex = V->GetTexture();
+		if (tex)
+			t_reticle->surface_set(tex->surface_get());
+		RCache.set_Element(elem);
 
 		RCache.set_xform_world(N.val.Matrix);
 		RImplementation.apply_object(N.val.pObject);
@@ -288,32 +287,31 @@ void CRenderTarget::phase_3DSSReticle()
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
-	// For now, we need to feed the data back to Level() svp code
-	auto distort = bDistort;
-	auto f = [this, distort]() -> void {
-
+	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 8); //PHASE_SCOPE_IMAGE
 		});
+	}
 
+	{   PIX_EVENT(SCOPE_PHASE_RETICLE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 16); //PHASE_SCOPE_RETICLE
 		});
+	}
 
+	{   PIX_EVENT(SCOPE_PHASE_DISCARD);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", 0); //Discard
 		});
+	}
 
-
-		// write far plane
+	{   PIX_EVENT(SCOPE_PHASE_DEPTHWRITE);
+	// write far plane
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
 			RCache.set_c("scope_phase", 2); //DEPTHWRITE
 			RCache.set_c("scope_depth_value", 1);
 		});
-	};
-
-	// Make sure to actually render the reticle
-	f();
+	}
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB->pZRT);
 };
