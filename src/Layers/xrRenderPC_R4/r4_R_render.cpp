@@ -421,8 +421,10 @@ void CRender::Render()
 			HW.pContext->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH, 1.0f, 0);
 		}*/
 
+
 		if (RImplementation.o.ssfx_motionvectors)
 		{
+			PIX_EVENT(ssfx_motionvectors);
 			Target->u_setrt(Device.dwWidth, Device.dwHeight, 0, 0, Target->rt_ssfx_motion_vectors->pRT, 0);
 
 			FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -451,7 +453,6 @@ void CRender::Render()
 		{
 			PIX_EVENT(DEFER_PART0_NO_SPLIT);
 			// level, DO NOT SPLIT
-			Target->phase_scene_begin();
 			r_dsgraph_render_hud();
 			r_dsgraph_render_graph(0);
 			r_dsgraph_render_lods(true, true);
@@ -465,9 +466,9 @@ void CRender::Render()
 		else
 		{
 			PIX_EVENT(DEFER_PART0_SPLIT);
+			Target->phase_scene_begin();
 
 			// level, SPLIT
-			Target->phase_scene_begin();
 
 			{
 				PIX_EVENT(RENDER_HUD_EARLY);
@@ -764,20 +765,16 @@ void CRender::Render()
 
 	{
 		PIX_EVENT(DRAW_MAIN);
-		TargetMain->SetActive();
-		auto m = Device.matrices[0];
-		SetMatrices(m.mView, m.mProject, m.mProjectHud);
 		renderGBuffer();
 	}
 
 
 	if (Device.m_SecondViewport.IsSVPActive()) {
-		TargetSVP->SetActive();
 		auto m = Device.matrices[1];
+		g_pGamePersistent->m_pGShaderConstants->hud_params.w = true;
+		Device.m_SecondViewport.isSVPFrame = true;
 		SetMatrices(m.mView, m.mProject, m.mProjectHud);
-		g_pGamePersistent->m_pGShaderConstants->hud_params.w
-			= Device.m_SecondViewport.isSVPFrame
-			= true;
+		TargetSVP->SetActive();
 		{
 			PIX_EVENT(DRAW_SVP);
 			renderGBuffer();
@@ -785,17 +782,14 @@ void CRender::Render()
 		{
 			PIX_EVENT(COMBINE_SVP);
 			combineGBuffer();
-		}
-		m = Device.matrices[0];
-		SetMatrices(m.mView, m.mProject, m.mProjectHud);
-		g_pGamePersistent->m_pGShaderConstants->hud_params.w
-			= Device.m_SecondViewport.isSVPFrame
-			= false;
+		}		
 	}
 
-	TargetMain->SetActive();
 	auto m = Device.matrices[0];
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
+	Device.m_SecondViewport.isSVPFrame = false;
 	SetMatrices(m.mView, m.mProject, m.mProjectHud);
+	TargetMain->SetActive();
 	{
 		PIX_EVENT(COMBINE_MAIN);
 		combineGBuffer();

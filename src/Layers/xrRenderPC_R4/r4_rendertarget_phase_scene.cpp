@@ -35,6 +35,7 @@ void CRenderTarget::phase_scene_prepare()
 // begin
 void CRenderTarget::phase_scene_begin()
 {
+	PIX_EVENT(phase_scene_begin);
 	SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);	
 	
 	ID3DDepthStencilView* pZB = baseZB->pZRT;

@@ -46,19 +46,11 @@ void CRender::SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_h
 
 void CRender::Calculate()
 {
-	Device.matrices[0].mView = Device.mView;
-	Device.matrices[0].mProject = Device.mProject;
-	Device.matrices[0].mProjectHud = Device.mProjectHud;
-
-	Device.matrices_previous[0].mView = Device.matrices[0].mView;
-	Device.matrices_previous[0].mProject = Device.matrices[0].mProject;
-	Device.matrices_previous[0].mProjectHud = Device.matrices[0].mProjectHud;
-
-	Device.matrices_previous[1].mView = Device.matrices[1].mView;
-	Device.matrices_previous[1].mProject = Device.matrices[1].mProject;
-	Device.matrices_previous[1].mProjectHud = Device.matrices[1].mProjectHud;
-
-	SetMatrices(Device.matrices_previous[0].mView, Device.matrices_previous[0].mProject, Device.matrices_previous[0].mProjectHud);
+	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
+	Device.m_SecondViewport.isSVPFrame = false;
+	auto m = Device.matrices[0];
+	SetMatrices(m.mView, m.mProject, m.mProjectHud);
+	TargetMain->SetActive();
 
 	// Transfer to global space to avoid deep pointer access
 	IRender_Target* T = getTarget();
