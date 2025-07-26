@@ -515,53 +515,55 @@ void CRender::Render()
 		}
 
 		//******* Occlusion testing of volume-limited light-sources
-		Target->phase_occq();
-		LP_normal.clear();
-		LP_pending.clear();
-		if (RImplementation.o.dx10_msaa)
-			RCache.set_ZB(RImplementation.Target->rt_MSAADepth->pZRT);
-		{
-			PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-			// perform tests
-			u32 count = 0;
-			light_Package& LP = Lights.package;
-
-			// stats
-			stats.l_shadowed = LP.v_shadowed.size();
-			stats.l_unshadowed = LP.v_point.size() + LP.v_spot.size();
-			stats.l_total = stats.l_shadowed + stats.l_unshadowed;
-
-			// perform tests
-			count = _max(count, LP.v_point.size());
-			count = _max(count, LP.v_spot.size());
-			count = _max(count, LP.v_shadowed.size());
-			for (u32 it = 0; it < count; it++)
+		if (Target == TargetMain) {
+			Target->phase_occq();
+			LP_normal.clear();
+			LP_pending.clear();
+			if (RImplementation.o.dx10_msaa)
+				RCache.set_ZB(RImplementation.Target->rt_MSAADepth->pZRT);
 			{
-				if (it < LP.v_point.size())
+				PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+				// perform tests
+				u32 count = 0;
+				light_Package& LP = Lights.package;
+
+				// stats
+				stats.l_shadowed = LP.v_shadowed.size();
+				stats.l_unshadowed = LP.v_point.size() + LP.v_spot.size();
+				stats.l_total = stats.l_shadowed + stats.l_unshadowed;
+
+				// perform tests
+				count = _max(count, LP.v_point.size());
+				count = _max(count, LP.v_spot.size());
+				count = _max(count, LP.v_shadowed.size());
+				for (u32 it = 0; it < count; it++)
 				{
-					light* L = LP.v_point[it];
-					L->vis_prepare();
-					if (L->vis.pending) LP_pending.v_point.push_back(L);
-					else LP_normal.v_point.push_back(L);
-				}
-				if (it < LP.v_spot.size())
-				{
-					light* L = LP.v_spot[it];
-					L->vis_prepare();
-					if (L->vis.pending) LP_pending.v_spot.push_back(L);
-					else LP_normal.v_spot.push_back(L);
-				}
-				if (it < LP.v_shadowed.size())
-				{
-					light* L = LP.v_shadowed[it];
-					L->vis_prepare();
-					if (L->vis.pending) LP_pending.v_shadowed.push_back(L);
-					else LP_normal.v_shadowed.push_back(L);
+					if (it < LP.v_point.size())
+					{
+						light* L = LP.v_point[it];
+						L->vis_prepare();
+						if (L->vis.pending) LP_pending.v_point.push_back(L);
+						else LP_normal.v_point.push_back(L);
+					}
+					if (it < LP.v_spot.size())
+					{
+						light* L = LP.v_spot[it];
+						L->vis_prepare();
+						if (L->vis.pending) LP_pending.v_spot.push_back(L);
+						else LP_normal.v_spot.push_back(L);
+					}
+					if (it < LP.v_shadowed.size())
+					{
+						light* L = LP.v_shadowed[it];
+						L->vis_prepare();
+						if (L->vis.pending) LP_pending.v_shadowed.push_back(L);
+						else LP_normal.v_shadowed.push_back(L);
+					}
 				}
 			}
+			LP_normal.sort();
+			LP_pending.sort();
 		}
-		LP_normal.sort();
-		LP_pending.sort();
 
 		//******* Main render :: PART-1 (second)
 		if (split_the_scene_to_minimize_wait)
