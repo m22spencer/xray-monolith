@@ -645,11 +645,6 @@ void CRender::Render()
 
 	};
 
-	auto renderShadowmaps = [&]() -> void {
-		PIX_EVENT(RENDER_SHADOWMAPS);
-		
-	};
-
 	auto combineGBuffer = [&]() -> void {
 		PIX_EVENT(COMBINE_GBUFFER);
 		Device.dwViewport++;
@@ -703,8 +698,6 @@ void CRender::Render()
 		if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
 		{
 			RImplementation.stats.l_visible++;
-			if (!Device.m_SecondViewport.IsSVPFrame())
-				shadowmap_sun_cascades();
 			render_sun_cascades();
 			Target->accum_direct_blend();
 		}
@@ -763,20 +756,13 @@ void CRender::Render()
 		}
 	};
 
+	TargetMain->SetActive();
 	{
 		PIX_EVENT(DRAW_MAIN);
 		renderGBuffer();
 	}
 
-	{
-		renderShadowmaps();
-	}
-
 	if (Device.m_SecondViewport.IsSVPActive()) {
-		auto m = Device.matrices[1];
-		g_pGamePersistent->m_pGShaderConstants->hud_params.w = true;
-		Device.m_SecondViewport.isSVPFrame = true;
-		SetMatrices(m.mView, m.mProject, m.mProjectHud);
 		TargetSVP->SetActive();
 		{
 			PIX_EVENT(DRAW_SVP);
@@ -788,10 +774,6 @@ void CRender::Render()
 		}		
 	}
 
-	auto m = Device.matrices[0];
-	g_pGamePersistent->m_pGShaderConstants->hud_params.w = false;
-	Device.m_SecondViewport.isSVPFrame = false;
-	SetMatrices(m.mView, m.mProject, m.mProjectHud);
 	TargetMain->SetActive();
 	{
 		PIX_EVENT(COMBINE_MAIN);

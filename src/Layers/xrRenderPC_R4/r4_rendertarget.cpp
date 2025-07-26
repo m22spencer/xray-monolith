@@ -348,6 +348,13 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 }
 
 void CRenderTarget::SetActive() {
+	auto isMain = this == RImplementation.TargetMain;
+	auto m = Device.matrices[isMain ? 0 : 1];
+	if (g_pGamePersistent) {
+		g_pGamePersistent->m_pGShaderConstants->hud_params.w = !isMain;
+		Device.m_SecondViewport.isSVPFrame = !isMain;
+		RImplementation.SetMatrices(m.mView, m.mProject, m.mProjectHud);
+	}
 	RImplementation.Target = this;
 	RCache.TextureOverrides = RenderTargetRemaps;
 
