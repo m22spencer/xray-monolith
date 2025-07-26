@@ -347,6 +347,7 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 		*dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
+#if USE_DX11 
 void CRenderTarget::SetActive() {
 	auto isMain = this == RImplementation.TargetMain;
 	auto m = Device.matrices[isMain ? 0 : 1];
@@ -367,7 +368,17 @@ void CRenderTarget::SetActive() {
 	Device.fASPECT = (float)Height / (float)Width;
 	Device.fWidth_2 = Width >> 1;
 	Device.fHeight_2 = Height >> 1;
+
+	set_viewport_size(HW.pContext, Width, Height);
+	RCache.set_RT(baseRT->pRT, 0);
+	RCache.set_RT(nullptr, 1);
+	RCache.set_RT(nullptr, 2);
+	RCache.set_RT(nullptr, 3);
+	RCache.set_ZB(baseZB->pZRT);
+
+	RCache.set_Constants(nullptr);	
 }
+#endif
 
 CRenderTarget::CRenderTarget()
 	: CRenderTarget(nullptr, Device.dwWidth, Device.dwHeight)

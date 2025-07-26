@@ -1424,6 +1424,11 @@ void CRender::shadowmap_sun_cascade(u32 cascade_ind)
 		PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
 		Target->create_minmax_SM();
 	}
+
+	// Restore XForms
+	RCache.set_xform_world(Fidentity);
+	RCache.set_xform_view(Device.mView);
+	RCache.set_xform_project(Device.mProject);
 }
 
 void CRender::render_sun_cascade(u32 cascade_ind)
