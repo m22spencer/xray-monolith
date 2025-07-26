@@ -356,7 +356,10 @@ void CRenderTarget::SetActive() {
 		RImplementation.SetMatrices(m.mView, m.mProject, m.mProjectHud);
 	}
 	RImplementation.Target = this;
-	RCache.TextureOverrides = RenderTargetRemaps;
+
+	for (auto rt : RenderTargetRemaps) {
+		rt.first->surface_set(rt.second->pSurface);
+	}
 
 	Device.dwWidth = Width;
 	Device.dwHeight = Height;
@@ -383,14 +386,14 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false) -> ref_rt {
 		ref_rt rt;
 
-		ref_texture dummy_texture;
-		dummy_texture.create(Name);
 
 		auto name = Name + ("$" + id);
 		rt.create(name.c_str(), w, h, f, SampleCount, useUAV);
 
-		RenderTargetDummies.push_back(dummy_texture);
-		RenderTargetRemaps.emplace(dummy_texture._get(), rt->pTexture._get());
+		ref_texture t;
+		t.create(Name);
+
+		RenderTargetRemaps.push_back({t, rt});
 
 		return rt;
 	};

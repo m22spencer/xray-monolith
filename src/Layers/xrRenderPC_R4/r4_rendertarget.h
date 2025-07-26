@@ -414,8 +414,7 @@ private:
 	bool m_bHasActiveVolumetric;
 	bool m_bHasActiveVolumetric_spot;
 
-	xr_list<ref_texture> RenderTargetDummies;
-	xr_map<CTexture*, CTexture*> RenderTargetRemaps;
+	xr_list<std::pair<ref_texture,ref_rt>> RenderTargetRemaps;
 public:
 	CRenderTarget();
 	CRenderTarget(LPCSTR name, u32 width, u32 height);

@@ -242,12 +242,6 @@ void CBackend::set_Textures(STextureList* _T)
 		u32 load_id = loader.first;
 		CTexture* load_surf = &*loader.second;
 
-#if USE_DX11
-		CTexture* o = TextureOverrides[load_surf];
-		if (o)
-			load_surf = o;
-#endif
-
 		//		if (load_id < 256)		{
 		if (load_id < CTexture::rstVertex)
 		{
