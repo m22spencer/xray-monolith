@@ -703,7 +703,6 @@ void CRender::Render()
 		if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
 		{
 			RImplementation.stats.l_visible++;
-			renderShadowmaps();
 			render_sun_cascades();
 			Target->accum_direct_blend();
 		}
@@ -774,6 +773,16 @@ void CRender::Render()
 			PIX_EVENT(DRAW_SVP);
 			renderGBuffer();
 		}
+	}
+
+	{
+		PIX_EVENT(DRAW_SHADOWMAPS);
+		TargetMain->SetActive();
+		renderShadowmaps();
+	}
+
+	if (Device.m_SecondViewport.IsSVPActive()) {
+		TargetSVP->SetActive();
 		{
 			PIX_EVENT(COMBINE_SVP);
 			combineGBuffer();

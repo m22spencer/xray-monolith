@@ -1435,6 +1435,10 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
 	HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, fuckingsun->rt_smap_depth->pSurface);
 
+	RCache.set_xform_world(Fidentity);
+	RCache.set_xform_view(Fidentity);
+	RCache.set_xform_project(fuckingsun->X.D.combine);
+
 	// Accumulate
 	{
 		PIX_EVENT(SE_SUN_ACCUMULATE);
