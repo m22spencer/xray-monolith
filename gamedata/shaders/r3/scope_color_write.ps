@@ -1,12 +1,8 @@
-#include "common.h"
+#include "scope_common.h"
 
 Texture2D s_pip_tex;
 Texture2D s_3dss_tex;
 Texture2D s_reticle;
-
-#define PHASE_SCOPE_IMAGE 8
-#define PHASE_SCOPE_RETICLE 16
-int scope_phase;
 
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
@@ -21,11 +17,6 @@ float3 scope_color(float2 tc) {
         ? s_pip_tex.Sample(smp_base, tc)
         : s_3dss_tex.Sample(smp_base, tc);
 }
-
-struct vf {
-    float4 hpos : SV_Position;
-    float2 tc0  : TEXCOORD0;
-};
 
 float4 main(vf I) : SV_Target 
 {

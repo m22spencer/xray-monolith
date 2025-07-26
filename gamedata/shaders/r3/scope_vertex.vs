@@ -1,4 +1,4 @@
-#include "common.h"
+#include "scope_common.h"
 
 
 struct v_in
@@ -6,12 +6,6 @@ struct v_in
 	float4	P		: POSITION;		// (float,float,float,1)
 	float3	N		: NORMAL;		// (nx,ny,nz)
 	float2	tc		: TEXCOORD0;	// (u,v)
-};
-
-
-struct vf {
-    float4 hpos : SV_Position;
-    float2 tc0  : TEXCOORD0;
 };
 
 vf main(v_in i) {

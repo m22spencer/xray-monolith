@@ -1,4 +1,4 @@
-#include "common.h"
+#include "scope_common.h"
 
 // Add to surface depth to handle precision issues
 #define EPSILON 0.0001f
@@ -6,17 +6,6 @@
 // If >= 0, write a specific fixed depth
 //   used for setting near and far rendering distance
 uniform float scope_depth_value;
-
-#define SCOPE_PHASE_GBUFFER 1
-#define SCOPE_PHASE_DEPTHWRITE 2
-#define SCOPE_PHASE_DISTORTION 4
-
-int scope_phase;
-
-struct vf {
-    float4 hpos : SV_Position;
-    float2 tc0  : TEXCOORD0;
-};
 
 struct PSOutput
 {
