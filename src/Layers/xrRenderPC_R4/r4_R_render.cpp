@@ -645,6 +645,11 @@ void CRender::Render()
 
 	};
 
+	auto renderShadowmaps = [&]() -> void {
+		PIX_EVENT(RENDER_SHADOWMAPS);
+		shadowmap_sun_cascades();
+	};
+
 	auto combineGBuffer = [&]() -> void {
 		PIX_EVENT(COMBINE_GBUFFER);
 		Device.dwViewport++;
@@ -698,6 +703,7 @@ void CRender::Render()
 		if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
 		{
 			RImplementation.stats.l_visible++;
+			renderShadowmaps();
 			render_sun_cascades();
 			Target->accum_direct_blend();
 		}
