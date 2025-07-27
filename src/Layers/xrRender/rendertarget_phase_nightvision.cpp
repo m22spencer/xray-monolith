@@ -267,6 +267,9 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 		RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
 		set_v3("scope_w_ffp", Device.m_SecondViewport.w_ffp);
 		set_v3("scope_w_sfp", Device.m_SecondViewport.w_sfp);
+		Fvector pt = {0,0,0};
+		Device.m_SecondViewport.eyepiece.m_W.transform(pt);
+		set_v3("scope_w_eyepiece", pt);
 
 		bind(&N);
 		V->Render(0);

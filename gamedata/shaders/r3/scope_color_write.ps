@@ -9,7 +9,7 @@ float3 scope_custom_image(Scope s);
 float4 scope_custom_reticle(Scope s);
 #include "scope_custom_reticle.h"
 
-float4 main(Scope I) : SV_Target 
+float4 main(v_out I) : SV_Target 
 {
     float2 tc = isSVPActive() 
         ? I.tc0.xy
@@ -21,11 +21,11 @@ float4 main(Scope I) : SV_Target
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-        o =  float4(scope_custom_image(I), 1.0);
+        o =  float4(scope_custom_image(new_Scope(I, true)), 1.0);
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
-        o = scope_custom_reticle(I);
+        o = scope_custom_reticle(new_Scope(I, false));
     }
 
     return o;

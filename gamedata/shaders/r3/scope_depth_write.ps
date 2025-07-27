@@ -22,7 +22,7 @@ struct PSOutput
 	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
-PSOutput main(Scope I)
+PSOutput main(v_out I)
 {
 	PSOutput output;
     output.depth = I.hpos.z + EPSILON;
@@ -47,7 +47,7 @@ PSOutput main(Scope I)
         //NYI
     }
     if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        output.target2 = scope_custom_depth(I);
+        output.target2 = scope_custom_depth(new_Scope(I, true));
     }
 
 	return output;

@@ -11,9 +11,9 @@ struct	v_in
 	float2	tc		: TEXCOORD0;	// (u,v)
 };
 
-Scope     main (v_in v)
+v_out     main (v_in v)
 {
-    Scope o;
+    v_out o;
 
     o.hpos = mul(m_WVP, v.P);
     o.tc0 = v.tc.xy;
