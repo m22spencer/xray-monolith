@@ -26,6 +26,9 @@ Texture2D s_pip_tex;
 Texture2D s_3dss_tex;
 Texture2D s_reticle;
 
+float4 scope_w_ffp;
+float4 scope_w_sfp;
+
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
 
@@ -34,6 +37,10 @@ float zoomFactor() {
     return s3ds_param_2.w;
 }
 
+uniform float4 shader_scope_params;
+float curMag() { return shader_scope_params.x; }
+float minMag() { return shader_scope_params.y; }
+float maxMag() { return shader_scope_params.z; }
 
 
 

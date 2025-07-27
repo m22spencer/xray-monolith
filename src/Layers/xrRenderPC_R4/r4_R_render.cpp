@@ -245,7 +245,7 @@ void debug_scope(Fmatrix scope_camera) {
 		lens.m_W.transform(v1);
 
 		CDebugRenderer().draw_line(Fmatrix().identity(), v0, v1, color, true);
-		};
+	};
 
 	auto draw_camera = [scope_camera, draw_circle](u32 color) -> void {
 		auto cm = 1.0 / 100.0;

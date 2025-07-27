@@ -152,6 +152,9 @@ public:
 		Lens eyepiece;
 		Lens objective;
 
+		Fvector3 w_ffp;
+		Fvector3 w_sfp;
+
 		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
 		Irect computeRect(float width, float height) {
 			Fvector v = { width, height };

@@ -202,6 +202,39 @@ void CRenderTarget::phase_heatvision()
 //--DSR-- HeatVision_start
 
 #if defined(USE_DX11)	
+void ffp_sfp(bool drawDebug) {
+	auto e = Device.m_SecondViewport.eyepiece;
+	auto o = Device.m_SecondViewport.objective;
+
+	Fvector p_e = {0,0,0}; e.m_W.transform(p_e);
+	Fvector p_o = {0,0,0}; o.m_W.transform(p_o);
+
+	Fvector p_d =  Fvector(p_o).sub(p_e);
+
+	Fvector p_c1 = Fvector(p_d).mul(0.4).add(p_e);
+	Fvector p_c2 = Fvector(p_d).mul(0.6).add(p_e);
+
+	if (drawDebug) {
+		Fvector u_e = {0,e.radius,0}; e.m_W.transform_dir(u_e);
+		Fvector u_o = {0,o.radius,0}; e.m_W.transform_dir(u_o);
+		Fvector u_c = {0,(o.radius + e.radius)*0.3,0}; e.m_W.transform_dir(u_c);
+
+
+		auto d = CDebugRenderer();
+		d.draw_line(Fmatrix(), Fvector(p_e).add(u_e), Fvector(p_c1).sub(u_c), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_e).sub(u_e), Fvector(p_c1).add(u_c), 0xffffffff, true);
+
+		d.draw_line(Fmatrix(), Fvector(p_c1).add(u_c), Fvector(p_c2).add(u_c), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_c1).sub(u_c), Fvector(p_c2).sub(u_c), 0xffffffff, true);
+
+		d.draw_line(Fmatrix(), Fvector(p_c2).add(u_c), Fvector(p_o).sub(u_o), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_c2).sub(u_c), Fvector(p_o).add(u_o), 0xffffffff, true);
+	}
+	
+	Device.m_SecondViewport.w_ffp = Fvector(p_c1).add(p_e).mul(0.5);
+	Device.m_SecondViewport.w_sfp = Fvector(p_c2).add(p_o).mul(0.5);
+}
+
 void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
 {
 	auto elem = se ? se->E[0] : nullptr;
@@ -227,7 +260,13 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 		RImplementation.apply_object(N.val.pObject);
 		RImplementation.apply_lmaterial();
 
+		auto set_v3 = [](LPCSTR id, Fvector3 v) -> void {
+			RCache.set_c(id, v.x, v.y, v.z, 1.0);
+		};
+
 		RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
+		set_v3("scope_w_ffp", Device.m_SecondViewport.w_ffp);
+		set_v3("scope_w_sfp", Device.m_SecondViewport.w_sfp);
 
 		bind(&N);
 		V->Render(0);
@@ -258,6 +297,9 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 				// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
 				p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
 				p->objective.radius = o.w;
+			
+			
+				ffp_sfp(scope_debug >= 3);
 			}
 		}
 	}
@@ -270,7 +312,6 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 
 	RImplementation.o.distortion = FALSE;
 }
-
 
 //  Redotix99: for 3D Shader Based Scopes 		(sorry for using the nightvision phase file)
 void CRenderTarget::phase_3DSSReticle()
