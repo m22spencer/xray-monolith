@@ -6,6 +6,8 @@
 #include "common.h"
 #include "scope_defines.h"
 
+#define ASPECT_CORRECT_TC(tc) (tc - 0.5) * float2(screen_res.x/screen_res.y, 1.0) + 0.5;
+
 int scope_phase;
 
 struct Scope
@@ -61,12 +63,11 @@ float2 ndc2(float4 p) {
 
 float dbg_wp(v_out v, float4 p, float d) {
 	float2 screen_tc = v.hpos.xy * screen_res.zw;
-	float2 aspect = float2(screen_res.x/screen_res.y, 1.0);
 	float2 ffp_ndc = ndc2(mul(m_VP, p));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
 
-	float2 ffp_tc_a = (ffp_tc - 0.5) * aspect + 0.5;
-	float2 screen_tc_a = (screen_tc - 0.5) * aspect + 0.5;
+	float2 ffp_tc_a = ASPECT_CORRECT_TC(ffp_tc);
+	float2 screen_tc_a = ASPECT_CORRECT_TC(screen_tc);
 
 	return distance(ffp_tc_a, screen_tc_a) < d ? 1.0 : 0.0;
 }
