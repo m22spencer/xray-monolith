@@ -170,6 +170,9 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.27**
+* Lucy: Model Visbox Update and Script Attachment Fixes (https://github.com/themrdemonized/xray-monolith/pull/306)
+
 **2025.07.26**
 * Nearby traders' inventory will be updated in advance
 * Sound:
