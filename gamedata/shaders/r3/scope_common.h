@@ -72,17 +72,45 @@ float dbg_wp(v_out v, float4 p, float d) {
 	return distance(ffp_tc_a, screen_tc_a) < d ? 1.0 : 0.0;
 }
 
-Scope new_Scope(v_out v, bool is_tc) {
+float2 world_to_corrected_tc(v_out v, float4 w_P) {
+	float2 screen_tc = v.hpos.xy * screen_res.zw;
+	float2 ffp_ndc = ndc2(mul(m_VP, w_P));
+	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
+
+	return ASPECT_CORRECT_TC(ffp_tc);
+}
+
+Scope new_Scope(v_out v, float tc_multiplier) {
 	float factor = 4.0;
 
 	Scope s;
-	float2 tc = is_tc && isSVPActive() ? v.tc0 : v.hpos.xy * screen_res.zw;
+	float2 tc = isSVPActive() ? v.tc0 : v.hpos.xy * screen_res.zw;
     
 	float r = dbg_wp(v, scope_w_eyepiece, .002);
 	float g = dbg_wp(v, scope_w_ffp, .004);
 	float b = dbg_wp(v, scope_w_sfp, .008);
 	s.dbg = float4(r, g-r, b-(g+r), max(max(r,g),b));
 
+	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
+	
+	{
+		// COMPUTE FFP
+		float2 ffp_tc = world_to_corrected_tc(v, scope_w_ffp);
+		float2 ffp_offset_tc = eye_tc - ffp_tc;
+
+
+		// FIXME: Aspect correct TC?
+		s.ffp = tc + ffp_offset_tc*tc_multiplier;
+	}
+
+	{
+		// COMPUTE SFP
+		float2 sfp_tc = world_to_corrected_tc(v, scope_w_sfp);
+		float2 sfp_offset_tc = eye_tc - sfp_tc;
+		s.sfp = (tc - 0.5) / curMag() + 0.5 + sfp_offset_tc*tc_multiplier;
+	}
+
+	/*
 	float2 screen_tc = v.hpos.xy * screen_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, scope_w_ffp));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
@@ -94,6 +122,7 @@ Scope new_Scope(v_out v, bool is_tc) {
 
 	s.ffp = tc + ffp_screen.xy*factor;
 	s.sfp = (tc - 0.5) / curMag() + 0.5 + sfp_screen.xy*factor;
+	*/
 
 	s.tc0 = v.tc0;
 	s.hpos = v.hpos;
