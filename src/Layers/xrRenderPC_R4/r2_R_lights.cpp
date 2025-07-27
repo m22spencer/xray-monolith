@@ -63,20 +63,9 @@ void CRender::render_lights(light_Package& LP)
 	// 1. calculate area + sort in descending order
 	// const	u16		smap_unassigned		= u16(-1);
 	{
-		xr_vector<light*>& source = LP.v_shadowed;
-		for (u32 it = 0; it < source.size(); it++)
+		for (auto L : LP.v_shadowed)
 		{
-			light* L = source[it];
-			L->vis_update();
-			if (!L->vis.visible)
-			{
-				source.erase(source.begin() + it);
-				it--;
-			}
-			else
-			{
-				LR.compute_xf_spot(L);
-			}
+			LR.compute_xf_spot(L);
 		}
 	}
 
@@ -101,59 +90,61 @@ void CRender::render_lights(light_Package& LP)
 		// if (has_spot_shadowed)
 		stats.s_used ++;
 
-		// generate spot shadowmap
-		Target->phase_smap_spot_clear();
-		L->X.S.posX = 0;
-		L->X.S.posY = 0;
-		u16 sid = L->vis.smap_ID;
-		if (L->smap_render_frame < Device.dwFrame && !Device.m_SecondViewport.IsSVPFrame()) {
-			L->smap_render_frame = Device.dwFrame;
-			HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
-			Lights_LastFrame.push_back(L);
-
-			// render
-			phase = PHASE_SMAP;
-			if (RImplementation.o.Tshadows) r_pmask(true, true);
-			else r_pmask(true, false);
-			L->svis.begin();
-			PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-			r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
-			bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-			bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-			if (bNormal || bSpecial)
+		
+		if (Target == TargetMain) {
+			// generate spot shadowmap
+			Target->phase_smap_spot_clear();
+			L->X.S.posX = 0;
+			L->X.S.posY = 0;
+			u16 sid = L->vis.smap_ID;
 			{
-				stats.s_merged ++;
-				Target->phase_smap_spot(L);
-				RCache.set_xform_world(Fidentity);
-				RCache.set_xform_view(L->X.S.view);
-				RCache.set_xform_project(L->X.S.project);
-				r_dsgraph_render_graph(0);
-				if (Details)
+				PIX_EVENT(LIGHT_SHADOWMAP_RENDER);
+				HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+
+				// render
+				phase = PHASE_SMAP;
+				if (RImplementation.o.Tshadows) r_pmask(true, true);
+				else r_pmask(true, false);
+				//L->svis.begin();
+				PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
+				r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
+				bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
+				bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+				if (bNormal || bSpecial)
 				{
-					if (check_grass_shadow(L, ViewBase))
+					stats.s_merged ++;
+					Target->phase_smap_spot(L);
+					RCache.set_xform_world(Fidentity);
+					RCache.set_xform_view(L->X.S.view);
+					RCache.set_xform_project(L->X.S.project);
+					r_dsgraph_render_graph(0);
+					if (Details)
 					{
-						Details->fade_distance = -1; // Use light position to calc "fade"
-						Details->light_position.set(L->position);
-						Details->Render();
+						if (check_grass_shadow(L, ViewBase))
+						{
+							Details->fade_distance = -1; // Use light position to calc "fade"
+							Details->light_position.set(L->position);
+							Details->Render();
+						}
+					}
+					L->X.S.transluent = FALSE;
+					if (bSpecial)
+					{
+						L->X.S.transluent = TRUE;
+						Target->phase_smap_spot_tsh(L);
+						PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
+						r_dsgraph_render_graph(1); // normal level, secondary priority
+						PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
+						r_dsgraph_render_sorted(); // strict-sorted geoms
 					}
 				}
-				L->X.S.transluent = FALSE;
-				if (bSpecial)
+				else
 				{
-					L->X.S.transluent = TRUE;
-					Target->phase_smap_spot_tsh(L);
-					PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
-					r_dsgraph_render_graph(1); // normal level, secondary priority
-					PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
-					r_dsgraph_render_sorted(); // strict-sorted geoms
+					stats.s_finalclip ++;
 				}
+				//L->svis.end();
+				r_pmask(true, false);
 			}
-			else
-			{
-				stats.s_finalclip ++;
-			}
-			L->svis.end();
-			r_pmask(true, false);
 		}
 
 		HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, L->rt_smap_depth->pSurface);
@@ -171,12 +162,8 @@ void CRender::render_lights(light_Package& LP)
 		{
 			light* L = LP.v_point.back();
 			LP.v_point.pop_back();
-			L->vis_update();
-			if (L->vis.visible)
-			{
-				Target->accum_point(L);
-				render_indirect(L);
-			}
+			Target->accum_point(L);
+			render_indirect(L);
 		}
 
 		PIX_EVENT(SPOT_LIGHTS);
@@ -186,13 +173,9 @@ void CRender::render_lights(light_Package& LP)
 		{
 			light* L = LP.v_spot.back();
 			LP.v_spot.pop_back();
-			L->vis_update();
-			if (L->vis.visible)
-			{
-				LR.compute_xf_spot(L);
-				Target->accum_spot(L);
-				render_indirect(L);
-			}
+			LR.compute_xf_spot(L);
+			Target->accum_spot(L);
+			render_indirect(L);
 		}
 
 		PIX_EVENT(SPOT_LIGHTS_ACCUM_VOLUMETRIC);
@@ -229,14 +212,9 @@ void CRender::render_lights(light_Package& LP)
 		xr_vector<light*>& Lvec = LP.v_point;
 		for (u32 pid = 0; pid < Lvec.size(); pid++)
 		{
-			Lvec[pid]->vis_update();
-			if (Lvec[pid]->vis.visible)
-			{
-				render_indirect(Lvec[pid]);
-				Target->accum_point(Lvec[pid]);
-			}
+			render_indirect(Lvec[pid]);
+			Target->accum_point(Lvec[pid]);
 		}
-		Lvec.clear();
 	}
 
 	PIX_EVENT(SPOT_LIGHTS_ACCUM);
@@ -246,15 +224,10 @@ void CRender::render_lights(light_Package& LP)
 		xr_vector<light*>& Lvec = LP.v_spot;
 		for (u32 pid = 0; pid < Lvec.size(); pid++)
 		{
-			Lvec[pid]->vis_update();
-			if (Lvec[pid]->vis.visible)
-			{
-				LR.compute_xf_spot(Lvec[pid]);
-				render_indirect(Lvec[pid]);
-				Target->accum_spot(Lvec[pid]);
-			}
+			LR.compute_xf_spot(Lvec[pid]);
+			render_indirect(Lvec[pid]);
+			Target->accum_spot(Lvec[pid]);
 		}
-		Lvec.clear();
 	}
 
 	// restore world projection if necessary

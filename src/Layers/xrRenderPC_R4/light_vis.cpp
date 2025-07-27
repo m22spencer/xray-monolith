@@ -18,7 +18,7 @@ void light::vis_prepare()
 	//		. perform testing				= ???,		pending
 
 	u32 frame = Device.dwFrame;
-	if (frame < vis.frame2test || Device.m_SecondViewport.IsSVPFrame())
+	if (frame < vis.frame2test)
 		return;
 	
 	if (vis.pending) 
@@ -86,7 +86,8 @@ void light::vis_update()
 
 	u32 frame = Device.dwFrame;
 
-	vis.visible = (query.fragments > cullfragments);
+	vis.visible_frags = vis.visible_frags * 0.5 + query.fragments;
+	vis.visible = (vis.visible_frags > cullfragments);
 	vis.pending = false;
 	if (vis.visible)
 	{

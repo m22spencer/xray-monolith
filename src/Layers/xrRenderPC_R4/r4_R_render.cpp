@@ -514,52 +514,47 @@ void CRender::Render()
 			Target->disable_aniso();
 		}
 
-		//******* Occlusion testing of volume-limited light-sources
+
 		if (Target == TargetMain) {
-			Target->phase_occq();
+			auto LP = &Lights.package;
 			LP_normal.clear();
-			LP_pending.clear();
+			for (auto L : LP->v_point) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_point.push_back(L);
+			}
+			for (auto L : LP->v_shadowed) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_shadowed.push_back(L);
+			}
+			for (auto L : LP->v_spot) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_spot.push_back(L);
+			}
+		}
+
+		auto view = Device.dwFrame % 2 == 0 ? TargetMain : TargetSVP;
+		if (Target == view || !Device.m_SecondViewport.IsSVPActive())
+		{
+			PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+			view->phase_occq();
 			if (RImplementation.o.dx10_msaa)
-				RCache.set_ZB(RImplementation.Target->rt_MSAADepth->pZRT);
+				RCache.set_ZB(view->rt_MSAADepth->pZRT);
 			{
-				PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-				// perform tests
-				u32 count = 0;
-				light_Package& LP = Lights.package;
+				auto LP = &Lights.package;
+				for (auto L : LP->v_point)
+					L->vis_prepare();
+				for (auto L : LP->v_shadowed)
+					L->vis_prepare();
+				for (auto L : LP->v_spot)
+					L->vis_prepare();
 
 				// stats
-				stats.l_shadowed = LP.v_shadowed.size();
-				stats.l_unshadowed = LP.v_point.size() + LP.v_spot.size();
+				stats.l_shadowed = LP_normal.v_shadowed.size();
+				stats.l_unshadowed = LP_normal.v_point.size() + LP_normal.v_spot.size();
 				stats.l_total = stats.l_shadowed + stats.l_unshadowed;
-
-				// perform tests
-				count = _max(count, LP.v_point.size());
-				count = _max(count, LP.v_spot.size());
-				count = _max(count, LP.v_shadowed.size());
-				for (u32 it = 0; it < count; it++)
-				{
-					if (it < LP.v_point.size())
-					{
-						light* L = LP.v_point[it];
-						L->vis_prepare();
-						if (L->vis.pending) LP_pending.v_point.push_back(L);
-						else LP_normal.v_point.push_back(L);
-					}
-					if (it < LP.v_spot.size())
-					{
-						light* L = LP.v_spot[it];
-						L->vis_prepare();
-						if (L->vis.pending) LP_pending.v_spot.push_back(L);
-						else LP_normal.v_spot.push_back(L);
-					}
-					if (it < LP.v_shadowed.size())
-					{
-						light* L = LP.v_shadowed[it];
-						L->vis_prepare();
-						if (L->vis.pending) LP_pending.v_shadowed.push_back(L);
-						else LP_normal.v_shadowed.push_back(L);
-					}
-				}
 			}
 			LP_normal.sort();
 			LP_pending.sort();
@@ -608,25 +603,6 @@ void CRender::Render()
 			Target->phase_wallmarks();
 
 			Wallmarks->Render(); // wallmarks has priority as normal geometry
-		}
-
-		// Update incremental shadowmap-visibility solver
-		{
-			PIX_EVENT(DEFER_FLUSH_OCCLUSION);
-			u32 it = 0;
-			for (it = 0; it < Lights_LastFrame.size(); it++)
-			{
-				if (0 == Lights_LastFrame[it]) continue;
-				try
-				{
-					Lights_LastFrame[it]->svis.flushoccq();
-				}
-				catch (...)
-				{
-					Msg("! Failed to flush-OCCq on light [%d] %X", it, *(u32*)(&Lights_LastFrame[it]));
-				}
-			}
-			Lights_LastFrame.clear();
 		}
 
 		// full screen pass to mark msaa-edge pixels in highest stencil bit
@@ -737,16 +713,10 @@ void CRender::Render()
 
 		// Lighting, non dependant on OCCQ
 		{
-			PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
+			PIX_EVENT(DEFERRED_LIGHTS);
 			Target->phase_accumulator();
 			HOM.Disable();
 			render_lights(LP_normal);
-		}
-
-		// Lighting, dependant on OCCQ
-		{
-			PIX_EVENT(DEFER_LIGHT_OCCQ);
-			render_lights(LP_pending);
 		}
 
 		{
