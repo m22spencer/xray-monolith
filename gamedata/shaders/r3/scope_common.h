@@ -61,9 +61,14 @@ float2 ndc2(float4 p) {
 
 float dbg_wp(v_out v, float4 p, float d) {
 	float2 screen_tc = v.hpos.xy * screen_res.zw;
+	float2 aspect = float2(screen_res.x/screen_res.y, 1.0);
 	float2 ffp_ndc = ndc2(mul(m_VP, p));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
-	return distance(ffp_tc, screen_tc) < d ? 1.0 : 0.0;
+
+	float2 ffp_tc_a = (ffp_tc - 0.5) * aspect + 0.5;
+	float2 screen_tc_a = (screen_tc - 0.5) * aspect + 0.5;
+
+	return distance(ffp_tc_a, screen_tc_a) < d ? 1.0 : 0.0;
 }
 
 Scope new_Scope(v_out v, bool is_tc) {
