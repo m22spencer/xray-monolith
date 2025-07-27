@@ -1,7 +1,9 @@
+// DO NOT EDIT, OR INCLUDE IN MODS
+
 #include "scope_common.h"
 
 // Forward declare functions for better error messages
-float scope_custom_depth(float2 tc);
+float scope_custom_depth(Scope s);
 #include "scope_custom_depth.h"
 
 // Add to surface depth to handle precision issues
@@ -20,10 +22,10 @@ struct PSOutput
 	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
-PSOutput main(vf i)
+PSOutput main(Scope I)
 {
 	PSOutput output;
-    output.depth = i.hpos.z + EPSILON;
+    output.depth = I.hpos.z + EPSILON;
  
     if (scope_phase == 0) {
         discard;
@@ -45,7 +47,7 @@ PSOutput main(vf i)
         //NYI
     }
     if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        output.target2 = scope_custom_depth(i.tc0);
+        output.target2 = scope_custom_depth(I);
     }
 
 	return output;

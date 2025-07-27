@@ -1,13 +1,15 @@
+// DO NOT EDIT, OR INCLUDE IN MODS
+
 #include "scope_common.h"
 
 // Forward declare functions for better error messages
-float3 scope_custom_image(float2 tc);
+float3 scope_custom_image(Scope s);
 #include "scope_custom_image.h"
 
-float4 scope_custom_reticle(float2 tc);
+float4 scope_custom_reticle(Scope s);
 #include "scope_custom_reticle.h"
 
-float4 main(vf I) : SV_Target 
+float4 main(Scope I) : SV_Target 
 {
     float2 tc = isSVPActive() 
         ? I.tc0.xy
@@ -19,11 +21,11 @@ float4 main(vf I) : SV_Target
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-        o =  float4(scope_custom_image(tc), 1.0);
+        o =  float4(scope_custom_image(I), 1.0);
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
-        o = scope_custom_reticle(I.tc0);
+        o = scope_custom_reticle(I);
     }
 
     return o;

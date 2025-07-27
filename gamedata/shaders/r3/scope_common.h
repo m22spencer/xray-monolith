@@ -1,3 +1,5 @@
+// DO NOT EDIT, OR INCLUDE IN MODS
+
 #ifndef SCOPE_COMMON_H
 #define SCOPE_COMMON_H
 
@@ -6,9 +8,18 @@
 
 int scope_phase;
 
-struct vf {
+struct Scope
+{
     float4 hpos : SV_Position;
-    float2 tc0  : TEXCOORD0;
+    float2 tc0 : TEXCOORD0;	
+	float3 w_P : POSITION0;
+	float3 w_T : TANGENT0;
+	float3 w_B : BINORMAL0;
+	float3 w_N : NORMAL0;
+	float3 v_P : POSITION1;
+	float3 v_T : TANGENT1;
+	float3 v_B : BINORMAL1;
+	float3 v_N : NORMAL1;
 };
 
 Texture2D s_pip_tex;
