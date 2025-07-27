@@ -91,11 +91,13 @@ void CObject::cNameVisual_set(shared_str N)
 		}
 		*/
 
+#ifdef OPTIMIZE_CALCULATE_BONES
 		if (new_k)
 			new_k->renderableParent = this;
 
 		if (old_k)
 			old_k->renderableParent = nullptr;
+#endif
 
 		if (old_k && new_k)
 		{
@@ -107,13 +109,16 @@ void CObject::cNameVisual_set(shared_str N)
 	}
 	else
 	{
+
+#ifdef OPTIMIZE_CALCULATE_BONES
 		if (renderable.visual)
 		{
 			IKinematics* new_k = renderable.visual->dcast_PKinematics();
 			if (new_k)
 				new_k->renderableParent = nullptr;
 		}
-		
+#endif
+
 		::Render->model_Delete(renderable.visual);
 		NameVisual = 0;
 	}

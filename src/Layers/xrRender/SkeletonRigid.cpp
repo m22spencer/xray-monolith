@@ -28,6 +28,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 	// Available only if can get parent xform
 	// Refactor later for per object basis
 	float update_rate_k = 1.f;
+
+#ifdef OPTIMIZE_CALCULATE_BONES
 	if (g_bootComplete)
 	{
 		if (auto xForm = getXForm())
@@ -67,7 +69,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 			}
 		}
 	}
-	
+#endif
 
 	UCalc_mtlock lock;
 	OnCalculateBones();

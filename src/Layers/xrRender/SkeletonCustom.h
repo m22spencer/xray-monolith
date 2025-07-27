@@ -124,6 +124,7 @@ public:
 public:
 	dxRender_Visual* m_lod;
 
+#ifdef OPTIMIZE_CALCULATE_BONES
 	IC bool canBeOptimized()
 	{
 		return renderableParent && renderableParent->canOptimizeCalculateBones();
@@ -133,6 +134,8 @@ public:
 	{
 		return renderableParent ? std::optional<const Fmatrix>(renderableParent->renderable.xform) : std::nullopt;
 	}
+#endif
+
 protected:
 	SkeletonWMVec wallmarks;
 	u32 wm_frame;
