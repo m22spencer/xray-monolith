@@ -14,6 +14,8 @@ struct Scope
 {
 	float2 ffp;
 	float2 sfp;
+	float2 exit_pupil;
+
 	float4 hpos;
     float2 tc0;	
 
@@ -85,11 +87,16 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 	float factor = 4.0;
 
 	Scope s;
+
+	float eye_relief = 0.2; // FIXME: Pull from 3dss params (The value seems to work if interpreted as cm)
+	float4 scope_w_exit = scope_w_eyepiece - (normalize(scope_w_sfp - scope_w_ffp) * eye_relief);
     
+	float y = dbg_wp(v, scope_w_exit, 0.001);
 	float r = dbg_wp(v, scope_w_eyepiece, .002);
 	float g = dbg_wp(v, scope_w_ffp, .004);
 	float b = dbg_wp(v, scope_w_sfp, .008);
 	s.dbg = float4(r, g-r, b-(g+r), max(max(r,g),b));
+	s.dbg = max(float4(y,y, 0, y), s.dbg);
 
 	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
 	
@@ -110,6 +117,14 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 		float2 sfp_tc = world_to_corrected_tc(v, scope_w_sfp);
 		float2 sfp_offset_tc = eye_tc - sfp_tc;
 		s.sfp = tc + sfp_offset_tc*tc_multiplier;
+	}
+
+	{
+		// COMPUTE EXIT PUPIL
+		float2 exit_tc = world_to_corrected_tc(v, scope_w_exit);
+		float2 exit_offset_tc = eye_tc - exit_tc;
+
+		s.exit_pupil = tc + exit_offset_tc*tc_multiplier;
 	}
 
 	s.tc0 = v.tc0;
