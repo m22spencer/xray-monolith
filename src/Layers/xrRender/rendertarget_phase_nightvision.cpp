@@ -265,7 +265,7 @@ void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapS
 		};
 
 		RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
-		RCache.set_c("scope_debug", scope_debug);
+		RCache.set_c("scope_debug", (int)scope_debug);
 		set_v3("scope_w_ffp", Device.m_SecondViewport.w_ffp);
 		set_v3("scope_w_sfp", Device.m_SecondViewport.w_sfp);
 		Fvector pt = {0,0,0};
