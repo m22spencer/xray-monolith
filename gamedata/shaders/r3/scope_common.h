@@ -81,7 +81,7 @@ float2 world_to_corrected_tc(v_out v, float4 w_P) {
 	return ASPECT_CORRECT_TC(ffp_tc);
 }
 
-Scope new_Scope(v_out v, float2 tc, float tc_multiplier) {
+Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 	float factor = 4.0;
 
 	Scope s;
@@ -107,22 +107,8 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier) {
 		// COMPUTE SFP
 		float2 sfp_tc = world_to_corrected_tc(v, scope_w_sfp);
 		float2 sfp_offset_tc = eye_tc - sfp_tc;
-		s.sfp = (tc - 0.5) / curMag() + 0.5 + sfp_offset_tc*tc_multiplier;
+		s.sfp = (mag_sfp ? ((tc - 0.5) / curMag() + 0.5) : tc) + sfp_offset_tc*tc_multiplier;
 	}
-
-	/*
-	float2 screen_tc = v.hpos.xy * screen_res.zw;
-	float2 ffp_ndc = ndc2(mul(m_VP, scope_w_ffp));
-	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
-	float2 ffp_screen = ffp_tc - 0.5;
-
-	float4 sfp_screen = mul(m_VP, scope_w_sfp);
-	sfp_screen.xyz /= sfp_screen.w;
-    sfp_screen.xy *= float2(0.5, -0.5); 
-
-	s.ffp = tc + ffp_screen.xy*factor;
-	s.sfp = (tc - 0.5) / curMag() + 0.5 + sfp_screen.xy*factor;
-	*/
 
 	s.tc0 = v.tc0;
 	s.hpos = v.hpos;

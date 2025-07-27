@@ -28,15 +28,16 @@ float4 main(v_out I) : SV_Target
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
 	    float2 tc = isSVPActive() ? I.tc0 : I.hpos.xy * screen_res.zw;
-        Scope s = new_Scope(I, tc, isSVPActive() ? tc_multiplier : 1.0);
+        Scope s = new_Scope(I, tc, isSVPActive() ? tc_multiplier : 1.0, false);
         o =  float4(scope_custom_image(s), 1.0);
-        if (scope_debug >= 3 && s.dbg.a > 0.5)
-            o = s.dbg;
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
 	    float2 tc = I.tc0;
-        o = scope_custom_reticle(new_Scope(I, tc, tc_multiplier));
+        Scope s = new_Scope(I, tc, tc_multiplier, true);
+        o = scope_custom_reticle(s);
+        if (scope_debug >= 3 && s.dbg.a > 0.5)
+            o = s.dbg;
     }
 
     return o;
