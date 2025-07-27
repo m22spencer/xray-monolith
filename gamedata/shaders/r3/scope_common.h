@@ -94,20 +94,22 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
 	
 	{
+		float mag = (curMag() - minMag()) + 1.0;
 		// COMPUTE FFP
 		float2 ffp_tc = world_to_corrected_tc(v, scope_w_ffp);
 		float2 ffp_offset_tc = eye_tc - ffp_tc;
 
 
 		// FIXME: Aspect correct TC?
-		s.ffp = tc + ffp_offset_tc*tc_multiplier;
+		//s.ffp = (tc - 0.5) / mag + 0.5 + ffp_offset_tc*tc_multiplier;
+		s.ffp = (tc + ffp_offset_tc*tc_multiplier - 0.5) / mag + 0.5 ;
 	}
 
 	{
 		// COMPUTE SFP
 		float2 sfp_tc = world_to_corrected_tc(v, scope_w_sfp);
 		float2 sfp_offset_tc = eye_tc - sfp_tc;
-		s.sfp = (mag_sfp ? ((tc - 0.5) / curMag() + 0.5) : tc) + sfp_offset_tc*tc_multiplier;
+		s.sfp = tc + sfp_offset_tc*tc_multiplier;
 	}
 
 	s.tc0 = v.tc0;
