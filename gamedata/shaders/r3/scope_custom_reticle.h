@@ -9,8 +9,5 @@ float4 scope_custom_reticle(Scope s) {
     bool opaque = s_reticle.SampleLevel(smp_base, tc, 10).a > .99;
     if (opaque)
         o.a = length(o.xyz);
-
-    if (s.dbg.a > 0.5)
-        return s.dbg;
     return o;
 }

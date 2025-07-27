@@ -43,6 +43,7 @@ Texture2D s_reticle;
 float4 scope_w_ffp;
 float4 scope_w_sfp;
 float4 scope_w_eyepiece;
+int scope_debug;
 
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
@@ -80,11 +81,10 @@ float2 world_to_corrected_tc(v_out v, float4 w_P) {
 	return ASPECT_CORRECT_TC(ffp_tc);
 }
 
-Scope new_Scope(v_out v, float tc_multiplier) {
+Scope new_Scope(v_out v, float2 tc, float tc_multiplier) {
 	float factor = 4.0;
 
 	Scope s;
-	float2 tc = isSVPActive() ? v.tc0 : v.hpos.xy * screen_res.zw;
     
 	float r = dbg_wp(v, scope_w_eyepiece, .002);
 	float g = dbg_wp(v, scope_w_ffp, .004);

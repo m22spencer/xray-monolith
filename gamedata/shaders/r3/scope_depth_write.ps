@@ -47,7 +47,8 @@ PSOutput main(v_out I)
         //NYI
     }
     if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        output.target2 = scope_custom_depth(new_Scope(I, true));
+	    float2 tc = isSVPActive() ? I.tc0 : I.hpos.xy * screen_res.zw;
+        output.target2 = scope_custom_depth(new_Scope(I, tc, true));
     }
 
 	return output;
