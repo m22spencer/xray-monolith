@@ -13,17 +13,18 @@ int scope_phase;
 
 struct Scope
 {
-	// SCOPECOORDS
+	// SCOPECOORDS ------------
+	// Range of -radius to +radius, around center.
+	// To get a valid texture sample coordinate call: SCOPECOORD_TO_TEXCOORD
 	float2 ffp;
 	float2 sfp;
 	float2 exit_pupil;
 	float2 center;
 	float radius;
 
-	// TEXCOORDS
+	// TEXCOORDS --------------
 	float4 hpos;
     float2 tc0;	
-
 
 	float4 dbg;
 };
@@ -77,6 +78,17 @@ uniform float4 shader_scope_params;
 float curMag() { return shader_scope_params.x; }
 float minMag() { return shader_scope_params.y; }
 float maxMag() { return shader_scope_params.z; }
+float mag_between_fovs(float current, float desired) {
+	return 1.0 / (tan(desired/2.0) / tan(current/2.0));
+}
+
+float digitalZoom() {
+    return isSVPActive()
+		? 1.0
+		: max( 1.0
+		     , mag_between_fovs( ogse_c_screen.x * (3.14159/180.0)
+		                       , shader_scope_params.w));
+}
 
 float2 ndc2(float4 p) {
 	return p.xy / p.w;
@@ -85,16 +97,17 @@ float2 ndc2(float4 p) {
 float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 	if (!isSVPActive() && scope_phase & SCOPE_PHASE_IMAGE) {
 		// This is fake pip mode, so we have to correct the coordinates
+		// FIXME: These coordinates need to be rotated to align with eye up
 		float screen_delta  = length(ddy(scope.hpos.xy * screen_res.zw));
 		float texture_delta = length(ddy(scope.tc0.xy));
 		float tc_multiplier = texture_delta / screen_delta;
 
-		return ASPECT_UNCORRECT_TC((sc - 0.5) / tc_multiplier + 0.5);
+		float f = (digitalZoom() * tc_multiplier);
+		return ASPECT_UNCORRECT_TC((sc - 0.5) / f + 0.5);
 
 	} else {
 		return sc;
 	}
-	
 }
 
 float dbg_wp(v_out v, float4 p, float d) {
@@ -145,8 +158,6 @@ Scope new_Scope(v_out v) {
 		float2 ffp_tc = world_to_corrected_tc(v, scope_w_ffp);
 		float2 ffp_offset_tc = eye_tc - ffp_tc;
 
-		// FIXME: Aspect correct TC?
-		//s.ffp = (tc - 0.5) / mag + 0.5 + ffp_offset_tc*tc_multiplier;
 		s.ffp = (v.tc0 + ffp_offset_tc*tc_multiplier - 0.5) / mag + 0.5 ;
 	}
 
