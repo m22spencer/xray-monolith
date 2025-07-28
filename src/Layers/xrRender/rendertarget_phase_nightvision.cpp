@@ -418,7 +418,7 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 void CRenderTarget::phase_svp_capture()
 {
 	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
-	u_setrt(rt_Color, nullptr, nullptr, nullptr);
+	u_setrt(rt_Color, nullptr, nullptr, nullptr, nullptr);
 
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
