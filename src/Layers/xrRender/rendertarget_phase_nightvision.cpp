@@ -330,7 +330,7 @@ void CRenderTarget::phase_3DSSReticle()
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
-	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB->pZRT);
+	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
@@ -362,7 +362,7 @@ void CRenderTarget::phase_3DSSReticle()
 		});
 	}
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB->pZRT);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 };
 
 /** Mask motion vectors & clear distortion rt
@@ -376,7 +376,7 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 	auto distort = bDistort ? RImplementation.Target->rt_Generic_1 : 0;
 
 	// Do not set color or position buffers, as these are done in the prior phase.
-	u_setrt(0, 0, mvec, distort, baseZB->pZRT);
+	u_setrt(0, 0, mvec, distort, baseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
@@ -388,7 +388,7 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 		RCache.set_c("bDistort", bDistort);
 	}
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, RImplementation.Target->baseZB->pZRT);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, RImplementation.Target->baseZB);
 };
 
 /** Run scope preprocesson the current frame and store in svp rt.

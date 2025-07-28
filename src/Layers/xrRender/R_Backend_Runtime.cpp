@@ -21,8 +21,7 @@ void CBackend::OnFrameEnd()
 #endif
 	{	
 #if defined(USE_DX11)
-		RImplementation.RenderToTarget(RImplementation.rtScreen);
-		RImplementation.Target->u_setrt(Device.dwWidth, Device.dwHeight, (HW).pBaseRT, NULL, NULL, (HW).pBaseZB);
+		RImplementation.TargetMain->SetActive();
 #endif
 
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -57,11 +56,11 @@ void CBackend::OnFrameBegin()
 		RImplementation.rmNormal();
 #if defined(USE_DX11)
 		RImplementation.TargetMain->SetActive();
-		set_RT(RImplementation.Target->baseRT->pRT);
-		set_ZB(RImplementation.Target->baseRT->pZRT);
+		set_RT(HW.pBaseRT);
+		set_ZB(HW.pBaseZB);
 #else
-		set_RT(HWpBaseRT);
-		set_ZB(HWpBaseZB);
+		set_RT(HW.pBaseRT);
+		set_ZB(HW.pBaseZB);
 #endif
 #endif	//	USE_DX10
 		Memory.mem_fill(&stat, 0, sizeof(stat));

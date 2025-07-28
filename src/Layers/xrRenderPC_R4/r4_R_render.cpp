@@ -183,20 +183,20 @@ void CRender::render_menu()
 
 	// Main Render
 	{
-		Target->u_setrt(Target->rt_Generic_0, 0, 0, HWpBaseZB); // LDR RT
+		Target->u_setrt(Target->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
 		g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
 	}
 
 	// Distort
 	{
 		FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
-		Target->u_setrt(Target->rt_Generic_1, 0, 0, HWpBaseZB); // Now RT is a distortion mask
+		Target->u_setrt(Target->rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
 		HW.pContext->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
 		g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
 	}
 
 	// Actual Display
-	Target->u_setrt(Device.dwWidth, Device.dwHeight, HWpBaseRT, NULL, NULL, HWpBaseZB);
+	Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
 	RCache.set_Shader(Target->s_menu);
 	RCache.set_Geometry(Target->g_menu);
 
@@ -343,7 +343,7 @@ void CRender::Render()
 	if (!(g_pGameLevel && g_hud)
 		|| bMenu)
 	{
-		Target->u_setrt(Device.dwWidth, Device.dwHeight, HWpBaseRT, NULL, NULL, HWpBaseZB);
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
 		return;
 	}
 
@@ -450,7 +450,7 @@ void CRender::Render()
 
 		if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS))
 		{
-			Target->u_setrt(Device.dwWidth, Device.dwHeight, NULL, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB->pZRT : Target->rt_MSAADepth->pZRT);
+			Target->u_setrt(Device.dwWidth, Device.dwHeight, NULL, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB : Target->rt_MSAADepth->pZRT);
 			r_dsgraph_render_landscape(0, false);
 		}
 
@@ -578,7 +578,7 @@ void CRender::Render()
 			if (0)
 			{
 				if (!RImplementation.o.dx10_msaa)
-					Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, Target->baseZB->pZRT);
+					Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, Target->baseZB);
 				else
 					Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1, 0,
 						RImplementation.Target->rt_MSAADepth->pZRT);
@@ -716,7 +716,7 @@ void CRender::Render()
 			// Render Emissive on `rt_ssfx_bloom_emissive`
 			FLOAT ColorRGBA[4] = { 0,0,0,0 };
 			HW.pContext->ClearRenderTargetView(Target->rt_ssfx_bloom_emissive->pRT, ColorRGBA);
-			Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB->pZRT : Target->rt_MSAADepth->pZRT);
+			Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB : Target->rt_MSAADepth->pZRT);
 			RImplementation.r_dsgraph_render_emissive(true, true);
 		}
 
@@ -812,28 +812,18 @@ void CRender::RenderToTarget(RRT target)
 	switch (target)
 	{
 	case rtPDA:
-	{
-		PIX_EVENT(COPY_TO_PDA);
-		HW.pContext->CopyResource(Target->rt_ui_pda->pSurface, Target->baseRT->pSurface);
-	}
+		RT = &Target->rt_ui_pda;
 		break;
-	case rtScreen:
-	{
-		PIX_EVENT(COPY_TO_FRAMEBUFFER);
-		TargetMain->SetActive();
-		ID3D11Resource* res;
-		(HW).pBaseRT->GetResource(&res);
-		HW.pContext->CopyResource(res, TargetMain->baseRT->pSurface);
-
-		(HW).pBaseZB->GetResource(&res);
-		HW.pContext->CopyResource(res, TargetMain->baseZB->pSurface);
-
-		Target->u_setrt(Device.dwWidth, Device.dwHeight, (HW).pBaseRT, NULL, NULL, (HW).pBaseZB);
-		res->Release();
+	case rtSVP:
+		RT = &Target->rt_secondVP;
 		break;
-	}
 	default:
 		Debug.fatal(DEBUG_INFO, "None or wrong Target specified: %i", target);
 		break;
 	}
+
+	ID3DTexture2D* pBuffer = nullptr;
+	HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBuffer);
+	HW.pContext->CopyResource((*RT)->pSurface, pBuffer);
+	pBuffer->Release();
 }

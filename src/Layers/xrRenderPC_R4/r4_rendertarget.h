@@ -102,8 +102,8 @@ public:
 #endif
 
 	// HW baseRT/baseZB
-	ref_rt baseRT;
-	ref_rt baseZB;
+	ID3D11RenderTargetView* baseRT;
+	ID3D11DepthStencilView* baseZB;
 
 	// MRT-path
 	ref_rt rt_Depth; // Z-buffer like - initial depth
@@ -275,6 +275,9 @@ public:
 	ref_shader s_scope_depth_write;
 private:
 	// OCCq
+
+	ref_rt rt_baseRT;
+	ref_rt rt_baseZB;
 
 	ref_shader s_occq;
 	ref_shader s_sunshafts;

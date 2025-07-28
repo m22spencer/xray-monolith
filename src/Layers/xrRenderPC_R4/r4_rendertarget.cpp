@@ -348,7 +348,10 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 }
 
 #if USE_DX11 
-void CRenderTarget::SetActive() {
+void CRenderTarget::SetActive() {	
+	HW.pBaseRT = baseRT;
+	HW.pBaseZB = baseZB;
+
 	auto isMain = this == RImplementation.TargetMain;
 	auto m = Device.matrices[isMain ? 0 : 1];
 	if (g_pGamePersistent) {
@@ -369,12 +372,13 @@ void CRenderTarget::SetActive() {
 	Device.fWidth_2 = Width >> 1;
 	Device.fHeight_2 = Height >> 1;
 
+
 	set_viewport_size(HW.pContext, Width, Height);
-	RCache.set_RT(baseRT->pRT, 0);
+	RCache.set_RT(baseRT, 0);
 	RCache.set_RT(nullptr, 1);
 	RCache.set_RT(nullptr, 2);
 	RCache.set_RT(nullptr, 3);
-	RCache.set_ZB(baseZB->pZRT);
+	RCache.set_ZB(baseZB);
 
 	RCache.set_Constants(nullptr);	
 }
@@ -549,8 +553,16 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 		auto colorfmt = RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8;
 		
-		baseRT = createUnique("$user$baseRT", w, h, colorfmt);
-		baseZB = createUnique("$user$baseZB", w, h, D3DFMT_D24S8);
+		if (id == "main") {
+			baseRT = HW.pBaseRT; 
+			baseZB = HW.pBaseZB; 
+		}
+		else {
+			rt_baseRT = createUnique("$user$baseRT", w, h, colorfmt);
+			rt_baseZB = createUnique("$user$baseZB", w, h, D3DFMT_D24S8);
+			baseRT = rt_baseRT->pRT;
+			baseZB = rt_baseZB->pZRT;
+		}
 
 		rt_Position = createUnique(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
@@ -988,7 +1000,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 			FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
 			HW.pContext->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
 		}
-		u_setrt(Width, Height, baseRT->pRT,NULL,NULL,baseZB->pZRT);
+		u_setrt(Width, Height, baseRT,NULL,NULL,baseZB);
 	}
 
 	// HBAO

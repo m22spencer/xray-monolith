@@ -29,7 +29,7 @@ void CRenderTarget::phase_dof()
 
 	//////////////////////////////////////////////////////////////////////////
 	//Set MSAA/NonMSAA rendertarget
-	u_setrt(rt_dof, 0, 0, HWpBaseZB);
+	u_setrt(rt_dof, 0, 0, HW.pBaseZB);
 
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
