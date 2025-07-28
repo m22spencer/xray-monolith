@@ -26,7 +26,9 @@ float4 main(v_out I) : SV_Target
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-        o =  float4(scope_custom_image(scope), 1.0);
+        o = isSVPActive()
+            ? float4(SampleBackbuffer(SCOPECOORD_TO_TEXCOORD(scope.sfp)), 1.0) // Hack for heatvision
+            : float4(scope_custom_image(scope), 1.0);
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
