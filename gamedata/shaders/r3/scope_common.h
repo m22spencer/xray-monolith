@@ -110,6 +110,12 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 	}
 }
 
+float3 SampleBackbuffer(float2 tc) {
+	return isSVPActive() 
+        ? s_pip_tex.Sample(smp_base, tc).rgb
+        : s_3dss_tex.Sample(smp_base, tc).rgb;
+}
+
 float dbg_wp(v_out v, float4 p, float d) {
 	float2 screen_tc = v.hpos.xy * screen_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, p));
