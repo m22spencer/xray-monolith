@@ -4,6 +4,8 @@
 
 #include 	"SkeletonCustom.h"
 
+#include "../../xrCore/profiler.h"
+
 extern int psSkeletonUpdate;
 
 #ifdef DEBUG
