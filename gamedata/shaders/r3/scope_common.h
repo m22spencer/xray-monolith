@@ -12,12 +12,17 @@ int scope_phase;
 
 struct Scope
 {
+	// SCOPECOORDS
 	float2 ffp;
 	float2 sfp;
 	float2 exit_pupil;
+	float2 center;
+	float radius;
 
+	// TEXCOORDS
 	float4 hpos;
     float2 tc0;	
+
 
 	float4 dbg;
 };
@@ -62,6 +67,10 @@ float maxMag() { return shader_scope_params.z; }
 
 float2 ndc2(float4 p) {
 	return p.xy / p.w;
+}
+
+float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
+	return sc;
 }
 
 float dbg_wp(v_out v, float4 p, float d) {
@@ -129,6 +138,8 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 
 	s.tc0 = v.tc0;
 	s.hpos = v.hpos;
+	s.center = float2(0.5, 0.5);
+	s.radius = 0.5;
 
 	return s;
 }
