@@ -3,6 +3,10 @@
 #include "FBasicVisual.h"
 #include "xrRender_console.h"
 
+#if USE_DX11
+#include "../../gamedata/shaders/r3/scope_defines.h"
+#endif
+
 void CRenderTarget::phase_nightvision()
 {
 	//Constants
@@ -334,20 +338,26 @@ void CRenderTarget::phase_3DSSReticle()
 
 	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
-			RCache.set_c("scope_phase", 8); //PHASE_SCOPE_IMAGE
+			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
 		});
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_RETICLE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
-			RCache.set_c("scope_phase", 16); //PHASE_SCOPE_RETICLE
+			RCache.set_c("scope_phase", SCOPE_PHASE_RETICLE);
+		});
+	}
+
+	{   PIX_EVENT(SCOPE_PHASE_SHADOW);
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_SHADOW);
 		});
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_CUSTOM_DEPTH);
-	// write far plane
+		// write far plane
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
-			RCache.set_c("scope_phase", 2 | 32); //DEPTHWRITE + CUSTOM_DEPTH
+			RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE | SCOPE_PHASE_CUSTOM_DEPTH);
 			RCache.set_c("scope_depth_value", -1);
 		});
 	}

@@ -7,6 +7,9 @@
 #include "../xrRender/QueryHelper.h"
 #include "../xrRender/r__dsgraph_build.cpp"
 #include "../xrGame/debug_renderer.h"
+#if USE_DX11
+#include "../../gamedata/shaders/r3/scope_defines.h"
+#endif
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
@@ -480,7 +483,7 @@ void CRender::Render()
 						PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
 						// Write lens depth
 						Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
-							RCache.set_c("scope_phase", 1); //GBUFFER
+							RCache.set_c("scope_phase", SCOPE_PHASE_GBUFFER); //GBUFFER
 							RCache.set_c("scope_depth_value", -1.f);
 							});
 					}

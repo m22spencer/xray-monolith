@@ -9,6 +9,6 @@ float3 scope_custom_image(Scope s) {
         return float3(0, 0, 0);
 
     return isSVPActive() 
-        ? s_pip_tex.Sample(smp_base, tc)
-        : s_3dss_tex.Sample(smp_base, tc);
+        ? s_pip_tex.Sample(smp_base, tc).rgb
+        : s_3dss_tex.Sample(smp_base, tc).rgb;
 }
