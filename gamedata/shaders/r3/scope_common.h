@@ -103,7 +103,7 @@ float2 world_to_corrected_tc(v_out v, float4 w_P) {
 	return ASPECT_CORRECT_TC(ffp_tc);
 }
 
-Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
+Scope new_Scope(v_out v) {
 	float factor = 4.0;
 
 	Scope s;
@@ -124,23 +124,26 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 
 	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
 	
+    float screen_delta  = length(ddy(v.hpos.xy * screen_res.zw));
+    float texture_delta = length(ddy(v.tc0.xy));
+    float tc_multiplier = texture_delta / screen_delta;
+
 	{
 		float mag = (curMag() - minMag()) + 1.0;
 		// COMPUTE FFP
 		float2 ffp_tc = world_to_corrected_tc(v, scope_w_ffp);
 		float2 ffp_offset_tc = eye_tc - ffp_tc;
 
-
 		// FIXME: Aspect correct TC?
 		//s.ffp = (tc - 0.5) / mag + 0.5 + ffp_offset_tc*tc_multiplier;
-		s.ffp = (tc + ffp_offset_tc*tc_multiplier - 0.5) / mag + 0.5 ;
+		s.ffp = (v.tc0 + ffp_offset_tc*tc_multiplier - 0.5) / mag + 0.5 ;
 	}
 
 	{
 		// COMPUTE SFP
 		float2 sfp_tc = world_to_corrected_tc(v, scope_w_sfp);
 		float2 sfp_offset_tc = eye_tc - sfp_tc;
-		s.sfp = tc + sfp_offset_tc*tc_multiplier;
+		s.sfp = v.tc0 + sfp_offset_tc*tc_multiplier;
 	}
 
 	{
@@ -148,7 +151,7 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 		float2 exit_tc = world_to_corrected_tc(v, scope_w_exit);
 		float2 exit_offset_tc = eye_tc - exit_tc;
 
-		s.exit_pupil = tc + exit_offset_tc*tc_multiplier;
+		s.exit_pupil = v.tc0 + exit_offset_tc*tc_multiplier;
 	}
 
 	s.tc0 = v.tc0;

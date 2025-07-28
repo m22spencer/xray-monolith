@@ -26,6 +26,8 @@ PSOutput main(v_out I)
 {
 	PSOutput output;
     output.depth = I.hpos.z + EPSILON;
+
+    Scope s = new_Scope(I);
  
     if (scope_phase == 0) {
         discard;
@@ -47,11 +49,7 @@ PSOutput main(v_out I)
         //NYI
     }
     if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        float screen_delta  = length(ddy(I.hpos.xy * screen_res.zw));
-        float texture_delta = length(ddy(I.tc0.xy));
-        float tc_multiplier = texture_delta / screen_delta;
-	    float2 tc = isSVPActive() ? I.tc0 : I.hpos.xy * screen_res.zw;
-        output.target2 = scope_custom_depth(new_Scope(I, tc, isSVPActive() ? tc_multiplier : 1.0, false));
+        output.target2 = scope_custom_depth(s);
     }
 
 	return output;

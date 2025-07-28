@@ -17,43 +17,29 @@ float4 scope_custom_lens(Scope s);
 
 float4 main(v_out I) : SV_Target 
 {
-    float2 tc = isSVPActive() 
-        ? I.tc0.xy
-        : ((I.hpos * screen_res.zw) - 0.5) / zoomFactor() + 0.5;
+    Scope s = new_Scope(I);
 
     float4 o;
     if (scope_phase == 0) {
         discard;
     }
 
-    float screen_delta  = length(ddy(I.hpos.xy * screen_res.zw));
-    float texture_delta = length(ddy(I.tc0.xy));
-
-    float tc_multiplier = texture_delta / screen_delta;
-
-
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-	    float2 tc = isSVPActive() ? I.tc0 : I.hpos.xy * screen_res.zw;
-        Scope s = new_Scope(I, tc, isSVPActive() ? tc_multiplier : 1.0, false);
         o =  float4(scope_custom_image(s), 1.0);
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
-	    float2 tc = I.tc0;
-        Scope s = new_Scope(I, tc, tc_multiplier, true);
         o = scope_custom_reticle(s);
         if (scope_debug >= 3 && s.dbg.a > 0.5)
             o = s.dbg;
     }
 
     if (scope_phase & SCOPE_PHASE_SHADOW) {
-        Scope s = new_Scope(I, tc, tc_multiplier, true);
         float c = scope_custom_shadow(s);
         o = float4(0,0,0,c);
     }
 
     if (scope_phase & SCOPE_PHASE_LENS) {
-        Scope s = new_Scope(I, tc, tc_multiplier, true);
         o = scope_custom_lens(s);
     }
 
