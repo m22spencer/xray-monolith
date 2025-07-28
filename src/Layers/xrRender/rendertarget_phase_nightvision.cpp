@@ -418,14 +418,14 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 void CRenderTarget::phase_svp_capture()
 {
 	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
-	u_setrt(rt_Color, nullptr, nullptr, nullptr, nullptr);
+	u_setrt(rt_secondVP, nullptr, nullptr, nullptr, nullptr);
 
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
 
 	RCache.set_Element(s_scope_preprocess->E[1]);
 	RCache.set_c("scope_render_phase", 1);  // PREPASS
-	RCache.set_c("bDistort", bDistort);
+	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
 
 	
 	{   // Draw fullscreen triangle.
@@ -448,6 +448,6 @@ void CRenderTarget::phase_svp_capture()
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
 	}
 
-	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
+//	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
 };
 #endif
