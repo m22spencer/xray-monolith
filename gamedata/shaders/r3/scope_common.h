@@ -47,6 +47,17 @@ Texture2D s_pip_tex;
 Texture2D s_3dss_tex;
 Texture2D s_reticle;
 
+float4 m_hud_params;
+float4 m_hud_fov_params;
+float4 ogse_c_screen;
+uniform float4 s3ds_param_1;
+uniform float4 s3ds_param_2;
+uniform float4 s3ds_param_3;
+uniform float4 s3ds_param_4;
+uniform float4 markswitch_current;
+uniform float4 markswitch_color;
+uniform float4 shader_param_8;
+
 float4 scope_w_ffp;
 float4 scope_w_sfp;
 float4 scope_w_eyepiece;
@@ -55,7 +66,7 @@ int scope_debug;
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
 
-uniform float4 s3ds_param_2;
+
 float zoomFactor() {
     return s3ds_param_2.w;
 }
@@ -97,10 +108,14 @@ Scope new_Scope(v_out v, float2 tc, float tc_multiplier, bool mag_sfp) {
 
 	Scope s;
 
-	float eye_relief = 0.2; // FIXME: Pull from 3dss params (The value seems to work if interpreted as cm)
+	float cm = .01;
+	float eye_relief = s3ds_param_1.y * cm;
+	if (eye_relief == 0) eye_relief = 2 * cm;
+
+	// FIXME: Projection will flip if exit pupil is behind eye
 	float4 scope_w_exit = scope_w_eyepiece - (normalize(scope_w_sfp - scope_w_ffp) * eye_relief);
     
-	float y = dbg_wp(v, scope_w_exit, 0.001);
+	float y = dbg_wp(v, scope_w_exit, 0.002);
 	float r = dbg_wp(v, scope_w_eyepiece, .002);
 	float g = dbg_wp(v, scope_w_ffp, .004);
 	float b = dbg_wp(v, scope_w_sfp, .008);
