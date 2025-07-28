@@ -70,6 +70,9 @@ uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
 
 
+float zoomRotateFactor() { return ogse_c_screen.x; }
+
+
 float zoomFactor() {
     return s3ds_param_2.w;
 }
@@ -114,6 +117,11 @@ float3 SampleBackbuffer(float2 tc) {
 	return isSVPActive() 
         ? s_pip_tex.Sample(smp_base, tc).rgb
         : s_3dss_tex.Sample(smp_base, tc).rgb;
+}
+
+bool VALID(float2 scopecoord) {
+	return distance(scopecoord, scope.center) < scope.radius
+		&& zoomRotateFactor() > 0.5;
 }
 
 float dbg_wp(v_out v, float4 p, float d) {

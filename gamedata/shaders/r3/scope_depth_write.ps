@@ -29,7 +29,7 @@ PSOutput main(v_out I)
 
     scope = new_Scope(I);
  
-    if (scope_phase == 0) {
+    if (!VALID(scope.sfp) || scope_phase == 0) {
         discard;
     }
     if (scope_phase & SCOPE_PHASE_GBUFFER) {
