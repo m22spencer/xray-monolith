@@ -170,6 +170,14 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.07.29**
+* Bone calc optimizations
+  * Usage of Screen Space Area (SSA) instead of distance check, works better with larger objects such as pseudogiants
+  * `ik_calc_ssa` cvar to control the optimization strength, default is 0.006
+* Reduced trader update radius 100 -> 30
+* `bullet_on...` callbacks received `bullet.element` field. When bullet hits alife object, element will be a bone id. If its static geometry, then it will be a geometry triangle number. -1 if there was no hit.
+* New ammo aggregation function, waits for game objects to be online and a different algorithm. Probably fixes https://github.com/themrdemonized/xray-monolith/issues/118
+
 **2025.07.27**
 * Lucy: Model Visbox Update and Script Attachment Fixes (https://github.com/themrdemonized/xray-monolith/pull/306)
 
