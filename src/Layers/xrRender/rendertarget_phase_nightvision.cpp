@@ -213,6 +213,27 @@ void ffp_sfp(bool drawDebug) {
 	Fvector p_e = {0,0,0}; e.m_W.transform(p_e);
 	Fvector p_o = {0,0,0}; o.m_W.transform(p_o);
 
+	if (o.radius < EPS)
+	{	// We have to have an objective lens or ffp/sfp wont work, so make one up
+		float cm = 0.01;
+		float distance = (10*cm);  // Something scopelike
+		o.radius = e.radius;
+		p_o = {0,0, distance};
+		e.m_W.transform(p_o);
+	}
+
+	{	// Not all scopes have eyepiece and objective inline, and we sure aren't going to simulate prisms
+		// So we will reproject the objective lens directly in front of the eyepiece lens and pretend
+		
+		float distance = p_o.distance_to(p_e) ;
+			
+		Fvector dir = {0,0,1};
+
+		o.m_W.transform_dir(dir);
+
+		p_o.set(dir.mul(distance).add(p_e));
+	}
+
 	Fvector p_d =  Fvector(p_o).sub(p_e);
 
 	Fvector p_c1 = Fvector(p_d).mul(0.4).add(p_e);
