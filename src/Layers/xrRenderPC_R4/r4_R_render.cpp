@@ -267,7 +267,29 @@ void svpCamera() {
 	float _, fov, fNearPlane, fFarPlane;
 	Device.matrices[0].mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
+	auto mm = Device.matrices[0];
+	
+	auto params = Device.m_SecondViewport;
 
+	// Project into NDC space to determine the amount of extra magnification we need to correct scope camera size
+	Fvector4 top, bot;
+	Fmatrix m_WVP = Fmatrix().mul(mm.mProjectHud, Fmatrix().mul(mm.mView, params.eyepiece.m_W));
+	m_WVP.transform(top, {0, params.eyepiece.radius,0, 1});
+	m_WVP.transform(bot, {0,-params.eyepiece.radius,0, 1});
+	top.div(top.w);
+	bot.div(bot.w);
+	float scope_height_NDC = abs(top.y - bot.y);
+	float screen_height_NDC = 2.0;
+	float ratio_magnification = screen_height_NDC / scope_height_NDC;
+
+	// The magnficiation of the scope (1X 4X etc)
+	float scope_magnification = fov / deg2rad(svp_fov);
+
+	// The fov we need to render at in order to have correct zoom
+	float vFov = 2.0 * atan(tan(fov*0.5) / (ratio_magnification * scope_magnification));
+
+	// The fov we need for camera placement
+	float vFovMagOnly = 2.0 * atan(tan(fov * 0.5) / scope_magnification);
 
 	auto camera_offset_from_vfov_and_radius = [](float vFov, float radius) -> float {
 		return radius / tan(vFov/2.0);
@@ -275,64 +297,29 @@ void svpCamera() {
 
 	Fvector w_P_obj = {0,0,0};
 	Fvector w_N_obj = {0,0,1};
-
-	auto params = Device.m_SecondViewport;
 	params.objective.m_W.transform(w_P_obj);
 	params.objective.m_W.transform_dir(w_N_obj);
 
-	auto d = camera_offset_from_vfov_and_radius(fov, params.objective.radius);
+	auto m_W_svpcam = params.eyepiece.m_W;  // By default we use the eyepiece for camera placement
+	if (scope_svp_enabled >= 2 && params.objective.radius > EPS) {
+		// compute camera for objective lens placement
+		// FIXME: This should be the min fov of the scope, not the current fov
+		auto d = camera_offset_from_vfov_and_radius(vFovMagOnly, params.objective.radius);
+		m_W_svpcam = Fmatrix().mul(params.objective.m_W, Fmatrix().translate(0, 0, -d));
+	}
 
-	auto m_W_svpcam = Fmatrix().mul(params.objective.m_W, Fmatrix().translate(0, 0, -d));
-
-
-
-	auto aspect = Device.svp_width() / Device.svp_height();
-
-	Fmatrix eye_camera; 
-	eye_camera.invert(Device.matrices[0].mView);
-
-	// ------------------------------------------
-	// Find FOV of full screen eyepiece lens
-	auto p = Device.m_SecondViewport.eyepiece;
-	Fvector p_W = { 0, 0, 0 };
-	p.m_W.transform(p_W);
-
-	float dist = p_W.distance_to(Device.mInvView.c);
-	float eye_lens_fov = atan(p.radius / dist) * 2.0;
-
-	float magnification = fov / deg2rad(svp_fov);
-
-
-
-	// -----------------------------------------
-	// Correct for hud fov
-	float hud_fov;
-	Device.matrices[0].mProjectHud.decompose_projection(hud_fov, _, _, _);
-	float corrected_eye_lens_fov = eye_lens_fov / hud_fov;
-
-	// -----------------------------------------
-	// Compute camera offset
-	auto lens_obj = Device.m_SecondViewport.objective;
-	auto offset = lens_obj.radius * tan(eye_lens_fov * 0.5);
-
+	auto aspect = RImplementation.TargetSVP->Width /  RImplementation.TargetSVP->Height;
 
 
 	float fNearPlane_hud, fFarPlane_hud;
 	Device.matrices[0].mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
-
-	eye_lens_fov /= magnification;
-	corrected_eye_lens_fov /= magnification;
-	auto svp_proj = Fmatrix().build_projection(corrected_eye_lens_fov, aspect, fNearPlane, fFarPlane);
-	auto svp_proj_hud = Fmatrix().build_projection(eye_lens_fov, aspect, 0.001, fFarPlane_hud);
-	auto scope_camera2 = Fmatrix().mul(lens_obj.m_W, Fmatrix().translate(0, 0, -offset));
-
-
-	auto use_camera = scope_svp_enabled >= 2 ? m_W_svpcam : eye_camera;
+	auto svp_proj = Fmatrix().build_projection(vFov, aspect, fNearPlane, fFarPlane);
+	auto svp_proj_hud = Fmatrix().build_projection(vFov, aspect, 0.001, fFarPlane_hud);
 
 	if (scope_debug >= 2)
-		debug_scope(use_camera);
+		debug_scope(m_W_svpcam);
 
-	Device.matrices[1].mView.invert(use_camera);
+	Device.matrices[1].mView.invert(m_W_svpcam);
 	Device.matrices[1].mProject = svp_proj;
 	Device.matrices[1].mProjectHud = svp_proj_hud;
 }
