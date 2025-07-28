@@ -7,6 +7,7 @@
 #include "scope_defines.h"
 
 #define ASPECT_CORRECT_TC(tc) (tc - 0.5) * float2(screen_res.x/screen_res.y, 1.0) + 0.5;
+#define ASPECT_UNCORRECT_TC(tc) (tc - 0.5) * float2(screen_res.y/screen_res.x, 1.0) + 0.5;
 
 int scope_phase;
 
@@ -26,6 +27,7 @@ struct Scope
 
 	float4 dbg;
 };
+static Scope scope;
 
 
 struct v_out {
@@ -81,7 +83,18 @@ float2 ndc2(float4 p) {
 }
 
 float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
-	return sc;
+	if (!isSVPActive() && scope_phase & SCOPE_PHASE_IMAGE) {
+		// This is fake pip mode, so we have to correct the coordinates
+		float screen_delta  = length(ddy(scope.hpos.xy * screen_res.zw));
+		float texture_delta = length(ddy(scope.tc0.xy));
+		float tc_multiplier = texture_delta / screen_delta;
+
+		return ASPECT_UNCORRECT_TC((sc - 0.5) / tc_multiplier + 0.5);
+
+	} else {
+		return sc;
+	}
+	
 }
 
 float dbg_wp(v_out v, float4 p, float d) {
@@ -104,8 +117,6 @@ float2 world_to_corrected_tc(v_out v, float4 w_P) {
 }
 
 Scope new_Scope(v_out v) {
-	float factor = 4.0;
-
 	Scope s;
 
 	float cm = .01;

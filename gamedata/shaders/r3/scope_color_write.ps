@@ -17,7 +17,8 @@ float4 scope_custom_lens(Scope s);
 
 float4 main(v_out I) : SV_Target 
 {
-    Scope s = new_Scope(I);
+    scope = new_Scope(I);
+
 
     float4 o;
     if (scope_phase == 0) {
@@ -25,22 +26,22 @@ float4 main(v_out I) : SV_Target
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-        o =  float4(scope_custom_image(s), 1.0);
+        o =  float4(scope_custom_image(scope), 1.0);
     }
 
     if (scope_phase & SCOPE_PHASE_RETICLE) {
-        o = scope_custom_reticle(s);
-        if (scope_debug >= 3 && s.dbg.a > 0.5)
-            o = s.dbg;
+        o = scope_custom_reticle(scope);
+        if (scope_debug >= 3 && scope.dbg.a > 0.5)
+            o = scope.dbg;
     }
 
     if (scope_phase & SCOPE_PHASE_SHADOW) {
-        float c = scope_custom_shadow(s);
+        float c = scope_custom_shadow(scope);
         o = float4(0,0,0,c);
     }
 
     if (scope_phase & SCOPE_PHASE_LENS) {
-        o = scope_custom_lens(s);
+        o = scope_custom_lens(scope);
     }
 
     return o;

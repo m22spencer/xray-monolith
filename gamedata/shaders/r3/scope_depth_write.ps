@@ -27,7 +27,7 @@ PSOutput main(v_out I)
 	PSOutput output;
     output.depth = I.hpos.z + EPSILON;
 
-    Scope s = new_Scope(I);
+    scope = new_Scope(I);
  
     if (scope_phase == 0) {
         discard;
@@ -49,7 +49,7 @@ PSOutput main(v_out I)
         //NYI
     }
     if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        output.target2 = scope_custom_depth(s);
+        output.target2 = scope_custom_depth(scope);
     }
 
 	return output;
