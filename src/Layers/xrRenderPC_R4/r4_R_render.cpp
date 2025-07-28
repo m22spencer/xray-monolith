@@ -267,6 +267,25 @@ void svpCamera() {
 	float _, fov, fNearPlane, fFarPlane;
 	Device.matrices[0].mProject.decompose_projection(fov, _, fNearPlane, fFarPlane);
 
+
+
+	auto camera_offset_from_vfov_and_radius = [](float vFov, float radius) -> float {
+		return radius / tan(vFov/2.0);
+	};
+
+	Fvector w_P_obj = {0,0,0};
+	Fvector w_N_obj = {0,0,1};
+
+	auto params = Device.m_SecondViewport;
+	params.objective.m_W.transform(w_P_obj);
+	params.objective.m_W.transform_dir(w_N_obj);
+
+	auto d = camera_offset_from_vfov_and_radius(fov, params.objective.radius);
+
+	auto m_W_svpcam = Fmatrix().mul(params.objective.m_W, Fmatrix().translate(0, 0, -d));
+
+
+
 	auto aspect = Device.svp_width() / Device.svp_height();
 
 	Fmatrix eye_camera; 
@@ -308,7 +327,7 @@ void svpCamera() {
 	auto scope_camera2 = Fmatrix().mul(lens_obj.m_W, Fmatrix().translate(0, 0, -offset));
 
 
-	auto use_camera = scope_svp_enabled >= 2 ? scope_camera2 : eye_camera;
+	auto use_camera = scope_svp_enabled >= 2 ? m_W_svpcam : eye_camera;
 
 	if (scope_debug >= 2)
 		debug_scope(use_camera);
