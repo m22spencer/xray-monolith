@@ -70,7 +70,7 @@ uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
 
 
-float zoomRotateFactor() { return ogse_c_screen.x; }
+float zoomRotateFactor() { return m_hud_params.x; }
 
 
 float zoomFactor() {
