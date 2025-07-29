@@ -35,7 +35,7 @@ float3 _main(p_screen I,  float4 pos2d)
 		
 	float2 r = float2(1.0, 3.0);
 
-	return tc.x > 3.0 ? sm.Sample(smp_base, tc)
+	return tc.x > 3.0 ? sm.Sample(smp_base, tc).rrr
 	     : tc.x > 2.0 ? (tc.y > 0.66 ? pf_s.Sample(smp_base, tc*r) : tc.y > 0.33 ? pp_s.Sample(smp_base, tc*r) : (mv_s.Sample(smp_base, tc*r) * 100.0))
 		 : tc.x > 1.0 ? (tc.y > 0.66 ? pf_m.Sample(smp_base, tc*r) : tc.y > 0.33 ? pp_m.Sample(smp_base, tc*r) : (mv_m.Sample(smp_base, tc*r) * 100.0))
 		 : sampleScopeTex(tc);

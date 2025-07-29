@@ -33,10 +33,11 @@ void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
 	}
 	L_pos.set(L->position);
 
+
 	// 
 	int _cached_size = L->X.S.size;
 	L->X.S.posX = L->X.S.posY = 0;
-	L->X.S.size = SMAP_adapt_max;
+	L->X.S.size =  btwPow2_Ceil(SMAP_adapt_max) >> 1;
 	L->X.S.transluent = FALSE;
 
 	// Compute approximate screen area (treating it as an point light) - R*R/dist_sq
@@ -76,7 +77,7 @@ void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
 	if (_size > max_size) _size = max_size;
 	int _epsilon = iCeil(float(_size) * 0.01f);
 	int _diff = _abs(int(_size) - int(_cached_size));
-	L->X.S.size = (_diff >= _epsilon) ? _size : _cached_size;
+	L->X.S.size = (_diff >= _epsilon) ? btwPow2_Ceil(_size) >> 1 : _cached_size;
 
 	// make N pixel border
 	L->X.S.view.build_camera_dir(L_pos, L_dir, L_up);
