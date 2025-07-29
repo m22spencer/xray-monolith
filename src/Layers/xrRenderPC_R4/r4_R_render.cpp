@@ -467,13 +467,15 @@ void CRender::renderGBuffer() {
 		}
 	}
 
-	auto view = Device.dwFrame % 2 == 0 ? TargetMain : TargetSVP;
-	if (Target == view || !Device.m_SecondViewport.IsSVPActive())
+		auto view = Device.m_SecondViewport.IsSVPActive()
+			? Device.dwFrame % 2 == 0 ? TargetMain : TargetSVP
+			: TargetMain;
+		if (Target == view)
 	{
 		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-		view->phase_occq();
+			Target->phase_occq();
 		if (RImplementation.o.dx10_msaa)
-			RCache.set_ZB(view->rt_MSAADepth->pZRT);
+				RCache.set_ZB(Target->rt_MSAADepth->pZRT);
 		{
 			auto LP = &Lights.package;
 			for (auto L : LP->v_point)
