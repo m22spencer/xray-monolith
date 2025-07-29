@@ -1,7 +1,11 @@
-#include "night_vision.h"
-#include "common.h"
+#include "scope_common.h"
 
-float4 main(p_screen I,  float4 pos2d : SV_POSITION) : SV_Target
+float3 scope_custom_image(Scope s);
+#include "scope_custom_image.h"
+
+float4 main(v2p_TL I) : SV_Target
 {
-	return float4(s_image.Sample(smp_base, I.tc0).rgb, 1.0);
+	Scope s;
+	s.sfp = I.Tex0;
+	return float4(scope_custom_image(s), 1.0);
 } 

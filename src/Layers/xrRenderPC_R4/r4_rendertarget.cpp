@@ -347,9 +347,23 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 		*dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
-void CRenderTarget::SetActive() {
+#if USE_DX11 
+void CRenderTarget::SetActive() {	
+	HW.pBaseRT = baseRT;
+	HW.pBaseZB = baseZB;
+
+	auto isMain = this == RImplementation.TargetMain;
+	auto m = Device.matrices[isMain ? 0 : 1];
+	if (g_pGamePersistent) {
+		g_pGamePersistent->m_pGShaderConstants->hud_params.w = !isMain;
+		Device.m_SecondViewport.isSVPFrame = !isMain;
+		RImplementation.SetMatrices(m.mView, m.mProject, m.mProjectHud);
+	}
 	RImplementation.Target = this;
-	RCache.TextureOverrides = RenderTargetRemaps;
+
+	for (auto rt : RenderTargetRemaps) {
+		rt.first->surface_set(rt.second->pSurface);
+	}
 
 	Device.dwWidth = Width;
 	Device.dwHeight = Height;
@@ -357,7 +371,18 @@ void CRenderTarget::SetActive() {
 	Device.fASPECT = (float)Height / (float)Width;
 	Device.fWidth_2 = Width >> 1;
 	Device.fHeight_2 = Height >> 1;
+
+
+	set_viewport_size(HW.pContext, Width, Height);
+	RCache.set_RT(baseRT, 0);
+	RCache.set_RT(nullptr, 1);
+	RCache.set_RT(nullptr, 2);
+	RCache.set_RT(nullptr, 3);
+	RCache.set_ZB(baseZB);
+
+	RCache.set_Constants(nullptr);	
 }
+#endif
 
 CRenderTarget::CRenderTarget()
 	: CRenderTarget(nullptr, Device.dwWidth, Device.dwHeight)
@@ -370,6 +395,23 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	u32 SampleCount = 1;
 	auto w = Width;
 	auto h = Height;
+
+
+	auto id = name ? name : std::to_string(reinterpret_cast<std::uintptr_t>(this));
+	auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false) -> ref_rt {
+		ref_rt rt;
+
+
+		auto name = Name + ("$" + id);
+		rt.create(name.c_str(), w, h, f, SampleCount, useUAV);
+
+		ref_texture t;
+		t.create(Name);
+
+		RenderTargetRemaps.push_back({t, rt});
+
+		return rt;
+	};
 
 
 	if (ps_r_ssao_mode != 2/*hdao*/)
@@ -507,26 +549,20 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	}
 	//	NORMAL
 	{
-		auto id = name ? name : std::to_string(reinterpret_cast<std::uintptr_t>(this));
-		auto createUnique = [this, id](LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1) -> ref_rt {
-			ref_rt rt;
-			
-			ref_texture dummy_texture;
-			dummy_texture.create(Name);
-
-			auto name = Name + ("$" + id);
-			rt.create(name.c_str(), w, h, f, SampleCount);
-
-			RenderTargetDummies.push_back(dummy_texture);
-			RenderTargetRemaps.emplace(dummy_texture._get(), rt->pTexture._get());
-
-			return rt;
-		};
+		
 
 		auto colorfmt = RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8;
 		
-		baseRT = createUnique("$user$baseRT", w, h, colorfmt);
-		baseZB = createUnique("$user$baseZB", w, h, D3DFMT_D24S8);
+		if (id == "main") {
+			baseRT = HW.pBaseRT; 
+			baseZB = HW.pBaseZB; 
+		}
+		else {
+			rt_baseRT = createUnique("$user$baseRT", w, h, colorfmt);
+			rt_baseZB = createUnique("$user$baseZB", w, h, D3DFMT_D24S8);
+			baseRT = rt_baseRT->pRT;
+			baseZB = rt_baseZB->pZRT;
+		}
 
 		rt_Position = createUnique(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
@@ -534,8 +570,6 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		{
 			rt_MSAADepth = createUnique(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 		}
-
-		rt_tempzb = createUnique("$user$temp_zb", w, h, D3DFMT_D24S8); // Redotix99: for 3D Shader Based Scopes
 
 		// select albedo & accum
 		if (RImplementation.o.mrtmixdepth)
@@ -594,6 +628,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		rt_dof = createUnique(r2_RT_dof, w, h, RImplementation.o.dx11_hdr10 ? D3DFMT_A16B16G16R16F : D3DFMT_A8R8G8B8);
 
 		rt_secondVP = createUnique(r2_RT_secondVP, w, h, rt_Color->fmt, 1);
+		t_reticle.create("$user$reticle");
 
 		if (RImplementation.o.dx11_hdr10) {
 			rt_ui_pda = createUnique(r2_RT_ui, w, h, D3DFMT_A2R10G10B10); // NOTE: this is a hack to use DXGI R10G10B10A2_UNORM
@@ -716,6 +751,8 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	s_fakescope.create(b_fakescope, "r2\\fakescope"); //crookr
 	s_scope_preprocess.create("scope_preprocess");
 	s_scope_debug.create("scope_debug");
+	s_scope_color_write.create("scope_color_write");
+	s_scope_depth_write.create("scope_depth_write");
 
 	s_heatvision.create(b_heatvision, "r2\\heatvision"); //--DSR-- HeatVision
 	s_lut.create(b_lut, "r2\\lut");
@@ -763,7 +800,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 		if (RImplementation.o.dx10_minmax_sm)
 		{
-			rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, size / 4, size / 4, D3DFMT_R32F);
+			rt_smap_depth_minmax = createUnique(r2_RT_smap_depth_minmax, size / 4, size / 4, D3DFMT_R32F);
 			CBlender_createminmax TempBlender;
 			s_create_minmax_sm.create(&TempBlender, "null");
 		}
@@ -919,8 +956,8 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		u32 fvf_filter = (u32)D3DFVF_XYZRHW | D3DFVF_TEX8 | D3DFVF_TEXCOORDSIZE4(0) | D3DFVF_TEXCOORDSIZE4(1) |
 			D3DFVF_TEXCOORDSIZE4(2) | D3DFVF_TEXCOORDSIZE4(3) | D3DFVF_TEXCOORDSIZE4(4) | D3DFVF_TEXCOORDSIZE4(5) |
 			D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
-		rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
-		rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
+		rt_Bloom_1 = createUnique(r2_RT_bloom1, w, h, fmt);
+		rt_Bloom_2 = createUnique(r2_RT_bloom2, w, h, fmt);
 		g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RCache.QuadIB);
 		g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
 		s_bloom_dbg_1.create("effects\\screen_set", r2_RT_bloom1);
@@ -936,8 +973,8 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 	//SMAA
 	{
-		rt_smaa_edgetex.create(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
-		rt_smaa_blendtex.create(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
+		rt_smaa_edgetex = createUnique(r2_RT_smaa_edgetex, w, h, D3DFMT_A8R8G8B8);
+		rt_smaa_blendtex = createUnique(r2_RT_smaa_blendtex, w, h, D3DFMT_A8R8G8B8);
 
 		s_smaa.create(b_smaa, "r3\\smaa");
 	}
@@ -963,7 +1000,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 			FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
 			HW.pContext->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
 		}
-		u_setrt(Width, Height, baseRT->pRT,NULL,NULL,baseZB->pZRT);
+		u_setrt(Width, Height, baseRT,NULL,NULL,baseZB);
 	}
 
 	// HBAO
@@ -1348,6 +1385,8 @@ CRenderTarget::~CRenderTarget()
 {
 	_RELEASE(t_ss_async);
 
+	Device.m_SecondViewport.update_lens_params = nullptr;
+
 	// Textures
 	t_material->surface_set(NULL);
 
@@ -1551,8 +1590,8 @@ bool CRenderTarget::use_minmax_sm_this_frame()
 	case CRender::MMSM_AUTODETECT:
 		{
 			u32 dwScreenArea =
-				HW.m_ChainDesc.Width *
-				HW.m_ChainDesc.Height;
+				Width *
+				Height;
 
 			if ((dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold))
 				return need_to_render_sunshafts();

@@ -274,7 +274,7 @@ public:
 	void __stdcall MT_CALC();
 	ICF void MT_SYNC()
 	{
-		if (m_frame_calc == RDEVICE.dwViewport)
+		if (m_frame_calc == RDEVICE.dwFrame)
 			return;
 
 		MT_CALC();

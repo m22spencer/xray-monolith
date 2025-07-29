@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "../../xrGame/debug_renderer.h"
 #include "FBasicVisual.h"
+#include "xrRender_console.h"
+
+#if USE_DX11
+#include "../../gamedata/shaders/r3/scope_defines.h"
+#endif
 
 void CRenderTarget::phase_nightvision()
 {
@@ -201,6 +206,142 @@ void CRenderTarget::phase_heatvision()
 //--DSR-- HeatVision_start
 
 #if defined(USE_DX11)	
+void ffp_sfp(bool drawDebug) {
+	auto e = Device.m_SecondViewport.eyepiece;
+	auto o = Device.m_SecondViewport.objective;
+
+	Fvector p_e = {0,0,0}; e.m_W.transform(p_e);
+	Fvector p_o = {0,0,0}; o.m_W.transform(p_o);
+
+	if (o.radius < EPS)
+	{	// We have to have an objective lens or ffp/sfp wont work, so make one up
+		float cm = 0.01;
+		float distance = (10*cm);  // Something scopelike
+		o.radius = e.radius;
+		p_o = {0,0, distance};
+		e.m_W.transform(p_o);
+	}
+
+	{	// Not all scopes have eyepiece and objective inline, and we sure aren't going to simulate prisms
+		// So we will reproject the objective lens directly in front of the eyepiece lens and pretend
+		
+		float distance = p_o.distance_to(p_e) ;
+			
+		Fvector dir = {0,0,1};
+
+		o.m_W.transform_dir(dir);
+
+		p_o.set(dir.mul(distance).add(p_e));
+	}
+
+	Fvector p_d =  Fvector(p_o).sub(p_e);
+
+	Fvector p_c1 = Fvector(p_d).mul(0.4).add(p_e);
+	Fvector p_c2 = Fvector(p_d).mul(0.6).add(p_e);
+
+	if (drawDebug) {
+		Fvector u_e = {0,e.radius,0}; e.m_W.transform_dir(u_e);
+		Fvector u_o = {0,o.radius,0}; e.m_W.transform_dir(u_o);
+		Fvector u_c = {0,(o.radius + e.radius)*0.3,0}; e.m_W.transform_dir(u_c);
+
+
+		auto d = CDebugRenderer();
+		d.draw_line(Fmatrix(), Fvector(p_e).add(u_e), Fvector(p_c1).sub(u_c), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_e).sub(u_e), Fvector(p_c1).add(u_c), 0xffffffff, true);
+
+		d.draw_line(Fmatrix(), Fvector(p_c1).add(u_c), Fvector(p_c2).add(u_c), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_c1).sub(u_c), Fvector(p_c2).sub(u_c), 0xffffffff, true);
+
+		d.draw_line(Fmatrix(), Fvector(p_c2).add(u_c), Fvector(p_o).sub(u_o), 0xffffffff, true);
+		d.draw_line(Fmatrix(), Fvector(p_c2).sub(u_c), Fvector(p_o).add(u_o), 0xffffffff, true);
+	}
+	
+	Device.m_SecondViewport.w_ffp = Fvector(p_c1).add(p_e).mul(0.5);
+	Device.m_SecondViewport.w_sfp = Fvector(p_c2).add(p_o).mul(0.5);
+}
+
+void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
+{
+	auto elem = se ? se->E[0] : nullptr;
+	if (!elem)
+		return;
+	Fmatrix FTold = Device.mFullTransform;
+
+	Device.mFullTransform = Device.mFullTransformHud;
+	RCache.set_xform_project(Device.mProjectHud);
+
+	// Rendering
+	RImplementation.rmNear();
+
+	for (auto N : RImplementation.mapScopeHUDSorted) {
+		dxRender_Visual* V = N.val.pVisual;
+
+		auto tex = V->GetTexture();
+		if (tex)
+			t_reticle->surface_set(tex->surface_get());
+		RCache.set_Element(elem);
+
+		RCache.set_xform_world(N.val.Matrix);
+		RImplementation.apply_object(N.val.pObject);
+		RImplementation.apply_lmaterial();
+
+		auto set_v3 = [](LPCSTR id, Fvector3 v) -> void {
+			RCache.set_c(id, v.x, v.y, v.z, 1.0);
+		};
+
+		RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
+		RCache.set_c("scope_debug", (int)scope_debug);
+		set_v3("scope_w_ffp", Device.m_SecondViewport.w_ffp);
+		set_v3("scope_w_sfp", Device.m_SecondViewport.w_sfp);
+		Fvector pt = {0,0,0};
+		Device.m_SecondViewport.eyepiece.m_W.transform(pt);
+		set_v3("scope_w_eyepiece", pt);
+
+		bind(&N);
+		V->Render(0);
+
+		auto p = &Device.m_SecondViewport;
+		// Clear so that we don't have invalid data for no lense being found
+
+		static u32 dwFrame = 0;
+		if (Device.dwFrame > dwFrame)
+		{   // Compute the lens information
+			dwFrame = Device.dwFrame;
+
+			p->eyepiece.radius = 0.f;
+			p->objective.radius = 0.f;
+
+			auto S = N.val.pVisual->getVisData().sphere;
+			auto m_W = RCache.get_xform_world();
+			m_W.mulB_43(Fmatrix().translate(S.P));
+
+			p->eyepiece.m_W = m_W;
+			p->eyepiece.radius = S.R;
+
+			if (p->eyepiece.radius > EPS) {
+				// Many guns have had their mesh directly scaled, so the only reliable unit of
+				//    measurement is based off the only reliable mesh in the file. The lens.
+				Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
+
+				// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
+				p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
+				p->objective.radius = o.w;
+			
+			
+				ffp_sfp(scope_debug >= 3);
+			}
+		}
+	}
+
+	RImplementation.rmNormal();
+
+	// Restore projection
+	Device.mFullTransform = FTold;
+	RCache.set_xform_project(Device.mProject);
+
+	RImplementation.o.distortion = FALSE;
+}
+
 //  Redotix99: for 3D Shader Based Scopes 		(sorry for using the nightvision phase file)
 void CRenderTarget::phase_3DSSReticle()
 {
@@ -210,68 +351,53 @@ void CRenderTarget::phase_3DSSReticle()
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, HW.pBaseZB);
+	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
-	// For now, we need to feed the data back to Level() svp code
-	auto distort = bDistort;
-	auto f = Device.m_SecondViewport.update_lens_params = [distort]() -> void {
-		auto p = &Device.m_SecondViewport;
+	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
+		});
+	}
 
-		// Clear so that we don't have invalid data for no lense being found
-		p->eyepiece.radius = 0.f;
-		p->objective.radius = 0.f;
+	{   PIX_EVENT(SCOPE_PHASE_RETICLE);
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_RETICLE);
+		});
+	}
 
-		for (auto N : RImplementation.mapScopeHUDSorted) {
-			RCache.set_Element(N.val.se);
-			RCache.set_c("scope_render_phase", 2);  // Draw
-			RCache.set_c("bDistort", distort);
+	{   PIX_EVENT(SCOPE_PHASE_SHADOW);
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_SHADOW);
+		});
+	}
 
+	{   PIX_EVENT(SCOPE_PHASE_CUSTOM_DEPTH);
+		// write far plane
+		draw_scope(s_scope_depth_write, [](auto _) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE | SCOPE_PHASE_CUSTOM_DEPTH);
+			RCache.set_c("scope_depth_value", -1);
+		});
+	}
 
-			RImplementation.render_Reticle();
-
-			{   // Compute the lens information
-				auto S = N.val.pVisual->getVisData().sphere;
-				auto m_W = RCache.get_xform_world();
-				m_W.mulB_43(Fmatrix().translate(S.P));
-							
-				p->eyepiece.m_W = m_W;
-				p->eyepiece.radius = S.R;
-
-				if (p->eyepiece.radius > EPS) {
-					// Many guns have had their mesh directly scaled, so the only reliable unit of
-					//    measurement is based off the only reliable mesh in the file. The lens.
-					Fvector4 o = Fvector4(scope_objective_lens_offset).mul(p->eyepiece.radius);
-
-					// FIXME: I think we need to use the coordinate system of the scope, with the look vector of the gun
-					p->objective.m_W.mul(p->eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
-					p->objective.radius = o.w;
-				}
-			}
-			break;  // For now, we only handle the first lens rendered
-		}
-	};
-
-	// Make sure to actually render the reticle
-	f();
-
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, HW.pBaseZB);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 };
 
 /** Mask motion vectors & clear distortion rt
   */
 void CRenderTarget::phase_3DSSReticle_fixup()
 {
+	return;
 	PIX_EVENT(PHASE_SCOPE_FIXUP);
 	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
 	auto mvec = RImplementation.Target->rt_ssfx_motion_vectors;
 	auto distort = bDistort ? RImplementation.Target->rt_Generic_1 : 0;
 
 	// Do not set color or position buffers, as these are done in the prior phase.
-	u_setrt(0, 0, mvec, distort, HW.pBaseZB);
+	u_setrt(0, 0, mvec, distort, baseZB);
 
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
@@ -282,9 +408,8 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 		RCache.set_c("scope_render_phase", 3);  // Fixup
 		RCache.set_c("bDistort", bDistort);
 	}
-	RImplementation.render_Reticle();
 
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, HW.pBaseZB);
+	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, RImplementation.Target->baseZB);
 };
 
 /** Run scope preprocesson the current frame and store in svp rt.
@@ -293,14 +418,14 @@ void CRenderTarget::phase_3DSSReticle_fixup()
 void CRenderTarget::phase_svp_capture()
 {
 	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
-	u_setrt(rt_Color, nullptr, nullptr, nullptr);
+	u_setrt(rt_secondVP, nullptr, nullptr, nullptr, nullptr);
 
 	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
 
 	RCache.set_Element(s_scope_preprocess->E[1]);
 	RCache.set_c("scope_render_phase", 1);  // PREPASS
-	RCache.set_c("bDistort", bDistort);
+	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
 
 	
 	{   // Draw fullscreen triangle.
@@ -323,6 +448,6 @@ void CRenderTarget::phase_svp_capture()
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
 	}
 
-	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
+//	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
 };
 #endif

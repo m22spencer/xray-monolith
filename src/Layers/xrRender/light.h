@@ -81,6 +81,7 @@ public:
 		u32			frame2test;		// frame the test is sheduled to
 		u32			query_id;		// ID of occlusion query
 		u32			query_order;	// order of occlusion query
+		float       visible_frags;  //
 		bool		visible;		// visible/invisible
 		bool		pending;		// test is still pending
 		u16			smap_ID;

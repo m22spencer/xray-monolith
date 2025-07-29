@@ -47,7 +47,6 @@ public:
 	R_dsgraph::mapHUD_T mapHUDSorted;
 	R_dsgraph::mapHUD_T mapCamAttachedSorted;
 #if defined(USE_DX11)
-	R_dsgraph::mapScopeHUD_T mapScopeHUD;	//  Redotix99: for 3D Shader Based Scopes
 	R_dsgraph::mapScopeHUD_T mapScopeHUDSorted;
 #endif
 	R_dsgraph::mapLandscape_T mapLandscape;

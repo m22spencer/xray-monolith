@@ -207,7 +207,7 @@ public:
 	enum RRT
 	{
 		rtPDA = 1,
-		rtSVP,
+		rtSVP = 2
 	};
 
 

@@ -180,7 +180,6 @@ public:
 
 	CLight_DB Lights;
 	CLight_Compute_XFORM_and_VIS LR;
-	xr_vector<light*> Lights_LastFrame;
 	SMAP_Allocator LP_smap_pool;
 	light_Package LP_normal;
 	light_Package LP_pending;
@@ -218,7 +217,6 @@ public:
 	IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
 	void render_main(Fmatrix& mCombined, bool _fportals);
 	void render_forward();
-	void render_Reticle();
 	void render_smap_direct(Fmatrix& mCombined);
 	void render_indirect(light* L);
 	void render_lights(light_Package& LP);
@@ -230,7 +228,11 @@ public:
 
 	void render_sun_cascade(u32 cascade_ind);
 	void init_cacades();
+	void shadowmap_sun_cascades();
 	void render_sun_cascades();
+
+	void shadowmap_sun_cascade(u32 cascade_ind);
+	void shadowmap_sun_cascades(u32 cascade_ind);
 
 public:
 	ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
@@ -386,6 +388,7 @@ public:
 	virtual BOOL occ_visible(sPoly& P);
 
 	// Main
+	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
 	virtual void Render();
 	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);

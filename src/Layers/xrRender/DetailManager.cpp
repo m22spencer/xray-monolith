@@ -332,7 +332,7 @@ void CDetailManager::UpdateVisibleM()
 				}
 #endif
 				// Add to visibility structures
-				if (RDEVICE.dwViewport > S.frame)
+				if (RDEVICE.dwFrame > S.frame)
 				{
 					// Calc fade factor	(per slot)
 					float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
@@ -346,7 +346,7 @@ void CDetailManager::UpdateVisibleM()
 					float alpha_i = 1.f - alpha;
 					float dist_sq_rcp = 1.f / dist_sq;
 
-					S.frame = RDEVICE.dwViewport + Random.randI(15, 30);
+					S.frame = RDEVICE.dwFrame + Random.randI(15, 30);
 					for (int sp_id = 0; sp_id < dm_obj_in_slot; sp_id++)
 					{
 						SlotPart& sp = S.G[sp_id];
@@ -441,7 +441,7 @@ void CDetailManager::Render()
 	g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флaa eонцa ?aндa?a o?aвu [end of grass render]	
 	
 	RDEVICE.Statistic->RenderDUMP_DT_Render.End();
-	m_frame_rendered = RDEVICE.dwViewport;
+	m_frame_rendered = RDEVICE.dwFrame;
 }
 
 void __stdcall CDetailManager::MT_CALC()
@@ -455,8 +455,8 @@ void __stdcall CDetailManager::MT_CALC()
 #endif
 
 	MT.Enter();
-	if (m_frame_calc != RDEVICE.dwViewport)
-		if ((m_frame_rendered + 1) == RDEVICE.dwViewport) //already rendered
+	if (m_frame_calc != RDEVICE.dwFrame)
+		if ((m_frame_rendered + 1) == RDEVICE.dwFrame) //already rendered
 		{
 			Fvector EYE = RDEVICE.vCameraPosition_saved;
 
@@ -468,7 +468,7 @@ void __stdcall CDetailManager::MT_CALC()
 			RDEVICE.Statistic->RenderDUMP_DT_Cache.End();
 
 			UpdateVisibleM();
-			m_frame_calc = RDEVICE.dwViewport;
+			m_frame_calc = RDEVICE.dwFrame;
 		}
 	MT.Leave();
 }
@@ -477,9 +477,6 @@ void CDetailManager::details_clear()
 {
 	// Disable fade, next render will be scene
 	fade_distance = 99999;
-
-	if (ps_ssfx_grass_shadows.x <= 0)
-		return;
 
 	for (u32 x = 0; x < 3; x++)
 	{

@@ -594,25 +594,6 @@ void CRender::deleteTargets()
 
 void CRender::reset_begin()
 {
-	// Update incremental shadowmap-visibility solver
-	// BUG-ID: 10646
-	{
-		u32 it = 0;
-		for (it = 0; it < Lights_LastFrame.size(); it++)
-		{
-			if (0 == Lights_LastFrame[it]) continue ;
-			try
-			{
-				Lights_LastFrame[it]->svis.resetoccq();
-			}
-			catch (...)
-			{
-				Msg("! Failed to flush-OCCq on light [%d] %X", it, *(u32*)(&Lights_LastFrame[it]));
-			}
-		}
-		Lights_LastFrame.clear();
-	}
-
 	//AVO: let's reload details while changed details options on vid_restart
 	if (b_loaded && ((dm_current_size != dm_size) || (ps_r__Detail_density != ps_current_detail_density) || (
 		ps_r__Detail_height != ps_current_detail_height)))

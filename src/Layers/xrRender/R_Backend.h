@@ -113,8 +113,6 @@ public:
 	DWORD dummy0; //	Padding to avoid warning	
 	DWORD dummy1; //	Padding to avoid warning	
 	DWORD dummy2; //	Padding to avoid warning	
-
-	xr_map<CTexture*, CTexture*> TextureOverrides;
 #endif
 private:
 	// Render-targets

@@ -1386,7 +1386,7 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
 bool CWeapon::need_renderable()
 {
-	bool svp_has_objective_lens = (scope_svp_enabled > 1 && Device.m_SecondViewport.objective.radius > EPS);
+	bool svp_has_objective_lens = (scope_svp_enabled >= 2 && Device.m_SecondViewport.objective.radius > EPS);
 	bool not_in_scope = !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
 
 	return svp_has_objective_lens || not_in_scope;
@@ -3240,15 +3240,17 @@ bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera)
 		//    measurement is based off the only reliable mesh in the file. The lens.
 		Fvector4 o = Fvector4(scope_objective_lens_offset).mul(Device.m_SecondViewport.eyepiece.radius);
 
-		// Move camera to where min magnification uses full objective lens
-		auto l = o.w / tan(deg2rad(GetMinScopeZoomFactor() * 0.75) / 2.0);
-		o.z -= l;
-
 		if (Device.m_SecondViewport.objective.radius < EPS) {
 			// Can't render weapon in scope, but we can place the camera on the eyepiece lens
 			camera.set(Device.m_SecondViewport.eyepiece.m_W);
 			return true;
 		}
+
+		// Move camera to where min magnification uses full objective lens
+		auto l = o.w / tan(deg2rad(GetMinScopeZoomFactor() * 0.75) / 2.0);
+		o.z -= l;
+
+		
 		
 		camera.mul(Device.m_SecondViewport.eyepiece.m_W, Fmatrix().translate({ o.x, o.y, o.z }));
 		return true;

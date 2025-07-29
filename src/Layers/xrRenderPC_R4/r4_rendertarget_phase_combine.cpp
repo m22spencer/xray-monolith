@@ -77,7 +77,6 @@ void CRenderTarget::phase_combine()
 	Fvector2 m_blur_scale;
 	{
 		static Fmatrix m_saved_viewproj[2];
-
 		static Fvector3 saved_position[2];
 		GetPrevious()->Position_previous.set(saved_position[Device.m_SecondViewport.IsSVPFrame()]);
 		saved_position[Device.m_SecondViewport.IsSVPFrame()].set(Device.vCameraPosition);
@@ -114,7 +113,7 @@ void CRenderTarget::phase_combine()
 	{
 		HW.pContext->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
 		HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-		u_setrt(rt_Generic_0, rt_Generic_1, rt_Heat, baseZB->pZRT);	//--DSR-- HeatVision
+		u_setrt(rt_Generic_0, rt_Generic_1, rt_Heat, baseZB);	//--DSR-- HeatVision
 	}
 	else
 	{
@@ -354,7 +353,7 @@ void CRenderTarget::phase_combine()
 	}
 
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Generic_0, 0, 0, baseZB->pZRT);
+		u_setrt(rt_Generic_0, 0, 0, baseZB);
 	else
 		u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT);
 
@@ -368,7 +367,7 @@ void CRenderTarget::phase_combine()
 			phase_ssfx_rain(); // Render a small color buffer to do the refraction and more
 
 			if (!RImplementation.o.dx10_msaa)
-				u_setrt(rt_Generic_0, 0, rt_ssfx_motion_vectors, baseZB->pZRT);
+				u_setrt(rt_Generic_0, 0, rt_ssfx_motion_vectors, baseZB);
 			else
 				u_setrt(rt_Generic_0_r, 0, rt_ssfx_motion_vectors, rt_MSAADepth->pZRT);
 		}
@@ -394,7 +393,7 @@ void CRenderTarget::phase_combine()
 
 		//--DSR-- HeatVision_start
 		if (!RImplementation.o.dx10_msaa)
-			u_setrt(rt_Generic_0, rt_Heat, rt_ssfx_motion_vectors, baseZB->pZRT); // LDR RT
+			u_setrt(rt_Generic_0, rt_Heat, rt_ssfx_motion_vectors, baseZB); // LDR RT
 		else
 			u_setrt(rt_Generic_0_r, rt_Heat, rt_ssfx_motion_vectors, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
 		//--DSR-- HeatVision_end
@@ -454,7 +453,7 @@ void CRenderTarget::phase_combine()
 			FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
 			if (!RImplementation.o.dx10_msaa)
 			{
-				u_setrt(rt_Generic_1, 0, 0, baseZB->pZRT); // Now RT is a distortion mask
+				u_setrt(rt_Generic_1, 0, 0, baseZB); // Now RT is a distortion mask
 				HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
 			}
 			else
@@ -528,8 +527,6 @@ void CRenderTarget::phase_combine()
 		phase_dof();
 	}
 
-	RImplementation.mapScopeHUDSorted.clear();
-
 	if (!Device.m_SecondViewport.IsSVPFrame())
 		phase_lut();
 
@@ -590,13 +587,13 @@ void CRenderTarget::phase_combine()
 	// Combine everything + perform AA
 	if (RImplementation.o.dx10_msaa)
 	{
-		if (PP_Complex) u_setrt(rt_Generic, 0, 0, baseZB->pZRT); // LDR RT
-		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT->pRT,NULL,NULL, baseZB->pZRT);
+		if (PP_Complex) u_setrt(rt_Generic, 0, 0, baseZB); // LDR RT
+		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT,NULL,NULL, baseZB);
 	}
 	else
 	{
-		if (PP_Complex) u_setrt(rt_Color, 0, 0, baseZB->pZRT); // LDR RT
-		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT->pRT, NULL, NULL, baseZB->pZRT);
+		if (PP_Complex) u_setrt(rt_Color, 0, 0, baseZB); // LDR RT
+		else u_setrt(Device.dwWidth, Device.dwHeight, baseRT, NULL, NULL, baseZB);
 	}
 	//. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
 	RCache.set_CullMode(CULL_NONE);
@@ -744,7 +741,6 @@ void CRenderTarget::phase_combine()
 		t_LUM_dest->surface_set(NULL);
 	}
 
-	phase_scope_debug();
 
 #ifdef DEBUG
 	RCache.set_CullMode	( CULL_CCW );
@@ -892,7 +888,7 @@ void CRenderTarget::phase_wallmarks()
 	RCache.set_RT(NULL, 2);
 	RCache.set_RT(NULL, 1);
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Color,NULL,NULL, baseZB->pZRT);
+		u_setrt(rt_Color,NULL,NULL, baseZB);
 	else
 		u_setrt(rt_Color,NULL,NULL, rt_MSAADepth->pZRT);
 	// Stencil	- draw only where stencil >= 0x1
@@ -911,7 +907,7 @@ void CRenderTarget::phase_combine_volumetric()
 
 	//u_setrt(rt_Generic_0,0,0,HW.pBaseZB );			// LDR RT
 	if (!RImplementation.o.dx10_msaa)
-		u_setrt(rt_Generic_0, rt_Generic_1, 0, baseZB->pZRT);
+		u_setrt(rt_Generic_0, rt_Generic_1, 0, baseZB);
 	else
 		u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
 	//	Sets limits to both render targets

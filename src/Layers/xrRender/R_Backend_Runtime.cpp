@@ -19,8 +19,13 @@ void CBackend::OnFrameEnd()
 #ifndef _EDITOR
 	if (!g_dedicated_server)
 #endif
-	{
+	{	
+#if defined(USE_DX11)
+		RImplementation.TargetMain->SetActive();
+#endif
+
 #if defined(USE_DX10) || defined(USE_DX11)
+
 		HW.pContext->ClearState();
 		Invalidate();
 #else	//	USE_DX10
@@ -51,8 +56,8 @@ void CBackend::OnFrameBegin()
 		RImplementation.rmNormal();
 #if defined(USE_DX11)
 		RImplementation.TargetMain->SetActive();
-		set_RT(RImplementation.Target->baseRT->pRT);
-		set_ZB(RImplementation.Target->baseRT->pZRT);
+		set_RT(HW.pBaseRT);
+		set_ZB(HW.pBaseZB);
 #else
 		set_RT(HW.pBaseRT);
 		set_ZB(HW.pBaseZB);
@@ -235,12 +240,6 @@ void CBackend::set_Textures(STextureList* _T)
 		std::pair<u32, ref_texture>& loader = *_it;
 		u32 load_id = loader.first;
 		CTexture* load_surf = &*loader.second;
-
-#if USE_DX11
-		CTexture* o = TextureOverrides[load_surf];
-		if (o)
-			load_surf = o;
-#endif
 
 		//		if (load_id < 256)		{
 		if (load_id < CTexture::rstVertex)

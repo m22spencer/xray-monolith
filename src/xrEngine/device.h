@@ -105,6 +105,7 @@ public:
 
 	MatrixData matrices[2];
 	MatrixData matrices_previous[2];
+
 protected:
 
 	u32 Timer_MM_Delta;
@@ -150,6 +151,9 @@ public:
 		struct Lens { Fmatrix m_W; float radius; };
 		Lens eyepiece;
 		Lens objective;
+
+		Fvector3 w_ffp;
+		Fvector3 w_sfp;
 
 		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
 		Irect computeRect(float width, float height) {

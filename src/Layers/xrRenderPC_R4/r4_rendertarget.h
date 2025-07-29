@@ -102,8 +102,8 @@ public:
 #endif
 
 	// HW baseRT/baseZB
-	ref_rt baseRT;
-	ref_rt baseZB;
+	ID3D11RenderTargetView* baseRT;
+	ID3D11DepthStencilView* baseZB;
 
 	// MRT-path
 	ref_rt rt_Depth; // Z-buffer like - initial depth
@@ -166,6 +166,8 @@ public:
 
 	// HDR10
 	ref_rt rt_HDR10_HalfRes[2];
+
+	ref_texture t_reticle;
 
 	// env
 	ref_texture t_envmap_0; // env-0
@@ -231,16 +233,12 @@ public:
 		Fmatrix Matrix_previous, Matrix_current;
 		Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
 		Fvector3 Position_previous;
-		float RVelocity;
 	} Previous[2];	
 
 	PreviousData* GetPrevious() {
 		return &Previous[Device.m_SecondViewport.IsSVPFrame()];
 	}
 	
-
-	ref_rt rt_tempzb; // Redotix99: for 3D Shader Based Scopes
-
 	ref_shader s_ssfx_dumb;
 
 	//	Igor: for async screenshots
@@ -254,8 +252,15 @@ public:
 	ref_texture t_noise [TEX_jitter_count];
 	ID3DTexture2D* t_noise_surf_mipped;
 	ref_texture t_noise_mipped;
+
+
+	ref_shader s_scope_color_write;
+	ref_shader s_scope_depth_write;
 private:
 	// OCCq
+
+	ref_rt rt_baseRT;
+	ref_rt rt_baseZB;
 
 	ref_shader s_occq;
 	ref_shader s_sunshafts;
@@ -413,8 +418,7 @@ private:
 	bool m_bHasActiveVolumetric;
 	bool m_bHasActiveVolumetric_spot;
 
-	xr_list<ref_texture> RenderTargetDummies;
-	xr_map<CTexture*, CTexture*> RenderTargetRemaps;
+	xr_list<std::pair<ref_texture,ref_rt>> RenderTargetRemaps;
 public:
 	CRenderTarget();
 	CRenderTarget(LPCSTR name, u32 width, u32 height);
@@ -453,6 +457,7 @@ public:
 	void phase_nightvision();
 	void phase_fakescope(); //crookr
 	void phase_heatvision(); //--DSR-- HeatVision
+	void draw_scope(ref_shader e, std::function<void(R_dsgraph::mapSorted_Node* N)> bind);
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
 	void phase_3DSSReticle_fixup();
 	void phase_svp_capture();
