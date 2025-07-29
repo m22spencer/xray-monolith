@@ -272,7 +272,6 @@ void CRender::render_rain()
 			r_pmask(true, false);
 		}
 	}
-	HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, RainLight->rt_smap_depth->pSurface);
 
 	// Restore XForms
 	RCache.set_xform_world(Fidentity);

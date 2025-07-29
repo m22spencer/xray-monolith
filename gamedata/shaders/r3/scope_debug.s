@@ -11,4 +11,5 @@ function normal(shader, t_base, t_second, t_detail)
 	shader:dx10texture("mv_s", "$user$ssfx_motion_vectors$svp")
 	shader:dx10texture("pf_m", "$user$ssfx_prev_frame$main")
 	shader:dx10texture("pf_s", "$user$ssfx_prev_frame$svp")
+	shader:dx10texture("sm"  , "$user$smap_depth")
 end

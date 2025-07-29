@@ -54,27 +54,28 @@ IC void hud_light_restore(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos
 
 void CRender::render_lights_shadowmaps(light_Package& LP) {
 	PIX_EVENT(SHADOWED_LIGHTS);
-	//////////////////////////////////////////////////////////////////////////
-	// sort lights by importance???
-	// while (has_any_lights_that_cast_shadows) {
-	//		if (has_point_shadowed)		->	generate point shadowmap
-	//		if (has_spot_shadowed)		->	generate spot shadowmap
-	//		switch-to-accumulator
-	//		if (has_point_unshadowed)	-> 	accum point unshadowed
-	//		if (has_spot_unshadowed)	-> 	accum spot unshadowed
-	//		if (was_point_shadowed)		->	accum point shadowed
-	//		if (was_spot_shadowed)		->	accum spot shadowed
-	//	}
-	//	if (left_some_lights_that_doesn't cast shadows)
-	//		accumulate them
+
+	Target->phase_smap_spot_clear();
+	LP_smap_pool.initialize(RImplementation.o.smapsize);	
 	HOM.Disable();
 	for (auto L : LP.v_shadowed)
 	{
-		// if (has_spot_shadowed)
-		stats.s_used ++;
-
+		SMAP_Rect R;
 		LR.compute_xf_spot(L);
 
+		if (LP_smap_pool.push(R, L->X.S.size)) {
+			L->X.S.posX = R.min.x;
+			L->X.S.posY = R.min.y;
+		} else {
+			L->X.S.posX = 0;
+			L->X.S.posY = 0;
+			L->X.S.size = 0;
+			CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xffffff00, false);
+			break;
+		}
+
+		stats.s_used ++;
+		
 		auto pixels = Device.dwWidth*Device.dwHeight;
 
 		auto c = L->vis.visible 
@@ -82,15 +83,8 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 			: 0xffcccccc;
 		if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), c, false);
 
-		// generate spot shadowmap
-		Target->phase_smap_spot_clear();
-		L->X.S.posX = 0;
-		L->X.S.posY = 0;
-		u16 sid = L->vis.smap_ID;
 		{
 			PIX_EVENT(LIGHT_SHADOWMAP_RENDER);
-			if (!L->rt_smap_depth) continue;// Can be null when debug render is locked
-			HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 
 			// render
 			phase = PHASE_SMAP;
@@ -167,9 +161,6 @@ void CRender::render_lights(light_Package& LP)
 		Target->phase_accumulator();
 		for (auto L : LP.v_shadowed)
 		{
-			if (!L->rt_smap_depth) continue;// Can be null when debug render is locked
-			HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, L->rt_smap_depth->pSurface);
-
 			PIX_EVENT(SPOT_LIGHTS_ACCUM_VOLUMETRIC);
 			// TODO: This originally only ran under if (bNormal || bSpecial)
 			//    check if we need to strore this information on shadow map generation
