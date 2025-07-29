@@ -390,6 +390,9 @@ public:
 	// Main
 	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
+	void renderGBuffer();
+	void renderShadowmaps();
+	void combineGBuffer();
 	virtual void Render();
 	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
 	virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer);
