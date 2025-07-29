@@ -555,6 +555,7 @@ void CRender::renderGBuffer() {
 void CRender::renderShadowmaps() {
 	PIX_EVENT(RENDER_SHADOWMAPS);
 	shadowmap_sun_cascades();
+	render_lights_shadowmaps(LP_normal);
 }
 
 void CRender::combineGBuffer() {
