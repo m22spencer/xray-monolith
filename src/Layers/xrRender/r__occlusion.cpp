@@ -122,7 +122,7 @@ void R_occlusion::occq_close(u32& ID) {
 // Non blocking alternative to occq_get
 R_occlusion::occq_try_result R_occlusion::occq_try_get(u32& ID)
 {
-	occq_result fragments = 0xFFFFFFFF;
+	occq_result fragments = 0;
 
 	if (enabled && ID != iInvalidHandle) {
 		auto status = GetData(used[ID].Q, &fragments, sizeof(fragments));

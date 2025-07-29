@@ -446,37 +446,40 @@ void CRender::renderGBuffer() {
 		Target->disable_aniso();
 	}
 
+	bool locked = scope_debug == 4;
 
-	if (Target == TargetMain) {
-		auto LP = &Lights.package;
-		LP_normal.clear();
-		for (auto L : LP->v_point) {
-			L->vis_update(); 
-			if (L->vis.visible)
-				LP_normal.v_point.push_back(L);
+	if (!locked) {
+		if (Target == TargetMain) {
+			auto LP = &Lights.package;
+			LP_normal.clear();
+			for (auto L : LP->v_point) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_point.push_back(L);
+				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
+			}
+			for (auto L : LP->v_shadowed) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_shadowed.push_back(L);
+				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
+			}
+			for (auto L : LP->v_spot) {
+				L->vis_update(); 
+				if (L->vis.visible)
+					LP_normal.v_spot.push_back(L);
+				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
+			}
 		}
-		for (auto L : LP->v_shadowed) {
-			L->vis_update(); 
-			if (L->vis.visible)
-				LP_normal.v_shadowed.push_back(L);
-		}
-		for (auto L : LP->v_spot) {
-			L->vis_update(); 
-			if (L->vis.visible)
-				LP_normal.v_spot.push_back(L);
-		}
-	}
 
 		auto view = Device.m_SecondViewport.IsSVPActive()
 			? Device.dwFrame % 2 == 0 ? TargetMain : TargetSVP
 			: TargetMain;
 		if (Target == view)
-	{
-		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-			Target->phase_occq();
-		if (RImplementation.o.dx10_msaa)
-				RCache.set_ZB(Target->rt_MSAADepth->pZRT);
 		{
+			PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+			Target->phase_occq();
+
 			auto LP = &Lights.package;
 			for (auto L : LP->v_point)
 				L->vis_prepare();
@@ -489,9 +492,10 @@ void CRender::renderGBuffer() {
 			stats.l_shadowed = LP_normal.v_shadowed.size();
 			stats.l_unshadowed = LP_normal.v_point.size() + LP_normal.v_spot.size();
 			stats.l_total = stats.l_shadowed + stats.l_unshadowed;
+
+			LP_normal.sort();
+			LP_pending.sort();
 		}
-		LP_normal.sort();
-		LP_pending.sort();
 	}
 
 	//******* Main render :: PART-1 (second)

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../../xrGame/debug_renderer.h"
 
 IC bool pred_area(light* _1, light* _2)
 {
@@ -74,6 +75,13 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 
 		LR.compute_xf_spot(L);
 
+		auto pixels = Device.dwWidth*Device.dwHeight;
+
+		auto c = L->vis.visible 
+			? color_argb_f(1, L->vis.visible_frags/pixels*.75 + .25, 0, 0)
+			: 0xffcccccc;
+		if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), c, false);
+
 		// generate spot shadowmap
 		Target->phase_smap_spot_clear();
 		L->X.S.posX = 0;
@@ -81,6 +89,7 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 		u16 sid = L->vis.smap_ID;
 		{
 			PIX_EVENT(LIGHT_SHADOWMAP_RENDER);
+			if (!L->rt_smap_depth) continue;// Can be null when debug render is locked
 			HW.pContext->ClearDepthStencilView(L->rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 
 			// render
@@ -158,6 +167,7 @@ void CRender::render_lights(light_Package& LP)
 		Target->phase_accumulator();
 		for (auto L : LP.v_shadowed)
 		{
+			if (!L->rt_smap_depth) continue;// Can be null when debug render is locked
 			HW.pContext->CopyResource(Target->rt_smap_depth->pSurface, L->rt_smap_depth->pSurface);
 
 			PIX_EVENT(SPOT_LIGHTS_ACCUM_VOLUMETRIC);

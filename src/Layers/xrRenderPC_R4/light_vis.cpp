@@ -24,46 +24,13 @@ void light::vis_prepare()
 	if (vis.pending) 
 		return; // If a query is pending, do not overwhelm the gpu with more queries.
 
-	float safe_area = VIEWPORT_NEAR;
-	{
-		float a0 = deg2rad(Device.fFOV * Device.fASPECT / 2.f);
-		float a1 = deg2rad(Device.fFOV / 2.f);
-		float x0 = VIEWPORT_NEAR / _cos(a0);
-		float x1 = VIEWPORT_NEAR / _cos(a1);
-		float c = _sqrt(x0 * x0 + x1 * x1);
-		safe_area = _max(_max(VIEWPORT_NEAR, _max(x0, x1)), c);
-	}
-
-	//Msg	("sc[%f,%f,%f]/c[%f,%f,%f] - sr[%f]/r[%f]",VPUSH(spatial.center),VPUSH(position),spatial.radius,range);
-	//Msg	("dist:%f, sa:%f",Device.vCameraPosition.distance_to(spatial.center),safe_area);
-	bool skiptest = false;
-	if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_UNSHADOWED) && !flags.bShadow) skiptest = true;
-	if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_SHADOWED) && flags.bShadow) skiptest = true;
-	//if (ps_ssfx_volumetric.x > 0 && flags.bShadow) skiptest = true; // Temp Fix
-
 	vis.distance = Device.vCameraPosition.distance_to(spatial.sphere.P);
-
-	if (skiptest || vis.distance <= (spatial.sphere.R * 1.01f + safe_area))
-	{
-		// small error
-		vis.visible = true;
-		vis.pending = false;
-		vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
-		return;
-	}
 
 	// testing
 	vis.pending = true;
 	xform_calc();
 	RCache.set_xform_world(m_xform);
 	vis.query_order = RImplementation.occq_begin(vis.query_id);
-	//	Hack: Igor. Light is visible if it's frutum is visible. (Only for volumetric)
-	//	Hope it won't slow down too much since there's not too much volumetric lights
-	//	TODO: sort for performance improvement if this technique hurts
-	if ((flags.type == IRender_Light::SPOT) && flags.bShadow && flags.bVolumetric)
-		RCache.set_Stencil(FALSE);
-	else
-		RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 	RImplementation.Target->draw_volume(this);
 	RImplementation.occq_end(vis.query_id);
 }
@@ -75,7 +42,6 @@ void light::vis_update()
 	//		. shedule for 'large' interval
 	//	. test-result:	invisible:
 	//		. shedule for 'next-frame' interval
-
 	if (!vis.pending) return;
 
 	// Non blocking vis check.
@@ -86,8 +52,10 @@ void light::vis_update()
 
 	u32 frame = Device.dwFrame;
 
-	vis.visible_frags = vis.visible_frags * 0.5 + query.fragments;
-	vis.visible = (vis.visible_frags > cullfragments);
+	// Tuning this too aggressively will cull lights when pip is active.
+	const float vis_frag_relax_rate = 0.5;
+	vis.visible_frags = (vis.visible_frags + query.fragments) * vis_frag_relax_rate;
+	vis.visible = vis.visible_frags > cullfragments;
 	vis.pending = false;
 	if (vis.visible)
 	{
