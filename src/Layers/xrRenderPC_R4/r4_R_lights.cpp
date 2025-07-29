@@ -52,12 +52,19 @@ IC void hud_light_restore(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos
 	}
 }
 
+bool smap_importance(light* a, light* b) {
+	return a->vis.visible_frags > b->vis.visible_frags;
+}
+
 void CRender::render_lights_shadowmaps(light_Package& LP) {
 	PIX_EVENT(SHADOWED_LIGHTS);
 
 	Target->phase_smap_spot_clear();
 	LP_smap_pool.initialize(RImplementation.o.smapsize);	
 	HOM.Disable();
+
+	std::sort(LP.v_shadowed.begin(), LP.v_shadowed.end(), smap_importance);
+
 	for (auto L : LP.v_shadowed)
 	{
 		SMAP_Rect R;
