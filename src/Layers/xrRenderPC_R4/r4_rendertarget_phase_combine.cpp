@@ -77,7 +77,6 @@ void CRenderTarget::phase_combine()
 	Fvector2 m_blur_scale;
 	{
 		static Fmatrix m_saved_viewproj[2];
-
 		static Fvector3 saved_position[2];
 		GetPrevious()->Position_previous.set(saved_position[Device.m_SecondViewport.IsSVPFrame()]);
 		saved_position[Device.m_SecondViewport.IsSVPFrame()].set(Device.vCameraPosition);
