@@ -44,7 +44,9 @@
 
 #define HOLDERCUSTOM_NEW								// Upgrade CHolderCustom.
 #define CAR_NEW                                         // Upgrade CCar.
-//#define STATIONARYMGUN_NEW								// Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
+#define STATIONARYMGUN_NEW
+//#define SE_STATIONARYMGUN_NEW								// Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
+//#define STATIONARYMGUN_ERR
 #define FEEL_ENHANCED									// Upgrade Feel.
 
 /*LAYERED_SND_SHOOT by Alundaio

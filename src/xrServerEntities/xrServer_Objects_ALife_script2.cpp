@@ -49,7 +49,7 @@ void CSE_ALifeCar::script_register(lua_State* L)
 	];
 }
 
-#ifdef STATIONARYMGUN_NEW
+#ifdef STATIONARYMGUN_ERR
 void CSE_ALifeStationaryMgun::script_register(lua_State* L)
 {
 	module(L)[

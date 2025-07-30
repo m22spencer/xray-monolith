@@ -644,7 +644,7 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeMountedWeapon)
 #define script_type_list save_type_list(CSE_ALifeMountedWeapon)
 
-#ifdef STATIONARYMGUN_NEW
+#ifdef SE_STATIONARYMGUN_NEW
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeStationaryMgun, CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton)
 #else
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeStationaryMgun, CSE_ALifeDynamicObjectVisual)
@@ -686,7 +686,7 @@ protected:
 #endif
 SERVER_ENTITY_DECLARE_END
 
-#ifdef STATIONARYMGUN_NEW
+#ifdef STATIONARYMGUN_ERR
 add_to_type_list(CSE_ALifeStationaryMgun)
 #define script_type_list save_type_list(CSE_ALifeStationaryMgun)
 #endif

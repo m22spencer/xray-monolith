@@ -364,10 +364,10 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 		B.net_Spawn(DC);
 		B.Light_Create();
 	}
-
 	CSE_ALifeStationaryMgun *E = smart_cast<CSE_ALifeStationaryMgun *>(DC);
 	VERIFY3(E, cNameSect_str(), "No CSE_ALifeStationaryMgun");
 
+#ifdef STATIONARYMGUN_ERR
 	{
 		SetAmmoElapsed(0);
 		SetAmmoType(E->ammo_type);
@@ -379,10 +379,9 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 				m_barrels.at(idx).SetAmmoElapsed(E->m_barrels.at(idx).a_elapsed);
 			}
 		}
-
-		iAmmoElapsed = E->a_elapsed;
-		SetAmmoElapsed(iAmmoElapsed);
+		SetAmmoElapsed(E->a_elapsed);
 	}
+#endif
 
 	LPCSTR custom_cam_first = READ_IF_EXISTS(ini, r_string, "camera", "cam_first", nullptr);
 	if (custom_cam_first && pSettings->section_exist(custom_cam_first))

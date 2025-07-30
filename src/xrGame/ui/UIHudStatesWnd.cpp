@@ -20,9 +20,6 @@
 #include "../ai/monsters/basemonster/base_monster.h"
 #include "../PDA.h"
 #include "WeaponMagazinedWGrenade.h"
-#ifdef STATIONARYMGUN_NEW
-#include "WeaponStatMgun.h"
-#endif
 
 CUIHudStatesWnd::CUIHudStatesWnd()
 	: m_b_force_update(true),

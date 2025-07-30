@@ -37,10 +37,6 @@
 #include "antirad.h"
 #include "BottleItem.h"
 
-#ifdef STATIONARYMGUN_NEW
-#include "WeaponStatMgun.h"
-#endif
-
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;

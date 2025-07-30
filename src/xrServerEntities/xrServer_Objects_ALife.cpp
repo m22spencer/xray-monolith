@@ -2125,13 +2125,13 @@ void CSE_ALifeMountedWeapon::FillProps			(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-#ifdef STATIONARYMGUN_NEW
+#ifdef SE_STATIONARYMGUN_NEW
 CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection)
 #else
 CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
 #endif
 {
-#ifdef STATIONARYMGUN_NEW
+#ifdef SE_STATIONARYMGUN_NEW
 	ammo_type = 0;
 	a_elapsed = 0;
 #endif
@@ -2229,6 +2229,7 @@ void CSE_ALifeStationaryMgun::STATE_Read(NET_Packet& tNetPacket, u16 size)
 	inherited1::STATE_Read(tNetPacket, size);
 	inherited2::STATE_Read(tNetPacket, size);
 
+#ifdef STATIONARYMGUN_NEW
 	ammo_type = tNetPacket.r_u8();
 	a_elapsed = tNetPacket.r_u16();
 
@@ -2245,6 +2246,7 @@ void CSE_ALifeStationaryMgun::STATE_Read(NET_Packet& tNetPacket, u16 size)
 	{
 		m_barrels.at(idx).read(tNetPacket);
 	}
+#endif
 #else
 	inherited::STATE_Read(tNetPacket, size);
 #endif
@@ -2256,6 +2258,7 @@ void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket)
 	inherited1::STATE_Write(tNetPacket);
 	inherited2::STATE_Write(tNetPacket);
 
+#ifdef STATIONARYMGUN_NEW
 	tNetPacket.w_u8(ammo_type);
 	tNetPacket.w_u16(a_elapsed);
 
@@ -2265,6 +2268,7 @@ void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket)
 	{
 		m_barrels.at(idx).write(tNetPacket);
 	}
+#endif
 #else
 	inherited::STATE_Write(tNetPacket);
 #endif
@@ -2273,7 +2277,7 @@ void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket)
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeStationaryMgun::FillProps			(LPCSTR pref, PropItemVec& values)
 {
-#ifdef STATIONARYMGUN_NEW
+#ifdef SE_STATIONARYMGUN_NEW
 	inherited1::FillProps			(pref,values);
 	inherited2::FillProps			(pref,values);
 #else
