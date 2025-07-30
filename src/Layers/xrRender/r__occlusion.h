@@ -1,6 +1,7 @@
 #pragma once
 
-const u32 occq_size = 2 * 768; //256	;	// queue for occlusion queries
+// FIXME: This should expand dynamically
+const u32 occq_size = 2 * 10000; //256	;	// queue for occlusion queries
 
 // must conform to following order of allocation/free
 // a(A), a(B), a(C), a(D), ....
@@ -44,6 +45,6 @@ public:
 	void occq_destroy();
 	u32 occq_begin(u32& ID); // returns 'order'
 	void occq_end(u32& ID);
-	occq_try_result occq_try_get(u32& ID);
+	occq_try_result occq_try_get(u32 ID);
 	occq_result occq_get(u32& ID);
 };

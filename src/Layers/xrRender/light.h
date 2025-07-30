@@ -61,8 +61,6 @@ public:
 	u32							indirect_photons;
 
 	smapvis			svis;		// used for 6-cubemap faces
-	ref_rt          rt_smap_depth;
-	u32             smap_render_frame = 0;
 
 	ref_shader		s_spot;
 	ref_shader		s_point;
@@ -81,7 +79,9 @@ public:
 		u32			frame2test;		// frame the test is sheduled to
 		u32			query_id;		// ID of occlusion query
 		u32			query_order;	// order of occlusion query
+		xr_vector<std::pair<u32,R_occlusion::occq_try_result>>   r4_queries;
 		float       visible_frags;  //
+		float       accumulating_frags;
 		bool		visible;		// visible/invisible
 		bool		pending;		// test is still pending
 		u16			smap_ID;
