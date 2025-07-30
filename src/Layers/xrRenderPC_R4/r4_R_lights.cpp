@@ -52,37 +52,43 @@ IC void hud_light_restore(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos
 	}
 }
 
-bool smap_importance(light* a, light* b) {
-	return a->vis.visible_frags > b->vis.visible_frags;
-}
-
 void CRender::render_lights_shadowmaps(light_Package& LP) {
 	PIX_EVENT(SHADOWED_LIGHTS);
 
 	Target->phase_smap_spot_clear();
-	LP_smap_pool.initialize(RImplementation.o.smapsize);	
 	HOM.Disable();
 
-	std::sort(LP.v_shadowed.begin(), LP.v_shadowed.end(), smap_importance);
+	xr_vector<light*> out;
 
-	for (auto L : LP.v_shadowed)
-	{
-		SMAP_Rect R;
-		LR.compute_xf_spot(L);
-
-		if (LP_smap_pool.push(R, L->X.S.size)) {
-			L->X.S.posX = R.min.x;
-			L->X.S.posY = R.min.y;
-		} else {
-			L->X.S.posX = 0;
-			L->X.S.posY = 0;
-			L->X.S.size = 0;
-			CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xffffff00, false);
-			break;
+	bool success = false;
+	float size_factor = 1.0;
+	while(!success) {
+		success = true;
+		out.clear();
+		LP_smap_pool.initialize(RImplementation.o.smapsize);	
+		for (auto L : LP.v_shadowed)
+		{
+			LR.compute_xf_spot(L);
+			SMAP_Rect R;
+			if (LP_smap_pool.push(R, int(L->X.S.size * size_factor))) {
+				L->X.S.posX = R.min.x;
+				L->X.S.posY = R.min.y;
+				out.push_back(L);
+			}
+			else 
+			{
+				success = false;
+			}
 		}
+		if (!success)
+			size_factor *= 0.8;
+	}
 
+	for (auto L : out)
+	{
 		stats.s_used ++;
 		
+		L->X.S.size *= size_factor;
 		auto pixels = Device.dwWidth*Device.dwHeight;
 
 		auto c = L->vis.visible 
@@ -138,6 +144,8 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 			r_pmask(true, false);
 		}
 	}
+
+	LP.v_shadowed = out;
 }
 
 void CRender::render_lights(light_Package& LP)
