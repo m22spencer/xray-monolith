@@ -114,6 +114,8 @@ public:
 	DWORD dummy1; //	Padding to avoid warning	
 	DWORD dummy2; //	Padding to avoid warning	
 #endif
+	
+	void Invalidate();
 private:
 	// Render-targets
 	ID3DRenderTargetView* pRT[4];
@@ -194,7 +196,6 @@ private:
 	CMatrix*						matrices	[8	];	// matrices are supported only for FFP
 #endif
 
-	void Invalidate();
 public:
 	struct _stats
 	{
