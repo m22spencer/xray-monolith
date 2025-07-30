@@ -20,7 +20,7 @@ void light::vis_prepare()
 	//		. perform testing				= ???,		pending
 
 	u32 frame = Device.dwFrame;
-	if (frame < vis.frame2test && scope_debug < 3)
+	if (frame < vis.frame2test)
 		return;
 
 	auto light_to_player = Fvector(Device.vCameraPosition).sub(position);
@@ -39,14 +39,14 @@ void light::vis_prepare()
 		R_occlusion::occq_try_result r;
 		r.complete  = true;
 		r.fragments = RImplementation.Target->Width * RImplementation.Target->Height;
-		vis.r4_queries.insert({-1, r});
+		vis.r4_queries.push_back({-1, r});
 	}
 	
 	R_occlusion::occq_try_result r;
 	xform_calc();
 	RCache.set_xform_world(m_xform);
 	vis.query_order = RImplementation.occq_begin(vis.query_id);
-	vis.r4_queries.insert({vis.query_id, r});
+	vis.r4_queries.push_back({vis.query_id, r});
 	RImplementation.Target->draw_volume(this);
 	RImplementation.occq_end(vis.query_id);
 }
