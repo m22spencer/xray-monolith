@@ -371,16 +371,15 @@ void CRenderTarget::SetActive() {
 	Device.fASPECT = (float)Height / (float)Width;
 	Device.fWidth_2 = Width >> 1;
 	Device.fHeight_2 = Height >> 1;
-
-
-	set_viewport_size(HW.pContext, Width, Height);
+	
+	RCache.Invalidate();
+	set_viewport_size(HW.pContext, custom_viewport->Width, custom_viewport->Height);
 	RCache.set_RT(baseRT, 0);
 	RCache.set_RT(nullptr, 1);
 	RCache.set_RT(nullptr, 2);
 	RCache.set_RT(nullptr, 3);
 	RCache.set_ZB(baseZB);
 
-	RCache.set_Constants(nullptr);	
 }
 #endif
 
