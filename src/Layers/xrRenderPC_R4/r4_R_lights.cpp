@@ -58,13 +58,11 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 	Target->phase_smap_spot_clear();
 	HOM.Disable();
 
-	xr_vector<light*> out;
-
+	// Rebuild atlas until all lights fit
 	bool success = false;
 	float size_factor = 1.0;
 	while(!success) {
 		success = true;
-		out.clear();
 		LP_smap_pool.initialize(RImplementation.o.smapsize);	
 		for (auto L : LP.v_shadowed)
 		{
@@ -73,7 +71,6 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 			if (LP_smap_pool.push(R, int(L->X.S.size * size_factor))) {
 				L->X.S.posX = R.min.x;
 				L->X.S.posY = R.min.y;
-				out.push_back(L);
 			}
 			else 
 			{
@@ -84,13 +81,15 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 			size_factor *= 0.8;
 	}
 
-	for (auto L : out)
+	// Render the shadowmaps
+	for (auto L : LP.v_shadowed)
 	{
 		stats.s_used ++;
 		
+		// Make sure to use the scaled size we computed above
 		L->X.S.size *= size_factor;
-		auto pixels = Device.dwWidth*Device.dwHeight;
 
+		auto pixels = Device.dwWidth*Device.dwHeight;
 		auto c = L->vis.visible 
 			? color_argb_f(1, L->vis.visible_frags/pixels*.75 + .25, 0, 0)
 			: 0xffcccccc;
@@ -144,8 +143,6 @@ void CRender::render_lights_shadowmaps(light_Package& LP) {
 			r_pmask(true, false);
 		}
 	}
-
-	LP.v_shadowed = out;
 }
 
 void CRender::render_lights(light_Package& LP)

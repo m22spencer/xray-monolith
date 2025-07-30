@@ -437,7 +437,7 @@ void CRender::renderGBuffer() {
 					scope_svp_enabled 
 						? RImplementation.rmNear()
 						: RImplementation.rmNormal();
-					RCache.set_c("scope_phase", 2); //DEPTHWRITE
+					RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE); //DEPTHWRITE
 					RCache.set_c("scope_depth_value", 1.f);
 					});
 			}
@@ -554,13 +554,13 @@ void CRender::renderGBuffer() {
 	if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
 	{
 		PIX_EVENT(DEFER_RAIN);
-		render_rain();
+		//render_rain();
 	}
 }
 
 void CRender::renderShadowmaps() {
 	PIX_EVENT(RENDER_SHADOWMAPS);
-	shadowmap_sun_cascades();
+	//shadowmap_sun_cascades();
 	render_lights_shadowmaps(LP_normal);
 }
 
