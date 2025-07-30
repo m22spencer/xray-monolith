@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "../xrRender/light.h"
 #include "../../xrEngine/cl_intersect.h"
+#include "../../xrGame/debug_renderer.h"
 
 const u32 delay_small_min = 1;
 const u32 delay_small_max = 3;
@@ -10,6 +11,7 @@ const u32 cullfragments = 4;
 
 void light::vis_prepare()
 {
+	PIX_EVENT(LIGHT_PREPARE);
 	if (int(indirect_photons) != ps_r2_GI_photons) gi_generate();
 
 	//	. test is sheduled for future	= keep old result
@@ -18,10 +20,31 @@ void light::vis_prepare()
 	//		. perform testing				= ???,		pending
 
 	u32 frame = Device.dwFrame;
-	if (frame < vis.frame2test)
+	if (frame < vis.frame2test && scope_debug < 3)
 		return;
 
-	vis.distance = Device.vCameraPosition.distance_to(spatial.sphere.P);
+	float safe_area = VIEWPORT_NEAR;
+	{
+		float a0 = deg2rad(Device.fFOV * Device.fASPECT / 2.f);
+		float a1 = deg2rad(Device.fFOV / 2.f);
+		float x0 = VIEWPORT_NEAR / _cos(a0);
+		float x1 = VIEWPORT_NEAR / _cos(a1);
+		float c = _sqrt(x0 * x0 + x1 * x1);
+		safe_area = _max(_max(VIEWPORT_NEAR, _max(x0, x1)), c);
+	}
+
+	auto vLightToPlayer = Fvector(Device.vCameraPosition).sub(position);
+	vis.distance = vLightToPlayer.magnitude();
+	auto inside_range = vis.distance < (spatial.sphere.R * 1.25f + safe_area);
+	auto inside_cone  = direction.dotproduct(vLightToPlayer) > 0;  //FIXME: Use actual cone
+	if (inside_range)
+	{
+		if (scope_debug >=3) CDebugRenderer().draw_aabb(Fvector(position).add(direction), .05, .05, .05, inside_cone ? 0xff00ff00 : 0xff0000ff, false);
+		vis.visible = true;
+		vis.visible_frags = 65000;  //Extremely high priority light
+		vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
+		return;
+	}
 
 	xform_calc();
 	RCache.set_xform_world(m_xform);
@@ -33,6 +56,30 @@ void light::vis_prepare()
 
 void light::vis_update()
 {
+	auto frame = Device.dwFrame;
+	float safe_area = VIEWPORT_NEAR;
+	{
+		float a0 = deg2rad(Device.fFOV * Device.fASPECT / 2.f);
+		float a1 = deg2rad(Device.fFOV / 2.f);
+		float x0 = VIEWPORT_NEAR / _cos(a0);
+		float x1 = VIEWPORT_NEAR / _cos(a1);
+		float c = _sqrt(x0 * x0 + x1 * x1);
+		safe_area = _max(_max(VIEWPORT_NEAR, _max(x0, x1)), c);
+	}
+
+	auto vLightToPlayer = Fvector(Device.vCameraPosition).sub(position);
+	vis.distance = vLightToPlayer.magnitude();
+	auto inside_range = vis.distance < (spatial.sphere.R * 1.25f + safe_area);
+	auto inside_cone  = direction.dotproduct(vLightToPlayer) > 0;  //FIXME: Use actual cone
+	if (inside_range)
+	{
+		if (scope_debug >=3) CDebugRenderer().draw_aabb(Fvector(position).add(direction), .05, .05, .05, inside_cone ? 0xff00ff00 : 0xff0000ff, false);
+		vis.visible = true;
+		vis.visible_frags = 65000;  //Extremely high priority light
+		vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
+		return;
+	}
+
 	//	. not pending	->>> return (early out)
 	//	. test-result:	visible:
 	//		. shedule for 'large' interval
@@ -51,8 +98,6 @@ void light::vis_update()
 	vis.r4_query_ids = o;
 	if (!vis.r4_query_ids.empty())
 		return;
-
-	u32 frame = Device.dwFrame;
 
 	vis.visible_frags = vis.accumulating_frags;
 	vis.accumulating_frags = 0;
