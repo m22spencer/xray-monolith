@@ -29,20 +29,15 @@ PSOutput main(v_out I)
 
     scope = new_Scope(I);
  
-    if (!VALID(scope.sfp) || scope_phase == 0) {
-        discard;
-    }
     if (scope_phase & SCOPE_PHASE_GBUFFER) {
-        // Temporary hack for fixing blur in scope
-        //     we write some garbage to g-buffer position
-        // FIXME: output the correct information here
-        const float4 NO_BLUR = float4(100.0, 100.0, 100.0, 1.0);
- 
-        output.target2 = NO_BLUR;            // gbuffer-position
+        // NYI
         output.target3 = float4(0, 0, 1, 1); // gbuffer-motionvectors
     }
     
     if (scope_phase & SCOPE_PHASE_DEPTHWRITE) {
+        // FIXME: This should not be sfp
+        if (!VALID(scope.sfp))
+            discard;
         output.depth = scope_depth_value;
     }
     if (scope_phase & SCOPE_PHASE_DISTORTION) {
