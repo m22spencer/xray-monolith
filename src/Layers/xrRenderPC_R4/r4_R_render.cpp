@@ -554,20 +554,12 @@ void CRender::renderGBuffer() {
 	if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
 	{
 		PIX_EVENT(DEFER_RAIN);
-		//render_rain();
+		if (!Device.m_SecondViewport.IsSVPFrame())
+			shadowmap_rain();
+		render_rain();
 	}
-}
 
-void CRender::renderShadowmaps() {
-	PIX_EVENT(RENDER_SHADOWMAPS);
-	//shadowmap_sun_cascades();
-	render_lights_shadowmaps(LP_normal);
-}
-
-void CRender::combineGBuffer() {
-	PIX_EVENT(COMBINE_GBUFFER);
-	Device.dwViewport++;
-	// Save previus and current matrices
+		// Save previus and current matrices
 	{
 		static Fmatrix mm_saved_viewproj[2];
 
@@ -613,14 +605,6 @@ void CRender::combineGBuffer() {
 		}
 	}
 
-	// Directional light - fucking sun
-	if (bSUN) //bSUN && Device.dwFrame & 1 --Delayed sun update. Worth to check it in future
-	{
-		RImplementation.stats.l_visible++;
-		render_sun_cascades();
-		Target->accum_direct_blend();
-	}
-
 	{
 		PIX_EVENT(DEFER_SELF_ILLUM);
 		Target->phase_accumulator();
@@ -648,6 +632,27 @@ void CRender::combineGBuffer() {
 		Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB : Target->rt_MSAADepth->pZRT);
 		RImplementation.r_dsgraph_render_emissive(true, true);
 	}
+}
+
+// Sun uses the entire depth texture, so we have to do an interleaved pass here
+void CRender::renderSun() {
+	// Directional light - fucking sun
+	if (bSUN)
+	{
+		RImplementation.stats.l_visible++;
+		render_sun_cascades();
+	}	
+}
+
+void CRender::renderShadowmaps() {
+	PIX_EVENT(RENDER_SHADOWMAPS);
+	render_lights_shadowmaps(LP_normal);
+}
+
+// Combine runs in inverted order (svp -> main)
+void CRender::combineGBuffer() {
+	PIX_EVENT(COMBINE_GBUFFER);
+	Device.dwViewport++;
 
 	// Lighting, non dependant on OCCQ
 	{
@@ -759,6 +764,12 @@ void CRender::Render()
 			PIX_EVENT(DRAW_SVP);
 			renderGBuffer();
 		}
+	}
+
+	{   
+		PIX_EVENT(RENDER_SUN);
+		TargetMain->SetActive();
+		renderSun();
 	}
 
 	{

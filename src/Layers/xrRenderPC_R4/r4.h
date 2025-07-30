@@ -225,6 +225,8 @@ public:
 	void render_sun_near();
 	void render_sun_filtered();
 	void render_menu();
+	bool is_raining();
+	void shadowmap_rain();
 	void render_rain();
 
 	void render_sun_cascade(u32 cascade_ind);
@@ -392,6 +394,7 @@ public:
 	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
 	void renderGBuffer();
+	void renderSun();
 	void renderShadowmaps();
 	void combineGBuffer();
 	virtual void Render();

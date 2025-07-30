@@ -55,7 +55,7 @@ IC void hud_light_restore(xr_map<light*, std::pair<Fvector, Fvector>>& saved_pos
 void CRender::render_lights_shadowmaps(light_Package& LP) {
 	PIX_EVENT(SHADOWED_LIGHTS);
 
-	Target->phase_smap_spot_clear();
+	Target->phase_smap_spot_clear(Target->rt_smap_depth);
 	HOM.Disable();
 
 	// Rebuild atlas until all lights fit

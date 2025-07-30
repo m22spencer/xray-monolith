@@ -793,7 +793,7 @@ void CRender::render_sun()
 		bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 		if (bNormal || bSpecial)
 		{
-			Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
+			Target->phase_smap_direct(fuckingsun, Target->rt_smap_depth, SE_SUN_FAR);
 			RCache.set_xform_world(Fidentity);
 			RCache.set_xform_view(Fidentity);
 			RCache.set_xform_project(fuckingsun->X.D.combine);
@@ -1035,7 +1035,7 @@ void CRender::render_sun_near()
 		bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 		if (bNormal || bSpecial)
 		{
-			Target->phase_smap_direct(fuckingsun, SE_SUN_NEAR);
+			Target->phase_smap_direct(fuckingsun, Target->rt_smap_depth, SE_SUN_NEAR);
 			RCache.set_xform_world(Fidentity);
 			RCache.set_xform_view(Fidentity);
 			RCache.set_xform_project(fuckingsun->X.D.combine);
@@ -1118,8 +1118,9 @@ void CRender::shadowmap_sun_cascades()
 	if (b_need_to_render_sunshafts)
 		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-	for (u32 i = 0; i < m_sun_cascades.size(); ++i)
+	for (u32 i = 0; i < m_sun_cascades.size(); ++i) {
 		shadowmap_sun_cascade(i);
+	}
 
 	if (b_need_to_render_sunshafts)
 		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
@@ -1129,8 +1130,23 @@ void CRender::render_sun_cascades()
 {
 	PIX_EVENT(RENDER_SUN_CASCADES);
 
-	for (u32 i = 0; i < m_sun_cascades.size(); ++i)
+	for (u32 i = 0; i < m_sun_cascades.size(); ++i) {
+		TargetMain->SetActive();
+		shadowmap_sun_cascade(i);
+		
+		if (Device.m_SecondViewport.IsSVPActive()) {
+			TargetSVP->SetActive();
+			render_sun_cascade(i);
+		}
+		TargetMain->SetActive();
 		render_sun_cascade(i);
+	}
+	if (Device.m_SecondViewport.IsSVPActive()) {
+		TargetSVP->SetActive();
+		TargetSVP->accum_direct_blend();
+	}
+	TargetMain->SetActive();
+	TargetMain->accum_direct_blend();
 }
 
 void CRender::shadowmap_sun_cascade(u32 cascade_ind)
@@ -1367,6 +1383,9 @@ void CRender::shadowmap_sun_cascade(u32 cascade_ind)
 		FPU::m24r();
 	}
 
+	auto smap = Target->rt_smap_depth;
+
+	Target->phase_smap_spot_clear(smap);
 
 	// Begin SMAP-render
 	{
@@ -1392,7 +1411,7 @@ void CRender::shadowmap_sun_cascade(u32 cascade_ind)
 		bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 		if (bNormal || bSpecial)
 		{
-			Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
+			Target->phase_smap_direct(fuckingsun, smap, SE_SUN_FAR);
 			RCache.set_xform_world(Fidentity);
 			RCache.set_xform_view(Fidentity);
 			RCache.set_xform_project(fuckingsun->X.D.combine);
