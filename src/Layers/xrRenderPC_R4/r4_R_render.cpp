@@ -490,8 +490,7 @@ void CRender::Render()
 						// Write lens depth
 						Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
 							RCache.set_c("scope_phase", SCOPE_PHASE_GBUFFER); //GBUFFER
-							RCache.set_c("scope_depth_value", -1.f);
-							});
+						});
 					}
 
 					svpCamera();
@@ -504,19 +503,17 @@ void CRender::Render()
 					RCache.set_ZFunc(D3DCMP_LESSEQUAL);
 				}
 
-				if (Target == TargetMain)
+				if (Target == TargetMain && !Device.m_SecondViewport.IsSVPActive())
 				{
 					PIX_EVENT(SCOPE_WRITE_FAR_DEPTH);
 					// Write far plane depth
 					Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
 
 						// Write far plane as depth
-						scope_svp_enabled 
-							? RImplementation.rmNear()
-							: RImplementation.rmNormal();
-						RCache.set_c("scope_phase", 2); //DEPTHWRITE
+						RImplementation.rmNormal();
+						RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE); //DEPTHWRITE
 						RCache.set_c("scope_depth_value", 1.f);
-						});
+					});
 				}
 			}
 			r_dsgraph_render_graph(0);
