@@ -472,22 +472,18 @@ void CRender::renderGBuffer() {
 			}
 		}
 
-		auto view = Device.m_SecondViewport.IsSVPActive()
-			? Device.dwFrame % 2 == 0 ? TargetMain : TargetSVP
-			: TargetMain;
-		if (Target == view)
-		{
-			PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-			Target->phase_occq();
+		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+		Target->phase_occq();
 
-			auto LP = &Lights.package;
-			for (auto L : LP->v_point)
-				L->vis_prepare();
-			for (auto L : LP->v_shadowed)
-				L->vis_prepare();
-			for (auto L : LP->v_spot)
-				L->vis_prepare();
+		auto LP = &Lights.package;
+		for (auto L : LP->v_point)
+			L->vis_prepare();
+		for (auto L : LP->v_shadowed)
+			L->vis_prepare();
+		for (auto L : LP->v_spot)
+			L->vis_prepare();
 
+		if (Target == TargetMain) {
 			// stats
 			stats.l_shadowed = LP_normal.v_shadowed.size();
 			stats.l_unshadowed = LP_normal.v_point.size() + LP_normal.v_spot.size();

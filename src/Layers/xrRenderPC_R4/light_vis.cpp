@@ -20,17 +20,13 @@ void light::vis_prepare()
 	u32 frame = Device.dwFrame;
 	if (frame < vis.frame2test)
 		return;
-	
-	if (vis.pending) 
-		return; // If a query is pending, do not overwhelm the gpu with more queries.
 
 	vis.distance = Device.vCameraPosition.distance_to(spatial.sphere.P);
 
-	// testing
-	vis.pending = true;
 	xform_calc();
 	RCache.set_xform_world(m_xform);
 	vis.query_order = RImplementation.occq_begin(vis.query_id);
+	vis.r4_query_ids.push_back(vis.query_id);
 	RImplementation.Target->draw_volume(this);
 	RImplementation.occq_end(vis.query_id);
 }
@@ -42,19 +38,24 @@ void light::vis_update()
 	//		. shedule for 'large' interval
 	//	. test-result:	invisible:
 	//		. shedule for 'next-frame' interval
-	if (!vis.pending) return;
+	if (vis.r4_query_ids.empty()) return;
 
 	// Non blocking vis check.
 	// Possible minor delays with light visiblity changes
-	auto query = RImplementation.occq_try_get(vis.query_id);
-	if (!query.complete)
+	xr_vector<u32> o;
+	for (auto q : vis.r4_query_ids) {
+		auto query = RImplementation.occq_try_get(q);
+		if (query.complete) vis.accumulating_frags += query.fragments;
+		else o.push_back(q);
+	}
+	vis.r4_query_ids = o;
+	if (!vis.r4_query_ids.empty())
 		return;
 
 	u32 frame = Device.dwFrame;
 
-	// Tuning this too aggressively will cull lights when pip is active.
-	const float vis_frag_relax_rate = 0.5;
-	vis.visible_frags = (vis.visible_frags + query.fragments) * vis_frag_relax_rate;
+	vis.visible_frags = vis.accumulating_frags;
+	vis.accumulating_frags = 0;
 	vis.visible = vis.visible_frags > cullfragments;
 	vis.pending = false;
 	if (vis.visible)

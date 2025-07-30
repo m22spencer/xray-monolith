@@ -41,6 +41,7 @@ light::light(void) : ISpatial(g_SpatialSpace)
 	vis.query_order = 0;
 	vis.visible = true;
 	vis.visible_frags = 0;
+	vis.accumulating_frags = 0;
 	vis.pending = false;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
