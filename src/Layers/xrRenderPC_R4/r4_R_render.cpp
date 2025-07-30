@@ -400,6 +400,8 @@ void CRender::Render()
 
 	// Clear the stored lenses
 	RImplementation.mapScopeHUDSorted.clear();
+	Device.m_SecondViewport.eyepiece.radius = 0;
+	Device.m_SecondViewport.objective.radius = 0;
 
 	auto renderGBuffer = [this, bSUN]() -> void {
 		PIX_EVENT(RENDER_GBUFFER);
