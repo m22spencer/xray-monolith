@@ -47,7 +47,7 @@ public:
 	R_dsgraph::mapHUD_T mapHUDSorted;
 	R_dsgraph::mapHUD_T mapCamAttachedSorted;
 #if defined(USE_DX11)
-	R_dsgraph::mapScopeHUD_T mapScopeHUDSorted;
+	xr_vector<R_dsgraph::mapSorted_Node> mapScopeHUDSorted;
 #endif
 	R_dsgraph::mapLandscape_T mapLandscape;
 	//R_dsgraph::HUDMask_T HUDMask; // SSS 23: Deprecated
