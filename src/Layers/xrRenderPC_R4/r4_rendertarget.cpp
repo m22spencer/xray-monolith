@@ -365,6 +365,9 @@ void CRenderTarget::SetActive() {
 		rt.first->surface_set(rt.second->pSurface);
 	}
 
+	RImplementation.ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	RImplementation.View = 0;
+
 	Device.dwWidth = Width;
 	Device.dwHeight = Height;
 

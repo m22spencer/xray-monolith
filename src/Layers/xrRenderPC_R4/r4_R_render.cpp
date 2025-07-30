@@ -362,9 +362,6 @@ void CRender::Render()
 	if (o.sunstatic) bSUN = FALSE;
 	// Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
-	// HOM
-	// Always use the frustum from the main view
-	//    to prevent culling of some items.
 	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 	View = 0;
 	if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
