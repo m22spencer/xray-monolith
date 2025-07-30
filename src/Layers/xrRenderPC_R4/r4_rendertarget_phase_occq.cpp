@@ -7,7 +7,7 @@ void CRenderTarget::phase_occq()
 	else
 		u_setrt(Device.dwWidth, Device.dwHeight,NULL,NULL,NULL, rt_MSAADepth->pZRT);
 	RCache.set_Shader(s_occq);
-	RCache.set_CullMode(CULL_NONE);      // For player standing inside light volume
+	RCache.set_CullMode(CULL_CCW);      
 	RCache.set_Stencil(FALSE);           // We need the depth test fragment count
 	RCache.set_ColorWriteEnable(FALSE);
 }

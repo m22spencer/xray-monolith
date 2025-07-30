@@ -23,33 +23,30 @@ void light::vis_prepare()
 	if (frame < vis.frame2test && scope_debug < 3)
 		return;
 
-	float safe_area = VIEWPORT_NEAR;
-	{
-		float a0 = deg2rad(Device.fFOV * Device.fASPECT / 2.f);
-		float a1 = deg2rad(Device.fFOV / 2.f);
-		float x0 = VIEWPORT_NEAR / _cos(a0);
-		float x1 = VIEWPORT_NEAR / _cos(a1);
-		float c = _sqrt(x0 * x0 + x1 * x1);
-		safe_area = _max(_max(VIEWPORT_NEAR, _max(x0, x1)), c);
-	}
+	auto light_to_player = Fvector(Device.vCameraPosition).sub(position);
+	auto inside_dist = light_to_player.magnitude() < range;
+	auto inside_fov  = acos(light_to_player.normalize().dotproduct(direction.normalize())) < deg2rad(120.0f * 0.5);
 
-	auto vLightToPlayer = Fvector(Device.vCameraPosition).sub(position);
-	vis.distance = vLightToPlayer.magnitude();
-	auto inside_range = vis.distance < (spatial.sphere.R * 1.25f + safe_area);
-	auto inside_cone  = direction.dotproduct(vLightToPlayer) > 0;  //FIXME: Use actual cone
-	if (inside_range)
-	{
-		if (scope_debug >=3) CDebugRenderer().draw_aabb(Fvector(position).add(direction), .05, .05, .05, inside_cone ? 0xff00ff00 : 0xff0000ff, false);
-		vis.visible = true;
-		vis.visible_frags = 65000;  //Extremely high priority light
-		vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
-		return;
-	}
+	auto always = inside_dist && inside_fov;
 
+	if (scope_debug >= 3) {
+		auto p = Fvector(direction.normalize()).mul(range).add(position);
+		auto c = color_rgba_f(inside_dist && inside_fov, inside_dist && !inside_fov, inside_fov && !inside_dist, 1.0);
+		CDebugRenderer().draw_aabb(p, 0.05, 0.05, 0.05, c, false);
+	}
+	
+	if (always) {
+		R_occlusion::occq_try_result r;
+		r.complete  = true;
+		r.fragments = RImplementation.Target->Width * RImplementation.Target->Height;
+		vis.r4_queries.insert({-1, r});
+	}
+	
+	R_occlusion::occq_try_result r;
 	xform_calc();
 	RCache.set_xform_world(m_xform);
 	vis.query_order = RImplementation.occq_begin(vis.query_id);
-	vis.r4_query_ids.push_back(vis.query_id);
+	vis.r4_queries.insert({vis.query_id, r});
 	RImplementation.Target->draw_volume(this);
 	RImplementation.occq_end(vis.query_id);
 }
@@ -57,50 +54,30 @@ void light::vis_prepare()
 void light::vis_update()
 {
 	auto frame = Device.dwFrame;
-	float safe_area = VIEWPORT_NEAR;
-	{
-		float a0 = deg2rad(Device.fFOV * Device.fASPECT / 2.f);
-		float a1 = deg2rad(Device.fFOV / 2.f);
-		float x0 = VIEWPORT_NEAR / _cos(a0);
-		float x1 = VIEWPORT_NEAR / _cos(a1);
-		float c = _sqrt(x0 * x0 + x1 * x1);
-		safe_area = _max(_max(VIEWPORT_NEAR, _max(x0, x1)), c);
-	}
-
-	auto vLightToPlayer = Fvector(Device.vCameraPosition).sub(position);
-	vis.distance = vLightToPlayer.magnitude();
-	auto inside_range = vis.distance < (spatial.sphere.R * 1.25f + safe_area);
-	auto inside_cone  = direction.dotproduct(vLightToPlayer) > 0;  //FIXME: Use actual cone
-	if (inside_range)
-	{
-		if (scope_debug >=3) CDebugRenderer().draw_aabb(Fvector(position).add(direction), .05, .05, .05, inside_cone ? 0xff00ff00 : 0xff0000ff, false);
-		vis.visible = true;
-		vis.visible_frags = 65000;  //Extremely high priority light
-		vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
-		return;
-	}
 
 	//	. not pending	->>> return (early out)
 	//	. test-result:	visible:
 	//		. shedule for 'large' interval
 	//	. test-result:	invisible:
 	//		. shedule for 'next-frame' interval
-	if (vis.r4_query_ids.empty()) return;
+	if (vis.r4_queries.empty()) return;
 
 	// Non blocking vis check.
 	// Possible minor delays with light visiblity changes
-	xr_vector<u32> o;
-	for (auto q : vis.r4_query_ids) {
-		auto query = RImplementation.occq_try_get(q);
-		if (query.complete) vis.accumulating_frags += query.fragments;
-		else o.push_back(q);
+	for (auto &q : vis.r4_queries) {
+		if (!q.second.complete) {
+			auto r = RImplementation.occq_try_get(q.first);
+			if (r.complete) q.second = r;
+			else return;
+		}
 	}
-	vis.r4_query_ids = o;
-	if (!vis.r4_query_ids.empty())
-		return;
 
-	vis.visible_frags = vis.accumulating_frags;
-	vis.accumulating_frags = 0;
+	vis.visible_frags = 0;
+	for (auto &q : vis.r4_queries) {
+		vis.visible_frags += q.second.fragments;
+	}
+	vis.r4_queries.clear();
+
 	vis.visible = vis.visible_frags > cullfragments;
 	vis.pending = false;
 	if (vis.visible)
