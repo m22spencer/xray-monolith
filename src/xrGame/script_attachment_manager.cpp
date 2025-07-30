@@ -524,6 +524,9 @@ void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecu
 		bool bVisibleNow = m_kinematics->LL_GetBoneVisible(bone_id);
 		if (bVisibleNow != bVisibility)
 			m_kinematics->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+
+		m_kinematics->CalculateBones_Invalidate();
+		m_kinematics->CalculateBones(TRUE);
 	}
 }
 

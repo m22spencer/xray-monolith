@@ -23,6 +23,9 @@ class CUIWindow;
 #define ORIGIN_OFFSET        0.04f,  0.04f,  0.04f, 0.02f
 #define ORIGIN_OFFSET_AIM    0.015f, 0.015f, 0.01f, 0.005f
 
+// Lucy: Uncomment if there ever is a use for correct visbox on HUD models
+// #define ATTACHMENT_HUD_VISBOX
+
 struct attachable_hud_item;
 class motion_marks;
 
@@ -301,6 +304,23 @@ public:
 	SPickParam& GetPick() { return PP; };
 	collide::rq_result& GetRQ() { return GetPick().result; };
 	float GetRQVis() { return PP.power; };
+
+#ifdef ATTACHMENT_HUD_VISBOX
+	typedef void __stdcall hud_visual_callback(IKinematics*);
+	typedef svector<hud_visual_callback*, 6> HUD_CALLBACK_VECTOR;
+	typedef HUD_CALLBACK_VECTOR::iterator HUD_CALLBACK_VECTOR_IT;
+
+	HUD_CALLBACK_VECTOR m_visual_callback;
+
+	void add_visual_callback(hud_visual_callback* callback);
+	void remove_visual_callback(hud_visual_callback* callback);
+	void SetKinematicsCallback(bool set);
+
+	IC HUD_CALLBACK_VECTOR& visual_callbacks()
+	{
+		return (m_visual_callback);
+	}
+#endif
 };
 
 class CAnonHudItem : public CHudItem

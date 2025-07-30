@@ -499,6 +499,9 @@
 	<string id="ui_mm_modded_exes_sound_sound_delay_snd_pitch_variation_power">
 		<text>Вариация тона звуков (snd_pitch_variation_power)</text>
 	</string>
+	<string id="ui_mm_modded_exes_sound_sound_delay_snd_efx_environment_change_time">
+		<text>Время для смены звуковой среды (snd_efx_environment_change_time)</text>
+	</string>
 	
 	<!-- Control -->
 	<string id="ui_mm_menu_control">
@@ -799,8 +802,11 @@
 	<string id="ui_mm_modded_exes_optimizations_r__optimize_calculate_bones_desc">
 		<text>Модели скелетов, которые не находятся в поле зрения игрока или находятся далеко от него, не будут обновлять анимацией для экономии ресурсов ЦП.</text>
 	</string>
-	<string id="ui_mm_modded_exes_optimizations_ik_calc_dist">
-		<text>Дистанция для остановки вычислений (ik_calc_dist)</text>
+	<string id="ui_mm_modded_exes_optimizations_ik_calc_ssa">
+		<text>Максимальная экранная площадь (ik_calc_ssa)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_ik_calc_ssa_desc">
+		<text>Объекты площадью меньше чем это число будут оптимизированы. Чем больше число - тем более агрессивная оптимизация, может привести к визуальным багам</text>
 	</string>
 	<string id="ui_mm_modded_exes_optimizations_ik_always_calc_dist">
 		<text>Дистанция для постоянных вычислений (ik_always_calc_dist)</text>

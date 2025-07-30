@@ -3,8 +3,8 @@
 
 #include <msacm.h>
 
-#include "soundrender_core.h"
-#include "soundrender_source.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
 
 //	SEEK_SET	0	File beginning
 //	SEEK_CUR	1	Current file pointer position
@@ -74,22 +74,21 @@ bool CSoundRender_Source::LoadWave(LPCSTR pName)
 
 	vorbis_info* ovi = ov_info(&ovf, -1);
 	// verify
-	R_ASSERT3(ovi, "Invalid source info:", pName);
-	//R_ASSERT3				(ovi->rate==44100,"Invalid source rate:",pName);
+	R_ASSERT3(ovi, "Invalid source info:", pname.c_str());
 
 	if (ovi->rate != 44100)
 	{
-		Msg("! Warning: Invalid source rate: %s", pName);
+		Msg("! Warning: Invalid source rate: %s", pname.c_str());
 		ov_clear(&ovf);
 		FS.r_close(wave);
 		return false;
 	}
 
 #ifdef DEBUG
-	if(ovi->channels==2)
-	{
-		Msg("stereo sound source [%s]", pName);
-	}
+    if (ovi->channels == 2)
+    {
+        Msg("stereo sound source [%s]", pname.c_str());
+    }
 #endif // #ifdef DEBUG
 
 	ZeroMemory(&m_wformat, sizeof( WAVEFORMATEX ));
@@ -115,7 +114,7 @@ bool CSoundRender_Source::LoadWave(LPCSTR pName)
 		{
 			m_fMinDist = F.r_float();
 			m_fMaxDist = F.r_float();
-			m_fBaseVolume = 1.f;
+			m_fBaseVolume = 1.0f;
 			m_uGameType = F.r_u32();
 			m_fMaxAIDist = m_fMaxDist;
 		}
@@ -134,12 +133,12 @@ bool CSoundRender_Source::LoadWave(LPCSTR pName)
 			m_fBaseVolume = F.r_float();
 			m_uGameType = F.r_u32();
 			m_fMaxAIDist = F.r_float();
-		}
+		} 
 		else
 		{
 			if (strstr(Core.Params, "-dbg"))
 			{
-				Log("! Invalid ogg-comment version, file: ", pName);
+				Log("! Invalid ogg-comment version, file: ", pname.c_str());
 			}
 		}
 	}
@@ -147,10 +146,10 @@ bool CSoundRender_Source::LoadWave(LPCSTR pName)
 	{
 		if (strstr(Core.Params, "-dbg"))
 		{
-			Log("! Missing ogg-comment, file: ", pName);
+			Log("! Missing ogg-comment, file: ", pname.c_str());
 		}
 	}
-	R_ASSERT3((m_fMaxAIDist>=0.1f)&&(m_fMaxDist>=0.1f), "Invalid max distance.", pName);
+	R_ASSERT3((m_fMaxAIDist >= 0.1f) && (m_fMaxDist >= 0.1f), "Invalid max distance.", pname.c_str());
 
 	ov_clear(&ovf);
 	FS.r_close(wave);

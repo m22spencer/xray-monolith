@@ -520,6 +520,9 @@
 	<string id="ui_mm_modded_exes_sound_sound_delay_snd_pitch_variation_power">
 		<text>Pitch Variation Strength (snd_pitch_variation_power)</text>
 	</string>
+	<string id="ui_mm_modded_exes_sound_sound_delay_snd_efx_environment_change_time">
+		<text>Change Between Sound Environments Time (snd_efx_environment_change_time)</text>
+	</string>
 
 	<!-- Control -->
 	<string id="ui_mm_menu_control">
@@ -823,8 +826,11 @@
 	<string id="ui_mm_modded_exes_optimizations_r__optimize_calculate_bones_desc">
 		<text>Skeleton models that are not in players view or far away from view won't have animation updates to save CPU resources</text>
 	</string>
-	<string id="ui_mm_modded_exes_optimizations_ik_calc_dist">
-		<text>Distance to stop bone calculations (ik_calc_dist)</text>
+	<string id="ui_mm_modded_exes_optimizations_ik_calc_ssa">
+		<text>Maximum Screen Space Area (ik_calc_ssa)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_ik_calc_ssa_desc">
+		<text>Objects with area below this number will be optimized. Bigger number will result in more aggressive optimizations and might lead to visual bugs</text>
 	</string>
 	<string id="ui_mm_modded_exes_optimizations_ik_always_calc_dist">
 		<text>Distance to always perform bone calculations (ik_always_calc_dist)</text>

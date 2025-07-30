@@ -72,9 +72,7 @@ CWeaponMagazined::~CWeaponMagazined()
 	}
 
 	// sounds
-	auto I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
-	if (I != Device.seqParallel.end())
-		Device.seqParallel.erase(I);
+	Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
 }
 
 void CWeaponMagazined::net_Destroy()
