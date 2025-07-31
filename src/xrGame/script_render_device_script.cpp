@@ -21,6 +21,14 @@ void set_device_paused(CRenderDevice* d, bool b)
 	Device.Pause(b, TRUE, FALSE, "set_device_paused_script");
 }
 
+extern ENGINE_API BOOL bShowPauseString;
+
+void set_device_paused_ex(CRenderDevice* d, bool b)
+{
+	Device.Pause(b, TRUE, TRUE, "set_device_paused_ex_script");
+	bShowPauseString = FALSE;
+}
+
 extern ENGINE_API BOOL g_appLoaded;
 
 bool is_app_ready()
@@ -64,7 +72,8 @@ void CScriptRenderDevice::script_register(lua_State* L)
 		.def_readonly("precache_frame", &CRenderDevice::dwPrecacheFrame)
 		.def_readonly("frame", &CRenderDevice::dwFrame)
 		.def("is_paused", &is_device_paused)
-		.def("pause", &set_device_paused),
+		.def("pause", &set_device_paused)
+		.def("pause_ex", &set_device_paused_ex),
 		def("app_ready", &is_app_ready)
 	];
 }

@@ -141,6 +141,15 @@
 		void RemoveColorAnimation()
     }
 
+    class CUIDialogWnd : CUIWindow {
+        void AllowWorkInPause(bool state)
+    }
+
+    class render_device {
+        // Switch the pause, with sound emitters and without hint on screen
+        void pause_ex(bool state)
+    }
+
     class particles_object {
         void set_hud_mode(bool hud_mode)
     }
