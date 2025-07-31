@@ -489,7 +489,11 @@ void CRender::Render()
 						PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
 						// Write lens depth
 						Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
-							RCache.set_c("scope_phase", SCOPE_PHASE_GBUFFER); //GBUFFER
+							auto phase = Device.m_SecondViewport.IsSVPActive() 
+								? SCOPE_PHASE_GBUFFER
+								:  SCOPE_PHASE_GBUFFER | SCOPE_PHASE_DEPTHWRITE; // For 3DSS mode it's necessary to cut a hole regardless of occlusion
+							RCache.set_c("scope_phase", phase); //GBUFFER
+							RCache.set_c("scope_depth_value", 0.f);
 						});
 					}
 

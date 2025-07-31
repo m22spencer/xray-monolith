@@ -16,7 +16,6 @@ uniform float scope_depth_value;
 struct PSOutput
 {
     float4 g_position : SV_Target0;
-    float4 g_motion   : SV_Target3;
 	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
@@ -29,8 +28,7 @@ PSOutput main(v_out I)
    
 	PSOutput output;
     output.depth = depth;
-    output.g_position = float4(100, 100, depth, 100);
-    output.g_motion = float4(0, 0, 1, 1);
+    output.g_position = float4(0, 0, depth, 0);
         
     return output;
 }
