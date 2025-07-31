@@ -285,6 +285,7 @@ private:
 	ref_shader s_accum_volume;
 	ref_shader s_blur;
 	ref_shader s_dof;
+	ref_shader s_distort;
 	ref_shader s_pp_bloom;
 	ref_shader s_gasmask_drops;
 	ref_shader s_gasmask_dudv;
@@ -420,6 +421,7 @@ private:
 
 	xr_list<std::pair<ref_texture,ref_rt>> RenderTargetRemaps;
 public:
+	void fullscreen_pass();
 	CRenderTarget();
 	CRenderTarget(LPCSTR name, u32 width, u32 height);
 	~CRenderTarget();

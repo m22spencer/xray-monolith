@@ -481,7 +481,14 @@ void CRenderTarget::phase_combine()
 	   */
 	RCache.set_Stencil(FALSE);
 
-
+	if (bDistort) {
+		PIX_EVENT(APPLY_DISTORTION);
+		bDistort = false;
+		u_setrt(rt_Generic, nullptr, nullptr, nullptr, nullptr);
+		RCache.set_Element(s_distort->E[0]);
+		fullscreen_pass();
+		HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), rt_Generic->pTexture->surface_get());
+	}
 
 
 	if (!_menu_pp)
