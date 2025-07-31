@@ -28,25 +28,6 @@ void light::vis_prepare()
 
 	if (frame != vis.queryframe)
 		return; // Queries have already been sent
-
-	auto light_to_player = Fvector(Device.vCameraPosition).sub(position);
-	auto inside_dist = light_to_player.magnitude() < range;
-	auto inside_fov  = acos(light_to_player.normalize().dotproduct(direction.normalize())) < deg2rad(120.0f * 0.5);
-
-	auto always = inside_dist && inside_fov;
-
-	if (scope_debug >= 3) {
-		auto p = Fvector(direction.normalize()).mul(range).add(position);
-		auto c = color_rgba_f(inside_dist && inside_fov, inside_dist && !inside_fov, inside_fov && !inside_dist, 1.0);
-		CDebugRenderer().draw_aabb(p, 0.05, 0.05, 0.05, c, false);
-	}
-	
-	if (always) {
-		R_occlusion::occq_try_result r;
-		r.complete  = true;
-		r.fragments = RImplementation.Target->Width * RImplementation.Target->Height;
-		vis.r4_queries.push_back({-1, r});
-	}
 	
 	R_occlusion::occq_try_result r;
 	xform_calc();
@@ -60,6 +41,27 @@ void light::vis_prepare()
 void light::vis_update()
 {
 	auto frame = Device.dwFrame;
+
+	auto light_to_player = Fvector(Device.vCameraPosition).sub(position);
+	auto distance = light_to_player.magnitude();
+	auto inside_dist = distance < range;
+	auto inside_fov  = acos(light_to_player.normalize().dotproduct(direction.normalize())) < deg2rad(120.0f * 0.5);
+	auto critical_dist = distance < 1.0;
+
+	auto always = critical_dist || (inside_dist && inside_fov);
+
+	if (scope_debug >= 3) {
+		auto p = Fvector(direction.normalize()).mul(range).add(position);
+		auto c = color_rgba_f(inside_dist && inside_fov, inside_dist && !inside_fov, inside_fov && !inside_dist, 1.0);
+		CDebugRenderer().draw_aabb(p, 0.05, 0.05, 0.05, c, false);
+	}
+	
+	if (always) {
+		// Light could potentially be visible with a pending query
+		//    so we force it on here.
+		vis.visible = true;
+		vis.visible_frags = RImplementation.Target->Width * RImplementation.Target->Height;
+	}
 
 	//	. not pending	->>> return (early out)
 	//	. test-result:	visible:
@@ -78,7 +80,7 @@ void light::vis_update()
 		}
 	}
 
-	vis.visible_frags = 0;
+	if (!always) vis.visible_frags = 0;
 	for (auto &q : vis.r4_queries) {
 		vis.visible_frags += q.second.fragments;
 	}
