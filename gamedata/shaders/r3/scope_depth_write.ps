@@ -28,7 +28,7 @@ PSOutput main(v_out I)
    
 	PSOutput output;
     output.depth = depth;
-    output.g_position = float4(0, 0, depth, 0);
+    output.g_position = float4(1, 1, depth, 1); // Only care about depth here
         
     return output;
 }
