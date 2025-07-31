@@ -360,6 +360,18 @@ void CRenderTarget::phase_3DSSReticle()
 	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
+
+			auto P = Device.m_SecondViewport;
+			Fvector up = {0,1,0};
+			P.objective.m_W.transform_dir(up);
+			Device.mView.transform_dir(up);
+
+			up.z = 0.0;
+			up.normalize();
+			auto angle = acos(up.dotproduct({0,1,0})) * (up.x > 0 ? 1 : -1);
+
+
+			RCache.set_c("hack_tex_angle", angle);
 		});
 	}
 
