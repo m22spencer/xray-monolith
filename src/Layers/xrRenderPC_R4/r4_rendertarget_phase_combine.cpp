@@ -481,15 +481,18 @@ void CRenderTarget::phase_combine()
 	   */
 	RCache.set_Stencil(FALSE);
 
-	if (bDistort) {
-		PIX_EVENT(APPLY_DISTORTION);
-		bDistort = false;
-		u_setrt(rt_Generic, nullptr, nullptr, nullptr, nullptr);
-		RCache.set_Element(s_distort->E[0]);
-		fullscreen_pass();
-		HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), rt_Generic->pTexture->surface_get());
+	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0)
+	{
+		phase_ssfx_taa();
 	}
 
+	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0)
+	{
+		phase_ssfx_motion_blur();
+	}
+
+	if (ssfx_PrevPos_Requiered)
+		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
 
 	if (!_menu_pp)
 	{
@@ -502,9 +505,13 @@ void CRenderTarget::phase_combine()
 		phase_ssfx_fog_scattering();
 	}
 
-	if (RImplementation.o.ssfx_motionblur && ps_ssfx_motionblur.y > 0)
-	{
-		phase_ssfx_motion_blur();
+	if (bDistort) {
+		PIX_EVENT(APPLY_DISTORTION);
+		bDistort = false;
+		u_setrt(rt_Generic, nullptr, nullptr, nullptr, nullptr);
+		RCache.set_Element(s_distort->E[0]);
+		fullscreen_pass();
+		HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), rt_Generic->pTexture->surface_get());
 	}
 
 	if (scope_3D_fake_enabled && !Device.m_SecondViewport.IsSVPFrame())
@@ -563,14 +570,6 @@ void CRenderTarget::phase_combine()
         phase_smaa();
         RCache.set_Stencil(FALSE);
     }    
-	
-	if (RImplementation.o.ssfx_taa && ps_ssfx_taa.x > 0)
-	{
-		phase_ssfx_taa();
-	}
-
-	if (ssfx_PrevPos_Requiered)
-		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
 
 	if (Device.m_SecondViewport.IsSVPFrame()) {
 		phase_svp_capture();
