@@ -375,6 +375,12 @@ void CRenderTarget::phase_3DSSReticle()
 		});
 	}
 
+	{   PIX_EVENT(SCOPE_PHASE_LENS);
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_LENS);
+		});
+	}
+
 	{   PIX_EVENT(SCOPE_PHASE_CUSTOM_DEPTH);
 		// write far plane
 		u_setrt(RImplementation.Target->rt_Position, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
