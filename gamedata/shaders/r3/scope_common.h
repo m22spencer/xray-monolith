@@ -97,6 +97,8 @@ float2 ndc2(float4 p) {
 	return p.xy / p.w;
 }
 
+float hack_tex_angle;
+
 float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 	if (!isSVPActive() && scope_phase & SCOPE_PHASE_IMAGE) {
 		// This is fake pip mode, so we have to correct the coordinates
@@ -105,8 +107,15 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 		float texture_delta = length(ddy(scope.tc0.xy));
 		float tc_multiplier = texture_delta / screen_delta;
 
+		sc -= 0.5;
+
+		float angle = hack_tex_angle;
+
+		sc = float2( sc.x * cos(angle) - sc.y * sin(angle)
+		           , sc.x * sin(angle) + sc.y * cos(angle));
+
 		float f = (digitalZoom() * tc_multiplier);
-		return ASPECT_UNCORRECT_TC((sc - 0.5) / f + 0.5);
+		return ASPECT_UNCORRECT_TC(sc / f + 0.5);
 
 	} else {
 		return sc;
