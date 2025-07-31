@@ -385,9 +385,11 @@ void CRenderTarget::phase_3DSSReticle()
 		// write far plane
 		u_setrt(RImplementation.Target->rt_Position, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
+			RCache.set_Stencil(TRUE, D3DCMP_NOTEQUAL, 0x1, 0x1, 0x0, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
 			RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE | SCOPE_PHASE_CUSTOM_DEPTH);
 			RCache.set_c("scope_depth_value", 1);
 		});
+		RCache.set_Stencil(FALSE);
 	}
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
