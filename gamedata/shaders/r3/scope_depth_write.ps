@@ -3,7 +3,7 @@
 #include "scope_common.h"
 
 // Forward declare functions for better error messages
-float scope_custom_depth(Scope s);
+float scope_custom_depth(float4 hpos);
 #include "scope_custom_depth.h"
 
 // Add to surface depth to handle precision issues
@@ -15,37 +15,22 @@ uniform float scope_depth_value;
 
 struct PSOutput
 {
-    float4 target0 : SV_Target0;
-    float4 target1 : SV_Target1;
-    float4 target2 : SV_Target2;
-    float4 target3 : SV_Target3;
+    float4 g_position : SV_Target0;
+    float4 g_motion   : SV_Target3;
 	float depth : SV_Depth; // TODO: Change to SV_DepthGreaterEqual
 };
 
 PSOutput main(v_out I)
 {
+    float depth = 
+        scope_phase & SCOPE_PHASE_CUSTOM_DEPTH ? scope_custom_depth(I.hpos)
+      : scope_phase & SCOPE_PHASE_DEPTHWRITE ? scope_depth_value
+      : I.hpos.z + EPSILON;
+   
 	PSOutput output;
-    output.depth = I.hpos.z + EPSILON;
-
-    scope = new_Scope(I);
- 
-    if (scope_phase & SCOPE_PHASE_GBUFFER) {
-        // NYI
-        output.target3 = float4(0, 0, 1, 1); // gbuffer-motionvectors
-    }
-    
-    if (scope_phase & SCOPE_PHASE_DEPTHWRITE) {
-        // FIXME: This should not be sfp
-        if (!VALID(scope.sfp))
-            discard;
-        output.depth = scope_depth_value;
-    }
-    if (scope_phase & SCOPE_PHASE_DISTORTION) {
-        //NYI
-    }
-    if (scope_phase & SCOPE_PHASE_CUSTOM_DEPTH) {
-        output.target2 = scope_custom_depth(scope);
-    }
-
-	return output;
+    output.depth = depth;
+    output.g_position = float4(100, 100, depth, 100);
+    output.g_motion = float4(0, 0, 1, 1);
+        
+    return output;
 }
