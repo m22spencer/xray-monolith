@@ -24,7 +24,7 @@ PSOutput main(v_out I)
     float depth = 
         scope_phase & SCOPE_PHASE_CUSTOM_DEPTH ? scope_custom_depth(I.hpos)
       : scope_phase & SCOPE_PHASE_DEPTHWRITE ? scope_depth_value
-      : I.hpos.z + EPSILON;
+      : I.hpos.z;
    
 	PSOutput output;
     output.depth = depth;
