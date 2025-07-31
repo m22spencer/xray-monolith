@@ -331,10 +331,16 @@ void CRender::renderGBuffer() {
 	// Main calc
 	Device.Statistic->RenderCALC.Begin();
 	r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-	if (bSUN) set_Recorder(&main_coarse_structure);
+	if (bSUN && Target == TargetMain) set_Recorder(&main_coarse_structure);
 	else set_Recorder(NULL);
 	phase = PHASE_NORMAL;
-	render_main(Device.mFullTransform, true);
+
+	//SVP HACK: Use main frame view matrix to prevent rendering the wrong sector
+	auto main_ft = Fmatrix().mul(Device.mProject, Device.matrices[0].mView);
+	ViewBase.CreateFromMatrix(main_ft, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	View = 0;
+
+	render_main(main_ft, true);
 	set_Recorder(NULL);
 	r_pmask(true, false); // disable priority "1"
 	Device.Statistic->RenderCALC.End();
@@ -733,7 +739,7 @@ void CRender::Render()
 	Device.m_SecondViewport.eyepiece.radius = 0;
 	Device.m_SecondViewport.objective.radius = 0;
 
-
+	auto mainCameraPos = Device.vCameraPosition;
 	TargetMain->SetActive();
 	{
 		PIX_EVENT(DRAW_MAIN);
@@ -744,6 +750,8 @@ void CRender::Render()
 		TargetSVP->SetActive();
 		{
 			PIX_EVENT(DRAW_SVP);
+			//SVP HACK: Use main frame view matrix to prevent rendering the wrong sector
+			Device.vCameraPosition = mainCameraPos;
 			renderGBuffer();
 		}
 	}
