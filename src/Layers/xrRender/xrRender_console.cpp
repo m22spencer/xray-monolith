@@ -1301,8 +1301,8 @@ void xrRender_initconsole()
 	CMD4(CCC_Vector4, "r__bloom_thresh", &ps_pp_bloom_thresh, twb_min, twb_max);
 	CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
 
-	CMD4(CCC_Integer, "r__fakescope", &scope_fake_enabled, 0, 1); //crookr for fake scope
-	CMD4(CCC_Integer, "r__3Dfakescope", &scope_3D_fake_enabled, 0, 1); // Redotix99: for 3D Shader Based Scopes
+	CMD4(CCC_Integer, "r__fakescope", &scope_fake_enabled, 0, 0); //crookr for fake scope
+	CMD4(CCC_Integer, "r__3Dfakescope", &scope_3D_fake_enabled, 1, 1); // Redotix99: for 3D Shader Based Scopes
 	CMD4(CCC_Integer, "r__svpscope", &scope_svp_enabled, 0, 2);
 	CMD4(CCC_Integer, "r__scope_debug", &scope_debug, 0, 4);
 
