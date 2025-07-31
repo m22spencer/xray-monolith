@@ -74,7 +74,7 @@ void light::vis_update()
 	u32 frame = Device.dwFrame;
 	u32 fragments = RImplementation.occq_get(vis.query_id);
 
-	vis.visible_frags = (vis.visible_frags * 0.5) + fragments;
+	vis.visible_frags = fragments;
 	vis.visible = (vis.visible_frags > cullfragments);
 	vis.pending = false;
 	if (vis.visible)

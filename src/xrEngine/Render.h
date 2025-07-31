@@ -219,6 +219,8 @@ public:
 
 	BENCH_SEC_SCRAMBLEMEMBER1
 
+	BOOL bSUN;
+
 	// data
 	CFrustum ViewBase;
 	CFrustum* View;

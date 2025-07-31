@@ -219,11 +219,14 @@ public:
 	void render_forward();
 	void render_smap_direct(Fmatrix& mCombined);
 	void render_indirect(light* L);
+	void render_lights_shadowmaps(light_Package& LP);
 	void render_lights(light_Package& LP);
 	void render_sun();
 	void render_sun_near();
 	void render_sun_filtered();
 	void render_menu();
+	bool is_raining();
+	void shadowmap_rain();
 	void render_rain();
 
 	void render_sun_cascade(u32 cascade_ind);
@@ -250,7 +253,7 @@ public:
 	// HW-occlusion culling
 	IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
 	IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-	IC R_occlusion::occq_try_result occq_try_get(u32& ID) { return HWOCC.occq_try_get(ID); }
+	IC R_occlusion::occq_try_result occq_try_get(u32 ID) { return HWOCC.occq_try_get(ID); }
 	IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
 	ICF void apply_object(IRenderable* O)
@@ -390,6 +393,10 @@ public:
 	// Main
 	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
+	void renderGBuffer();
+	void renderSun();
+	void renderShadowmaps();
+	void combineGBuffer();
 	virtual void Render();
 	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
 	virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer);

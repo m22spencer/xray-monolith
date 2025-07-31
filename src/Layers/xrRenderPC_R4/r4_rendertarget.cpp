@@ -365,22 +365,24 @@ void CRenderTarget::SetActive() {
 		rt.first->surface_set(rt.second->pSurface);
 	}
 
+	RImplementation.ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	RImplementation.View = 0;
+
 	Device.dwWidth = Width;
 	Device.dwHeight = Height;
 
 	Device.fASPECT = (float)Height / (float)Width;
 	Device.fWidth_2 = Width >> 1;
 	Device.fHeight_2 = Height >> 1;
-
-
-	set_viewport_size(HW.pContext, Width, Height);
+	
+	RCache.Invalidate();
+	set_viewport_size(HW.pContext, custom_viewport->Width, custom_viewport->Height);
 	RCache.set_RT(baseRT, 0);
 	RCache.set_RT(nullptr, 1);
 	RCache.set_RT(nullptr, 2);
 	RCache.set_RT(nullptr, 3);
 	RCache.set_ZB(baseZB);
 
-	RCache.set_Constants(nullptr);	
 }
 #endif
 

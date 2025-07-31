@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::phase_smap_spot_clear()
+void CRenderTarget::phase_smap_spot_clear(ref_rt smap)
 {
 	/*
 	if (RImplementation.b_HW_smap)		u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_d_depth->pRT);
@@ -8,14 +8,14 @@ void CRenderTarget::phase_smap_spot_clear()
 	CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
 	*/
 
-	HW.pContext->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+	HW.pContext->ClearDepthStencilView(smap->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 }
 
 void CRenderTarget::phase_smap_spot(light* L)
 {
 	// Targets + viewport
 	//	TODO: DX10: CHeck if we don't need old-style SMAP
-	if (RImplementation.o.HW_smap) u_setrt(rt_smap_surf, NULL, NULL, L->rt_smap_depth->pZRT);
+	if (RImplementation.o.HW_smap) u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pZRT);
 		//else								u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_ZB);
 	else
 		VERIFY(!"Use HW SMap only for DX10!");
