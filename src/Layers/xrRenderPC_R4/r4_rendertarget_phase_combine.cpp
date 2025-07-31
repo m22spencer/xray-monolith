@@ -511,26 +511,24 @@ void CRenderTarget::phase_combine()
 	//Compute blur textures
 	phase_blur();
 
-	//Compute bloom (new)
-	if (RImplementation.o.ssfx_bloom)
-	{
-		if (!Device.m_SecondViewport.IsSVPFrame())
+	if (!Device.m_SecondViewport.IsSVPFrame()) {
+		//Compute bloom (new)
+		if (RImplementation.o.ssfx_bloom)
+		{
 			phase_ssfx_bloom();
-	}
-	else
-	{
-		phase_pp_bloom();
-	}
+		}
+		else
+		{
+			phase_pp_bloom();
+		}
 
-	if (ps_r2_ls_flags.test(R2FLAG_DOF))
-	{
-		phase_dof();
-	}
+		if (ps_r2_ls_flags.test(R2FLAG_DOF))
+		{
+			phase_dof();
+		}
 
-	if (!Device.m_SecondViewport.IsSVPFrame())
 		phase_lut();
 
-	if (!Device.m_SecondViewport.IsSVPFrame()) {
 		if (ps_r2_mask_control.x > 0)
 		{
 			phase_gasmask_dudv();
@@ -539,12 +537,12 @@ void CRenderTarget::phase_combine()
 
 		if (ps_r2_nightvision > 0)
 			phase_nightvision();
-	}
 
-	//--DSR-- HeatVision_start
-	if (ps_r2_heatvision > 0)
-		phase_heatvision();
-	//--DSR-- HeatVision_end
+		//--DSR-- HeatVision_start
+		if (ps_r2_heatvision > 0)
+			phase_heatvision();
+		//--DSR-- HeatVision_end
+	}
 
 	if (scope_fake_enabled && !scope_svp_enabled)
 	{
@@ -566,7 +564,6 @@ void CRenderTarget::phase_combine()
 
 	if (ssfx_PrevPos_Requiered)
 		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
-
 
 	if (Device.m_SecondViewport.IsSVPFrame()) {
 		phase_svp_capture();
