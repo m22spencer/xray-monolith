@@ -50,7 +50,6 @@ struct SafemodeAnm
 struct Lens {
 	Fmatrix transform = Fmatrix().identity();
 	float radius = 0.0;
-	IRenderVisual* visual = NULL;
 };
 
 class CWeapon : public CHudItemObject,
@@ -106,9 +105,6 @@ public:
 	int last_hide_bullet;
 	bool bHasBulletsToHide;
 
-	Lens eyepieceLens;
-	Lens objectiveLens;
-
 	//--DSR-- SilencerOverheat_start
 	float temperature;
 
@@ -126,7 +122,6 @@ public:
 	virtual void HUD_VisualBulletUpdate(bool force = false, int force_idx = -1);
 
 	void UpdateSecondVP();
-	void SetLensShaderNames(LPCSTR eyepiece, LPCSTR objective);
 	bool CWeapon::GetSVPCameraMatrix(Fmatrix& camera);
 
 

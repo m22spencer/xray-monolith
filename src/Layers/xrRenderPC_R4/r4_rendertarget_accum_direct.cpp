@@ -742,7 +742,7 @@ void CRenderTarget::accum_direct_blend()
 	{
 		VERIFY(0);
 		if (! RImplementation.o.dx10_msaa)
-			u_setrt(rt_Accumulator,NULL,NULL, HW.pBaseZB);
+			u_setrt(rt_Accumulator,NULL,NULL, baseZB);
 		else
 			u_setrt(rt_Accumulator,NULL,NULL, rt_MSAADepth->pZRT);
 
@@ -750,8 +750,8 @@ void CRenderTarget::accum_direct_blend()
 		// Common calc for quad-rendering
 		u32 Offset;
 		u32 C = color_rgba(255, 255, 255, 255);
-		float _w = float(Device.dwWidth);
-		float _h = float(Device.dwHeight);
+		float _w = float(Width);
+		float _h = float(Height);
 		
 		Fvector2 p0, p1;
 		p0.set(0.0f, 0.0f);
@@ -823,7 +823,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 	}
 	phase_accumulator();
 	if (! RImplementation.o.dx10_msaa)
-		u_setrt(rt_Generic_0,NULL,NULL, HW.pBaseZB);
+		u_setrt(rt_Generic_0,NULL,NULL, baseZB);
 	else
 		u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT);
 
@@ -932,7 +932,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 	// Perform lighting
 	{
 		if (! RImplementation.o.dx10_msaa)
-			u_setrt(rt_Generic_0,NULL,NULL, HW.pBaseZB); // enshure RT setup
+			u_setrt(rt_Generic_0,NULL,NULL, baseZB); // enshure RT setup
 		else
 			u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT); // enshure RT setup
 		RCache.set_CullMode(CULL_NONE);
@@ -1226,7 +1226,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
 	//	Set correct depth surface
 	//	It's slow. Make this when shader is created
-	{
+	if (false) {
 		char* pszSMapName;
 		BOOL b_HW_smap = RImplementation.o.HW_smap;
 		BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;

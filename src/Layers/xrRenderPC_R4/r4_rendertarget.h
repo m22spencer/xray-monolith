@@ -101,6 +101,10 @@ public:
 	xr_vector<Fplane>												dbg_planes;
 #endif
 
+	// HW baseRT/baseZB
+	ID3D11RenderTargetView* baseRT;
+	ID3D11DepthStencilView* baseZB;
+
 	// MRT-path
 	ref_rt rt_Depth; // Z-buffer like - initial depth
 	ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
@@ -162,6 +166,8 @@ public:
 
 	// HDR10
 	ref_rt rt_HDR10_HalfRes[2];
+
+	ref_texture t_reticle;
 
 	// env
 	ref_texture t_envmap_0; // env-0
@@ -227,16 +233,12 @@ public:
 		Fmatrix Matrix_previous, Matrix_current;
 		Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
 		Fvector3 Position_previous;
-		float RVelocity;
 	} Previous[2];	
 
 	PreviousData* GetPrevious() {
 		return &Previous[Device.m_SecondViewport.IsSVPFrame()];
 	}
 	
-
-	ref_rt rt_tempzb; // Redotix99: for 3D Shader Based Scopes
-
 	ref_shader s_ssfx_dumb;
 
 	//	Igor: for async screenshots
@@ -250,8 +252,15 @@ public:
 	ref_texture t_noise [TEX_jitter_count];
 	ID3DTexture2D* t_noise_surf_mipped;
 	ref_texture t_noise_mipped;
+
+
+	ref_shader s_scope_color_write;
+	ref_shader s_scope_depth_write;
 private:
 	// OCCq
+
+	ref_rt rt_baseRT;
+	ref_rt rt_baseZB;
 
 	ref_shader s_occq;
 	ref_shader s_sunshafts;
@@ -276,6 +285,7 @@ private:
 	ref_shader s_accum_volume;
 	ref_shader s_blur;
 	ref_shader s_dof;
+	ref_shader s_distort;
 	ref_shader s_pp_bloom;
 	ref_shader s_gasmask_drops;
 	ref_shader s_gasmask_dudv;
@@ -380,6 +390,10 @@ public:
 	ref_geom g_menu;
 
 	bool bDistort;
+
+	// The size at creation
+	const u32 Width;
+	const u32 Height;
 private:
 	float im_noise_time;
 	u32 im_noise_shift_w;
@@ -404,11 +418,14 @@ private:
 	//	Igor: used for volumetric lights
 	bool m_bHasActiveVolumetric;
 	bool m_bHasActiveVolumetric_spot;
+
+	xr_list<std::pair<ref_texture,ref_rt>> RenderTargetRemaps;
 public:
+	void fullscreen_pass();
 	CRenderTarget();
+	CRenderTarget(LPCSTR name, u32 width, u32 height);
 	~CRenderTarget();
-	void svp_scissor_hack(float width, float height);
-	void map_viewport_render_targets(std::function<void(ref_rt original, ref_rt views[2])> f);
+	void SetActive();
 	void accum_point_geom_create();
 	void accum_point_geom_destroy();
 	void accum_omnip_geom_create();
@@ -442,6 +459,7 @@ public:
 	void phase_nightvision();
 	void phase_fakescope(); //crookr
 	void phase_heatvision(); //--DSR-- HeatVision
+	void draw_scope(ref_shader e, std::function<void(R_dsgraph::mapSorted_Node* N)> bind);
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
 	void phase_3DSSReticle_fixup();
 	void phase_svp_capture();
@@ -456,9 +474,9 @@ public:
 	void phase_downsamp();
 	void phase_scope_debug();
 	void phase_wallmarks();
-	void phase_smap_direct(light* L, u32 sub_phase);
+	void phase_smap_direct(light* L, ref_rt smap, u32 sub_phase);
 	void phase_smap_direct_tsh(light* L, u32 sub_phase);
-	void phase_smap_spot_clear();
+	void phase_smap_spot_clear(ref_rt smap);
 	void phase_smap_spot(light* L);
 	void phase_smap_spot_tsh(light* L);
 	void phase_accumulator();

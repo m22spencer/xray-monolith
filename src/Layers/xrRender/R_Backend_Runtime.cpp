@@ -19,8 +19,13 @@ void CBackend::OnFrameEnd()
 #ifndef _EDITOR
 	if (!g_dedicated_server)
 #endif
-	{
+	{	
+#if defined(USE_DX11)
+		RImplementation.TargetMain->SetActive();
+#endif
+
 #if defined(USE_DX10) || defined(USE_DX11)
+
 		HW.pContext->ClearState();
 		Invalidate();
 #else	//	USE_DX10
@@ -49,8 +54,14 @@ void CBackend::OnFrameBegin()
 		Invalidate();
 		//	DX9 sets base rt nd base zb by default
 		RImplementation.rmNormal();
+#if defined(USE_DX11)
+		RImplementation.TargetMain->SetActive();
 		set_RT(HW.pBaseRT);
 		set_ZB(HW.pBaseZB);
+#else
+		set_RT(HW.pBaseRT);
+		set_ZB(HW.pBaseZB);
+#endif
 #endif	//	USE_DX10
 		Memory.mem_fill(&stat, 0, sizeof(stat));
 		Vertex.Flush();
@@ -229,6 +240,7 @@ void CBackend::set_Textures(STextureList* _T)
 		std::pair<u32, ref_texture>& loader = *_it;
 		u32 load_id = loader.first;
 		CTexture* load_surf = &*loader.second;
+
 		//		if (load_id < 256)		{
 		if (load_id < CTexture::rstVertex)
 		{

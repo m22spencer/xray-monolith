@@ -30,6 +30,7 @@
 #ifdef INGAME_EDITOR
 # include "../Include/editor/interfaces.hpp"
 #endif // #ifdef INGAME_EDITOR
+#include "../Include/xrRender/Kinematics.h"
 
 class engine_impl;
 
@@ -104,6 +105,7 @@ public:
 
 	MatrixData matrices[2];
 	MatrixData matrices_previous[2];
+
 protected:
 
 	u32 Timer_MM_Delta;
@@ -146,7 +148,12 @@ public:
 		bool isActive; // Oeaa aeoeaaoee ?aiaa?a ai aoi?ie au?ii?o
 
 	public:
-		Irect clipRect;
+		struct Lens { Fmatrix m_W; float radius; };
+		Lens eyepiece;
+		Lens objective;
+
+		Fvector3 w_ffp;
+		Fvector3 w_sfp;
 
 		// Objective lens screen space bounding box (FIXME: Hardcoded to 50% screen size)
 		Irect computeRect(float width, float height) {
@@ -166,6 +173,11 @@ public:
 		IC bool IsSVPActive() { return isActive; }
 		void SetSVPActive(bool bState);
 		bool IsSVPFrame() { return isSVPFrame; }
+
+		// Fetch the bone matrix of `v` from renderable skeleton (set in r4)
+		//    No longer required once scope calculations are moved into r4
+		std::function<bool(IKinematics* k, IRenderVisual* v, Fmatrix& m)> get_bone_matrix;
+		std::function<void()> update_lens_params;
 	};	
 	
 private:
@@ -262,6 +274,10 @@ public:
 	Fmatrix mInvFullTransform;
 
 	CSecondVPParams m_SecondViewport;	//--#SM+#-- +SecondVP+
+
+	// FIXME: Use chaindesc (Macro)
+	u32 svp_width() { return svp_height(); }
+	u32 svp_height() { return dwHeight >> 1; }
 
 	//float fFOV;
 	//float fASPECT;

@@ -38,6 +38,7 @@ public:
 	//	void								Apply			(u32 dwStage);
 
 	void surface_set(ID3DBaseTexture* surf);
+	void fast_set_unsafe(CTexture* source);
 	ID3DBaseTexture* surface_get();
 
 	IC BOOL isUser() { return flags.bUser; }

@@ -174,11 +174,12 @@ public:
 	CModelPool* Models;
 	CWallmarksEngine* Wallmarks;
 
-	CRenderTarget* Target; // Render-target
+	CRenderTarget* Target; // Active Render-target
+	CRenderTarget* TargetMain;
+	CRenderTarget* TargetSVP;
 
 	CLight_DB Lights;
 	CLight_Compute_XFORM_and_VIS LR;
-	xr_vector<light*> Lights_LastFrame;
 	SMAP_Allocator LP_smap_pool;
 	light_Package LP_normal;
 	light_Package LP_pending;
@@ -216,19 +217,25 @@ public:
 	IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
 	void render_main(Fmatrix& mCombined, bool _fportals);
 	void render_forward();
-	void render_Reticle();
 	void render_smap_direct(Fmatrix& mCombined);
 	void render_indirect(light* L);
+	void render_lights_shadowmaps(light_Package& LP);
 	void render_lights(light_Package& LP);
 	void render_sun();
 	void render_sun_near();
 	void render_sun_filtered();
 	void render_menu();
+	bool is_raining();
+	void shadowmap_rain();
 	void render_rain();
 
 	void render_sun_cascade(u32 cascade_ind);
 	void init_cacades();
+	void shadowmap_sun_cascades();
 	void render_sun_cascades();
+
+	void shadowmap_sun_cascade(u32 cascade_ind);
+	void shadowmap_sun_cascades(u32 cascade_ind);
 
 public:
 	ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
@@ -246,7 +253,7 @@ public:
 	// HW-occlusion culling
 	IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
 	IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-	IC R_occlusion::occq_try_result occq_try_get(u32& ID) { return HWOCC.occq_try_get(ID); }
+	IC R_occlusion::occq_try_result occq_try_get(u32 ID) { return HWOCC.occq_try_get(ID); }
 	IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
 	ICF void apply_object(IRenderable* O)
@@ -304,6 +311,8 @@ public:
 	// Loading / Unloading
 	virtual void create();
 	virtual void destroy();
+	void initializeTargets();
+	void deleteTargets();
 	virtual void reset_begin();
 	virtual void reset_end();
 
@@ -382,7 +391,12 @@ public:
 	virtual BOOL occ_visible(sPoly& P);
 
 	// Main
+	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
+	void renderGBuffer();
+	void renderSun();
+	void renderShadowmaps();
+	void combineGBuffer();
 	virtual void Render();
 	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
 	virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer);
