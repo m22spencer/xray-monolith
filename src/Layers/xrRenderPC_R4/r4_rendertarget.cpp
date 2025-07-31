@@ -349,6 +349,9 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 
 #if USE_DX11 
 void CRenderTarget::SetActive() {	
+	if (RImplementation.Target == this)
+		return;
+
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
@@ -362,7 +365,7 @@ void CRenderTarget::SetActive() {
 	RImplementation.Target = this;
 
 	for (auto rt : RenderTargetRemaps) {
-		rt.first->surface_set(rt.second->pSurface);
+		rt.first->fast_set_unsafe(rt.second->pTexture._get());
 	}
 
 	RImplementation.ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
