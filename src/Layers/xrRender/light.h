@@ -77,6 +77,7 @@ public:
 
 	struct _vis		{
 		u32			frame2test;		// frame the test is sheduled to
+		u32         queryframe;     // frame queries are issued on
 		u32			query_id;		// ID of occlusion query
 		u32			query_order;	// order of occlusion query
 		xr_vector<std::pair<u32,R_occlusion::occq_try_result>>   r4_queries;

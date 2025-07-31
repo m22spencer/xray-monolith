@@ -21,7 +21,13 @@ void light::vis_prepare()
 
 	u32 frame = Device.dwFrame;
 	if (frame < vis.frame2test)
-		return;
+		return; // Not time to test
+
+	if (vis.r4_queries.empty())
+		vis.queryframe = frame;
+
+	if (frame != vis.queryframe)
+		return; // Queries have already been sent
 
 	auto light_to_player = Fvector(Device.vCameraPosition).sub(position);
 	auto inside_dist = light_to_player.magnitude() < range;

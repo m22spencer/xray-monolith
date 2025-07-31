@@ -450,48 +450,34 @@ void CRender::renderGBuffer() {
 	bool locked = scope_debug == 4;
 
 	if (!locked) {
+		// Build light list
+		// I doubt there is any point to occq checking non-shadowcasters
+
 		if (Target == TargetMain) {
 			auto LP = &Lights.package;
 			LP_normal.clear();
-			for (auto L : LP->v_point) {
-				L->vis_update(); 
-				if (L->vis.visible)
-					LP_normal.v_point.push_back(L);
-				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
-			}
 			for (auto L : LP->v_shadowed) {
 				L->vis_update(); 
 				if (L->vis.visible)
 					LP_normal.v_shadowed.push_back(L);
 				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
 			}
-			for (auto L : LP->v_spot) {
-				L->vis_update(); 
-				if (L->vis.visible)
-					LP_normal.v_spot.push_back(L);
-				else if (scope_debug >= 3) CDebugRenderer().draw_line(Fmatrix(), L->position, Fvector(L->direction).mul(L->range).add(L->position), 0xff999999, false);
-			}
-		}
+			for (auto L : LP->v_point) LP_normal.v_point.push_back(L);
+			for (auto L : LP->v_spot) LP_normal.v_spot.push_back(L);
 
-		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-		Target->phase_occq();
-
-		auto LP = &Lights.package;
-		for (auto L : LP->v_point)
-			L->vis_prepare();
-		for (auto L : LP->v_shadowed)
-			L->vis_prepare();
-		for (auto L : LP->v_spot)
-			L->vis_prepare();
-
-		if (Target == TargetMain) {
 			// stats
 			stats.l_shadowed = LP_normal.v_shadowed.size();
 			stats.l_unshadowed = LP_normal.v_point.size() + LP_normal.v_spot.size();
 			stats.l_total = stats.l_shadowed + stats.l_unshadowed;
+		}
 
-			LP_normal.sort();
-			LP_pending.sort();
+		{
+			PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+			Target->phase_occq();
+
+			auto LP = &Lights.package;
+			for (auto L : LP->v_shadowed)
+				L->vis_prepare();
 		}
 	}
 
