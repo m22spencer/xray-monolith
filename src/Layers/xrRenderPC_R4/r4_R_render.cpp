@@ -407,40 +407,40 @@ void CRender::renderGBuffer() {
 
 			if (Target == TargetMain)
 			{
-					{
-						PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
-						// Write lens depth
-						Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
-							auto phase = Device.m_SecondViewport.IsSVPActive() 
-								? SCOPE_PHASE_GBUFFER
-								:  SCOPE_PHASE_GBUFFER | SCOPE_PHASE_DEPTHWRITE; // For 3DSS mode it's necessary to cut a hole regardless of occlusion
-							RCache.set_c("scope_phase", phase); //GBUFFER
-							RCache.set_c("scope_depth_value", 0.f);
-						});
-					}
-
-					svpCamera();
-				}
-
+				
 				{
-					PIX_EVENT(RENDER_HUD);
-					RCache.set_ZFunc(D3DCMP_LESS);
-					r_dsgraph_render_hud();
-					RCache.set_ZFunc(D3DCMP_LESSEQUAL);
-				}
-
-				if (Target == TargetMain && !Device.m_SecondViewport.IsSVPActive())
-				{
-					PIX_EVENT(SCOPE_WRITE_FAR_DEPTH);
-					// Write far plane depth
-					Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
-
-						// Write far plane as depth
-						RImplementation.rmNormal();
-						RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE); //DEPTHWRITE
-						RCache.set_c("scope_depth_value", 1.f);
+					PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
+					// Write lens depth
+					Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
+						auto phase = Device.m_SecondViewport.IsSVPActive() 
+							? SCOPE_PHASE_GBUFFER
+							:  SCOPE_PHASE_GBUFFER | SCOPE_PHASE_DEPTHWRITE; // For 3DSS mode it's necessary to cut a hole regardless of occlusion
+						RCache.set_c("scope_phase", phase); //GBUFFER
+						RCache.set_c("scope_depth_value", 0.f);
 					});
-        }
+				}
+
+				svpCamera();
+			}
+
+			{
+				PIX_EVENT(RENDER_HUD);
+				RCache.set_ZFunc(D3DCMP_LESS);
+				r_dsgraph_render_hud();
+				RCache.set_ZFunc(D3DCMP_LESSEQUAL);
+			}
+
+			if (Target == TargetMain && !Device.m_SecondViewport.IsSVPActive())
+			{
+				PIX_EVENT(SCOPE_WRITE_FAR_DEPTH);
+				// Write far plane depth
+				Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
+
+					// Write far plane as depth
+					RImplementation.rmNormal();
+					RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE); //DEPTHWRITE
+					RCache.set_c("scope_depth_value", 1.f);
+				});
 			}
 		}
 		r_dsgraph_render_graph(0);
