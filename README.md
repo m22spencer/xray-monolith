@@ -170,6 +170,10 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.08.01**
+* Fixed missing `ik_calc_ssa` setting in Modded Exes menu
+* Fixed crash with certain mods that misuse ammo aggregation function
+
 **2025.07.31**
 * Use x64 toolchain for compiling
 * Orleonn: Lua export: CUIDialogWnd::AllowWorkInPause and render_device:pause_ex (https://github.com/themrdemonized/xray-monolith/pull/308)

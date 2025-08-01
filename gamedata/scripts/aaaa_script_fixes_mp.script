@@ -611,6 +611,11 @@ end
 -- Ammo aggregation script that waits for game objects to spawn, proceed after
 -- Different aggregation algorithm
 function item_weapon.ammo_aggregation_full(npc_id)
+	-- Some shitty mods send objects there
+	if type(npc_id) == "userdata" then
+		npc_id = type(npc_id.id) == "function" and npc_id:id() or npc_id.id
+	end
+	
 	local npc = level.object_by_id(npc_id)
 	if not npc then
 		return true
