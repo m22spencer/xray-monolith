@@ -73,6 +73,7 @@ public:
 
 #if defined(USE_DX11)	//	USE_DX10
 private:
+	friend class CRenderTarget;
 	// These are the real base buffers
 	//   the game mutates pBaseRT/ZB, so we need to ensure HW points to the real deal
 	ID3D11RenderTargetView*	secret_pBaseRT;	//	combine with DX9 pBaseRT via typedef
