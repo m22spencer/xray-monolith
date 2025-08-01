@@ -349,13 +349,19 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 
 #if USE_DX11 
 void CRenderTarget::SetActive() {	
-	if (RImplementation.Target == this)
-		return;
-
+	auto isMain = this == RImplementation.TargetMain;
+	if (isMain) {
+		// Ensure that baseRT/baseZB *always* point to the HW targets
+		//    otherwise they can point to garbage in situations like alt-tab
+		baseRT = HW.secret_pBaseRT;
+		baseZB = HW.secret_pBaseZB;
+	}
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
-	auto isMain = this == RImplementation.TargetMain;
+	if (RImplementation.Target == this)
+		return;
+
 	auto m = Device.matrices[isMain ? 0 : 1];
 	if (g_pGamePersistent) {
 		g_pGamePersistent->m_pGShaderConstants->hud_params.w = !isMain;
@@ -388,27 +394,6 @@ void CRenderTarget::SetActive() {
 
 }
 #endif
-
-void CRenderTarget::fullscreen_pass() {
-	// Draw fullscreen triangle.
-	u32 Offset = 0;
-	u32 C = color_rgba(0, 0, 0, 255);
-
-	float d_Z = EPS_S;
-	float d_W = 1.0f;
-	float w = float(Width);
-	float h = float(Height);
-
-	Fvector2 tc;
-	tc.set(1.0, 1.0);
-	FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
-	pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
-	pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
-	pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
-	RCache.Vertex.Unlock(3, g_combine->vb_stride);
-	RCache.set_Geometry(g_combine);
-	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-}
 
 CRenderTarget::CRenderTarget()
 	: CRenderTarget(nullptr, Device.dwWidth, Device.dwHeight)
@@ -770,7 +755,6 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	s_blur.create(b_blur, "r2\\blur");
 	s_pp_bloom.create(b_pp_bloom, "r2\\pp_bloom");
 	s_dof.create(b_dof, "r2\\dof");
-	s_distort.create("distort");
 	s_gasmask_drops.create(b_gasmask_drops, "r2\\gasmask_drops");
 	s_gasmask_dudv.create(b_gasmask_dudv, "r2\\gasmask_dudv");
 	s_nightvision.create(b_nightvision, "r2\\nightvision");
