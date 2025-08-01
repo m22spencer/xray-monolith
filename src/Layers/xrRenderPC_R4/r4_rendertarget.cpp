@@ -349,13 +349,19 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 
 #if USE_DX11 
 void CRenderTarget::SetActive() {	
-	if (RImplementation.Target == this)
-		return;
-
+	auto isMain = this == RImplementation.TargetMain;
+	if (isMain) {
+		// Ensure that baseRT/baseZB *always* point to the HW targets
+		//    otherwise they can point to garbage in situations like alt-tab
+		baseRT = HW.secret_pBaseRT;
+		baseZB = HW.secret_pBaseZB;
+	}
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
-	auto isMain = this == RImplementation.TargetMain;
+	if (RImplementation.Target == this)
+		return;
+
 	auto m = Device.matrices[isMain ? 0 : 1];
 	if (g_pGamePersistent) {
 		g_pGamePersistent->m_pGShaderConstants->hud_params.w = !isMain;
