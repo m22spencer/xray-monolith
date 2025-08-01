@@ -549,7 +549,7 @@ void CRender::renderGBuffer() {
 		render_rain();
 	}
 
-		// Save previus and current matrices
+	// Save previus and current matrices
 	{
 		static Fmatrix mm_saved_viewproj[2];
 
@@ -558,7 +558,7 @@ void CRender::renderGBuffer() {
 		mm_saved_viewproj[Device.m_SecondViewport.IsSVPFrame()].set(Device.mFullTransform);
 	}
 
-	if (RImplementation.o.ssfx_sss)
+		if (RImplementation.o.ssfx_sss)
 	{
 		static bool sss_rendered, sss_extended_rendered;
 
@@ -594,7 +594,10 @@ void CRender::renderGBuffer() {
 			}
 		}
 	}
+}
 
+void CRender::combineLightingAndBloom()
+{
 	{
 		PIX_EVENT(DEFER_SELF_ILLUM);
 		Target->phase_accumulator();
@@ -761,6 +764,16 @@ void CRender::Render()
 		PIX_EVENT(RENDER_SUN);
 		TargetMain->SetActive();
 		renderSun();
+	}
+
+	{	
+		PIX_EVENT(COMBINE_GBUFFER_CONT);
+		TargetMain->SetActive();
+		combineLightingAndBloom();
+		if (Device.m_SecondViewport.IsSVPActive()) {
+			TargetSVP->SetActive();
+			combineLightingAndBloom();
+		}
 	}
 
 	{
