@@ -394,6 +394,7 @@ public:
 	void SetMatrices(Fmatrix view, Fmatrix projection, Fmatrix projection_hud);
 	virtual void Calculate();
 	void renderGBuffer();
+	void combineLightingAndBloom();
 	void renderSun();
 	void renderShadowmaps();
 	void combineGBuffer();
