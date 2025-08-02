@@ -30,7 +30,7 @@ void CPHSimpleCharacter::UpdateDynamicDamage(dContact* c, u16 obj_material_idx, 
 {
 	//if(ph_world ->IsFreezed())
 	//return;
-	if (!c || !b) return;
+	if (!c) return;
 	const dReal* vel = dBodyGetLinearVel(m_body);
 	if (!vel) return;
 	dReal c_vel;
