@@ -152,7 +152,9 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 		}
 		if (g_pGameLevel && (phase == PHASE_NORMAL))
 		{
+			Target->bCaptureScopeLens = true;
 			g_hud->Render_Last(); // HUD
+			Target->bCaptureScopeLens = false;
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
 			if (g_hud->RenderCamAttachedUIQuery())
@@ -164,7 +166,9 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 		set_Object(0);
 		if (g_pGameLevel && (phase == PHASE_NORMAL))
 		{
+			Target->bCaptureScopeLens = true;
 			g_hud->Render_Last(); // HUD
+			Target->bCaptureScopeLens = false;
 			if (g_hud->RenderActiveItemUIQuery())
 				r_dsgraph_render_hud_ui();
 			if (g_hud->RenderCamAttachedUIQuery())

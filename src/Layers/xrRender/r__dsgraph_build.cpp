@@ -39,7 +39,8 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 	auto sh = pVisual->shader->E[0]._get();
 #if defined(USE_DX11) //  Redotix99: for 3D Shader Based Scopes 
 	if (nullptr != sh && sh->flags.iScopeLense > 0) {
-		if (sh->flags.iScopeLense == 3 && mapScopeHUDSorted.empty()) {
+		// Only want a single lens, if rendering the player HUD (bCaptureScopeLens)
+		if (RImplementation.Target->bCaptureScopeLens && sh->flags.iScopeLense == 3 && mapScopeHUDSorted.empty()) {
 			// We must detect the lens surface immediately, ignoring all culling.
 			float distSQ;
 			float SSA = CalcSSA(distSQ, Center, pVisual);

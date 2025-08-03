@@ -389,6 +389,7 @@ public:
 	ref_geom g_menu;
 
 	bool bDistort;
+	bool bCaptureScopeLens;
 
 	// The size at creation
 	const u32 Width;
