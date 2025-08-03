@@ -789,7 +789,13 @@ void CRender::Render()
 		TargetSVP->SetActive();
 		{
 			PIX_EVENT(COMBINE_SVP);
+
+			// NVG shader is required, but tube overlay is not
+			//   so we increase the size to the max that doesn't break the shader
+			auto nvg_tube_radius = ps_dev_param_7.y;
+			ps_dev_param_7.y = 0.99;
 			combineGBuffer();
+			ps_dev_param_7.y = nvg_tube_radius;
 		}		
 	}
 
