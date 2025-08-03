@@ -370,7 +370,6 @@ void CRenderTarget::phase_3DSSReticle()
 			up.normalize();
 			auto angle = acos(up.dotproduct({0,1,0})) * (up.x > 0 ? 1 : -1);
 
-
 			RCache.set_c("hack_tex_angle", angle);
 		});
 	}
@@ -394,14 +393,14 @@ void CRenderTarget::phase_3DSSReticle()
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_CUSTOM_DEPTH);
-		// write far plane
+		// I don't think we need to stencil this?
+		// Some hud items in front of scopes may have incorrect blur, but this should be hardly noticeable
+		// Allow a custom shader to override the depth for DOF calculations
 		u_setrt(RImplementation.Target->rt_Position, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
 		draw_scope(s_scope_depth_write, [](auto _) -> void {
-			RCache.set_Stencil(TRUE, D3DCMP_NOTEQUAL, 0x1, 0x1, 0x0, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
 			RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE | SCOPE_PHASE_CUSTOM_DEPTH);
 			RCache.set_c("scope_depth_value", 1);
 		});
-		RCache.set_Stencil(FALSE);
 	}
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
