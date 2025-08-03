@@ -339,7 +339,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 #if RENDER==R_R4
 	if (sh->flags.isWater && RImplementation.o.ssfx_water)
 	{
-		mapWater_Node* N = mapWater.insertInAnyWay(distSQ);
+		mapWater_Node* N = mapWater[Device.m_SecondViewport.IsSVPFrame()].insertInAnyWay(distSQ);
 		N->val.ssa = SSA;
 		N->val.pObject = NULL;
 		N->val.pVisual = pVisual;
