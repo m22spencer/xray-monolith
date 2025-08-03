@@ -278,6 +278,7 @@ extern ECORE_API float ps_r2_img_saturation; // r2-only
 extern ECORE_API Fvector ps_r2_img_cg; // r2-only
 
 ////
+extern ECORE_API Fvector4 ps_dev_param_7;
 
 //	x - min (0), y - focus (1.4), z - max (100)
 extern ECORE_API Fvector3 ps_r2_dof;
