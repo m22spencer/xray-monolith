@@ -777,13 +777,13 @@ void R_dsgraph_structure::r_dsgraph_render_emissive(bool clear, bool renderHUD)
 
 void R_dsgraph_structure::r_dsgraph_render_water_ssr()
 {
-	mapWater.traverseLR(water_node_ssr);
+	mapWater[Device.m_SecondViewport.IsSVPFrame()].traverseLR(water_node_ssr);
 }
 
 void R_dsgraph_structure::r_dsgraph_render_water()
 {
-	mapWater.traverseLR(water_node);
-	mapWater.clear();
+	mapWater[Device.m_SecondViewport.IsSVPFrame()].traverseLR(water_node);
+	mapWater[Device.m_SecondViewport.IsSVPFrame()].clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
