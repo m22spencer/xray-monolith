@@ -300,12 +300,15 @@ void svpCamera() {
 	params.objective.m_W.transform(w_P_obj);
 	params.objective.m_W.transform_dir(w_N_obj);
 
+	auto near_plane = fNearPlane;
 	auto m_W_svpcam = params.eyepiece.m_W;  // By default we use the eyepiece for camera placement
 	if (scope_svp_enabled >= 2 && params.objective.radius > EPS) {
 		// compute camera for objective lens placement
 		// FIXME: This should be the min fov of the scope, not the current fov
 		auto d = camera_offset_from_vfov_and_radius(vFovMagOnly, params.objective.radius);
 		m_W_svpcam = Fmatrix().mul(params.objective.m_W, Fmatrix().translate(0, 0, -d));
+
+		near_plane = d;
 	}
 
 	auto aspect = RImplementation.TargetSVP->Width /  RImplementation.TargetSVP->Height;
@@ -313,8 +316,8 @@ void svpCamera() {
 
 	float fNearPlane_hud, fFarPlane_hud;
 	Device.matrices[0].mProject.decompose_projection(_, _, fNearPlane_hud, fFarPlane_hud);
-	auto svp_proj = Fmatrix().build_projection(vFov, aspect, fNearPlane, fFarPlane);
-	auto svp_proj_hud = Fmatrix().build_projection(vFov, aspect, 0.001, fFarPlane_hud);
+	auto svp_proj = Fmatrix().build_projection(vFov, aspect, near_plane, fFarPlane);
+	auto svp_proj_hud = Fmatrix().build_projection(vFov, aspect, near_plane, fFarPlane_hud);
 
 	if (scope_debug >= 2)
 		debug_scope(m_W_svpcam);
