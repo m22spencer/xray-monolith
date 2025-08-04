@@ -26,6 +26,8 @@ struct Scope
 	float4 hpos;
     float2 tc0;	
 
+	float2 ssp_jitter;  // screenspace jitter offset
+
 	float4 dbg;
 };
 static Scope scope;
@@ -38,10 +40,12 @@ struct v_out {
 	float3 w_T : TANGENT0;
 	float3 w_B : BINORMAL0;
 	float3 w_N : NORMAL0;
-	float3 v_P : POSITION1;
+	float4 v_P : POSITION1;
 	float3 v_T : TANGENT1;
 	float3 v_B : BINORMAL1;
 	float3 v_N : NORMAL1;
+
+	float2 ssp_jitter : TEXCOORD1;
 };
 
 
@@ -134,7 +138,7 @@ bool VALID(float2 scopecoord) {
 }
 
 float dbg_wp(v_out v, float4 p, float d) {
-	float2 screen_tc = v.hpos.xy * screen_res.zw;
+	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * screen_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, p));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
 
@@ -145,7 +149,7 @@ float dbg_wp(v_out v, float4 p, float d) {
 }
 
 float2 world_to_corrected_tc(v_out v, float4 w_P) {
-	float2 screen_tc = v.hpos.xy * screen_res.zw;
+	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * screen_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, w_P));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
 
@@ -154,6 +158,8 @@ float2 world_to_corrected_tc(v_out v, float4 w_P) {
 
 Scope new_Scope(v_out v) {
 	Scope s;
+
+	s.ssp_jitter = v.ssp_jitter;
 
 	float cm = .01;
 	float eye_relief = s3ds_param_1.y * cm;
@@ -171,7 +177,7 @@ Scope new_Scope(v_out v) {
 
 	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
 	
-    float screen_delta  = length(ddy(v.hpos.xy * screen_res.zw));
+    float screen_delta  = length(ddy((v.hpos.xy - v.ssp_jitter) * screen_res.zw));
     float texture_delta = length(ddy(v.tc0.xy));
     float tc_multiplier = texture_delta / screen_delta;
 
@@ -200,7 +206,7 @@ Scope new_Scope(v_out v) {
 	}
 
 	s.tc0 = v.tc0;
-	s.hpos = v.hpos;
+	s.hpos = float4(v.hpos.xy - v.ssp_jitter, v.hpos.z, v.hpos.w);
 	s.center = float2(0.5, 0.5);
 	s.radius = 0.5;
 
