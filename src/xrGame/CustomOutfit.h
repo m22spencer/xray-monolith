@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
+#include <optional>
 
 struct SBoneProtections;
 
@@ -37,6 +38,10 @@ protected:
 	shared_str m_ActorVisual;
 	shared_str m_full_icon_name;
 	SBoneProtections* m_boneProtection;
+
+	std::optional<float> m_fireWoundParam1 = std::nullopt;
+	std::optional<float> m_fireWoundParam2 = std::nullopt;
+
 protected:
 	u32 m_ef_equipment_type;
 	u32 m_artefact_count;

@@ -82,7 +82,10 @@ void CCustomOutfit::Load(LPCSTR section)
 	m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f; //pSettings->r_float(section,"fire_wound_protection");
 	//	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
 	m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
+
 	m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
+	if (pSettings->line_exist(section, "fire_wound_param_1")) m_fireWoundParam1 = pSettings->r_float(section, "fire_wound_param_1");
+	if (pSettings->line_exist(section, "fire_wound_param_2")) m_fireWoundParam2 = pSettings->r_float(section, "fire_wound_param_2");
 
 	if (pSettings->line_exist(section, "nightvision_sect"))
 		m_NightVisionSect = pSettings->r_string(section, "nightvision_sect");
@@ -163,15 +166,15 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
 	if (hit_type == ALife::eHitTypeFireWound)
 	{
 		// demonized: Alternative formula by Jurko, to be revised later
-		if (pSettings->line_exist(cNameSect(), "fire_wound_param_1") && pSettings->line_exist(cNameSect(), "fire_wound_param_2"))
+		if (m_fireWoundParam1.has_value() && m_fireWoundParam2.has_value())
 		{
 			float ba = GetBoneArmor(element);
 			if (ba <= 0.0f)
 				return NewHitPower;
 
 			float BoneArmor = ba * GetCondition();
-			float var1 = pSettings->r_float(cNameSect(), "fire_wound_param_1");
-			float var2 = pSettings->r_float(cNameSect(), "fire_wound_param_2");
+			float var1 = m_fireWoundParam1.value();
+			float var2 = m_fireWoundParam2.value();
 			if (ap <= BoneArmor / var2)
 			{
 				float d_hit_power = m_boneProtection->m_fHitFracActor;
