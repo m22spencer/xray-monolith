@@ -110,6 +110,10 @@ class CPhysicObject;
 class CArtefact;
 class script_attachment;
 
+#ifdef STATIONARYMGUN_NEW
+class CWeaponStatMgun;
+#endif
+
 #ifdef DEBUG
     template <typename _object_type>
     class CActionBase;
@@ -680,6 +684,9 @@ public:
 	CHelicopter* get_helicopter();
 	//CAR
 	CCar* get_car();
+#ifdef STATIONARYMGUN_NEW
+	CWeaponStatMgun *get_stmgun();
+#endif
 	//LAMP
 	CHangingLamp* get_hanging_lamp();
 
@@ -689,6 +696,9 @@ public:
 
 	CHolderCustom* get_custom_holder();
 	CHolderCustom* get_current_holder(); //actor only
+#ifdef HOLDERCUSTOM_NEW
+	CScriptGameObject *get_holder_owner();
+#endif
 
 	void start_particles(LPCSTR pname, LPCSTR bone);
 	void stop_particles(LPCSTR pname, LPCSTR bone);
