@@ -58,16 +58,6 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 	return 0;
 }
 
-xr_vector<xr_pair<u16, shared_str>> CKinematics::list_bones()
-{
-	xr_vector<xr_pair<u16, shared_str>> result;
-	CKinematics::accel::iterator _I, _E = bone_map_N->end();
-	for (_I = bone_map_N->begin(); _I != _E; ++_I) {
-		result.emplace_back(_I->second, _I->first);
-	}
-	return result;
-}
-
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {

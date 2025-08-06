@@ -576,9 +576,9 @@ bool CScriptGameObject::is_bone_visible(u16 bone_id, bool bHud)
 
 	if (!k) return result;
 
-	auto bones = k->list_bones();
-	for (const auto& bone : bones)
-		result[bone.first] = bone.second.c_str();
+	auto bones = k->LL_Bones();
+	for (const auto& bone : *bones)
+		result[bone.second] = bone.first.c_str();
 
 	return result;
 }
