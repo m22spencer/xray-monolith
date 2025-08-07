@@ -37,6 +37,7 @@ class NET_Packet;
 class CEatableItem;
 struct SPHNetState;
 struct net_update_IItem;
+class CFlashlight;
 
 class CInventoryOwner;
 

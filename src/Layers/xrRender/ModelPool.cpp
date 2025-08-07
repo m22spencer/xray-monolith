@@ -535,7 +535,7 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
 	for (; it != en; ++it)
 	{
 		dxRender_Visual* ptr = it->model;
-		Fvisual* vis_ptr = dynamic_cast<Fvisual*>(ptr);
+		Fvisual* vis_ptr = fast_dynamic_cast<Fvisual*>(ptr);
 
 		if (vis_ptr == NULL)
 			continue;
@@ -603,7 +603,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            CKinematics* pV		= dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
+            CKinematics* pV		= fast_dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
             if (fis_zero(m_fLOD,EPS)&&pV->m_lod){
 		        if (_IsValidShader(pV->m_lod,priority,strictB2F)){
 	                RCache.set_Shader		(pV->m_lod->shader?pV->m_lod->shader:EDevice.m_WireShader);
@@ -625,7 +625,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     }break;
     case MT_HIERRARHY:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            FHierrarhyVisual* pV		= dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
+            FHierrarhyVisual* pV		= fast_dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
             I = pV->children.begin		();
             E = pV->children.end		();
             for (; I!=E; I++){
@@ -638,7 +638,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
         }
     }break;
     case MT_PARTICLE_GROUP:{
-        PS::CParticleGroup* pG			= dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
+        PS::CParticleGroup* pG			= fast_dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
 //		if (_IsBoxVisible(m_pVisual,mTransform))
         {
             RCache.set_xform_world	  		(mTransform);

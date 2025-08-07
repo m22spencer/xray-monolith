@@ -1152,7 +1152,7 @@ void CAI_Stalker::update_throw_params()
 #else
 	m_throw_position = Position();
 
-	CMissile* const pMissile = dynamic_cast<CMissile*>(inventory().ActiveItem());
+	CMissile* const pMissile = fast_dynamic_cast<CMissile*>(inventory().ActiveItem());
 	if (pMissile)
 	{
 		static const LPCSTR third_person_offset_id = "third_person_throw_point_offset";

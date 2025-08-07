@@ -375,8 +375,8 @@ void CRender::set_Object(IRenderable* O)
 	val_pObject = O; // NULL is OK, trust me :)
 	if (val_pObject)
 	{
-		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
-		if (O->renderable.pROS) { VERIFY(dynamic_cast<CROS_impl*>(O->renderable.pROS)); }
+		VERIFY(fast_dynamic_cast<CObject*>(O) || fast_dynamic_cast<CPS_Instance*>(O));
+		if (O->renderable.pROS) { VERIFY(fast_dynamic_cast<CROS_impl*>(O->renderable.pROS)); }
 	}
 	if (PHASE_NORMAL == phase)
 	{
@@ -402,8 +402,8 @@ void CRender::apply_object(IRenderable* O)
 	if (O->renderable_ROS())
 	{
 		CROS_impl& LT = *((CROS_impl*)O->renderable.pROS);
-		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
-		VERIFY(dynamic_cast<CROS_impl*>(O->renderable.pROS));
+		VERIFY(fast_dynamic_cast<CObject*>(O) || fast_dynamic_cast<CPS_Instance*>(O));
+		VERIFY(fast_dynamic_cast<CROS_impl*>(O->renderable.pROS));
 		float o_hemi = 0.5f * LT.get_hemi();
 		float o_sun = 0.5f * LT.get_sun();
 		RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
@@ -455,7 +455,7 @@ ICF bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 void CRender::Calculate()
 {
 #ifdef _GPA_ENABLED
-		TAL_SCOPED_TASK_NAMED( "CRender::Calculate()" );
+	TAL_SCOPED_TASK_NAMED("CRender::Calculate()");
 #endif // _GPA_ENABLED
 
 	Device.Statistic->RenderCALC.Begin();
@@ -473,7 +473,7 @@ void CRender::Calculate()
 	r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
 
 	// Frustum & HOM rendering
-	ViewBase.CreateFromMatrix(Device.mFullTransform,FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 	View = 0;
 	if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
 	{
@@ -513,7 +513,7 @@ void CRender::Calculate()
 		L_DB->Update();
 
 	// Main process
-	marker ++;
+	marker++;
 	if (pLastSector)
 	{
 		// Traverse sector/portal structure
@@ -562,7 +562,7 @@ void CRender::Calculate()
 			u32 uID_LTRACK = 0xffffffff;
 			if (phase == PHASE_NORMAL)
 			{
-				uLastLTRACK ++;
+				uLastLTRACK++;
 				if (lstRenderables.size()) uID_LTRACK = uLastLTRACK % lstRenderables.size();
 
 				// update light-vis for current entity / actor
@@ -598,7 +598,7 @@ void CRender::Calculate()
 						if (0 == renderable)
 						{
 							// It may be an glow
-							CGlow* glow = dynamic_cast<CGlow*>(spatial);
+							CGlow* glow = fast_dynamic_cast<CGlow*>(spatial);
 							VERIFY(glow);
 							L_Glows->add(glow);
 						}
