@@ -48,6 +48,7 @@
 #include "Pda.h"
 #include "player_hud.h"
 #include "script_attachment_manager.h"
+#include "CustomDevice.h"
 
 class CScriptBinderObject;
 
@@ -779,6 +780,38 @@ void CScriptGameObject::SetPsyFactor(float val)
 		return;
 	}
 	pda->m_psy_factor = val;
+}
+
+// Added by Ncenka - allow turn on/off devices
+bool CScriptGameObject::IsDeviceEnabled() const
+{
+	CPda* pda = smart_cast<CPda*>(m_game_object);
+	if (pda)
+		return pda->m_PdaEnabled;
+
+	CCustomDevice* custom_device = smart_cast<CCustomDevice*>(m_game_object);
+	if (custom_device)
+		return custom_device->m_CustomDeviceEnabled;
+
+	return false;
+}
+
+// Added by Ncenka - allow turn on/off devices
+void CScriptGameObject::SetDeviceEnabled(bool enabled)
+{
+	CPda* pda = smart_cast<CPda*>(m_game_object);
+	if (pda)
+	{
+		pda->m_PdaEnabled = enabled;
+		return;
+	}
+
+	CCustomDevice* custom_device = smart_cast<CCustomDevice*>(m_game_object);
+	if (custom_device)
+	{
+		custom_device->m_CustomDeviceEnabled = enabled;
+		return;
+	}
 }
 
 void CScriptGameObject::eat(CScriptGameObject* item)
