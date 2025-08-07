@@ -198,6 +198,10 @@ public:
 	float GetPsyFactor() const;
 	void SetPsyFactor(float val);
 
+	// Added by Ncenka - allow turn on/off devices
+	_DECLARE_FUNCTION10(IsDeviceEnabled, bool);
+	_DECLARE_FUNCTION11(SetDeviceEnabled, void, bool);
+
 	// CEntity
 	_DECLARE_FUNCTION10(DeathTime, u32);
 	_DECLARE_FUNCTION10(MaxHealth, float);
