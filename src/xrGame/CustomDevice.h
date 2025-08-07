@@ -57,6 +57,7 @@ public:
 	virtual bool render_item_3d_ui_query();
 
 	bool m_bZoomed;
+	bool m_CustomDeviceEnabled;
 	float m_fZoomfactor;
 	Fvector m_hud_offset[2];
 protected:
