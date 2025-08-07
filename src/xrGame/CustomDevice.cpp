@@ -15,6 +15,7 @@ CCustomDevice::CCustomDevice()
 	m_bZoomed = false;
 	m_fZoomfactor = 0.f;
 	m_bOldZoom = false;
+	m_CustomDeviceEnabled = true;
 }
 
 CCustomDevice::~CCustomDevice()
@@ -133,7 +134,7 @@ void CCustomDevice::OnStateSwitch(u32 S, u32 oldState)
 	{
 		g_player_hud->attach_item(this);
 
-		if (!IsUsingCondition() || (IsUsingCondition() && GetCondition() >= m_fLowestBatteryCharge))
+		if (!IsUsingCondition() || (m_CustomDeviceEnabled && IsUsingCondition() && GetCondition() >= m_fLowestBatteryCharge))
 			TurnDeviceInternal(true);
 
 		m_sounds.PlaySound("sndShow", Fvector().set(0, 0, 0), this, true, false);
@@ -464,9 +465,9 @@ void CCustomDevice::UpdateCL()
 
 	if (IsUsingCondition())
 	{
-		if (m_bWorking && GetCondition() < m_fLowestBatteryCharge)
+		if (m_bWorking && (!m_CustomDeviceEnabled || GetCondition() < m_fLowestBatteryCharge))
 			TurnDeviceInternal(false);
-		else if (!m_bWorking && (GetState() == eIdle || GetState() == eIdleZoom) && GetCondition() >= m_fLowestBatteryCharge)
+		else if (m_CustomDeviceEnabled && !m_bWorking && (GetState() == eIdle || m_CustomDeviceEnabled && GetState() == eIdleZoom) && GetCondition() >= m_fLowestBatteryCharge)
 			TurnDeviceInternal(true);
 	}
 
