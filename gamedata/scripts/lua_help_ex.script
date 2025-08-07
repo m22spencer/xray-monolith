@@ -428,7 +428,7 @@
         function get_artefact_additional_inventory_weight()
         function set_artefact_additional_inventory_weight(float)
 
-	/Devices
+	// Devices
 	function set_device_enabled(bool)
 	function is_device_enabled()
 
