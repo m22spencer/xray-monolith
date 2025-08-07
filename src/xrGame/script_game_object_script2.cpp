@@ -109,6 +109,11 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
 		.def("power_critical", &CScriptGameObject::GetPowerCritical)
 		.def("psy_factor", &CScriptGameObject::GetPsyFactor)
 		.def("set_psy_factor", &CScriptGameObject::SetPsyFactor)
+
+		// Added by Ncenka - allow turn on/off devices
+		.def("is_device_enabled", &CScriptGameObject::IsDeviceEnabled)
+		.def("set_device_enabled", &CScriptGameObject::SetDeviceEnabled)
+		
 		.def("death_time", &CScriptGameObject::DeathTime)
 		//		.def("armor",						&CScriptGameObject::Armor)
 		.def("max_health", &CScriptGameObject::MaxHealth)
