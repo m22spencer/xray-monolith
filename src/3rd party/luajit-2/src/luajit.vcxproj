@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="ProfiledDX11|x64">
       <Configuration>ProfiledDX11</Configuration>
@@ -16,22 +16,24 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{632AEEB6-DC06-4E15-9551-B2B09A4B73C5}</ProjectGuid>
-    <Keyword>MakeFileProj</Keyword>
+    <Keyword>Win32Proj</Keyword>
     <ProjectName>LuaJIT-2</ProjectName>
+    <ReplaceWildcardsInProjectItems>true</ReplaceWildcardsInProjectItems>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Verified|x64'" Label="Configuration">
-    <ConfigurationType>Makefile</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
@@ -53,35 +55,152 @@
     <Import Project="..\..\..\Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <NMakeBuildCommandLine>msvcbuild.bat static $(PlatformShortName)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>msvcbuild.bat static $(PlatformShortName)</NMakeReBuildCommandLine>
-    <NMakeOutput>lua51.dll</NMakeOutput>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='ProfiledDX11'">
-    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Verified'">
-    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-  </PropertyGroup>
+  <!-- Override output to place lua51.lib next to project so existing link search paths can find it. -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(xrGameDir)bin_dbg\</OutDir>
-    <NMakeCleanCommandLine>msvcbuild.bat clean $(PlatformShortName)</NMakeCleanCommandLine>
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>lua51</TargetName>
+    <TargetExt>.lib</TargetExt>
+    <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">
-    <OutDir>$(xrGameDir)bin_dbg\</OutDir>
-    <NMakeCleanCommandLine>msvcbuild.bat clean $(PlatformShortName)</NMakeCleanCommandLine>
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>lua51</TargetName>
+    <TargetExt>.lib</TargetExt>
+    <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">
-    <OutDir>$(xrGameDir)bin_dbg\</OutDir>
-    <NMakeCleanCommandLine>msvcbuild.bat clean $(PlatformShortName)</NMakeCleanCommandLine>
+    <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>lua51</TargetName>
+    <TargetExt>.lib</TargetExt>
+    <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)host;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">stdcpp17</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>lj_vm.obj;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <!-- Code generation is handled via a CustomBuild on vm_x86.dasc below for incremental builds. -->
+    <PreBuildEvent>
+      <Message>Ensuring LuaJIT generated files exist</Message>
+      <Command>"$(ProjectDir)gen_luajit_artifacts.bat" "$(Platform)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="vm_x86.dasc">
+      <Message>Generating LuaJIT VM object and headers</Message>
+      <Command>"$(ProjectDir)gen_luajit_artifacts.bat" "$(Platform)"</Command>
+      <Outputs>lj_vm.obj;lj_bcdef.h;lj_ffdef.h;lj_libdef.h;lj_recdef.h;jit\vmdef.lua;lj_folddef.h;host\minilua.exe;host\buildvm.exe;host\buildvm_arch.h</Outputs>
+      <AdditionalInputs>host\minilua.c;host\buildvm.c;host\buildvm_peobj.c;host\buildvm_lib.c;host\buildvm_asm.c;..\dynasm\dynasm.lua;lj_opt_fold.c;lib_base.c;lib_math.c;lib_bit.c;lib_string.c;lib_table.c;lib_io.c;lib_os.c;lib_package.c;lib_debug.c;lib_jit.c;lib_ffi.c</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Core LuaJIT sources -->
+    <!-- Exclude amalgamation unit when compiling individual files -->
+    <ClCompile Include="ljamalg.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <!-- Exclude the standalone interpreter from the static lib -->
+    <ClCompile Include="luajit.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfiledDX11|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Verified|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="lj_alloc.c" />
+    <ClCompile Include="lj_api.c" />
+    <ClCompile Include="lj_asm.c" />
+    <ClCompile Include="lj_bc.c" />
+    <ClCompile Include="lj_bcread.c" />
+    <ClCompile Include="lj_bcwrite.c" />
+    <ClCompile Include="lj_carith.c" />
+    <ClCompile Include="lj_ccall.c" />
+    <ClCompile Include="lj_ccallback.c" />
+    <ClCompile Include="lj_cconv.c" />
+    <ClCompile Include="lj_cdata.c" />
+    <ClCompile Include="lj_char.c" />
+    <ClCompile Include="lj_clib.c" />
+    <ClCompile Include="lj_cparse.c" />
+    <ClCompile Include="lj_crecord.c" />
+    <ClCompile Include="lj_ctype.c" />
+    <ClCompile Include="lj_debug.c" />
+    <ClCompile Include="lj_dispatch.c" />
+    <ClCompile Include="lj_err.c" />
+    <ClCompile Include="lj_ffrecord.c" />
+    <ClCompile Include="lj_func.c" />
+    <ClCompile Include="lj_gc.c" />
+    <ClCompile Include="lj_gdbjit.c" />
+    <ClCompile Include="lj_ir.c" />
+    <ClCompile Include="lj_lex.c" />
+    <ClCompile Include="lj_lib.c" />
+    <ClCompile Include="lj_load.c" />
+    <ClCompile Include="lj_mcode.c" />
+    <ClCompile Include="lj_meta.c" />
+    <ClCompile Include="lj_obj.c" />
+    <ClCompile Include="lj_opt_dce.c" />
+    <ClCompile Include="lj_opt_fold.c" />
+    <ClCompile Include="lj_opt_loop.c" />
+    <ClCompile Include="lj_opt_mem.c" />
+    <ClCompile Include="lj_opt_narrow.c" />
+    <ClCompile Include="lj_opt_sink.c" />
+    <ClCompile Include="lj_opt_split.c" />
+    <ClCompile Include="lj_parse.c" />
+    <ClCompile Include="lj_record.c" />
+    <ClCompile Include="lj_snap.c" />
+    <ClCompile Include="lj_state.c" />
+    <ClCompile Include="lj_str.c" />
+    <ClCompile Include="lj_strscan.c" />
+    <ClCompile Include="lj_tab.c" />
+    <ClCompile Include="lj_trace.c" />
+    <ClCompile Include="lj_udata.c" />
+    <ClCompile Include="lj_vmevent.c" />
+    <ClCompile Include="lj_vmmath.c" />
+    <ClCompile Include="lib_aux.c" />
+    <ClCompile Include="lib_base.c" />
+    <ClCompile Include="lib_bit.c" />
+    <ClCompile Include="lib_debug.c" />
+    <ClCompile Include="lib_ffi.c" />
+    <ClCompile Include="lib_init.c" />
+    <ClCompile Include="lib_io.c" />
+    <ClCompile Include="lib_jit.c" />
+    <ClCompile Include="lib_math.c" />
+    <ClCompile Include="lib_os.c" />
+    <ClCompile Include="lib_package.c" />
+    <ClCompile Include="lib_string.c" />
+    <ClCompile Include="lib_table.c" />
+    <ClCompile Include="xr_alloc.c" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <PropertyGroup>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      LuaJITClean;
+    </CleanDependsOn>
+  </PropertyGroup>
+  <Target Name="LuaJITClean">
+    <Message Text="LuaJIT: Cleaning generated files" Importance="high"/>
+
+    <ItemGroup>
+      <_CustomFilesToDelete Include="$(ProjectDir)\*.obj"/>
+      <_CustomFilesToDelete Include="$(ProjectDir)\*.pdb"/>
+    </ItemGroup>
+
+    <Delete Files="@(_CustomFilesToDelete)" ContinueOnError="true" />
+  </Target>
 </Project>
