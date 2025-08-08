@@ -39,7 +39,6 @@ public:
 	virtual bool UseScopeTexture();
 	virtual float CurrentZoomFactor();
 	virtual u8 GetCurrentHudOffsetIdx();
-	virtual void FireEnd();
 	void LaunchGrenade();
 
 	virtual void OnStateSwitch(u32 S, u32 oldState);

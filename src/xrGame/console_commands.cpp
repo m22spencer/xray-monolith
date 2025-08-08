@@ -234,6 +234,8 @@ extern float wallmark_range_skeleton;
 
 ENGINE_API extern float g_console_sensitive;
 
+extern BOOL g_fire_reloads_ubgl;
+
 u32 g_dead_body_collision = 1;
 
 xr_token dead_body_collision_tokens[] =
@@ -2576,6 +2578,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "g_aimpos_zoom", &psActorFlags, AF_AIMPOS_ZOOM);
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
+
+	CMD4(CCC_Integer, "g_fire_reloads_ubgl", &g_fire_reloads_ubgl, 0, 1);
 
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psCrosshair_Flags, CROSSHAIR_SHOW_ALWAYS);
 	CMD3(CCC_Mask, "g_crosshair_independent", &psCrosshair_Flags, CROSSHAIR_INDEPENDENT);

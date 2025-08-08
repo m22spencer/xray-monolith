@@ -18,6 +18,8 @@
 #	include "phdebug.h"
 #endif
 
+BOOL g_fire_reloads_ubgl = TRUE;
+
 CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(ESoundTypes eSoundType) : CWeaponMagazined(eSoundType)
 {
 	m_ammoType2 = 0;
@@ -313,12 +315,15 @@ bool CWeaponMagazinedWGrenade::Action(u16 cmd, u32 flags)
 					LaunchGrenade();
 				else
 					FireStart();
-			else
+			else if(g_fire_reloads_ubgl)
 				Reload();
 
 			if (GetState() == eIdle)
 				OnEmptyClick();
 		}
+		else
+			FireEnd();
+
 		return true;
 	}
 	
@@ -497,16 +502,6 @@ void CWeaponMagazinedWGrenade::LaunchGrenade()
 			u_EventSend(P);
 		};
 	}
-}
-
-void CWeaponMagazinedWGrenade::FireEnd()
-{
-	if (m_bGrenadeMode)
-	{
-		CWeapon::FireEnd();
-	}
-	else
-		inherited::FireEnd();
 }
 
 void CWeaponMagazinedWGrenade::OnMagazineEmpty()
