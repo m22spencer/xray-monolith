@@ -236,6 +236,10 @@ ENGINE_API extern float g_console_sensitive;
 
 extern BOOL g_auto_reload;
 extern BOOL g_fire_reloads_ubgl;
+extern BOOL g_dynamic_launcher_range;
+extern BOOL g_dynamic_launcher_range_zoom;
+extern float g_dynamic_launcher_range_max;
+extern int g_dynamic_launcher_range_mode;
 
 u32 g_dead_body_collision = 1;
 
@@ -2582,6 +2586,10 @@ void CCC_RegisterCommands()
 
 	CMD4(CCC_Integer, "g_auto_reload", &g_auto_reload, 0, 1);
 	CMD4(CCC_Integer, "g_fire_reloads_ubgl", &g_fire_reloads_ubgl, 0, 1);
+	CMD4(CCC_Integer, "g_dynamic_launcher_range", &g_dynamic_launcher_range, 0, 1);
+	CMD4(CCC_Integer, "g_dynamic_launcher_range_zoom", &g_dynamic_launcher_range_zoom, 0, 1);
+	CMD4(CCC_Float, "g_dynamic_launcher_range_max", &g_dynamic_launcher_range_max, 0.f, 1000.f);
+	CMD4(CCC_Integer, "g_dynamic_launcher_range_mode", &g_dynamic_launcher_range_mode, 0, 1);
 
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psCrosshair_Flags, CROSSHAIR_SHOW_ALWAYS);
 	CMD3(CCC_Mask, "g_crosshair_independent", &psCrosshair_Flags, CROSSHAIR_INDEPENDENT);
