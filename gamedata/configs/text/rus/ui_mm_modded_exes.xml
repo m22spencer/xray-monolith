@@ -578,6 +578,23 @@
 		<text>Геймплей</text>
 	</string>
 
+	<!-- Gameplay General -->
+	<string id="ui_mm_menu_gameplay_general">
+		<text>Общие</text>
+	</string>
+	<string id="ui_mm_gameplay_general_modded_exes">
+		<text>Общие</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost">
+		<text>Прогрессивная затрата выносливости (g_progressive_stamina_cost)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost_desc">
+		<text>Выносливость будет уменьшаться линейно в зависимости от текущего веса, а не по пороговому значению</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_auto_reload">
+		<text>Автоматически перезаряжать оружие при исчерпании боеприпасов (g_auto_reload)</text>
+	</string>
+
 	<!-- Aim -->
 	<string id="ui_mm_menu_aim">
 		<text>Aim</text>
@@ -648,6 +665,30 @@
 		<text>Предмет</text>
 	</string>
 
+	<!-- Launchers -->
+	<string id="ui_mm_menu_launchers">
+		<text>Гранатометы</text>
+	</string>
+	<string id="ui_mm_launchers_modded_exes">
+		<text>Гранатометы</text>
+	</string>
+	
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_fire_reloads_ubgl">
+		<text>Перезаряжать подствольные гранатометы с помощью огня (g_fire_reloads_ubgl)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range">
+		<text>Применять помощь при запуске, когда не нацеливаешься (g_launcher_dynamic_range)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_zoom">
+		<text>Применяйте помощь прицеливания при наведении (g_launcher_dynamic_range_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_mode">
+		<text>Нацеливайтесь на динамические объекты с помощью системы помощи при запуске (g_launcher_dynamic_range_mode)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_max">
+		<text>Максимальная дальность действия пусковой установки (g_launcher_dynamic_range_max)</text>
+	</string>
+
 	<!-- First Person Death -->
 	<string id="ui_mm_menu_first_person_death">
 		<text>Смерть от первого лица</text>
@@ -664,20 +705,6 @@
 	</string>
 	<string id="ui_mm_modded_exes_gameplay_first_person_death_first_person_death_direction_smoothing">
 		<text>Гладкость смены направления камеры (first_person_death_direction_smoothing)</text>
-	</string>
-
-	<!-- Gameplay General -->
-	<string id="ui_mm_menu_gameplay_general">
-		<text>Общие</text>
-	</string>
-	<string id="ui_mm_gameplay_general_modded_exes">
-		<text>Общие</text>
-	</string>
-	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost">
-		<text>Прогрессивная затрата выносливости (g_progressive_stamina_cost)</text>
-	</string>
-	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost_desc">
-		<text>Выносливость будет уменьшаться линейно в зависимости от текущего веса, а не по пороговому значению</text>
 	</string>
 
 	<!-- Stalkers -->

@@ -600,6 +600,23 @@
 		<text>Gameplay</text>
 	</string>
 
+	<!-- Gameplay General -->
+	<string id="ui_mm_menu_gameplay_general">
+		<text>General</text>
+	</string>
+	<string id="ui_mm_gameplay_general_modded_exes">
+		<text>General</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost">
+		<text>Progressive stamina cost (g_progressive_stamina_cost)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost_desc">
+		<text>Stamina will drain linearly with current weight instead of cutoff point</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_auto_reload">
+		<text>Automatically reload weapon when ammo is depleted (g_auto_reload)</text>
+	</string>
+
 	<!-- Aim -->
 	<string id="ui_mm_menu_aim">
 		<text>Aim</text>
@@ -670,6 +687,30 @@
 		<text>Item</text>
 	</string>
 
+	<!-- Launchers -->
+	<string id="ui_mm_menu_launchers">
+		<text>Launchers</text>
+	</string>
+	<string id="ui_mm_launchers_modded_exes">
+		<text>Launchers</text>
+	</string>
+	
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_fire_reloads_ubgl">
+		<text>Reload under-barrel launchers with fire input (g_fire_reloads_ubgl)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range">
+		<text>Apply launcher assist while unaimed (g_launcher_dynamic_range)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_zoom">
+		<text>Apply launcher assist while aimed (g_launcher_dynamic_range_zoom)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_mode">
+		<text>Target dynamic objects with launcher assist (g_launcher_dynamic_range_mode)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_launchers_g_launcher_dynamic_range_max">
+		<text>Maximum launcher assist range (g_launcher_dynamic_range_max)</text>
+	</string>
+
 	<!-- First Person Death -->
 	<string id="ui_mm_menu_first_person_death">
 		<text>First Person Death</text>
@@ -686,20 +727,6 @@
 	</string>
 	<string id="ui_mm_modded_exes_gameplay_first_person_death_first_person_death_direction_smoothing">
 		<text>FPD Camera Direction Change Smoothing (first_person_death_direction_smoothing)</text>
-	</string>
-
-	<!-- Gameplay General -->
-	<string id="ui_mm_menu_gameplay_general">
-		<text>General</text>
-	</string>
-	<string id="ui_mm_gameplay_general_modded_exes">
-		<text>General</text>
-	</string>
-	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost">
-		<text>Progressive stamina cost (g_progressive_stamina_cost)</text>
-	</string>
-	<string id="ui_mm_modded_exes_gameplay_gameplay_general_g_progressive_stamina_cost_desc">
-		<text>Stamina will drain linearly with current weight instead of cutoff point</text>
 	</string>
 
 	<!-- Stalkers -->
