@@ -32,6 +32,12 @@
     <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -58,8 +64,8 @@
   <PropertyGroup>
     <TargetName>lua51</TargetName>
     <TargetExt>.lib</TargetExt>
-    <OutDir>$(ProjectDir)</OutDir>
-    <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(xrGameDir)bin_dbg\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

@@ -44,5 +44,3 @@ host\buildvm.exe -m folddef -o lj_folddef.h lj_opt_fold.c || exit /b 1
 echo [LuaJIT] Generation complete
 popd
 exit /b 0
-
-
