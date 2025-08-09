@@ -9,7 +9,7 @@
 #ifndef INVENTORY_UPGRADE_BASE_H_INCLUDED
 #define INVENTORY_UPGRADE_BASE_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+
 #include "object_broker.h"
 
 class CInventoryItem;
@@ -39,7 +39,7 @@ namespace inventory
 		};
 
 		class UpgradeBase :
-			private boost::noncopyable
+			private xray::noncopyable
 		{
 		public:
 			UpgradeBase();

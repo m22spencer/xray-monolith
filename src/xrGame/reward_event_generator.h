@@ -3,7 +3,7 @@
 
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "profile_data_types.h"
-#include <boost/noncopyable.hpp>
+
 
 class atlas_submit_queue;
 
@@ -14,7 +14,7 @@ namespace award_system
 	class rewarding_event_handlers;
 	class best_scores_helper;
 
-	class reward_event_generator : public boost::noncopyable
+	class reward_event_generator : public xray::noncopyable
 	{
 	public:
 		explicit reward_event_generator(u32 const max_rewards_per_game);

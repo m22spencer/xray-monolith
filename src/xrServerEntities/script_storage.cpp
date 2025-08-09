@@ -1158,9 +1158,9 @@ bool CScriptStorage::object(LPCSTR namespace_name, LPCSTR identifier, int type)
 	}
 }
 
-#include <boost/noncopyable.hpp>
 
-struct raii_guard : private boost::noncopyable
+
+struct raii_guard : private xray::noncopyable
 {
 	int m_error_code;
 	LPCSTR const& m_error_description;

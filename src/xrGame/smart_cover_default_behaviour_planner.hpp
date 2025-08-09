@@ -8,7 +8,7 @@
 #ifndef SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_HPP_INCLUDED
 #define SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_HPP_INCLUDED
 
-#include <boost/noncopyable.hpp>
+
 #include "smart_cover_detail.h"
 #include "action_planner_action.h"
 #include "debug_make_final.hpp"
@@ -19,7 +19,7 @@ namespace smart_cover
 
 	class default_behaviour_planner :
 		public CActionPlannerAction<animation_planner>,
-		private boost::noncopyable,
+		private xray::noncopyable,
 		private debug::make_final<default_behaviour_planner>
 	{
 	private:

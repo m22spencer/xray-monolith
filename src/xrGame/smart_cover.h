@@ -8,7 +8,7 @@
 #ifndef SMART_COVER_H_INCLUDED
 #define SMART_COVER_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "_noncopyable.h"
 #include "smart_cover_description.h"
 #include "cover_point.h"
 #include "smart_cover_loophole.h"
@@ -27,10 +27,10 @@ namespace smart_cover
 		u32 m_level_vertex_id;
 	};
 
-	class cover :
-		public CCoverPoint,
-		private debug::make_final<cover>,
-		private boost::noncopyable
+class cover :
+	public CCoverPoint,
+	private debug::make_final<cover>,
+	private xray::noncopyable
 	{
 	public:
 		typedef intrusive_ptr<

@@ -5,10 +5,9 @@
 //	Description : Smart cover description class
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef SMART_COVER_DESCRIPTION_H_INCLUDED
-#define SMART_COVER_DESCRIPTION_H_INCLUDED
+#pragma once
 
-#include <boost/noncopyable.hpp>
+#include "_noncopyable.h"
 #include "smart_cover_detail.h"
 #include "graph_abstract.h"
 #include "debug_make_final.hpp"
@@ -25,7 +24,7 @@ namespace smart_cover
 
 	class description :
 		private debug::make_final<description>,
-		private boost::noncopyable,
+		private xray::noncopyable,
 		public detail::intrusive_base_time
 	{
 	public:
@@ -58,8 +57,6 @@ namespace smart_cover
 		void process_loopholes();
 		void load_actions(::luabind::object const& table, ActionsList& result);
 	};
-} // namespace smart_cover
+}
 
 #include "smart_cover_description_inline.h"
-
-#endif // SMART_COVER_DESCRIPTION_H_INCLUDED

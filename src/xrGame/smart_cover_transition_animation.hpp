@@ -17,7 +17,7 @@ namespace smart_cover
 	{
 		class animation_action :
 			private debug::make_final<animation_action>,
-			private boost::noncopyable
+			private xray::noncopyable
 		{
 		private:
 			Fvector m_position;

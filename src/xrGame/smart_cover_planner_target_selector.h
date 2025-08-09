@@ -8,7 +8,7 @@
 #ifndef SMART_COVER_PLANNER_TARGET_SELECTOR_H_INCLUDED
 #define SMART_COVER_PLANNER_TARGET_SELECTOR_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+
 #include "smart_cover_detail.h"
 #include "action_planner_action.h"
 #include "script_callback_ex.h"
@@ -20,7 +20,7 @@ namespace smart_cover
 
 	class target_selector :
 		public CActionPlannerAction<animation_planner>,
-		private boost::noncopyable,
+		private xray::noncopyable,
 		private debug::make_final<target_selector>
 	{
 	private:

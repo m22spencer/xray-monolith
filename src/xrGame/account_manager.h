@@ -1,7 +1,7 @@
 #ifndef ACCOUNT_MANAGER
 #define ACCOUNT_MANAGER
 
-#include <boost/noncopyable.hpp>
+
 #include "mixed_delegate.h"
 #include "script_export_space.h"
 #include "queued_async_method.h"
@@ -40,7 +40,7 @@ namespace gamespy_gp
 		suggest_nicks_cb_tag> suggest_nicks_cb;
 
 
-	class account_manager : private boost::noncopyable
+	class account_manager : private xray::noncopyable
 	{
 	public:
 		explicit account_manager(CGameSpy_GP* gsgp_inst);

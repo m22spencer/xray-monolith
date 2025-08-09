@@ -35,7 +35,7 @@
 #include "PHElementInline.h"
 #include "PhysicsShellAnimator.h"
 #include "phshellbuildjoint.h"
-#include <boost/noncopyable.hpp>
+
 #ifdef DEBUG
 #include    "debug_output.h"
 #endif
@@ -1112,7 +1112,7 @@ void CPHShell::SetCallbacks()
 	};
 	std::for_each(elements.begin(), elements.end(), set_bone_callback());
 
-	struct set_bone_reference : private boost::noncopyable
+	struct set_bone_reference : private xray::noncopyable
 	{
 		IKinematics& K;
 
