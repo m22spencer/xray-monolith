@@ -171,7 +171,7 @@ How to compile exes:
 
 ## Changelog
 **2025.08.09**
-* Replace `smart_cast` with fast_dynamic_cast library (https://github.com/ixray-team/ixray-1.6-stcop/commit2197a168bbd700f64df0fbcb5f0139a289a39102)
+* Replace `smart_cast` with fast_dynamic_cast library (https://github.com/ixray-team/ixray-1.6-stcop/commit/2197a168bbd700f64df0fbcb5f0139a289a39102)
 * Convert LuaJIT NMake to VS2022 project (https://github.com/themrdemonized/xray-monolith/pull/323)
 * Reduced .pdb size
 
