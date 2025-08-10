@@ -9,7 +9,7 @@
 #include "NewZoomFlag.h"
 #include "object_broker.h"
 #include "inventory.h"
-
+BOOL binoculars_dynamic_zoom_check = 0;
 extern float n_zoom_step_count;
 float czoom;
 
@@ -161,7 +161,9 @@ void newGetZoomData(const float scope_factor, const float zoom_step_count, float
 
 void CWeaponBinoculars::ZoomInc()
 {
-	if (!m_zoom_params.m_bUseDynamicZoom) return;
+	if (binoculars_dynamic_zoom_check) {
+		if (!m_zoom_params.m_bUseDynamicZoom) return;
+	}
 	float delta, min_zoom_factor;
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);
@@ -177,7 +179,9 @@ void CWeaponBinoculars::ZoomInc()
 
 void CWeaponBinoculars::ZoomDec()
 {
-	if (!m_zoom_params.m_bUseDynamicZoom) return;
+	if (binoculars_dynamic_zoom_check) {
+		if (!m_zoom_params.m_bUseDynamicZoom) return;
+	}
 	float delta, min_zoom_factor;
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);

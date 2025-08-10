@@ -118,6 +118,8 @@ extern BOOL g_ai_die_in_anomaly; //Alundaio
 
 extern BOOL g_telekinetic_objects_include_corpses; // Tosox
 
+extern BOOL binoculars_dynamic_zoom_check; //VodoXleb
+
 extern BOOL g_allow_weapon_control_inertion_factor; // momopate
 extern BOOL g_allow_outfit_control_inertion_factor;
 extern BOOL g_render_short_tracers;
@@ -2813,6 +2815,8 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "ai_use_old_vision", &g_ai_use_old_vision, 0, 1);
 
 	CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
+
+	CMD4(CCC_Integer, "binoculars_dynamic_zoom_check", &binoculars_dynamic_zoom_check, 0, 1); //VodoXleb
 
 	CMD4(CCC_Integer, "pseudogiant_can_damage_objects_on_stomp", &pseudogiantCanDamageObjects, 0, 1);
 
