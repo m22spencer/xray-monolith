@@ -170,6 +170,17 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.08.11**
+* Small reorganization of 3rd party files
+* `g_interrupt_fire_on_aim_toggle` cvar to set stop firing when pressed aim, default enabled addresses issue https://github.com/themrdemonized/xray-monolith/issues/327
+* v2v3v4: update all sound positions at once
+* ProfLander: Launchers: Cartridge Ammo + Trajectory and Reload Options (https://github.com/themrdemonized/xray-monolith/pull/322)
+* VodoXleb: Add `binoculars_dynamic_zoom_check` cvar for new Binoc zoom, default disabled (https://github.com/themrdemonized/xray-monolith/pull/328)
+* Lucy: Fix lua function to get/set shaders and textures of models (https://github.com/themrdemonized/xray-monolith/pull/329)
+* LVutner:
+  * Removed useless DSVs... (https://github.com/themrdemonized/xray-monolith/pull/330)
+  * Possible fix for corrupted CBuffers [r_ComputePass] (https://github.com/themrdemonized/xray-monolith/pull/331)
+
 **2025.08.09**
 * Replace `smart_cast` with fast_dynamic_cast library (https://github.com/ixray-team/ixray-1.6-stcop/commit/2197a168bbd700f64df0fbcb5f0139a289a39102)
 * Convert LuaJIT NMake to VS2022 project (https://github.com/themrdemonized/xray-monolith/pull/323)
