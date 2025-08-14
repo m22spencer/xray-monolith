@@ -13,6 +13,7 @@ class FHierrarhyVisual : public dxRender_Visual
 {
 public:
 	xr_vector<IRenderVisual*> children;
+	xr_vector<IRenderVisual*> children_invisible;
 	BOOL bDontDelete;
 public:
 	FHierrarhyVisual();
@@ -27,6 +28,7 @@ public:
 	//--DSR-- HeatVision_end
 
 	virtual xr_vector<IRenderVisual*>* get_children() { return &children; };
+	virtual xr_vector<IRenderVisual*>* get_children_invisible() { return &children_invisible; };
 };
 
 #endif //FHierrarhyVisualH

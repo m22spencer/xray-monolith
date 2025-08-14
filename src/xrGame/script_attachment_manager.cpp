@@ -524,6 +524,9 @@ void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecu
 		bool bVisibleNow = m_kinematics->LL_GetBoneVisible(bone_id);
 		if (bVisibleNow != bVisibility)
 			m_kinematics->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+
+		m_kinematics->CalculateBones_Invalidate();
+		m_kinematics->CalculateBones(TRUE);
 	}
 }
 
@@ -611,9 +614,9 @@ LPCSTR script_attachment::bone_name(u16 bone_id)
 {
 	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 
-	auto bones = m_kinematics->list_bones();
-	for (const auto& bone : bones)
-		result[bone.first] = bone.second.c_str();
+	auto bones = m_kinematics->LL_Bones();
+	for (const auto& bone : *bones)
+		result[bone.second] = bone.first.c_str();
 
 	return result;
 }
@@ -910,8 +913,9 @@ Fvector script_attachment::GetCenter()
 	}
 
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShader();
@@ -920,15 +924,20 @@ Fvector script_attachment::GetCenter()
 		return table;
 	}
 
-	int i = 1;
-
 	for (auto* child : *children)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShader();
+		subtable["texture"] = child->getDebugTexture();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
@@ -945,8 +954,9 @@ Fvector script_attachment::GetCenter()
 	}
 
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShaderDef();
@@ -955,15 +965,20 @@ Fvector script_attachment::GetCenter()
 		return table;
 	}
 
-	int i = 1;
-
 	for (auto* child : *children)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShaderDef();
+		subtable["texture"] = child->getDebugTextureDef();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
@@ -973,50 +988,76 @@ void script_attachment::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture)
 {
 	if (!m_model) return;
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		m_model->SetShaderTexture(shader, texture);
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->SetShaderTexture(shader, texture);
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->SetShaderTexture(shader, texture);
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->SetShaderTexture(shader, texture);
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
 }
 
 void script_attachment::ResetShaderTexture(int id)
 {
 	if (!m_model) return;
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		m_model->ResetShaderTexture();
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->ResetShaderTexture();
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->ResetShaderTexture();
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->ResetShaderTexture();
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
 }

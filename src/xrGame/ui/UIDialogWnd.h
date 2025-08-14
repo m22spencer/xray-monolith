@@ -28,6 +28,7 @@ public:
 	void AllowMovement(bool b) { m_bAllowMovement = b; }
 	void AllowCursor(bool b) { m_bNeedCursor = b; }
 	void AllowCenterCursor(bool b) { m_bNeedCenterCursor = b; }
+	void AllowWorkInPause(bool b) { m_bWorkInPause = b; }
 	virtual bool StopAnyMove() { return !m_bAllowMovement; }
 	virtual bool NeedCursor() const { return m_bNeedCursor; }
 	virtual bool NeedCenterCursor() const { return m_bNeedCenterCursor; }

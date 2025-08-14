@@ -112,13 +112,13 @@ void CExplosive::Load(CInifile const* ini, LPCSTR section)
 	m_fUpThrowFactor = ini->r_float(section, "up_throw_factor");
 
 	// momopate: Extended shrapnel customization
-	m_fFragAP = READ_IF_EXISTS(pSettings, r_float, section, "frags_ap", 1.0f);
-	m_fFragAirRes = READ_IF_EXISTS(pSettings, r_float, section, "frags_air_resistance", 1.0f);
-	m_bFragTracer = READ_IF_EXISTS(pSettings, r_bool, section, "frags_tracer", false);
-	m_bFrag4to1Tracer = READ_IF_EXISTS(pSettings, r_bool, section, "frags_4to1_tracer", false);
-	m_bFragMagneticBeamShot = READ_IF_EXISTS(pSettings, r_bool, section, "frags_magnetic_beam_shot", false);	// Probably has literal zero use cases but, you know, what if?
-	m_bFragAllowRicochet = READ_IF_EXISTS(pSettings, r_bool, section, "frags_allow_ricochet", true);
-	u8FragColorID = READ_IF_EXISTS(pSettings, r_u8, section, "frags_tracer_color_ID", 0);
+	m_fFragAP = READ_IF_EXISTS(ini, r_float, section, "frags_ap", 1.0f);
+	m_fFragAirRes = READ_IF_EXISTS(ini, r_float, section, "frags_air_resistance", 1.0f);
+	m_bFragTracer = READ_IF_EXISTS(ini, r_bool, section, "frags_tracer", false);
+	m_bFrag4to1Tracer = READ_IF_EXISTS(ini, r_bool, section, "frags_4to1_tracer", false);
+	m_bFragMagneticBeamShot = READ_IF_EXISTS(ini, r_bool, section, "frags_magnetic_beam_shot", false);	// Probably has literal zero use cases but, you know, what if?
+	m_bFragAllowRicochet = READ_IF_EXISTS(ini, r_bool, section, "frags_allow_ricochet", true);
+	u8FragColorID = READ_IF_EXISTS(ini, r_u8, section, "frags_tracer_color_ID", 0);
 
 	fWallmarkSize = ini->r_float(section, "wm_size");
 	R_ASSERT(fWallmarkSize>0);

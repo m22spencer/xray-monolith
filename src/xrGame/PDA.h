@@ -95,7 +95,7 @@ protected:
 	float m_fLR_MovingFactor;
 	float m_fLR_InertiaFactor;
 	float m_fUD_InertiaFactor;
-	bool hasEnoughBatteryPower(){ return (!IsUsingCondition() || (IsUsingCondition() && GetCondition() > m_fLowestBatteryCharge)); }
+	bool hasEnoughBatteryPower(){ return (!IsUsingCondition() || (m_PdaEnabled && IsUsingCondition() && GetCondition() > m_fLowestBatteryCharge)); }
 	static void _BCL JoystickCallback(CBoneInstance* B);
 	bool m_bNoticedEmptyBattery;
 	bool m_LastMBZoom;
@@ -127,6 +127,7 @@ public:
 	eDeferredEnableState m_eDeferredEnable;
 	bool m_bPowerSaving;
 	float m_psy_factor;
+	bool m_PdaEnabled;
 	float m_thumb_rot[2];
 	float m_nearwall_zoomed_range;
 };

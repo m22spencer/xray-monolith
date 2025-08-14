@@ -43,6 +43,11 @@ function game_object_on_net_destroy(obj)
 			end
 		end
 	end
+
+	-- Fix self.response containing deleted object
+	if instance and instance.response and instance.response["who"] and type(instance.response["who"]) == "userdata" and instance.response["who"]:id() == obj:id() then
+		instance.response["who"] = nil
+	end
 end
 
 -- Game objects iterator
@@ -105,6 +110,7 @@ AddScriptCallback("bullet_on_remove")
 -- target_id = game object id of entity the bullet hit (it will be 65535 if bullet hit the terrain or vanished)
 -- material = name of material that bullet hit
 -- life_time = time of bullet fly
+-- element - bone_id if the target hit is object, triangle number if its static geometry. -1 if nothing was hit
 
 -- Called when bullet is shot from the weapon
 _G.CBulletOnInit = function(bullet)
@@ -524,13 +530,21 @@ function actor_on_first_update_prefetch()
 	end, db.actor)
 end
 
+-- Force update close enough traders
+function npc_on_update(npc)
+	if npc:position():distance_to_sqr(db.actor:position()) < 30^2 then
+		trade_manager.update(npc)
+	end
+end
+
 function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 
 	-- Prefetch callbacks. Disabled for now, conflict with SSS
 	-- RegisterScriptCallback("actor_item_to_slot", actor_item_to_slot_prefetch)
 	-- RegisterScriptCallback("actor_on_first_update", actor_on_first_update_prefetch)
-
+	
+	RegisterScriptCallback("npc_on_update", npc_on_update)
 	RegisterScriptCallback("ActorMenu_on_item_after_move", ActorMenu_on_item_after_move)
 	RegisterScriptCallback("anomaly_on_before_activate", anomaly_on_before_activate)
 	RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)

@@ -1,6 +1,3 @@
 #pragma once
 
-#include "map"
-#include "../xrCore/xrstring.h"
-
-std::map<shared_str, float> listScopeRadii;
+xr_map<shared_str, float> listScopeRadii;

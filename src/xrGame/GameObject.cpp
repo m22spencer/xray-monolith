@@ -277,7 +277,19 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 	const CSE_Visual* visual = smart_cast<const CSE_Visual*>(E);
 	if (visual)
 	{
-		cNameVisual_set(visual_name(E));
+		auto visualName = visual_name(E);
+
+		// If model doesn't exist, and object config has "visual" field, try to update the model
+		if(!Render->models_Exists(visualName) && pSettings->line_exist(cNameSect(), "visual")) {
+			auto visualFromSec = pSettings->r_string(cNameSect(), "visual");
+			Msg("~WARNING : Failed to load '%s', falling back to '%s'", visualName, visualFromSec);
+			cNameVisual_set(visualFromSec);
+		}
+		// Otherwise... proceed as normal (will CTD if model doesn't exist)
+		else {
+			cNameVisual_set(visualName);
+		}
+
 		if (visual->flags.test(CSE_Visual::flObstacle))
 		{
 			ISpatial* self = smart_cast<ISpatial*>(this);
@@ -854,26 +866,18 @@ script_attachment* CGameObject::add_attachment(LPCSTR name, script_attachment* a
 {
 	R_ASSERT(att);
 	remove_child(name, true);
+
+	if (!m_script_attachments.size())
+	{
+		add_visual_callback(update_visbox);
+
+#ifdef ATTACHMENT_HUD_VISBOX
+		CHudItem* hud = smart_cast<CHudItem*>(this);
+		if (hud) hud->add_visual_callback(update_visbox_hud);
+#endif
+	}
+
 	m_script_attachments.emplace(mk_pair(name, att));
-
-	if (!Visual()->dcast_PKinematics()->GetUpdateCallback())
-	{
-		Visual()->dcast_PKinematics()->SetUpdateCallback(update_visbox);
-		Visual()->dcast_PKinematics()->SetUpdateCallbackParam(this);
-	}
-
-	CHudItem* obj = smart_cast<CHudItem*>(this);
-	if (obj)
-	{
-		IKinematics* k = obj->HudItemData()->m_model;
-
-		if (!k->GetUpdateCallback())
-		{
-			k->SetUpdateCallback(update_visbox_hud);
-			k->SetUpdateCallbackParam(obj);
-		}
-	}
-
 	return att;
 }
 
@@ -902,23 +906,12 @@ void CGameObject::remove_child(LPCSTR name, bool destroy)
 
 	if (!m_script_attachments.size())
 	{
-		if (Visual()->dcast_PKinematics()->GetUpdateCallbackParam() == this)
-		{
-			Visual()->dcast_PKinematics()->SetUpdateCallback(nullptr);
-			Visual()->dcast_PKinematics()->SetUpdateCallbackParam(nullptr);
-		}
+		remove_visual_callback(update_visbox);
 
-		CHudItem* obj = smart_cast<CHudItem*>(this);
-		if (obj)
-		{
-			IKinematics* k = obj->HudItemData()->m_model;
-
-			if (k->GetUpdateCallbackParam() == obj)
-			{
-				k->SetUpdateCallback(nullptr);
-				k->SetUpdateCallbackParam(nullptr);
-			}
-		}
+#ifdef ATTACHMENT_HUD_VISBOX
+		CHudItem* hud = smart_cast<CHudItem*>(this);
+		if (hud) hud->remove_visual_callback(update_visbox_hud);
+#endif
 	}
 }
 
@@ -1005,22 +998,20 @@ BOOL CGameObject::TestServerFlag(u32 Flag) const
 
 void CGameObject::add_visual_callback(visual_callback* callback)
 {
-	VERIFY(smart_cast<IKinematics*>(Visual()));
+	if (!smart_cast<IKinematics*>(Visual())) return;
 	CALLBACK_VECTOR_IT I = std::find(visual_callbacks().begin(), visual_callbacks().end(), callback);
-	VERIFY(I == visual_callbacks().end());
-
+	if (I != visual_callbacks().end()) return;
 	if (m_visual_callback.empty()) SetKinematicsCallback(true);
-	//		smart_cast<IKinematics*>(Visual())->Callback(VisualCallback,this);
 	m_visual_callback.push_back(callback);
 }
 
 void CGameObject::remove_visual_callback(visual_callback* callback)
 {
+	if (!smart_cast<IKinematics*>(Visual())) return;
 	CALLBACK_VECTOR_IT I = std::find(m_visual_callback.begin(), m_visual_callback.end(), callback);
-	VERIFY(I != m_visual_callback.end());
+	if (I == m_visual_callback.end()) return;
 	m_visual_callback.erase(I);
 	if (m_visual_callback.empty()) SetKinematicsCallback(false);
-	//		smart_cast<IKinematics*>(Visual())->Callback(0,0);
 }
 
 void CGameObject::SetKinematicsCallback(bool set)
@@ -1030,11 +1021,18 @@ void CGameObject::SetKinematicsCallback(bool set)
 		smart_cast<IKinematics*>(Visual())->Callback(VisualCallback, this);
 	else
 		smart_cast<IKinematics*>(Visual())->Callback(0, 0);
-};
+}
 
 void VisualCallback(IKinematics* tpKinematics)
 {
-	CGameObject* game_object = static_cast<CGameObject*>(static_cast<CObject*>(tpKinematics->GetUpdateCallbackParam()));
+	if (!tpKinematics) return;
+
+	auto cobj = static_cast<CObject*>(tpKinematics->GetUpdateCallbackParam());
+	if (!cobj) return;
+
+	CGameObject* game_object = static_cast<CGameObject*>(cobj);
+	if (!game_object) return;
+
 	VERIFY(game_object);
 
 	CGameObject::CALLBACK_VECTOR_IT I = game_object->visual_callbacks().begin();

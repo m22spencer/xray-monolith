@@ -29,7 +29,7 @@ class CNightVisionEffector;
 
 extern float f_weapon_deterioration;
 
-extern std::map<shared_str, float> listScopeRadii;
+extern xr_map<shared_str, float> listScopeRadii;
 
 extern float scope_scrollpower;
 extern float sens_multiple;
@@ -55,6 +55,8 @@ struct Lens {
 class CWeapon : public CHudItemObject,
                 public CShootingObject
 {
+	friend class CWeaponGrenadeLauncher;
+	
 private:
 	typedef CHudItemObject inherited;
 
@@ -69,6 +71,7 @@ public:
 	virtual void net_Destroy();
 	virtual void net_Export(NET_Packet& P);
 	virtual void net_Import(NET_Packet& P);
+	virtual void net_Relcase(CObject* object) override;
 
 	virtual CWeapon* cast_weapon()
 	{

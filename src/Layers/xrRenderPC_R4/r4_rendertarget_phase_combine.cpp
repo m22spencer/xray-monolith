@@ -540,14 +540,17 @@ void CRenderTarget::phase_combine()
 
 		phase_lut();
 
-		if (ps_r2_mask_control.x > 0)
+	if(ps_r2_mask_control.x > 0)
+	{
+		phase_gasmask_dudv();
+		if (ps_r2_drops_control.x > 0)
 		{
-			phase_gasmask_dudv();
 			phase_gasmask_drops();
 		}
-
-		if (ps_r2_nightvision > 0)
-			phase_nightvision();
+	}
+	
+	if(ps_r2_nightvision > 0)
+		phase_nightvision();
 
 		//--DSR-- HeatVision_start
 		if (ps_r2_heatvision > 0)

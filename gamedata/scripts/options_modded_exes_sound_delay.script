@@ -19,4 +19,9 @@ PAGE = page {
 		def = 0,
 		step = 0.1,
 	},
+	track {
+		id = "snd_efx_environment_change_time",
+		def = 1.66,
+		step = 0.1,
+	},
 }

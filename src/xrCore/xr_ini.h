@@ -1,11 +1,7 @@
 #ifndef xr_iniH
 #define xr_iniH
 
-#include "fastdelegate.h"
-
-#ifdef USE_ROBINHOOD
-#include "robin_hood.h"
-#endif
+#include <fastdelegate/fastdelegate.h>
 
 // refs
 class CInifile;

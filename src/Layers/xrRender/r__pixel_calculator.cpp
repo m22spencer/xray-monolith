@@ -86,7 +86,7 @@ void r_pixel_calculator::run()
 	begin();
 	for (u32 it = 0; it < RImplementation.Visuals.size(); it++)
 	{
-		if (0 == dynamic_cast<IRender_Mesh*>(RImplementation.Visuals[it])) continue;
+		if (0 == fast_dynamic_cast<IRender_Mesh*>(RImplementation.Visuals[it])) continue;
 		Msg("*%d*", it);
 		calculate((dxRender_Visual*)RImplementation.Visuals[it]);
 	}

@@ -141,6 +141,15 @@
 		void RemoveColorAnimation()
     }
 
+    class CUIDialogWnd : CUIWindow {
+        void AllowWorkInPause(bool state)
+    }
+
+    class render_device {
+        // Switch the pause, with sound emitters and without hint on screen
+        void pause_ex(bool state)
+    }
+
     class particles_object {
         void set_hud_mode(bool hud_mode)
     }
@@ -152,9 +161,12 @@
         box,
     }
     debug_render {
-        DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
-        void remove_object(u16 id)
-        DBG_ScriptObject* get_object(u16 id)
+        DBG_ScriptObject* add_object(u32 id, DebugRenderType type)
+        DBG_ScriptObject* add_object(LPCSTR id, DebugRenderType type)
+        void remove_object(u32 id)
+        void remove_object(LPCSTR id)
+        DBG_ScriptObject* get_object(u32 id)
+        DBG_ScriptObject* get_object(LPCSTR id)
         u32 get_flags()
         void set_flags(u32 flags)
         DBG_ScriptSphere* cast_dbg_sphere()
@@ -415,6 +427,10 @@
         // Artefact
         function get_artefact_additional_inventory_weight()
         function set_artefact_additional_inventory_weight(float)
+
+	// Devices
+	function set_device_enabled(bool)
+	function is_device_enabled()
 
         // Bones
         u16 get_bone_id(string)

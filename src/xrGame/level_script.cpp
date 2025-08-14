@@ -2064,28 +2064,41 @@ CScriptIniFile* GetVisualUserdata(LPCSTR visual)
 	return ini;
 }
 
-DBG_ScriptObject* get_object(u16 id)
+DBG_ScriptObject* get_object(LPCSTR s)
 {
-	xr_map<u16, DBG_ScriptObject*>::iterator it = Level().getScriptRenderQueue()->find(id);
+	shared_str id(s);
+	auto it = Level().getScriptRenderQueue()->find(id);
 	if (it == Level().getScriptRenderQueue()->end())
 		return nullptr;
 
 	return it->second;
 }
-
-void remove_object(u16 id)
+DBG_ScriptObject* get_object(u32 id)
 {
-	DBG_ScriptObject* dbg_obj = get_object(id);
+	auto s = std::to_string(id);
+	return get_object(s.c_str());
+}
+
+void remove_object(LPCSTR s)
+{
+	shared_str id(s);
+	DBG_ScriptObject* dbg_obj = get_object(id.c_str());
 	if (!dbg_obj)
 		return;
 
 	xr_delete(dbg_obj);
 	Level().getScriptRenderQueue()->erase(id);
 }
-
-DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
+void remove_object(u32 id)
 {
-	remove_object(id);
+	auto s = std::to_string(id);
+	remove_object(s.c_str());
+}
+
+DBG_ScriptObject* add_object(LPCSTR s, DebugRenderType type)
+{
+	shared_str id(s);
+	remove_object(id.c_str());
 	DBG_ScriptObject* dbg_obj = nullptr;
 
 	switch (type)
@@ -2107,6 +2120,11 @@ DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
 	Level().getScriptRenderQueue()->emplace(mk_pair(id, dbg_obj));
 
 	return dbg_obj;
+}
+DBG_ScriptObject* add_object(u32 id, DebugRenderType type)
+{
+	auto s = std::to_string(id);
+	return add_object(s.c_str(), type);
 }
 
 u32 get_flags()
@@ -2199,9 +2217,12 @@ void CLevel::script_register(lua_State* L)
 
 	module(L, "debug_render")
 		[
-			def("add_object", add_object),
-			def("remove_object", remove_object),
-			def("get_object", get_object),
+			def("add_object", ((DBG_ScriptObject * (*)(u32, DebugRenderType)) & add_object)),
+			def("add_object", ((DBG_ScriptObject * (*)(LPCSTR, DebugRenderType)) & add_object)),
+			def("remove_object", ((void (*)(u32)) & remove_object)),
+			def("remove_object", ((void (*)(LPCSTR)) & remove_object)),
+			def("get_object", ((DBG_ScriptObject * (*)(u32)) & get_object)),
+			def("get_object", ((DBG_ScriptObject * (*)(LPCSTR)) & get_object)),
 			def("get_flags", get_flags),
 			def("set_flags", set_flags)
 		];

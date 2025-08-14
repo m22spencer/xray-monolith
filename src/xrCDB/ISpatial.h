@@ -119,6 +119,9 @@ public:
 	virtual IRenderable* dcast_Renderable() { return 0; }
 	virtual IRender_Light* dcast_Light() { return 0; }
 
+	// demonized: Check if eligible for bone calc optimizations
+	virtual bool canOptimizeCalculateBones() { return true; }
+
 	ISpatial(ISpatial_DB* space);
 	virtual ~ISpatial();
 };

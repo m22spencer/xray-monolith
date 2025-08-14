@@ -266,7 +266,7 @@ void CUIMpTradeWnd::CreateHelperItems(CUIDragDropListEx* list, const CStoreHiera
 			SBuyItemInfo* new_item = CreateItem(item_name, SBuyItemInfo::e_undefined, false);
 
 			CUIInventoryCellItem* inventory_cell_item;
-			if ((inventory_cell_item = dynamic_cast<CUIInventoryCellItem*>(new_item->m_cell_item)) != NULL)
+			if ((inventory_cell_item = fast_dynamic_cast<CUIInventoryCellItem*>(new_item->m_cell_item)) != NULL)
 			{
 				inventory_cell_item->SetIsHelper(true);
 				inventory_cell_item->UpdateItemText();

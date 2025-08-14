@@ -45,6 +45,7 @@ class ai_obstacle;
 class CFlashlight;
 class IKinematics;
 class script_attachment;
+class CMissile;
 
 template <typename _return_type>
 class CScriptCallbackEx;

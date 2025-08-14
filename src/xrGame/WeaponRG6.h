@@ -2,6 +2,7 @@
 
 #include "rocketlauncher.h"
 #include "weaponShotgun.h"
+#include "WeaponGrenadeLauncher.h"
 #include "script_export_space.h"
 
 class CWeaponRG6 : public CRocketLauncher,
@@ -9,6 +10,9 @@ class CWeaponRG6 : public CRocketLauncher,
 {
 	typedef CRocketLauncher inheritedRL;
 	typedef CWeaponShotgun inheritedSG;
+
+private:
+	virtual bool is_grenade();
 
 public:
 	virtual ~CWeaponRG6();

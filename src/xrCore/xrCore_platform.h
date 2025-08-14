@@ -12,9 +12,15 @@
 #define _CRT_SECURE_NO_DEPRECATE // vc8.0 stuff, don't deprecate several ANSI functions
 
 // windows.h
+#undef _WIN32_WINNT
+
 #ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x0501
-#endif
+#ifdef _MSC_VER
+#define _WIN32_WINNT _WIN32_WINNT_WIN7
+#else // ifdef _MSC_VER
+#define _WIN32_WINNT 0x0501
+#endif // ifdef _MSC_VER
+#endif // ifndef _WIN32_WINNT
 
 #ifdef __BORLANDC__
 #include <vcl.h>

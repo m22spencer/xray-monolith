@@ -9,7 +9,8 @@
 #include "NewZoomFlag.h"
 #include "object_broker.h"
 #include "inventory.h"
-
+BOOL binoculars_dynamic_zoom_check = FALSE;
+BOOL useNewZoomDeltaAlgorithm = FALSE;
 extern float n_zoom_step_count;
 float czoom;
 
@@ -129,7 +130,6 @@ void CWeaponBinoculars::render_item_ui()
 }
 
 // demonized: new zoom delta change to have same multiple between steps for same visual change with each step
-BOOL useNewZoomDeltaAlgorithm = FALSE;
 void newGetZoomDelta(const float scope_factor, float& delta, const float min_zoom_factor, float steps)
 {
 	delta = pow(scope_factor / min_zoom_factor, 1.0f / steps);
@@ -161,6 +161,8 @@ void newGetZoomData(const float scope_factor, const float zoom_step_count, float
 
 void CWeaponBinoculars::ZoomInc()
 {
+	if (binoculars_dynamic_zoom_check && !m_zoom_params.m_bUseDynamicZoom) return;
+
 	float delta, min_zoom_factor;
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);
@@ -176,6 +178,8 @@ void CWeaponBinoculars::ZoomInc()
 
 void CWeaponBinoculars::ZoomDec()
 {
+	if (binoculars_dynamic_zoom_check && !m_zoom_params.m_bUseDynamicZoom) return;
+
 	float delta, min_zoom_factor;
 	if (zoomFlags.test(NEW_ZOOM)) {
 		newGetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, delta, min_zoom_factor, czoom);

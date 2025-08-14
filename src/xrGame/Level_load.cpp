@@ -108,12 +108,22 @@ bool CLevel::Load_GameSpecific_After()
 			::Sound->set_geometry_env(F);
 			FS.r_close(F);
 		}
+		else
+		{
+			// demonized: reset sound environment if the map doesn't have it, so that the next map won't be using environment of the previous one
+			::Sound->set_geometry_env(nullptr);
+		}
 		// loading SOM
 		if (FS.exist(fn_game, "$level$", "level.som"))
 		{
 			IReader* F = FS.r_open(fn_game);
 			::Sound->set_geometry_som(F);
 			FS.r_close(F);
+		}
+		else
+		{
+			// demonized: same here
+			::Sound->set_geometry_som(nullptr);
 		}
 
 		// loading random (around player) sounds

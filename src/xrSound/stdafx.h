@@ -28,14 +28,15 @@
 #include <vorbis/vorbisfile.h>
 
 #include "../xrCDB/xrCDB.h"
-#include "sound.h"
+#include "Sound.h"
 
 #define ENGINE_API
 
-#include "../xrcore/xr_resource.h"
+#include "../xrCore/xr_resource.h"
+#include "../xrCore/profiler.h"
 
 #ifdef _EDITOR
 # 	include "ETools.h"
 #endif
-// TODO: reference additional headers your program requires here
+
 #endif

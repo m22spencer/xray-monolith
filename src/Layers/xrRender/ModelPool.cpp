@@ -432,6 +432,35 @@ void CModelPool::Prefetch_One(LPCSTR N, bool assert)
 		Delete(V,FALSE);
 }
 
+bool CModelPool::Exists(LPCSTR N)
+{
+	string_path low_name;
+	VERIFY(xr_strlen(N) < sizeof(low_name));
+	xr_strcpy(low_name, N);
+	strlwr(low_name);
+	if (strext(low_name)) *strext(low_name) = 0;
+
+	// Search pool and return early if exists
+	POOL_IT it = Pool.find(low_name);
+	if (it != Pool.end())
+		return true;
+
+	// Search for already loaded model (reference, base model) and return early if exists
+	dxRender_Visual* Base = Instance_Find(low_name);
+	if (Base)
+		return true;
+
+	// Prefetch model
+	dxRender_Visual* V = Create(N, 0, false);
+	if (V) 
+	{
+		Delete(V, FALSE);
+		return true;
+	}
+
+	return false;
+}
+
 dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)
 {
 	PS::CParticleEffect* V = (PS::CParticleEffect*)Instance_Create(MT_PARTICLE_EFFECT);
@@ -506,7 +535,7 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
 	for (; it != en; ++it)
 	{
 		dxRender_Visual* ptr = it->model;
-		Fvisual* vis_ptr = dynamic_cast<Fvisual*>(ptr);
+		Fvisual* vis_ptr = fast_dynamic_cast<Fvisual*>(ptr);
 
 		if (vis_ptr == NULL)
 			continue;
@@ -574,7 +603,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            CKinematics* pV		= dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
+            CKinematics* pV		= fast_dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
             if (fis_zero(m_fLOD,EPS)&&pV->m_lod){
 		        if (_IsValidShader(pV->m_lod,priority,strictB2F)){
 	                RCache.set_Shader		(pV->m_lod->shader?pV->m_lod->shader:EDevice.m_WireShader);
@@ -596,7 +625,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     }break;
     case MT_HIERRARHY:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            FHierrarhyVisual* pV		= dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
+            FHierrarhyVisual* pV		= fast_dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
             I = pV->children.begin		();
             E = pV->children.end		();
             for (; I!=E; I++){
@@ -609,7 +638,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
         }
     }break;
     case MT_PARTICLE_GROUP:{
-        PS::CParticleGroup* pG			= dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
+        PS::CParticleGroup* pG			= fast_dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
 //		if (_IsBoxVisible(m_pVisual,mTransform))
         {
             RCache.set_xform_world	  		(mTransform);

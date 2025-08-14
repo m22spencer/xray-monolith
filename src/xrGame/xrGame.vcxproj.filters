@@ -2497,6 +2497,9 @@
     <Filter Include="UI\Common\ImGui">
       <UniqueIdentifier>{c14ffa0c-947d-49b9-8e01-269569b48371}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Grenade Launcher">
+      <UniqueIdentifier>{6750ea25-06ba-4a57-b46a-dd2be81676ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6186,15 +6189,6 @@
     <ClInclude Include="..\xrServerEntities\smart_cast.h">
       <Filter>Core\Common\SmartCast</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl0.h">
-      <Filter>Core\Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl1.h">
-      <Filter>Core\Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl2.h">
-      <Filter>Core\Common\SmartCast</Filter>
-    </ClInclude>
     <ClInclude Include="string_table.h">
       <Filter>Core\Common\StringTable</Filter>
     </ClInclude>
@@ -7359,9 +7353,6 @@
     <ClInclude Include="..\Include\xrRender\DrawUtils.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrCore\FastDelegate.h">
-      <Filter>Core\Server\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="CustomDevice.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClInclude>
@@ -7400,6 +7391,16 @@
     </ClInclude>
     <ClInclude Include="script_imgui_inline.h">
       <Filter>UI\Common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponGrenadeLauncher.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Grenade Launcher</Filter>
+    <ClInclude Include="..\3rd party\fast_dynamic_cast\fast_dynamic_cast.hpp">
+      <Filter>Core\Common\SmartCast</Filter>
+    <ClInclude Include="WeaponGrenadeLauncher.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Grenade Launcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3rd party\fastdelegate\fastdelegate.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9782,12 +9783,6 @@
     <ClCompile Include="random32.cpp">
       <Filter>Core\Common\Random\32bit</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\smart_cast.cpp">
-      <Filter>Core\Common\SmartCast</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\smart_cast_stats.cpp">
-      <Filter>Core\Common\SmartCast</Filter>
-    </ClCompile>
     <ClCompile Include="string_table.cpp">
       <Filter>Core\Common\StringTable</Filter>
     </ClCompile>
@@ -11098,6 +11093,9 @@
     </ClCompile>
     <ClCompile Include="script_imgui_script.cpp">
       <Filter>UI\Common\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponGrenadeLauncher.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Grenade Launcher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

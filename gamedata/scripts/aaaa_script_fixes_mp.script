@@ -606,4 +606,4 @@ function trans_outfit.transparent_gg()
 			end 
 		end 
 	end
-end 
+end

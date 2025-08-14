@@ -4,8 +4,9 @@
 #include "cl_intersect.h"
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
-#include "SoundRender_Target.h"
+#include "SoundRender_TargetA.h"
 #include "SoundRender_Source.h"
+#include "SoundRender_CoreA.h"
 
 CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, BOOL _loop, float delay)
 {
@@ -101,19 +102,26 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 			s_targets_defer[it]->fill_parameters();
 	}
 
-	// update EAX
-	if (psSoundFlags.test(ss_EAX) && bEAX)
+	// update EFX
+	if (m_is_supported)
 	{
 		if (bListenerMoved)
 		{
 			bListenerMoved = FALSE;
-			e_target = *get_environment(P);
+			e_target_ptr = get_environment(P);
+			if (!e_target_ptr)
+				e_target_ptr = &e_identity;
 		}
 
-		e_current.lerp(e_current, e_target, dt_sec);
+		// demonized: Interpolate from e_current to 95% of e_target in close to exact time
+		constexpr float percent = 0.95f;
+		float alpha = 1.0f - std::exp(std::log(1.0f - percent) * dt_sec / snd_efx_environment_change_time);
+		clamp(alpha, 0.f, 1.f);
+		//Msg("interpolating from e_current to e_target %.2f", std::min(e_current.Reverb, e_target_ptr->Reverb) / std::max(e_current.Reverb, e_target_ptr->Reverb));
+		e_current.lerp(e_current, *e_target_ptr, alpha);
 
-		i_eax_listener_set(&e_current);
-		i_eax_commit_setting();
+		set_listener(e_current);
+		commit();
 	}
 
 	// update listener
@@ -122,9 +130,15 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 	// Start rendering of pending targets
 	if (!s_targets_defer.empty())
 	{
+		CSoundRender_CoreA* Core = (CSoundRender_CoreA*)this;
 		//Msg	("! update: start render");
 		for (it = 0; it < s_targets_defer.size(); it++)
-			s_targets_defer[it]->render();
+		{
+			CSoundRender_TargetA* Ptr = (CSoundRender_TargetA*)s_targets_defer[it];
+			if (m_is_supported)
+				Ptr->SetSlot(Core->slot);
+			Ptr->render();
+		}
 	}
 
 	// Events

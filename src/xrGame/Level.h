@@ -230,8 +230,8 @@ public:
 	};
 
 	Flags32 m_debug_render_flags;
-	xr_map<u16, DBG_ScriptObject*> m_debug_render_queue;
-	xr_map<u16, DBG_ScriptObject*>* getScriptRenderQueue() { return &m_debug_render_queue; }
+	xr_map<shared_str, DBG_ScriptObject*> m_debug_render_queue;
+	xr_map<shared_str, DBG_ScriptObject*>* getScriptRenderQueue() { return &m_debug_render_queue; }
 	void ScriptDebugRender();
 
 	virtual shared_str OpenDemoFile(const char* demo_file_name);
