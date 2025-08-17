@@ -310,7 +310,7 @@ void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& positi
 			if (output && output.type() == LUA_TTABLE)
 			{
 				std::string volume_mult_ex_str = std::string(::luabind::object_cast<LPCSTR>(output["volume_mult"]));
-				float volume_mult_ex = std::stof(volume_mult_ex_str)
+				float volume_mult_ex = std::stof(volume_mult_ex_str);
 				LPCSTR section = ::luabind::object_cast<LPCSTR>(output["section"]);
 				LPCSTR line = ::luabind::object_cast<LPCSTR>(output["line"]);
 				if (volume_mult_ex) {
