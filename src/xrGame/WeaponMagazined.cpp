@@ -110,7 +110,6 @@ void CWeaponMagazined::Load(LPCSTR section)
 	if (WeaponSoundExist(section, "snd_shoot_actor"))
 		m_sounds.LoadSound(section, "snd_shoot_actor", "sndShotActor", false, m_eSoundShot);
 	//-Alundaio
-
 	// Cyclic fire sounds
 	if (WeaponSoundExist(section, "snd_shoot_actor_first"))
 		m_sounds.LoadSound(section, "snd_shoot_actor_first", "sndShotActorFirst", false, m_eSoundShot);
