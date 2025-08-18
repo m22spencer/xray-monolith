@@ -49,7 +49,7 @@ namespace Feel
 		return (fp->vis > fp->vis_threshold);
 	}
 
-#ifdef FEEL_ENHANCED
+#ifdef SPATIAL_CHANGE
 	IC BOOL feel_vision_test_callback(const collide::ray_defs &rd, CObject *object, LPVOID user_data)
 	{
 		/* Return FALSE to see through object. */
@@ -238,7 +238,7 @@ namespace Feel
 						// cache outdated. real query.
 						VERIFY(!fis_zero(RD.dir.magnitude()));
 
-#ifdef FEEL_ENHANCED
+#ifdef SPATIAL_CHANGE
 						if (g_pGameLevel->ObjectSpace.RayQuery(RQR, RD, feel_vision_callback, &feel_params, feel_vision_test_callback, NULL))
 #else
 						if (g_pGameLevel->ObjectSpace.RayQuery(RQR, RD, feel_vision_callback, &feel_params, NULL, NULL))

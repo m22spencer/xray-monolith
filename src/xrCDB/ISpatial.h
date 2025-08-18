@@ -40,7 +40,7 @@ enum
 	STYPE_OBSTACLE = (1 << 6),
 	STYPE_SHAPE = (1 << 7),
 	STYPE_LIGHTSOURCEHEMI = (1 << 8),
-#ifdef FEEL_ENHANCED
+#ifdef SPATIAL_CHANGE
 	STYPE_FEELVISIONIGNORE = (1 << 9),
 #endif
 
