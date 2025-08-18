@@ -82,7 +82,10 @@ void CCustomOutfit::Load(LPCSTR section)
 	m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f; //pSettings->r_float(section,"fire_wound_protection");
 	//	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
 	m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
+
 	m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
+	if (pSettings->line_exist(section, "fire_wound_param_1")) m_fireWoundParam1 = pSettings->r_float(section, "fire_wound_param_1");
+	if (pSettings->line_exist(section, "fire_wound_param_2")) m_fireWoundParam2 = pSettings->r_float(section, "fire_wound_param_2");
 
 	if (pSettings->line_exist(section, "nightvision_sect"))
 		m_NightVisionSect = pSettings->r_string(section, "nightvision_sect");
@@ -162,32 +165,75 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
 	float NewHitPower = hit_power;
 	if (hit_type == ALife::eHitTypeFireWound)
 	{
-		float ba = GetBoneArmor(element);
-		if (ba <= 0.0f)
-			return NewHitPower;
-
-		float BoneArmor = ba * GetCondition();
-		if (ap <= BoneArmor)
+		// demonized: Alternative formula by Jurko, to be revised later
+		if (m_fireWoundParam1.has_value() && m_fireWoundParam2.has_value())
 		{
-			//пуля НЕ пробила бронь
-			NewHitPower *= m_boneProtection->m_fHitFracActor;
-			//add_wound = false; 	//раны нет
+			float ba = GetBoneArmor(element);
+			if (ba <= 0.0f)
+				return NewHitPower;
 
-			if (strstr(Core.Params, "-dbgbullet"))
-				Msg("CCustomOutfit::HitThroughArmor AP(%f) <= bone_armor(%f) [HitFracActor=%f] modified hit_power=%f",
-				    ap, BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+			float BoneArmor = ba * GetCondition();
+			float var1 = m_fireWoundParam1.value();
+			float var2 = m_fireWoundParam2.value();
+			if (ap <= BoneArmor / var2)
+			{
+				float d_hit_power = m_boneProtection->m_fHitFracActor;
+
+				if (ap <= BoneArmor * var2)
+				{
+					d_hit_power = m_boneProtection->m_fHitFracActor * var1;
+				}
+
+				NewHitPower *= d_hit_power;
+
+				if (strstr(Core.Params, "-dbgbullet"))
+					Msg("CHelmet::HitThroughArmor AP(%f) <= bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap,
+						BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+			}
+			else
+			{
+				float d_hit_power = (ap - BoneArmor * var2) / (ap * (1.1f - BoneArmor * var1));
+				if (ap / 2 > BoneArmor / var2)
+				{
+					d_hit_power = d_hit_power / var1;
+				}
+
+				clamp(d_hit_power, m_boneProtection->m_fHitFracActor, 1.0f);
+
+				NewHitPower *= d_hit_power;
+
+				if (strstr(Core.Params, "-dbgbullet"))
+					Msg("CHelmet::HitThroughArmor AP(%f) > bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap,
+						BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+			}
 		}
-
 		else
 		{
-			float d_hit_power = (ap - BoneArmor) / (ap * m_boneProtection->APScale);
-			clamp(d_hit_power, m_boneProtection->m_fHitFracActor, 1.0f);
+			float ba = GetBoneArmor(element);
+			if (ba <= 0.0f)
+				return NewHitPower;
 
-			NewHitPower *= d_hit_power;
+			float BoneArmor = ba * GetCondition();
+			if (ap <= BoneArmor)
+			{
+				//пуля НЕ пробила бронь
+				NewHitPower *= m_boneProtection->m_fHitFracActor;
+				//add_wound = false; 	//раны нет
+				if (strstr(Core.Params, "-dbgbullet"))
+					Msg("CHelmet::HitThroughArmor AP(%f) <= bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap,
+						BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+			}
+			else
+			{
+				float d_hit_power = (ap - BoneArmor) / (ap * m_boneProtection->APScale);
+				clamp(d_hit_power, m_boneProtection->m_fHitFracActor, 1.0f);
 
-			if (strstr(Core.Params, "-dbgbullet"))
-				Msg("CCustomOutfit::HitThroughArmor AP(%f) > bone_armor(%f) [HitFracActor=%f] modified hit_power=%f",
-				    ap, BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+				NewHitPower *= d_hit_power;
+
+				if (strstr(Core.Params, "-dbgbullet"))
+					Msg("CHelmet::HitThroughArmor AP(%f) > bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap,
+						BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
+			}
 		}
 	}
 	else

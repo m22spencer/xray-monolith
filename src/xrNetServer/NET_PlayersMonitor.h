@@ -3,7 +3,7 @@
 
 #include "net_shared.h"
 #include "NET_Common.h"
-#include "../xrCore/fastdelegate.h"
+#include <fastdelegate/fastdelegate.h>
 
 class IClient;
 

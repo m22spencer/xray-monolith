@@ -153,12 +153,14 @@ IC T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p
 }
 #endif // DEBUG_MEMORY_NAME
 
+#include <fast_dynamic_cast/fast_dynamic_cast.hpp>
+
 template <bool _is_pm, typename T>
 struct xr_special_free
 {
 	IC void operator()(T*& ptr)
 	{
-		void* _real_ptr = dynamic_cast<void*>(ptr);
+		void* _real_ptr = fast_dynamic_cast<void*>(ptr);
 		ptr->~T();
 		Memory.mem_free(_real_ptr);
 	}

@@ -118,6 +118,8 @@ extern BOOL g_ai_die_in_anomaly; //Alundaio
 
 extern BOOL g_telekinetic_objects_include_corpses; // Tosox
 
+extern BOOL binoculars_dynamic_zoom_check; //VodoXleb
+
 extern BOOL g_allow_weapon_control_inertion_factor; // momopate
 extern BOOL g_allow_outfit_control_inertion_factor;
 extern BOOL g_render_short_tracers;
@@ -160,6 +162,7 @@ extern BOOL fun_allowed;
 extern BOOL progressiveStaminaCost;
 extern BOOL NPCsLookAtActor;
 extern float NPCsLookAtActorMinDistance;
+extern BOOL interruptFireOnAimToggle;
 
 extern BOOL mt_UpdateWeaponSounds;
 
@@ -233,6 +236,13 @@ extern float wallmark_range_static;
 extern float wallmark_range_skeleton;
 
 ENGINE_API extern float g_console_sensitive;
+
+extern BOOL g_auto_reload;
+extern BOOL g_fire_reloads_ubgl;
+extern BOOL g_launcher_dynamic_range;
+extern BOOL g_launcher_dynamic_range_zoom;
+extern BOOL g_launcher_dynamic_range_mode;
+extern float g_launcher_dynamic_range_max;
 
 u32 g_dead_body_collision = 1;
 
@@ -2577,6 +2587,13 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
 
+	CMD4(CCC_Integer, "g_auto_reload", &g_auto_reload, 0, 1);
+	CMD4(CCC_Integer, "g_fire_reloads_ubgl", &g_fire_reloads_ubgl, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range", &g_launcher_dynamic_range, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_zoom", &g_launcher_dynamic_range_zoom, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_mode", &g_launcher_dynamic_range_mode, 0, 1);
+	CMD4(CCC_Float, "g_launcher_dynamic_range_max", &g_launcher_dynamic_range_max, 0.f, 1000.f);
+
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psCrosshair_Flags, CROSSHAIR_SHOW_ALWAYS);
 	CMD3(CCC_Mask, "g_crosshair_independent", &psCrosshair_Flags, CROSSHAIR_INDEPENDENT);
 	
@@ -2814,6 +2831,8 @@ void CCC_RegisterCommands()
 
 	CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
 
+	CMD4(CCC_Integer, "binoculars_dynamic_zoom_check", &binoculars_dynamic_zoom_check, 0, 1); //VodoXleb
+
 	CMD4(CCC_Integer, "pseudogiant_can_damage_objects_on_stomp", &pseudogiantCanDamageObjects, 0, 1);
 
 	CMD4(CCC_Integer, "telekinetic_objects_include_corpses", &g_telekinetic_objects_include_corpses, 0, 1); // Tosox
@@ -2847,6 +2866,7 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "g_progressive_stamina_cost", &progressiveStaminaCost, 0, 1);
 	CMD4(CCC_Integer, "g_npcs_look_at_actor", &NPCsLookAtActor, 0, 1);
 	CMD4(CCC_Float, "g_npcs_look_at_actor_min_distance", &NPCsLookAtActorMinDistance, 1.f, 8.f);
+	CMD4(CCC_Integer, "g_interrupt_fire_on_aim_toggle", &interruptFireOnAimToggle, 0, 1);
 
 	// demonized: Restores fun physics bugs like lift
 	CMD4(CCC_Integer, "fun_allowed", &fun_allowed, 0, 1);

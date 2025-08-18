@@ -128,7 +128,6 @@ protected:
 	u32 CurrentFrame;
 	Fmatrix	Matrix_Prev;
 	Fmatrix Matrix_Temp;
-	xr_vector<dxRender_Visual*> children_invisible;
 
 	// Globals
 	CInifile* pUserData;
@@ -188,8 +187,6 @@ public:
 	u16 _BCL LL_BoneID(LPCSTR B);
 	u16 _BCL LL_BoneID(const shared_str& B);
 	LPCSTR _BCL LL_BoneName_dbg(u16 ID);
-
-	xr_vector<xr_pair<u16, shared_str>> list_bones();
 
 	CInifile* _BCL LL_UserData() { return pUserData; }
 	accel* LL_Bones() { return bone_map_N; }

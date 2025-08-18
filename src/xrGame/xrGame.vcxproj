@@ -40,6 +40,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VerifiedDX11|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -47,6 +48,7 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Verified|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -54,12 +56,14 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -358,6 +362,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\3rd party\fastdelegate\fastdelegate.h" />
+    <ClInclude Include="..\3rd party\fast_dynamic_cast\fast_dynamic_cast.hpp" />
     <ClInclude Include="..\xrCore\ChooseTypes.H" />
     <ClInclude Include="..\xrServerEntities\ai_sounds.h" />
     <ClInclude Include="..\xrServerEntities\alife_human_brain.h" />
@@ -374,7 +380,6 @@
     <ClInclude Include="..\xrServerEntities\character_info_defs.h" />
     <ClInclude Include="..\xrServerEntities\clsid_game.h" />
     <ClInclude Include="..\Include\xrRender\DrawUtils.h" />
-    <ClInclude Include="..\xrCore\FastDelegate.h" />
     <ClInclude Include="..\xrServerEntities\gametype_chooser.h" />
     <ClInclude Include="..\xrServerEntities\game_base_space.h" />
     <ClInclude Include="..\xrServerEntities\game_graph_space.h" />
@@ -447,9 +452,6 @@
     <ClInclude Include="..\xrServerEntities\ShapeData.h" />
     <ClInclude Include="..\xrServerEntities\shared_data.h" />
     <ClInclude Include="..\xrServerEntities\smart_cast.h" />
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl0.h" />
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl1.h" />
-    <ClInclude Include="..\xrServerEntities\smart_cast_impl2.h" />
     <ClInclude Include="..\xrServerEntities\specific_character.h" />
     <ClInclude Include="..\xrServerEntities\WaveForm.h" />
     <ClInclude Include="..\xrServerEntities\xml_str_id_loader.h" />
@@ -1963,6 +1965,7 @@
     <ClInclude Include="WeaponCustomPistol.h" />
     <ClInclude Include="WeaponFN2000.h" />
     <ClInclude Include="WeaponFORT.h" />
+    <ClInclude Include="WeaponGrenadeLauncher.h" />
     <ClInclude Include="WeaponGroza.h" />
     <ClInclude Include="WeaponHPSA.h" />
     <ClInclude Include="WeaponKnife.h" />
@@ -2111,8 +2114,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\smart_cast.cpp" />
-    <ClCompile Include="..\xrServerEntities\smart_cast_stats.cpp" />
     <ClCompile Include="..\xrServerEntities\specific_character.cpp" />
     <ClCompile Include="..\xrServerEntities\xrServer_Factory.cpp" />
     <ClCompile Include="..\xrServerEntities\xrServer_Objects.cpp" />
@@ -4197,6 +4198,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="WeaponGrenadeLauncher.cpp" />
     <ClCompile Include="WeaponGroza.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

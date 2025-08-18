@@ -10,6 +10,8 @@ class CGameObject;
 
 class CRocketLauncher
 {
+	friend class CWeaponGrenadeLauncher;
+
 public:
 	CRocketLauncher();
 	~CRocketLauncher();

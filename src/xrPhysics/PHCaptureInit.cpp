@@ -294,7 +294,7 @@ void CPHCapture::Deactivate()
 	Release();
 	if (m_taget_element)
 	{
-		VERIFY(dynamic_cast<CPHElement*>(m_taget_element));
+		VERIFY(fast_dynamic_cast<CPHElement*>(m_taget_element));
 
 		m_taget_element->Enable();
 	}

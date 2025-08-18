@@ -134,15 +134,12 @@ public:
 
 	ref_rt rt_blur_h_2;
 	ref_rt rt_blur_2;
-	ref_rt rt_blur_2_zb;
 
 	ref_rt rt_blur_h_4;
 	ref_rt rt_blur_4;
-	ref_rt rt_blur_4_zb;
 
 	ref_rt rt_blur_h_8;
 	ref_rt rt_blur_8;
-	ref_rt rt_blur_8_zb;
 
 	ref_rt rt_pp_bloom;
 

@@ -32,6 +32,7 @@ CPda::CPda(void)
 	m_fLR_InertiaFactor = 0.f;
 	m_fUD_InertiaFactor = 0.f;
 	m_bNoticedEmptyBattery = false;
+	m_PdaEnabled = true;
 }
 
 CPda::~CPda() {}

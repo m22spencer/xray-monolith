@@ -284,6 +284,17 @@ void HUD_SOUND_COLLECTION_LAYERED::SetPosition(LPCSTR alias, const Fvector& pos)
 	}
 }
 
+void HUD_SOUND_COLLECTION_LAYERED::UpdateAllSoundsPositions(const Fvector& P)
+{
+	for (auto& i : m_sound_items)
+	{
+		for (auto& s : i.m_sound_items)
+		{
+			s.set_position(P);
+		}
+	}
+}
+
 void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent,
                                              bool hud_mode, bool looped, u8 index, float volume_mult)
 {

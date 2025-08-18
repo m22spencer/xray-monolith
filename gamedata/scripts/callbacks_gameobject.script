@@ -43,6 +43,11 @@ function game_object_on_net_destroy(obj)
 			end
 		end
 	end
+
+	-- Fix self.response containing deleted object
+	if instance and instance.response and instance.response["who"] and type(instance.response["who"]) == "userdata" and instance.response["who"]:id() == obj:id() then
+		instance.response["who"] = nil
+	end
 end
 
 -- Game objects iterator
