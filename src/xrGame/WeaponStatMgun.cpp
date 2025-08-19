@@ -402,7 +402,7 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 	{
 		/* Hack. net_spawn() of CScriptBinderObjectWrapper runs first. This allows overriding configs read in engine net_Spawn(). */
 		LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect_str(), "net_spawn_after", nullptr);
-		luabind::functor<bool> lua_function;
+		::luabind::functor<bool> lua_function;
 		if (str && ai().script_engine().functor(str, lua_function))
 		{
 			lua_function(lua_game_object());
@@ -1081,7 +1081,7 @@ bool CWeaponStatMgun::Use(const Fvector &pos, const Fvector &dir, const Fvector 
 
 	if (m_on_before_use_callback && strlen(m_on_before_use_callback))
 	{
-		luabind::functor<bool> lua_function;
+		::luabind::functor<bool> lua_function;
 		if (ai().script_engine().functor(m_on_before_use_callback, lua_function))
 		{
 			if (!lua_function(lua_game_object(), pos, dir, foot_pos))

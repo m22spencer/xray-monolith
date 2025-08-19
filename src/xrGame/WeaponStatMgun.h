@@ -252,8 +252,8 @@ private:
 		};
 		shared_str m_idle[eAnimSize];
 		SStmAnimActor();
-		IC LPCSTR GetAnimation(u8 id);
-		IC void SetAnimation(u8 id, LPCSTR anim);
+		LPCSTR GetAnimation(u8 id);
+		void SetAnimation(u8 id, LPCSTR anim);
 	};
 	SStmAnimActor m_animation;
 
