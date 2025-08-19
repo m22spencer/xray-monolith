@@ -347,7 +347,6 @@ void CPHShell::applyTorque(float x, float y, float z)
 	}
 };
 
-#if 1
 void CPHShell::applyRelForce(const Fvector &dir, float val)
 {
 	if (!isActive())
@@ -393,7 +392,6 @@ void CPHShell::applyRelTorque(float x, float y, float z)
 		applyRelTorque(dir, val);
 	}
 };
-#endif
 
 void CPHShell::applyImpulse(const Fvector& dir, float val)
 {
