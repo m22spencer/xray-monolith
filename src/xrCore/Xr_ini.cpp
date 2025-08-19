@@ -859,7 +859,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 				CInifile::SectIt_ sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), *I.first, item_pred);
 
 				// If item list doesn't exist and wasn't deleted by previous operation, insert as is
-				if (I.second != NULL && !deletedItems.contains(I.first.c_str()) && dltx_listmode == '>' && (sect_it == CurrentSect->Data.end() || !sect_it->first.equal(I.first))) {
+				if (I.second != NULL && deletedItems.find(I.first.c_str()) == deletedItems.end() && dltx_listmode == '>' && (sect_it == CurrentSect->Data.end() || !sect_it->first.equal(I.first))) {
 					CurrentSect->Data.insert(sect_it, I);	
 
 				// If item list exists, split existing list and perform operation

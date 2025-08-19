@@ -284,13 +284,13 @@ template <class T>
 using xr_hash = robin_hood::hash<T>;
 
 template <typename K, class V, class Hasher = xr_hash<K>>
-using xr_unordered_map = robin_hood::unordered_map<K, V, Hasher>;
+using xr_unordered_map = robin_hood::unordered_node_map<K, V, Hasher>;
 
 template <typename K, class V>
 using xr_pair = robin_hood::pair<K, V>;
 
 template <class T, class Hasher = xr_hash<T>>
-using xr_unordered_set = robin_hood::unordered_set<T, Hasher>;
+using xr_unordered_set = robin_hood::unordered_node_set<T, Hasher>;
 
 #else
 

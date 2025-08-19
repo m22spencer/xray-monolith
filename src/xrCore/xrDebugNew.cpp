@@ -508,10 +508,12 @@ int out_of_memory_handler(size_t size)
 	{
 		Memory.mem_compact();
 		size_t process_heap = Memory.mem_usage();
-		int eco_strings = (int)g_pStringContainer->stat_economy();
+        u32 eco_strings_count = 0;
+		int eco_strings = (int)g_pStringContainer->stat_economy(eco_strings_count);
 		int eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
-		Msg("* [x-ray]: process heap[%llu K]", process_heap / 1024, process_heap / 1024);
-		Msg("* [x-ray]: economy: strings[%lld K], smem[%lld K]", eco_strings / 1024, eco_smem);
+		Msg("* [x-ray]: process heap[%llu K]", process_heap / 1024);
+		Msg("* [x-ray]: strings: memory[%ld K], count[%lu]", eco_strings / 1024, eco_strings_count);
+		Msg("* [x-ray]: shared: memory[%ld K]", eco_smem);
 	}
 
 	Debug.fatal(DEBUG_INFO, "Out of memory. Memory request: %lld K", size / 1024);
