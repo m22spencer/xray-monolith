@@ -353,18 +353,26 @@ _G.CPickupModeUpdate_COD = function(obj)
 end
 
 --[[
-on_before_play_hud_sound callback, possibility to override sound with another one
-Callback returns a table which must contain "section" and "line" fields, which refer to section and line to load new sounds from
+on_before_play_hud_sound callback, possibility to override sound with another one, or changing the volume of existing sound or both
+Callback returns a table which must contain "section", "line" or "volume_mult" fields, which refer to section and line to load new sounds from, and the volume multiplier.
+Unforturnately, the engine have some limitation regarding its sound's volume, so it can't increase the volume too much.
 
 Arguments
 	Alias: internal sound type in the engine
 	Parent: Parent object of an object that initiated the sound (`actor` when shooting a weapon for example), might be nil
 
-Example
+Example:
 	if alias == "sndShot" and parent and parent:id() == AC_ID then
 		result.section = "wpn_l96a1_sounds"
 		result.line = "snd_shoot"
+		result.volume_mult = 0.75 -- Multiply the fire sound's volume by 0.75
 	end
+
+Or:
+	if alias == "sndShot" and parent and parent:id() == AC_ID then
+		result.volume_mult = 0.5 -- Multiply the fire sound's volume by 0.5
+	end
+	
 
 Possible aliases:
 	"catch_snd"
@@ -405,7 +413,6 @@ Possible aliases:
 	"sndShotActor"
 	"sndShotActorFirst"
 	"sndShotG"
-	"sndShotIndoor"
 	"sndShotMisfire"
 	"sndShotMisfireActor"
 	"sndShow"
@@ -414,7 +421,6 @@ Possible aliases:
 	"sndSilencerShot"
 	"sndSilencerShotActor"
 	"sndSilencerShotActorFirst"
-	"sndSilencerShotIndoor"
 	"sndSilencerShotMisfire"
 	"sndSilencerShotMisfireActor"
 	"sndSwitch"
@@ -429,12 +435,13 @@ AddScriptCallback("on_before_play_hud_sound")
 _G.COnBeforePlayHudSound = function(alias, parent)
 	local result = {
 		section = nil,
-		line = nil
+		line = nil,
+		volume_mult = nil
 	}
 
 	SendScriptCallback("on_before_play_hud_sound", alias, parent, result)
 
-	if result.section and result.line then
+	if (result.section and result.line) or result.volume_mult then
 		return result
 	end
 end
