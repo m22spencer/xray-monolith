@@ -223,33 +223,30 @@ void CActorCondition::UpdateCondition()
 	float base_weight = object().MaxCarryWeight();
 	float cur_weight = object().inventory().TotalWeight();
 
-	if ((object().mstate_real & mcAnyMove))
+	if (m_object->Holder() == nullptr)
 	{
-		ConditionWalk(cur_weight / base_weight,
-		              isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()),
-		              (object().mstate_real & mcSprint) != 0);
-	}
-	else
-	{
-		ConditionStand(cur_weight / base_weight);
-	}
 
-	if (IsGameTypeSingle())
-	{
-		float k_max_power = 1.0f;
-		if (true)
+		if ((object().mstate_real & mcAnyMove))
 		{
-			k_max_power = 1.0f + _min(cur_weight, base_weight) / base_weight
-				+ _max(0.0f, (cur_weight - base_weight) / 10.0f);
+			ConditionWalk(cur_weight / base_weight, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
 		}
 		else
 		{
-			k_max_power = 1.0f;
+			ConditionStand(cur_weight / base_weight);
 		}
-		float power_leak_speed = IsSleeping() ? m_fPowerLeakSpeedSleep : m_fPowerLeakSpeed;
-		SetMaxPower(GetMaxPower() - power_leak_speed * m_fDeltaTime * k_max_power);
-	}
 
+		if (IsGameTypeSingle())
+		{
+			float k_max_power = k_max_power = 1.0f + _min(cur_weight, base_weight) / base_weight
+					+ _max(0.0f, (cur_weight - base_weight) / 10.0f);
+			float power_leak_speed = IsSleeping() ? m_fPowerLeakSpeedSleep : m_fPowerLeakSpeed;
+			SetMaxPower(GetMaxPower() - power_leak_speed * m_fDeltaTime * k_max_power);
+		}
+	}
+	else
+	{
+		SetMaxPower(1.0f);
+	}
 
 	m_fAlcohol += v_alcohol * m_fDeltaTime;
 	clamp(m_fAlcohol, 0.0f, 1.0f);
