@@ -274,18 +274,6 @@ CHolderCustom* CScriptGameObject::get_custom_holder()
 	return holder;
 }
 
-#ifdef HOLDERCUSTOM_NEW
-CScriptGameObject *CScriptGameObject::get_holder_owner()
-{
-	CHolderCustom *holder = smart_cast<CHolderCustom *>(&object());
-	if (!holder)
-	{
-		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CGameObject : it is not a holder!");
-	}
-	return (holder && holder->Owner()) ? holder->Owner()->lua_game_object() : nullptr;
-}
-#endif
-
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
