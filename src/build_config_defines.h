@@ -45,7 +45,7 @@
 #define HOLDERCUSTOM_NEW								// Upgrade CHolderCustom.
 #define CAR_NEW                                         // Upgrade CCar.
 #define STATIONARYMGUN_NEW								// Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
-#define FEEL_ENHANCED									// Upgrade Feel.
+#define SPATIAL_CHANGE									// Upgrade spatial and feel_vision.
 
 /*LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.

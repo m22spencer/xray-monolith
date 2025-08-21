@@ -1190,7 +1190,6 @@ void CPHElement::applyTorque(float x, float y, float z)
 	VERIFY(dBodyStateValide(m_body));
 }
 
-#if 1
 void CPHElement::applyRelForce(const Fvector &dir, float val)
 {
 	applyRelForce(dir.x * val, dir.y * val, dir.z * val);
@@ -1230,7 +1229,6 @@ void CPHElement::applyRelTorque(float x, float y, float z)
 	BodyCutForce(m_body, m_l_limit, m_w_limit);
 	VERIFY(dBodyStateValide(m_body));
 }
-#endif
 
 void CPHElement::applyImpulse(const Fvector& dir, float val) //aux
 {
