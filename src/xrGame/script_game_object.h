@@ -36,6 +36,7 @@
 #include "medkit.h"
 #include "antirad.h"
 #include "BottleItem.h"
+#include "Missile.h"
 
 enum EPdaMsg;
 enum ESoundTypes;
@@ -936,6 +937,7 @@ public:
 	_DECLARE_FUNCTION14(cast_Antirad, CAntirad);
 	_DECLARE_FUNCTION14(cast_FoodItem, CFoodItem);
 	_DECLARE_FUNCTION14(cast_BottleItem, CBottleItem);
+	_DECLARE_FUNCTION14(cast_Missile, CMissile);
 
 	void SetHealthEx(float hp); //AVO
 	float GetLuminocityHemi();

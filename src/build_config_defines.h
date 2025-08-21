@@ -43,6 +43,8 @@
 //-TWEAKS
 
 
+#define SPATIAL_CHANGE									// Upgrade spatial.
+
 /*LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.
 You can have as many layers as you want, but you must follow naming convention,
