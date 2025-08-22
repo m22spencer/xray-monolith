@@ -277,19 +277,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 	const CSE_Visual* visual = smart_cast<const CSE_Visual*>(E);
 	if (visual)
 	{
-		auto visualName = visual_name(E);
-
-		// If model doesn't exist, and object config has "visual" field, try to update the model
-		if(!Render->models_Exists(visualName) && pSettings->line_exist(cNameSect(), "visual")) {
-			auto visualFromSec = pSettings->r_string(cNameSect(), "visual");
-			Msg("~WARNING : Failed to load '%s', falling back to '%s'", visualName, visualFromSec);
-			cNameVisual_set(visualFromSec);
-		}
-		// Otherwise... proceed as normal (will CTD if model doesn't exist)
-		else {
-			cNameVisual_set(visualName);
-		}
-
+		cNameVisual_set(visual_name(E));
 		if (visual->flags.test(CSE_Visual::flObstacle))
 		{
 			ISpatial* self = smart_cast<ISpatial*>(this);
