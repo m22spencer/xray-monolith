@@ -432,6 +432,19 @@ void CModelPool::Prefetch_One(LPCSTR N, bool assert)
 		Delete(V,FALSE);
 }
 
+bool CModelPool::Exists(LPCSTR N)
+{
+	dxRender_Visual* V = Create(N, 0, false);
+	if (V) {
+		Delete(V, FALSE);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)
 {
 	PS::CParticleEffect* V = (PS::CParticleEffect*)Instance_Create(MT_PARTICLE_EFFECT);
