@@ -170,6 +170,10 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.08.23**
+* Kutez: Callback Priority System (https://github.com/themrdemonized/xray-monolith/pull/339)
+* Ncenka: PDA UI XML Setter (https://github.com/themrdemonized/xray-monolith/pull/343)
+
 **2025.08.21**
 * GhenTuong:
   * CCar CWeaponStatMgun changes (https://github.com/themrdemonized/xray-monolith/pull/310)
