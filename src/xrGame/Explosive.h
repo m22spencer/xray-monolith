@@ -190,6 +190,8 @@ protected:
 
 #ifdef CEXPLOSIVE_CHANGE
 	shared_str m_on_explode_callback;
+	void LoadExplosiveSection(LPCSTR section);
+	void LoadExplosiveSection(CInifile *ini, LPCSTR section);
 #endif
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };

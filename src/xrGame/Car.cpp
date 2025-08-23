@@ -112,6 +112,15 @@ CCar::CCar()
 	m_zoom_factor_aim = 1.0F;
 	m_zoom_status = false;
 
+	m_control_press_ele_up = false;
+	m_control_press_ele_dw = false;
+	m_control_press_yaw_rs = false;
+	m_control_press_yaw_ls = false;
+	m_control_press_pit_fs = false;
+	m_control_press_pit_bs = false;
+	m_control_press_rol_rs = false;
+	m_control_press_rol_ls = false;
+
 	m_control_ele = eControlEle_NA;
 	m_control_yaw = eControlYaw_NA;
 	m_control_pit = eControlPit_NA;
@@ -119,14 +128,14 @@ CCar::CCar()
 
 	m_control_neutral = 0.0F;
 	m_control_ele_max = 0.0F;
+	m_control_yaw_max = 0.0F;
 	m_control_pit_max = 0.0F;
 	m_control_rol_max = 0.0F;
-	m_control_yaw_max = 0.0F;
 
 	m_control_ele_inc = 0.0F;
+	m_control_yaw_inc = 0.0F;
 	m_control_pit_inc = 0.0F;
 	m_control_rol_inc = 0.0F;
-	m_control_yaw_inc = 0.0F;
 
 	m_body_bid = BI_NONE;
 	m_rotor_force_max = 0.0F;
