@@ -390,6 +390,9 @@
     }
 
     class game_object {
+		// Class casting
+		function cast_Knife()
+
         // General
         Fmatrix xform(bool bHud)
         Fbox bounding_box(bool bHud)
@@ -627,6 +630,21 @@
         // Get and set the zoom_rotate_time (time in seconds to fully ADS) field for a given weapon
         function GetZoomRotateTime()
         function SetZoomRotateTime(float)
+    }
+
+    class CWeaponKnife : CWeapon {
+		function GetHit1Power()
+		function GetHit2Power()
+		function GetHit1PowerCritical()
+		function GetHit2PowerCritical()
+		function GetHit1Impulse()
+		function GetHit2Impulse()
+		function SetHit1Power(float power)
+		function SetHit2Power(float power)
+		function SetHit1PowerCritical(float power)
+		function SetHit2PowerCritical(float power)
+		function SetHit1Impulse(float impulse)
+		function SetHit2Impulse(float impulse)
     }
 	
     enum rq_target { (sum them up to target multiple types)
