@@ -126,9 +126,14 @@
     globals {
         player_hud* get_player_hud()
     }
+
     player_hud {
         void set_hands(string section)
         void reset_hands()
+    }
+
+    namespace ActorMenu {
+        CUIMessagesWindow get_messages_menu()
     }
 
     class CUIProgressBar {
@@ -143,6 +148,25 @@
 
     class CUIDialogWnd : CUIWindow {
         void AllowWorkInPause(bool state)
+    }
+
+	 class CUIPdaWnd : CUIDialogWnd {
+        // Ncenka - allow to change PDA UI XML file
+		function SetPdaXml(string)
+		function GetPdaXml()
+    }
+
+    class CUIMessagesWindow : CUIWindow {
+        // no extra exports yet
+    }
+
+    class CUIMainIngameWnd : CUIWindow {
+        property m_QuickSlotText1
+        property m_QuickSlotText2
+        property m_QuickSlotText3
+        property m_QuickSlotText4
+
+        table GetQuickSlotIcons()
     }
 
     class render_device {
@@ -271,20 +295,6 @@
         //        air_resistance = 0.2,
         //    }
         //    level.add_bullet(t)
-    }
-
-    class CUIMessagesWindow : CUIWindow {
-        // no extra exports yet
-    }
-
-	 class CUIPdaWnd : CUIDialogWnd {
-        // Ncenka - allow to change PDA UI XML file
-		function SetPdaXml(string)
-		function GetPdaXml()
-    }
-
-    namespace ActorMenu {
-        function get_messages_menu()
     }
 
     // obj:get_physics_shell()

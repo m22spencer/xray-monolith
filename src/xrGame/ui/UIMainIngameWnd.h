@@ -25,9 +25,7 @@ public:
 	virtual void Draw();
 	virtual void Update();
 
-
 public:
-
 	CUIStatic* UIStaticDiskIO;
 	CUITextWnd* UIStaticQuickHelp;
 	CUIMotionIcon* UIMotionIcon;
@@ -59,8 +57,10 @@ public:
 
 	void DrawMainIndicatorsForInventory();
 
-	CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; } //temp
+	CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; }
 	void OnSectorChanged(int sector);
+
+	::luabind::object GetQuickSlotIconsScript();
 
 	xr_vector<CUIStatic*> m_quick_slots_icons;
 	CUITextWnd* m_QuickSlotText1;
@@ -69,7 +69,6 @@ public:
 	CUITextWnd* m_QuickSlotText4;
 
 protected:
-
 	// 5 статиков для отображения иконок:
 	// - сломанного оружия(only mp)
 	// - радиации
@@ -77,12 +76,7 @@ protected:
 	// - голода
 	// - усталости
 	CUIStatic* UIWeaponJammedIcon;
-	//	CUIStatic			UIRadiaitionIcon;
-	//	CUIStatic			UIWoundIcon;
-	//	CUIStatic			UIStarvationIcon;
-	//	CUIStatic			UIPsyHealthIcon;
 	CUIStatic* UIInvincibleIcon;
-	//	CUIStatic			UISleepIcon;
 	CUIStatic* UIArtefactIcon;
 
 	CUIScrollView* m_UIIcons;
@@ -90,17 +84,11 @@ protected:
 	CUIWindow* m_pMPLogWnd;
 
 public:
-
 	// Енумы соответсвующие предупреждающим иконкам 
 	enum EWarningIcons
 	{
 		ewiAll = 0,
 		ewiWeaponJammed,
-		//		ewiRadiation,
-		//		ewiWound,
-		//		ewiStarvation,
-		//		ewiPsyHealth,
-		//		ewiSleep,
 		ewiInvincible,
 		ewiArtefact,
 	};
@@ -138,16 +126,10 @@ protected:
 	void InitFlashingIcons(CUIXml* node);
 	void DestroyFlashingIcons();
 	void UpdateFlashingIcons();
-	//	void				UpdateActiveItemInfo			();
-
-	//	void				SetAmmoIcon						(const shared_str& seсt_name);
 
 	// first - иконка, second - анимация
 	DEF_MAP(FlashingIcons, EFlashingIcons, CUIStatic*);
 	FlashingIcons m_FlashingIcons;
-
-	//	CMissile*			m_pGrenade;
-	//	CInventoryItem*		m_pItem;
 
 	// Отображение подсказок при наведении прицела на объект
 	void RenderQuickInfos();
@@ -167,11 +149,9 @@ protected:
 	float m_iPickUpItemIconHeight;
 
 	void UpdatePickUpItem();
+
 public:
 	void SetPickUpItem(CInventoryItem* PickUpItem);
-#ifdef DEBUG
-	void				draw_adjust_mode					();
-#endif
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
