@@ -295,6 +295,13 @@
         //        air_resistance = 0.2,
         //    }
         //    level.add_bullet(t)
+
+         // Script Attachments
+        function add_attachment(string, string)
+        function get_attachment(string)
+        function remove_attachment(string)
+        function remove_attachment(script_attachment)
+        function iterate_attachments(function)
     }
 
     // obj:get_physics_shell()
@@ -757,6 +764,7 @@
         -- Parent
         function set_parent(ScriptAttachment*);
         function set_parent(game_object*);
+        function set_parent_level();
         function get_parent();
 
         -- Child
