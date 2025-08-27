@@ -521,6 +521,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("cast_Artefact", &CScriptGameObject::cast_Artefact)
 		.def("cast_Ammo", &CScriptGameObject::cast_Ammo)
 		.def("cast_Weapon", &CScriptGameObject::cast_Weapon)
+		.def("cast_Knife", &CScriptGameObject::cast_Knife)
 		.def("cast_WeaponMagazined", &CScriptGameObject::cast_WeaponMagazined)
 		.def("cast_WeaponMagazinedWGrenade", &CScriptGameObject::cast_WeaponMagazinedWGrenade)
 		.def("cast_EatableItem", &CScriptGameObject::cast_EatableItem)

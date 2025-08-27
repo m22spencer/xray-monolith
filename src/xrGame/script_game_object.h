@@ -37,6 +37,7 @@
 #include "antirad.h"
 #include "BottleItem.h"
 #include "Missile.h"
+#include "WeaponKnife.h"
 
 enum EPdaMsg;
 enum ESoundTypes;
@@ -940,6 +941,7 @@ public:
 	_DECLARE_FUNCTION14(cast_Artefact, CArtefact);
 	_DECLARE_FUNCTION14(cast_Ammo, CWeaponAmmo);
 	_DECLARE_FUNCTION14(cast_Weapon, CWeapon);
+	_DECLARE_FUNCTION14(cast_Knife, CWeaponKnife);
 	_DECLARE_FUNCTION14(cast_WeaponMagazined, CWeaponMagazined);
 	_DECLARE_FUNCTION14(cast_WeaponMagazinedWGrenade, CWeaponMagazinedWGrenade);
 	_DECLARE_FUNCTION14(cast_EatableItem, CEatableItem);
