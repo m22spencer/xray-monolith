@@ -1113,22 +1113,18 @@ void CRender::init_cacades()
 void CRender::shadowmap_sun_cascades() 
 {
 	PIX_EVENT(SHADOWMAP_SUN_CASCADES);
-	bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
-	bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
-	if (b_need_to_render_sunshafts)
-		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
-
-	for (u32 i = 0; i < m_sun_cascades.size(); ++i) {
-		shadowmap_sun_cascade(i);
-	}
-
-	if (b_need_to_render_sunshafts)
-		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+	
+	// FIXME: Shader does not respect light atlas bounds, which prevents usage of a combined light atlas
 }
 
 void CRender::render_sun_cascades()
 {
 	PIX_EVENT(RENDER_SUN_CASCADES);
+
+	bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+	bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
+	if (b_need_to_render_sunshafts)
+		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
 	for (u32 i = 0; i < m_sun_cascades.size(); ++i) {
 		TargetMain->SetActive();
@@ -1141,6 +1137,10 @@ void CRender::render_sun_cascades()
 		TargetMain->SetActive();
 		render_sun_cascade(i);
 	}
+	
+	if (b_need_to_render_sunshafts)
+		m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+
 	if (Device.m_SecondViewport.IsSVPActive()) {
 		TargetSVP->SetActive();
 		TargetSVP->accum_direct_blend();
