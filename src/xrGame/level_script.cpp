@@ -52,6 +52,7 @@
 #include "script_ini_file.h"
 #include "EffectorBobbing.h"
 #include "LevelDebugScript.h"
+#include "script_attachment_manager.h"
 
 #include "ui\UIPdaMsgListItem.h"
 #include "ui\UILogsWnd.h"
@@ -2195,6 +2196,34 @@ void update_pda_news_from_uiwindow(CUIWindow* CUIWindowPItem) {
 	}
 }
 
+script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name)
+{
+	script_attachment* att = xr_new<script_attachment>(name, model_name);
+	R_ASSERT(att);
+	att->SetParentLevel();
+	return att;
+}
+
+script_attachment* GetAttachment(LPCSTR name)
+{
+	return Level().get_attachment(name);
+}
+
+void RemoveAttachment(LPCSTR name)
+{
+	Level().remove_attachment(name);
+}
+
+void RemoveAttachment(script_attachment* child)
+{
+	Level().remove_attachment(child);
+}
+
+void IterateAttachments(::luabind::functor<bool> functor)
+{
+	Level().iterate_attachments(functor);
+}
+
 #pragma optimize("s",on)
 
 extern void open_originals_link();
@@ -2428,7 +2457,14 @@ void CLevel::script_register(lua_State* L)
 			def("iterate_nearest", &iterate_nearest),
 			def("pick_material", &PickMaterial),
 			def("add_bullet", ((void (*)(Fvector, Fvector, float, float, float, u16, ALife::EHitType, float, LPCSTR, float))& AddBullet)),
-			def("add_bullet", ((void (*)(::luabind::object))& AddBullet))
+			def("add_bullet", ((void (*)(::luabind::object))& AddBullet)),
+
+			// Lucy: Script Attachments
+			def("add_attachment", &AddAttachment),
+			def("get_attachment", &GetAttachment),
+			def("remove_attachment", (void (*)(LPCSTR)) &RemoveAttachment),
+			def("remove_attachment", (void (*)(script_attachment*)) &RemoveAttachment),
+			def("iterate_attachments", &IterateAttachments)
 		],
 
 		module(L, "actor_stats")
