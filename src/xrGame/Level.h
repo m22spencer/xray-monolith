@@ -36,6 +36,7 @@ class demoplay_control;
 class demo_info;
 class CDebugRenderer;
 class DBG_ScriptObject;
+class script_attachment;
 
 extern float g_fov;
 
@@ -239,6 +240,14 @@ public:
 	void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
 	void cl_Process_Spawn(NET_Packet& P);
 
+	script_attachment* add_attachment(LPCSTR name, script_attachment* att);
+	script_attachment* get_attachment(LPCSTR name);
+	void remove_child(LPCSTR name, bool destroy = false);
+	void remove_attachment(LPCSTR name) { remove_child(name, true); }
+	void remove_attachment(script_attachment* child);
+	void iterate_attachments(::luabind::functor<bool> functor);
+	xr_map<shared_str, script_attachment*>* GetAttachments() { return &m_script_attachments; }
+
 //AVO: used by SPAWN_ANTIFREEZE (by alpet)
 #ifdef SPAWN_ANTIFREEZE
 public:
@@ -335,6 +344,7 @@ public:
 
 protected:
 	CBulletManager* m_pBulletManager;
+	xr_map<shared_str, script_attachment*> m_script_attachments;
 
 public:
 	IC CBulletManager& BulletManager() { return *m_pBulletManager; }

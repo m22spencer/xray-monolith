@@ -36,6 +36,8 @@
 #include "medkit.h"
 #include "antirad.h"
 #include "BottleItem.h"
+#include "Missile.h"
+#include "WeaponKnife.h"
 
 enum EPdaMsg;
 enum ESoundTypes;
@@ -109,6 +111,10 @@ class CZoneCampfire;
 class CPhysicObject;
 class CArtefact;
 class script_attachment;
+
+#ifdef STATIONARYMGUN_NEW
+class CWeaponStatMgun;
+#endif
 
 #ifdef DEBUG
     template <typename _object_type>
@@ -684,6 +690,9 @@ public:
 	CHelicopter* get_helicopter();
 	//CAR
 	CCar* get_car();
+#ifdef STATIONARYMGUN_NEW
+	CWeaponStatMgun *get_stmgun();
+#endif
 	//LAMP
 	CHangingLamp* get_hanging_lamp();
 
@@ -693,6 +702,9 @@ public:
 
 	CHolderCustom* get_custom_holder();
 	CHolderCustom* get_current_holder(); //actor only
+#ifdef HOLDERCUSTOM_NEW
+	CScriptGameObject *get_holder_owner();
+#endif
 
 	void start_particles(LPCSTR pname, LPCSTR bone);
 	void stop_particles(LPCSTR pname, LPCSTR bone);
@@ -929,6 +941,7 @@ public:
 	_DECLARE_FUNCTION14(cast_Artefact, CArtefact);
 	_DECLARE_FUNCTION14(cast_Ammo, CWeaponAmmo);
 	_DECLARE_FUNCTION14(cast_Weapon, CWeapon);
+	_DECLARE_FUNCTION14(cast_Knife, CWeaponKnife);
 	_DECLARE_FUNCTION14(cast_WeaponMagazined, CWeaponMagazined);
 	_DECLARE_FUNCTION14(cast_WeaponMagazinedWGrenade, CWeaponMagazinedWGrenade);
 	_DECLARE_FUNCTION14(cast_EatableItem, CEatableItem);
@@ -936,6 +949,7 @@ public:
 	_DECLARE_FUNCTION14(cast_Antirad, CAntirad);
 	_DECLARE_FUNCTION14(cast_FoodItem, CFoodItem);
 	_DECLARE_FUNCTION14(cast_BottleItem, CBottleItem);
+	_DECLARE_FUNCTION14(cast_Missile, CMissile);
 
 	void SetHealthEx(float hp); //AVO
 	float GetLuminocityHemi();

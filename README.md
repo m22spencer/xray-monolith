@@ -170,6 +170,37 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.08.30**
+* MFB: Smart covers now have fixed enter min/max distances (https://github.com/themrdemonized/xray-monolith/pull/352)
+* Lucy: Level Script Attachments (https://github.com/themrdemonized/xray-monolith/pull/353)
+* ProfLander: ImGui: Implement grouping API (https://github.com/themrdemonized/xray-monolith/pull/354)
+
+**2025.08.27**
+* Fix https://github.com/themrdemonized/xray-monolith/issues/346
+* NLTP_Ashes:
+  * Export multiple CWeaponKnife related functions to Lua (https://github.com/themrdemonized/xray-monolith/pull/347)
+  * Export HUD elements to Lua (https://github.com/themrdemonized/xray-monolith/pull/351)
+* Ncenka: Fix for Random Music in Main Menu (https://github.com/themrdemonized/xray-monolith/pull/345)
+
+**2025.08.23**
+* Kutez: Callback Priority System (https://github.com/themrdemonized/xray-monolith/pull/339)
+* Ncenka: PDA UI XML Setter (https://github.com/themrdemonized/xray-monolith/pull/343)
+
+**2025.08.21**
+* GhenTuong:
+  * CCar CWeaponStatMgun changes (https://github.com/themrdemonized/xray-monolith/pull/310)
+  * Export API functions and minor improvements (https://github.com/themrdemonized/xray-monolith/pull/340)
+* Antglobes: Sun values (https://github.com/themrdemonized/xray-monolith/pull/341)
+
+**2025.08.19**
+* Removed `parallel_for` in HOM and `particle_actions_collection` in favor of single-threaded loop for less thread creation overhead
+* Replace `unordered_map` implementation to `unordered_node_map`, same with set
+* Removed double loop in volumetric lights code
+* Disabled update of actor stamina while driving cars (https://github.com/ixray-team/ixray-1.6-stcop/commit/6c1ad01adffba180df8f47a58f33e66e69def949)
+* Fix crash when NPC trying use destroyed object (https://github.com/ixray-team/ixray-1.6-stcop/commit/d34966c3e255568f60df7bd0e33d61bebfe98afa)
+* ProfLander: Add string count to stat_memory and OOM handler (https://github.com/themrdemonized/xray-monolith/pull/337)
+* Kutez: Added the new "volume_mult" property for HUD sound call back. Removed all indoor framework related engine side code (https://github.com/themrdemonized/xray-monolith/pull/338)
+
 **2025.08.12u1**
 * Fix issue https://github.com/themrdemonized/xray-monolith/issues/333
 * v2v3v4: fix ctd when zooming into about to be destroyed object with detector scopes

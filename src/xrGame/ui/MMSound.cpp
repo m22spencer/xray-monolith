@@ -5,6 +5,8 @@
 
 CMMSound::CMMSound()
 {
+	// Ncenka - fix for not playing random Main Menu music
+	m_random.seed(u32(CPU::QPC() & 0xffffffff));
 }
 
 CMMSound::~CMMSound()
@@ -69,7 +71,9 @@ void CMMSound::music_Play()
 	if (m_play_list.empty())
 		return;
 
-	int i = Random.randI(m_play_list.size());
+	int i = 0;
+	if (m_bRandom)
+		i = m_random.randI(m_play_list.size());
 
 	string_path _path;
 	strconcat(sizeof(_path), _path, m_play_list[i].c_str(), ".ogg");

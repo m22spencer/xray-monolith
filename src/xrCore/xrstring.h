@@ -49,7 +49,7 @@ public:
 	void dump();
 	void dump(IWriter* W);
 	void verify();
-	u32 stat_economy();
+	u32 stat_economy(u32& count);
 #ifdef PROFILE_CRITICAL_SECTIONS
     str_container ():cs(MUTEX_PROFILE_ID(str_container)) {}
 #endif // PROFILE_CRITICAL_SECTIONS

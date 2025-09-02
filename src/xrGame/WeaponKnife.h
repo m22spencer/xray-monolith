@@ -43,7 +43,6 @@ protected:
 	float fHitImpulse_2;
 
 	float fCurrentHit;
-
 	float fHitImpulse_cur;
 
 	u32 dwUpdateSounds_Frame;
@@ -55,6 +54,20 @@ public:
 	virtual ~CWeaponKnife();
 
 	void Load(LPCSTR section);
+
+	float GetHit1Power();
+	float GetHit2Power();
+	float GetHit1PowerCritical();
+	float GetHit2PowerCritical();
+	float GetHit1Impulse();
+	float GetHit2Impulse();
+
+	void SetHit1Power(float power);
+	void SetHit2Power(float power);
+	void SetHit1PowerCritical(float power);
+	void SetHit2PowerCritical(float power);
+	void SetHit1Impulse(float impulse);
+	void SetHit2Impulse(float impulse);
 
 	virtual bool NeedBlendAnm();
 	virtual bool MovingAnimAllowedNow();

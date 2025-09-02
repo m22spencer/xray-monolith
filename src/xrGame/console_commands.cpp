@@ -153,8 +153,6 @@ extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
 extern BOOL g_freelook_while_reloading;
 extern BOOL useSeparateUBGLKeybind;
-extern float g_gunsnd_indoor;
-extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
@@ -317,7 +315,8 @@ static void full_memory_stats()
 	u32		_game_lua = game_lua_memory_usage();
 	u32		_render = ::Render->memory_usage();
 #endif // SEVERAL_ALLOCATORS
-	int _eco_strings = (int)g_pStringContainer->stat_economy();
+    u32 _eco_strings_count = 0;
+	int _eco_strings = (int)g_pStringContainer->stat_economy(_eco_strings_count);
 	int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
 	u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
 
@@ -335,7 +334,8 @@ static void full_memory_stats()
 	Msg("* [x-ray]: process heap[%u K], game lua[%d K], render[%d K]", _process_heap / 1024, _game_lua / 1024, _render / 1024);
 #endif // SEVERAL_ALLOCATORS
 
-	Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
+	Msg("* [x-ray]: shared strings: memory[%ld K], count[%lu]", _eco_strings / 1024, _eco_strings_count);
+	Msg("* [x-ray]: shared memory: memory[%ld K]", _eco_smem);
 
 #ifdef FS_DEBUG
 	Msg("* [x-ray]: file mapping: memory[%d K], count[%d]", g_file_mapped_memory / 1024, g_file_mapped_count);
@@ -3002,9 +3002,6 @@ void CCC_RegisterCommands()
 
 	// Allows freelook during reload animations
 	CMD4(CCC_Integer, "freelook_while_reloading", &g_freelook_while_reloading, 0, 1);
-	// Indoor weapon sounds
-	CMD4(CCC_Float, "g_gunsnd_indoor", &g_gunsnd_indoor, 0.0f, 1.0f);
-	CMD4(CCC_Float, "g_gunsnd_indoor_volume", &g_gunsnd_indoor_volume, 0.0f, 5.0f);
 
 	// Draw pickup item names
 	CMD4(CCC_Integer, "g_draw_pickup_item_names", &drawPickupItemNames, 0, 1);

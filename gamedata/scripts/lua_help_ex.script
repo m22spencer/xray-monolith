@@ -126,9 +126,14 @@
     globals {
         player_hud* get_player_hud()
     }
+
     player_hud {
         void set_hands(string section)
         void reset_hands()
+    }
+
+    namespace ActorMenu {
+        CUIMessagesWindow get_messages_menu()
     }
 
     class CUIProgressBar {
@@ -143,6 +148,25 @@
 
     class CUIDialogWnd : CUIWindow {
         void AllowWorkInPause(bool state)
+    }
+
+	 class CUIPdaWnd : CUIDialogWnd {
+        // Ncenka - allow to change PDA UI XML file
+		function SetPdaXml(string)
+		function GetPdaXml()
+    }
+
+    class CUIMessagesWindow : CUIWindow {
+        // no extra exports yet
+    }
+
+    class CUIMainIngameWnd : CUIWindow {
+        property m_QuickSlotText1
+        property m_QuickSlotText2
+        property m_QuickSlotText3
+        property m_QuickSlotText4
+
+        table GetQuickSlotIcons()
     }
 
     class render_device {
@@ -237,6 +261,12 @@
         script_rq_result get_target_result(ETraceTarget)
         script_rq_result get_target_result()
 
+        // antglobes
+        Fvector get_sun_pos() // Get the sun's position in the sky
+        Fcolor get_sun_color() // Get the float represenation of the sun's color in rgb format
+        float get_sun_intensity() // Get the sun's brightness
+        bool is_sun_visible() // Check if the weather is clear
+
         void map_remove_all_object_spots(id)
 
         CUIStatic* map_get_object_spot_static(u16 id, LPCSTR spot_type)
@@ -265,14 +295,13 @@
         //        air_resistance = 0.2,
         //    }
         //    level.add_bullet(t)
-    }
 
-    class CUIMessagesWindow : CUIWindow {
-        // no extra exports yet
-    }
-
-    namespace ActorMenu {
-        function get_messages_menu()
+         // Script Attachments
+        function add_attachment(string, string)
+        function get_attachment(string)
+        function remove_attachment(string)
+        function remove_attachment(script_attachment)
+        function iterate_attachments(function)
     }
 
     // obj:get_physics_shell()
@@ -378,6 +407,9 @@
     }
 
     class game_object {
+		// Class casting
+		function cast_Knife()
+
         // General
         Fmatrix xform(bool bHud)
         Fbox bounding_box(bool bHud)
@@ -428,9 +460,9 @@
         function get_artefact_additional_inventory_weight()
         function set_artefact_additional_inventory_weight(float)
 
-	// Devices
-	function set_device_enabled(bool)
-	function is_device_enabled()
+		// Devices
+		function set_device_enabled(bool)
+		function is_device_enabled()
 
         // Bones
         u16 get_bone_id(string)
@@ -616,6 +648,21 @@
         function GetZoomRotateTime()
         function SetZoomRotateTime(float)
     }
+
+    class CWeaponKnife : CWeapon {
+		function GetHit1Power()
+		function GetHit2Power()
+		function GetHit1PowerCritical()
+		function GetHit2PowerCritical()
+		function GetHit1Impulse()
+		function GetHit2Impulse()
+		function SetHit1Power(float power)
+		function SetHit2Power(float power)
+		function SetHit1PowerCritical(float power)
+		function SetHit2PowerCritical(float power)
+		function SetHit1Impulse(float impulse)
+		function SetHit2Impulse(float impulse)
+    }
 	
     enum rq_target { (sum them up to target multiple types)
         rqtNone     = 0,
@@ -717,6 +764,7 @@
         -- Parent
         function set_parent(ScriptAttachment*);
         function set_parent(game_object*);
+        function set_parent_level();
         function get_parent();
 
         -- Child

@@ -23,6 +23,7 @@ void script_attachment::script_register(lua_State* L)
 		//Parent
 		.def("set_parent", (void (script_attachment::*)(script_attachment*)) &script_attachment::SetParent)
 		.def("set_parent", (void (script_attachment::*)(CScriptGameObject*)) &script_attachment::SetParent)
+		.def("set_parent_level", &script_attachment::SetParentLevel)
 		.def("get_parent", &script_attachment::GetParent)
 
 		//Child

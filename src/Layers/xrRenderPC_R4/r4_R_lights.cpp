@@ -181,16 +181,15 @@ void CRender::render_lights(light_Package& LP)
 			Target->accum_spot(L);
 			render_indirect(L);
 
-			PIX_EVENT(ACCUM_VOLUMETRIC);
-			if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
-			{
-				// Current Resolution
-				float w = float(Device.dwWidth);
-				float h = float(Device.dwHeight);
+				if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
+				{
+					// Current Resolution
+					float w = float(Device.dwWidth);
+					float h = float(Device.dwHeight);
 
-				// Adjust resolution
-				if (RImplementation.o.ssfx_volumetric)
-					Target->set_viewport_size(HW.pContext, w / 8, h / 8);
+					// Adjust resolution
+					if (RImplementation.o.ssfx_volumetric)
+						Target->set_viewport_size(HW.pContext, w / 8, h / 8);
 
 				Target->accum_volumetric(L);
 				
