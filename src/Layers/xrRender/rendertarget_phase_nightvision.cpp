@@ -357,6 +357,15 @@ void CRenderTarget::phase_3DSSReticle()
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
 
+	{   PIX_EVENT(SCOPE_PHASE_JITTERFIX);
+
+		// Write a dark color to the jittered geometry position to ensure
+		//  no light/sky bleed
+		draw_scope(s_scope_color_write, [](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_JITTERFIX);
+		});
+	}
+
 	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);

@@ -26,6 +26,10 @@ float4 main(v_out I) : SV_Target
         discard;
     }
 
+    if (scope_phase & SCOPE_PHASE_JITTERFIX) {
+        return float4(0,0,0,1);
+    }
+
     if (scope_phase & SCOPE_PHASE_IMAGE) {
         o = valid
             ? isSVPActive()

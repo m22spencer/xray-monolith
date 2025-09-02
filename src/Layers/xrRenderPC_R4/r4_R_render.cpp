@@ -418,14 +418,18 @@ void CRender::renderGBuffer() {
 		{
 			PIX_EVENT(RENDER_HUD_EARLY);
 
+			auto fakescope = Target == TargetMain && !Device.m_SecondViewport.IsSVPActive();
+
 			if (Target == TargetMain)
 			{
 				
 				{
 					PIX_EVENT(SCOPE_WRITE_LENS_DEPTH);
 					// Write lens depth
-					Target->draw_scope(Target->s_scope_depth_write, [](auto N) -> void {
-						RCache.set_Stencil(FALSE);
+					Target->draw_scope(Target->s_scope_depth_write, [&](auto N) -> void {
+						// Mask the lens so we know what to push for svpscope 0
+						//    This must contain 0x01 to prevent the skybox from rendering into the diffuse buffer
+						RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x3, 0x3, 0x3, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 						RCache.set_c("scope_phase", SCOPE_PHASE_GBUFFER); //GBUFFER
 						RCache.set_c("scope_depth_value", 0.f);
 					});
@@ -437,7 +441,6 @@ void CRender::renderGBuffer() {
 			{
 				PIX_EVENT(RENDER_HUD);
 				RCache.set_ZFunc(D3DCMP_LESS);
-				RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x1, 0x1, 0x1, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 				r_dsgraph_render_hud();
 				RCache.set_ZFunc(D3DCMP_LESSEQUAL);
 			}
@@ -447,16 +450,17 @@ void CRender::renderGBuffer() {
 				PIX_EVENT(SCOPE_HOLEPUNCH);
 				// Clear depth anywhere the hud does not occlude the lens
 				//   which allows g-buffer to populate for us to sample later.
-				Target->draw_scope(Target->s_scope_depth_write, [](auto _) -> void {
+				Target->draw_scope(Target->s_scope_depth_write, [&](auto _) -> void {
 					RImplementation.rmNormal();
-					// Use stencil buffer to mask depth write
-					RCache.set_Stencil(TRUE, D3DCMP_NOTEQUAL, 0x1, 0x1, 0x0, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
+					// holepunch everything that is not occluded by closer objects, and is part of the lens
+					//    making sure to clear the stencil to zero, so that the skybox can render.
+					RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x3, 0x3, 0x3, D3DSTENCILOP_KEEP, D3DSTENCILOP_ZERO, D3DSTENCILOP_KEEP);
 					RCache.set_c("scope_phase", SCOPE_PHASE_DEPTHWRITE); //DEPTHWRITE
 					RCache.set_c("scope_depth_value", 1.f);
 				});
-				RCache.set_Stencil(FALSE);
 			}
 		}
+		Target->phase_scene_begin();
 		r_dsgraph_render_graph(0);
 		Target->disable_aniso();
 	}
