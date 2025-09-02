@@ -108,6 +108,9 @@ public: //	Public class members (must be encapsulated furthur)
 	};
 
 private:
+	// has been set via unsafe_fast_set
+	// This is a quick hack to prevent release of invalid textures
+	bool unsafe_set = false;  
 	ID3DBaseTexture* pSurface;
 	// Sequence data
 	xr_vector<ID3DBaseTexture*> seqDATA;
