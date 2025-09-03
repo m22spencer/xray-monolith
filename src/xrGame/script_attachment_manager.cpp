@@ -52,13 +52,13 @@ static void update_visbox_attachment(IKinematics* k)
 #endif
 }
 
-script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
+script_attachment::script_attachment(LPCSTR name, LPCSTR model_name): ISpatial(g_SpatialSpace)
 {
 	m_name = name;
-	m_model = nullptr;
 	m_kinematics = nullptr;
 	m_parent_attachment = nullptr;
 	m_parent_object = nullptr;
+	m_parent_level = false;
 	m_script_ui = nullptr;
 	m_script_ui_func = 0;
 	m_script_ui_mat = Fidentity;
@@ -72,7 +72,8 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_script_light_bone = 0;
 	m_parent_bone = 0;
 	m_offset = Fidentity;
-	m_transform = Fidentity;
+	renderable.visual = nullptr;
+	renderable.xform = Fidentity;
 	m_attachment_offset[0].set(0, 0, 0);
 	m_attachment_offset[1].set(0, 0, 0);
 	m_attachment_offset[2].set(1, 1, 1);
@@ -84,6 +85,7 @@ script_attachment::script_attachment(LPCSTR name, LPCSTR model_name)
 	m_current_motion = "idle";
 	m_model_name = "";
 	m_userdata = nullptr;
+	spatial.type |= STYPE_RENDERABLE;
 	LoadModel(model_name);
 	PlayMotion("idle", false);
 }
@@ -103,14 +105,31 @@ void script_attachment::RemoveAttachment(script_attachment* child)
 	RemoveAttachment(child->GetName());
 }
 
-void script_attachment::Render(IKinematics* model, Fmatrix* mat)
+void script_attachment::spatial_register()
 {
-	if (!model || (m_bone_callbacks[0] && m_bone_callbacks[0]->m_bone_id != BI_NONE))
-		m_transform = *mat;
-	else
-		m_transform.mul_43(*mat, BoneTransform(model));
+	renderable.xform.transform_tiny(spatial.sphere.P, renderable.visual ? renderable.visual->getVisData().sphere.P : Fvector{ 0,0,0 });
+	Fvector& scale = m_attachment_offset[2];
+	spatial.sphere.R = renderable.visual ? renderable.visual->getVisData().sphere.R * max(scale.x, max(scale.y, scale.z)) : 0.f;
+	ISpatial::spatial_register();
+}
 
-	m_transform.mulB_43(m_offset);
+void script_attachment::spatial_unregister()
+{
+	ISpatial::spatial_unregister();
+}
+
+void script_attachment::spatial_move()
+{
+	if (!spatial.node_ptr) return;
+	renderable.xform.transform_tiny(spatial.sphere.P, renderable.visual->getVisData().sphere.P);
+	Fvector& scale = m_attachment_offset[2];
+	spatial.sphere.R = renderable.visual->getVisData().sphere.R * max(scale.x, max(scale.y, scale.z));
+	ISpatial::spatial_move();
+}
+
+void script_attachment::renderable_Render()
+{
+	if (GetType() != eSA_World) return;
 
 	if (m_script_light)
 	{
@@ -121,11 +140,55 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat)
 		else
 			light_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
-		LM.mul(m_transform, light_bone);
+		LM.mul(renderable.xform, light_bone);
 		m_script_light->SetXFORM(LM);
 	}
 
-	IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
+	if (::Render->get_generation() == ::Render->GENERATION_R1)
+		g_pGamePersistent->AttachmentUIsToRender.push_back(this);
+	else
+		RenderUI();
+
+	IKinematicsAnimated* ka = renderable.visual->dcast_PKinematicsAnimated();
+	if (ka) ka->UpdateTracks();
+	m_kinematics->CalculateBones_Invalidate();
+	m_kinematics->CalculateBones(TRUE);
+
+	::Render->set_Transform(&renderable.xform);
+	::Render->add_Visual(renderable.visual);
+
+	if (m_children.size())
+	{
+		for (auto& pair : m_children)
+		{
+			pair.second->Render(m_kinematics, &renderable.xform);
+		}
+	}
+}
+
+void script_attachment::Render(IKinematics* model, Fmatrix* mat)
+{
+	if (!model || (m_bone_callbacks[0] && m_bone_callbacks[0]->m_bone_id != BI_NONE))
+		renderable.xform = *mat;
+	else
+		renderable.xform.mul_43(*mat, BoneTransform(model));
+
+	renderable.xform.mulB_43(m_offset);
+
+	if (m_script_light)
+	{
+		Fmatrix LM;
+		Fmatrix light_bone;
+		if (m_kinematics->LL_BoneCount() > m_script_light_bone)
+			light_bone = m_kinematics->LL_GetTransform(m_script_light_bone);
+		else
+			light_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
+
+		LM.mul(renderable.xform, light_bone);
+		m_script_light->SetXFORM(LM);
+	}
+
+	IKinematicsAnimated* ka = renderable.visual->dcast_PKinematicsAnimated();
 	if (ka || GetType() == eSA_CamAttached)
 	{
 		if (ka) ka->UpdateTracks();
@@ -133,14 +196,14 @@ void script_attachment::Render(IKinematics* model, Fmatrix* mat)
 		m_kinematics->CalculateBones(TRUE);
 	}
 
-	::Render->set_Transform(&m_transform);
-	::Render->add_Visual(m_model);
+	::Render->set_Transform(&renderable.xform);
+	::Render->add_Visual(renderable.visual);
 
 	if (m_children.size())
 	{
 		for (auto& pair : m_children)
 		{
-			pair.second->Render(m_kinematics, &m_transform);
+			pair.second->Render(m_kinematics, &renderable.xform);
 		}
 	}
 }
@@ -251,7 +314,7 @@ void script_attachment::RenderUI()
 		else
 			ui_bone = m_kinematics->LL_GetTransform(m_kinematics->LL_GetBoneRoot());
 
-		LM.mul(m_transform, ui_bone);
+		LM.mul(renderable.xform, ui_bone);
 		LM.mulB_43(m_script_ui_mat);
 		UIRender->CacheSetXformWorld(LM);
 		m_script_ui->Draw();
@@ -311,6 +374,12 @@ void script_attachment::RecalcOffset()
 		m_offset.translate_over(position);
 		m_offset.mulB_43(Fmatrix().scale(scale));
 	}
+
+	if (m_parent_level)
+	{
+		renderable.xform = m_offset;
+		spatial_move();
+	}
 }
 
 void script_attachment::SetPosition(float x, float y, float z)
@@ -353,6 +422,11 @@ void script_attachment::SetParent(script_attachment* att)
 	if (m_parent_object)
 		m_parent_object->remove_child(GetName());
 
+	if (m_parent_level)
+		Level().remove_child(GetName());
+
+	spatial_unregister();
+	m_parent_level = false;
 	m_parent_object = nullptr;
 	m_parent_attachment = att;
 	m_parent_attachment->AddChild(GetName(), this);
@@ -373,8 +447,12 @@ void script_attachment::SetParent(CGameObject* obj)
 
 		m_parent_object->remove_child(GetName());
 	}
-		
+	
+	if (m_parent_level)
+		Level().remove_child(GetName());
 
+	spatial_unregister();
+	m_parent_level = false;
 	m_parent_object = obj;
 	m_parent_attachment = nullptr;
 	m_parent_object->add_attachment(GetName(), this);
@@ -396,10 +474,33 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 		m_parent_object->remove_child(GetName());
 	}
 
+	if (m_parent_level)
+		Level().remove_child(GetName());
 
+	spatial_unregister();
+	m_parent_level = false;
 	m_parent_object = &obj->object();
 	m_parent_attachment = nullptr;
 	m_parent_object->add_attachment(GetName(), this);
+}
+
+void script_attachment::SetParentLevel()
+{
+	if (m_parent_level)
+		return;
+
+	if (m_parent_attachment)
+		m_parent_attachment->RemoveChild(GetName());
+
+	if (m_parent_object)
+		m_parent_object->remove_child(GetName());
+
+	m_parent_level = true;
+	m_parent_object = nullptr;
+	m_parent_attachment = nullptr;
+	Level().add_attachment(GetName(), this);
+	spatial_register();
+	spatial_move();
 }
 
 ::luabind::object script_attachment::GetParent()
@@ -407,6 +508,7 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["object"] = m_parent_object ? m_parent_object->lua_game_object() : nullptr;
 	table["attachment"] = m_parent_attachment ? m_parent_attachment : nullptr;
+	table["level"] = m_parent_level;
 	return table;
 }
 
@@ -464,7 +566,7 @@ Fmatrix& script_attachment::BoneTransform(IKinematics* model)
 
 u32 script_attachment::PlayMotion(LPCSTR name, bool mixin, float speed)
 {
-	IKinematicsAnimated* k = m_model->dcast_PKinematicsAnimated();
+	IKinematicsAnimated* k = renderable.visual->dcast_PKinematicsAnimated();
 
 	if (!k)
 		return 0;
@@ -502,7 +604,7 @@ u32 script_attachment::PlayMotion(LPCSTR name, bool mixin, float speed)
 
 u32 script_attachment::motion_length(const MotionID& M, const CMotionDef*& md, float speed)
 {
-	IKinematicsAnimated* k = m_model->dcast_PKinematicsAnimated();
+	IKinematicsAnimated* k = renderable.visual->dcast_PKinematicsAnimated();
 
 	if (!k)
 		return 0;
@@ -524,6 +626,9 @@ void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecu
 		bool bVisibleNow = m_kinematics->LL_GetBoneVisible(bone_id);
 		if (bVisibleNow != bVisibility)
 			m_kinematics->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+
+		m_kinematics->CalculateBones_Invalidate();
+		m_kinematics->CalculateBones(TRUE);
 	}
 }
 
@@ -574,7 +679,7 @@ Fmatrix script_attachment::bone_transform(u16 bone_id)
 	}
 
 	Fmatrix matrix;
-	matrix.mul_43(m_transform, m_kinematics->LL_GetTransform(bone_id));
+	matrix.mul_43(renderable.xform, m_kinematics->LL_GetTransform(bone_id));
 	return matrix;
 }
 
@@ -611,9 +716,9 @@ LPCSTR script_attachment::bone_name(u16 bone_id)
 {
 	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 
-	auto bones = m_kinematics->list_bones();
-	for (const auto& bone : bones)
-		result[bone.first] = bone.second.c_str();
+	auto bones = m_kinematics->LL_Bones();
+	for (const auto& bone : *bones)
+		result[bone.second] = bone.first.c_str();
 
 	return result;
 }
@@ -627,16 +732,18 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 
 	u16 count_prev = 0;
 
-	if (m_model)
+	if (renderable.visual)
 	{
 		count_prev = m_kinematics->LL_BoneCount();
-		::Render->model_Delete(m_model);
+		::Render->model_Delete(renderable.visual);
 	}
 	
-	m_model = ::Render->model_Create(*m_model_name);
-	R_ASSERT(m_model);
-	m_kinematics = m_model->dcast_PKinematics();
+	renderable.visual = ::Render->model_Create(*m_model_name);
+	R_ASSERT(renderable.visual);
+	m_kinematics = renderable.visual->dcast_PKinematics();
 	R_ASSERT(m_kinematics);
+
+	spatial_move();
 
 	// Bone Callbacks
 	if (keep_bc && m_bone_callbacks.size() && count_prev <= m_kinematics->LL_BoneCount())
@@ -656,7 +763,25 @@ void script_attachment::LoadModel(LPCSTR model_name, bool keep_bc)
 
 void script_attachment::SetName(LPCSTR name)
 {
-	if (m_parent_object)
+	if (m_parent_level)
+	{
+		// Remove old instance from parent (without destroying it)
+		Level().remove_child(GetName(), false);
+
+		auto& pair = Level().GetAttachments()->find(name);
+		if (pair != Level().GetAttachments()->end())
+		{
+			// Attachment with name exists, replace it
+			xr_delete(pair->second);
+			pair->second = this;
+		}
+		else
+		{
+			// Attachment with name does not exist, add it
+			Level().add_attachment(name, this);
+		}
+	}
+	else if (m_parent_object)
 	{
 		// Remove old instance from parent (without destroying it)
 		m_parent_object->remove_child(GetName(), false);
@@ -888,13 +1013,13 @@ void script_attachment::RemoveBoneCallback(u16 bone_id)
 
 const Fbox& script_attachment::Box()
 {
-	return m_model->dcast_PKinematics()->GetBox();
+	return renderable.visual->dcast_PKinematics()->GetBox();
 }
 
 Fvector script_attachment::GetCenter()
 {
-	if (m_model)
-		return m_model->getVisData().sphere.P;
+	if (renderable.visual)
+		return renderable.visual->getVisData().sphere.P;
 
 	return { 0,0,0 };
 }
@@ -903,32 +1028,38 @@ Fvector script_attachment::GetCenter()
 {
 	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
-	if (!m_model)
+	if (!renderable.visual)
 	{
 		table["error"] = true;
 		return table;
 	}
 
-	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = renderable.visual->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
-		subtable["shader"] = m_model->getDebugShader();
-		subtable["texture"] = m_model->getDebugTexture();
+		subtable["shader"] = renderable.visual->getDebugShader();
+		subtable["texture"] = renderable.visual->getDebugTexture();
 		table[1] = subtable;
 		return table;
 	}
-
-	int i = 1;
 
 	for (auto* child : *children)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShader();
+		subtable["texture"] = child->getDebugTexture();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
@@ -938,32 +1069,38 @@ Fvector script_attachment::GetCenter()
 {
 	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
-	if (!m_model)
+	if (!renderable.visual)
 	{
 		table["error"] = true;
 		return table;
 	}
 
-	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = renderable.visual->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
-		subtable["shader"] = m_model->getDebugShaderDef();
-		subtable["texture"] = m_model->getDebugTextureDef();
+		subtable["shader"] = renderable.visual->getDebugShaderDef();
+		subtable["texture"] = renderable.visual->getDebugTextureDef();
 		table[1] = subtable;
 		return table;
 	}
-
-	int i = 1;
 
 	for (auto* child : *children)
 	{
 		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShaderDef();
+		subtable["texture"] = child->getDebugTextureDef();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
@@ -971,52 +1108,78 @@ Fvector script_attachment::GetCenter()
 
 void script_attachment::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture)
 {
-	if (!m_model) return;
-	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	if (!renderable.visual) return;
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = renderable.visual->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
-		m_model->SetShaderTexture(shader, texture);
+		renderable.visual->SetShaderTexture(shader, texture);
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->SetShaderTexture(shader, texture);
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->SetShaderTexture(shader, texture);
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->SetShaderTexture(shader, texture);
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
 }
 
 void script_attachment::ResetShaderTexture(int id)
 {
-	if (!m_model) return;
-	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	if (!renderable.visual) return;
+	xr_vector<IRenderVisual*>* children = renderable.visual->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = renderable.visual->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
-		m_model->ResetShaderTexture();
+		renderable.visual->ResetShaderTexture();
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->ResetShaderTexture();
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->ResetShaderTexture();
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->ResetShaderTexture();
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
 }

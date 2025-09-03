@@ -51,6 +51,7 @@ extern float scope_radius;
 Flags32 zoomFlags = {};
 extern float n_zoom_step_count;
 float sens_multiple = 1.0f;
+float hud_fov_aim_multiplier = 1.0f;
 
 extern int g_nearwall;
 
@@ -507,17 +508,25 @@ void CWeapon::SetZoomType(u8 new_zoom_type)
 
 extern float g_ironsights_factor;
 
-inline float smoothstep(float x)
+// new easing for hud_fov_aim_factor
+inline float easeInQuart(float x)
 {
-	return x * x * (3 - 2 * x);
+	return x * x * x * x;
+}
+
+// new easing for hud_fov_aim_factor
+inline float easeOutQuart(float x)
+{
+	return 1 - pow(1 - x, 4);
 }
 
 float CWeapon::GetTargetHudFov()
 {
 	float base = inherited::GetTargetHudFov();
 
-	float x = smoothstep(m_zoom_params.m_fZoomRotationFactor);
-	float factor = hud_fov_aim_factor > 0 ? hud_fov_aim_factor : 1;
+	// check aim state to determine easing
+	float x = IsZoomed() ? easeOutQuart(m_zoom_params.m_fZoomRotationFactor) : easeInQuart(m_zoom_params.m_fZoomRotationFactor);
+	float factor = hud_fov_aim_factor > 0 ? hud_fov_aim_factor * hud_fov_aim_multiplier : 1; // ltx hud_fov_aim_factor
 	base = (base * factor) * x + base * (1 - x);
 
 	/*
@@ -872,6 +881,7 @@ void CWeapon::Load(LPCSTR section)
 	m_bCanBeLowered = READ_IF_EXISTS(pSettings, r_bool, section, "can_be_lowered", false);
 
 	m_fSafeModeRotateTime = READ_IF_EXISTS(pSettings, r_float, section, "weapon_lower_speed", 1.f);
+	hud_fov_aim_multiplier = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_aim_factor", 1.f);
 
 	UpdateUIScope();
 
@@ -1435,6 +1445,7 @@ void CWeapon::UpdatePosition(const Fmatrix& trans)
 	VERIFY(!fis_zero(DET(renderable.xform)));
 }
 
+BOOL interruptFireOnAimToggle = FALSE;
 bool CWeapon::Action(u16 cmd, u32 flags)
 {
 	if (inherited::Action(cmd, flags)) return true;
@@ -1490,7 +1501,7 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 
 							if (GetState() != eAimStart && HudAnimationExist("anm_idle_aim_start"))
 								SwitchState(eAimStart);
-							else if (GetState() != eIdle)
+							else if (interruptFireOnAimToggle && GetState() != eIdle)
 								SwitchState(eIdle);
 
 							OnZoomIn();
@@ -1516,7 +1527,7 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 
 						if (GetState() != eAimStart && HudAnimationExist("anm_idle_aim_start"))
 							SwitchState(eAimStart);
-						else if (GetState() != eIdle)
+						else if (interruptFireOnAimToggle && GetState() != eIdle)
 							SwitchState(eIdle);
 
 						OnZoomIn();
@@ -3309,4 +3320,15 @@ Fmatrix CWeapon::RayTransform()
 	ApplyAimModifiers(matrix);
 
 	return matrix;
+}
+
+// v2v3v4: fix ctd when zooming into about to be destroyed object with detector scopes
+void CWeapon::net_Relcase(CObject* object)
+{
+	CHudItem::net_Relcase(object);
+
+	if (!m_zoom_params.m_pVision)
+		return;
+
+	m_zoom_params.m_pVision->remove_links(object);
 }

@@ -184,10 +184,10 @@ void CROS_impl::update(IRenderable* O)
 	dwFrame = Device.dwFrame;
 	if (0 == O) return;
 	if (0 == O->renderable.visual) return;
-	VERIFY(dynamic_cast<CROS_impl*> (O->renderable_ROS()));
+	VERIFY(fast_dynamic_cast<CROS_impl*> (O->renderable_ROS()));
 	//float	dt			=	Device.fTimeDelta;
 
-	CObject* _object = dynamic_cast<CObject*>(O);
+	CObject* _object = fast_dynamic_cast<CObject*>(O);
 
 	// select sample, randomize position inside object
 	vis_data& vis = O->renderable.visual->getVisData();
@@ -311,7 +311,7 @@ void CROS_impl::smart_update(IRenderable* O)
 
 	//	Acquire current position
 	Fvector position;
-	VERIFY(dynamic_cast<CROS_impl*> (O->renderable_ROS()));
+	VERIFY(fast_dynamic_cast<CROS_impl*> (O->renderable_ROS()));
 	vis_data& vis = O->renderable.visual->getVisData();
 	O->renderable.xform.transform_tiny(position, vis.sphere.P);
 
@@ -448,7 +448,7 @@ void CROS_impl::calc_sky_hemi_value(Fvector& position, CObject* _object)
 
 void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
 {
-	CObject* _object = dynamic_cast<CObject*>(O);
+	CObject* _object = fast_dynamic_cast<CObject*>(O);
 	float dt = Device.fTimeDelta;
 
 	vis_data& vis = O->renderable.visual->getVisData();

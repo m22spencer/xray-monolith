@@ -13,13 +13,13 @@
 bool CConsole::GetBool(LPCSTR cmd) const
 {
 	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Mask* cf = dynamic_cast<CCC_Mask*>(cc);
+	CCC_Mask* cf = fast_dynamic_cast<CCC_Mask*>(cc);
 	if (cf)
 	{
 		return (cf->GetValue() != 0);
 	}
 
-	CCC_Integer* ci = dynamic_cast<CCC_Integer*>(cc);
+	CCC_Integer* ci = fast_dynamic_cast<CCC_Integer*>(cc);
 	if (ci)
 	{
 		return (ci->GetValue() != 0);
@@ -32,7 +32,7 @@ float CConsole::GetFloat(LPCSTR cmd, float& min, float& max) const
 	min = 0.0f;
 	max = 0.0f;
 	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Float* cf = dynamic_cast<CCC_Float*>(cc);
+	CCC_Float* cf = fast_dynamic_cast<CCC_Float*>(cc);
 	if (cf)
 	{
 		cf->GetBounds(min, max);
@@ -58,13 +58,13 @@ int CConsole::GetInteger(LPCSTR cmd, int& min, int& max) const
 	max = 1;
 	IConsole_Command* cc = GetCommand(cmd);
 
-	CCC_Integer* cf = dynamic_cast<CCC_Integer*>(cc);
+	CCC_Integer* cf = fast_dynamic_cast<CCC_Integer*>(cc);
 	if (cf)
 	{
 		cf->GetBounds(min, max);
 		return cf->GetValue();
 	}
-	CCC_Mask* cm = dynamic_cast<CCC_Mask*>(cc);
+	CCC_Mask* cm = fast_dynamic_cast<CCC_Mask*>(cc);
 	if (cm)
 	{
 		min = 0;
@@ -94,7 +94,7 @@ xr_token* CConsole::GetXRToken(LPCSTR cmd) const
 {
 	IConsole_Command* cc = GetCommand(cmd);
 
-	CCC_Token* cf = dynamic_cast<CCC_Token*>(cc);
+	CCC_Token* cf = fast_dynamic_cast<CCC_Token*>(cc);
 	if (cf)
 	{
 		return cf->GetToken();
@@ -105,7 +105,7 @@ xr_token* CConsole::GetXRToken(LPCSTR cmd) const
 Fvector* CConsole::GetFVectorPtr(LPCSTR cmd) const
 {
 	IConsole_Command* cc = GetCommand(cmd);
-	CCC_Vector3* cf = dynamic_cast<CCC_Vector3*>(cc);
+	CCC_Vector3* cf = fast_dynamic_cast<CCC_Vector3*>(cc);
 	if (cf)
 	{
 		return cf->GetValuePtr();

@@ -52,7 +52,7 @@ public:
 	R_dsgraph::mapLandscape_T mapLandscape;
 	//R_dsgraph::HUDMask_T HUDMask; // SSS 23: Deprecated
 	R_dsgraph::HUDMask_T HUDMaskCamAttached;
-	R_dsgraph::mapWater_T mapWater;
+	R_dsgraph::mapWater_T mapWater[2];
 
 #if RENDER!=R_R1
 	R_dsgraph::mapSorted_T										mapWmark;			// sorted
@@ -189,7 +189,8 @@ public:
 		mapLandscape.destroy();
 		//HUDMask.destroy(); // SSS 23: Deprecated
 		HUDMaskCamAttached.destroy();
-		mapWater.destroy();
+		for(auto &w : mapWater)
+			w.destroy();
 
 #if RENDER!=R_R1
 		mapWmark.destroy();

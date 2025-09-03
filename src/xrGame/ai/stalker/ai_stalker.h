@@ -132,6 +132,8 @@ private:
     u32 dTimeFSeen;
     u32 dTimeNfSeen;
 
+	bool INVALID_HEAD_BONE = false;
+
 private:
 	float m_fRankDisperison;
 	float m_fRankVisibility;
@@ -864,6 +866,17 @@ public:
 
 private:
 	ignored_touched_objects_type m_ignored_touched_objects;
+
+#ifdef HOLDERCUSTOM_NEW
+private:
+	CHolderCustom *m_holder = nullptr;
+
+public:
+	CHolderCustom *Holder() { return m_holder; }
+	bool attach_Holder(CHolderCustom *holder);
+	void detach_Holder();
+	bool use_HolderEx(CHolderCustom *object);
+#endif
 
 public:
 DECLARE_SCRIPT_REGISTER_FUNCTION

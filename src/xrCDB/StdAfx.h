@@ -25,12 +25,14 @@
 #	define CALLOC(type,count)	xr_alloc<type>(count)
 #endif // #ifdef USE_ARENA_ALLOCATOR
 
+#include <fast_dynamic_cast/fast_dynamic_cast.hpp>
+
 template <bool _is_pm, typename T>
 struct cspecial_free
 {
 	IC void operator()(T* & ptr)
 	{
-		void* _real_ptr = dynamic_cast<void*>(ptr);
+		void* _real_ptr = fast_dynamic_cast<void*>(ptr);
 		ptr->~T();
 		CFREE(_real_ptr);
 	}

@@ -107,51 +107,17 @@ void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
 		break;
 	case eFire:
 		{
-			//-------------------------------------------
 			m_eHitType = m_eHitType_1;
-			//fHitPower		= fHitPower_1;
-			if (ParentIsActor())
-			{
-				if (GameID() == eGameIDSingle)
-				{
-					fCurrentHit = fvHitPower_1[g_SingleGameDifficulty];
-				}
-				else
-				{
-					fCurrentHit = fvHitPower_1[egdMaster];
-				}
-			}
-			else
-			{
-				fCurrentHit = fvHitPower_1[egdMaster];
-			}
-			fHitImpulse_cur = fHitImpulse_1;
-			//-------------------------------------------
+			fCurrentHit = GetHit1Power();
+			fHitImpulse_cur = GetHit1Impulse();
 			switch2_Attacking(S);
 		}
 		break;
 	case eFire2:
 		{
-			//-------------------------------------------
 			m_eHitType = m_eHitType_2;
-			//fHitPower		= fHitPower_2;
-			if (ParentIsActor())
-			{
-				if (GameID() == eGameIDSingle)
-				{
-					fCurrentHit = fvHitPower_2[g_SingleGameDifficulty];
-				}
-				else
-				{
-					fCurrentHit = fvHitPower_2[egdMaster];
-				}
-			}
-			else
-			{
-				fCurrentHit = fvHitPower_2[egdMaster];
-			}
-			fHitImpulse_cur = fHitImpulse_2;
-			//-------------------------------------------
+			fCurrentHit = GetHit2Power();
+			fHitImpulse_cur = GetHit2Impulse();
 			switch2_Attacking(S);
 		}
 		break;
@@ -299,9 +265,7 @@ void CWeaponKnife::UpdateCL()
 	dwUpdateSounds_Frame = Device.dwFrame;
 
 	auto& P = get_LastFP();
-
-	m_sounds.SetPosition("sndShow", P);
-	m_sounds.SetPosition("sndHide", P);
+	m_sounds.UpdateAllSoundsPositions(P);
 }
 
 
@@ -384,65 +348,74 @@ void CWeaponKnife::LoadFireParams(LPCSTR section)
 {
 	inherited::LoadFireParams(section);
 
-	string32 buffer;
-	shared_str s_sHitPower_2;
-	shared_str s_sHitPowerCritical_2;
-
-	fvHitPower_1 = fvHitPower;
-	fvHitPowerCritical_1 = fvHitPowerCritical;
-	fHitImpulse_1 = fHitImpulse;
+	// Loading hit 1 params
+	SetHit1Power(fvHitPower[g_SingleGameDifficulty]);
+	SetHit1PowerCritical(fvHitPowerCritical[g_SingleGameDifficulty]);
+	SetHit1Impulse(fHitImpulse);
 	m_eHitType_1 = ALife::g_tfString2HitType(pSettings->r_string(section, "hit_type"));
 
-	//fHitPower_2			= pSettings->r_float	(section,strconcat(full_name, prefix, "hit_power_2"));
-	s_sHitPower_2 = pSettings->r_string_wb(section, "hit_power_2");
-	s_sHitPowerCritical_2 = pSettings->r_string_wb(section, "hit_power_critical_2");
+	// Loading hit 2 params
+	shared_str s_sHitPower_2 = pSettings->r_string_wb(section, "hit_power_2");
+	shared_str s_sHitPowerCritical_2 = pSettings->r_string_wb(section, "hit_power_critical_2");
 
-	fvHitPower_2[egdMaster] = (float)atof(_GetItem(*s_sHitPower_2, 0, buffer));
-	//первый параметр - это хит для уровня игры мастер
-	fvHitPowerCritical_2[egdMaster] = (float)atof(_GetItem(*s_sHitPowerCritical_2, 0, buffer));
-	//первый параметр - это хит для уровня игры мастер
+	string32 buffer;
 
-	fvHitPower_2[egdNovice] = fvHitPower_2[egdStalker] = fvHitPower_2[egdVeteran] = fvHitPower_2[egdMaster];
-	//изначально параметры для других уровней сложности такие же
-	fvHitPowerCritical_2[egdNovice] = fvHitPowerCritical_2[egdStalker] = fvHitPowerCritical_2[egdVeteran] =
-		fvHitPowerCritical_2[egdMaster]; //изначально параметры для других уровней сложности такие же
-
-	int num_game_diff_param = _GetItemCount(*s_sHitPower_2); //узнаём колличество параметров для хитов
-	if (num_game_diff_param > 1) //если задан второй параметр хита
-	{
-		fvHitPower_2[egdVeteran] = (float)atof(_GetItem(*s_sHitPower_2, 1, buffer));
-		//то вычитываем его для уровня ветерана
-	}
-	if (num_game_diff_param > 2) //если задан третий параметр хита
-	{
-		fvHitPower_2[egdStalker] = (float)atof(_GetItem(*s_sHitPower_2, 2, buffer));
-		//то вычитываем его для уровня сталкера
-	}
-	if (num_game_diff_param > 3) //если задан четвёртый параметр хита
-	{
-		fvHitPower_2[egdNovice] = (float)atof(_GetItem(*s_sHitPower_2, 3, buffer));
-		//то вычитываем его для уровня новичка
-	}
-
-	num_game_diff_param = _GetItemCount(*s_sHitPowerCritical_2); //узнаём колличество параметров
-	if (num_game_diff_param > 1) //если задан второй параметр хита
-	{
-		fvHitPowerCritical_2[egdVeteran] = (float)atof(_GetItem(*s_sHitPowerCritical_2, 1, buffer));
-		//то вычитываем его для уровня ветерана
-	}
-	if (num_game_diff_param > 2) //если задан третий параметр хита
-	{
-		fvHitPowerCritical_2[egdStalker] = (float)atof(_GetItem(*s_sHitPowerCritical_2, 2, buffer));
-		//то вычитываем его для уровня сталкера
-	}
-	if (num_game_diff_param > 3) //если задан четвёртый параметр хита
-	{
-		fvHitPowerCritical_2[egdNovice] = (float)atof(_GetItem(*s_sHitPowerCritical_2, 3, buffer));
-		//то вычитываем его для уровня новичка
-	}
-
-	fHitImpulse_2 = pSettings->r_float(section, "hit_impulse_2");
+	SetHit2Power((float) atof(_GetItem(*s_sHitPower_2, 0, buffer)));
+	SetHit2PowerCritical((float) atof(_GetItem(*s_sHitPowerCritical_2, 0, buffer)));
+	SetHit2Impulse(pSettings->r_float(section, "hit_impulse_2"));
 	m_eHitType_2 = ALife::g_tfString2HitType(pSettings->r_string(section, "hit_type_2"));
+}
+
+float CWeaponKnife::GetHit1Power() {
+	return fvHitPower_1[g_SingleGameDifficulty];
+}
+
+float CWeaponKnife::GetHit2Power() {
+	return fvHitPower_2[g_SingleGameDifficulty];
+}
+
+float CWeaponKnife::GetHit1PowerCritical() {
+	return fvHitPowerCritical_1[g_SingleGameDifficulty];
+}
+
+float CWeaponKnife::GetHit2PowerCritical() {
+	return fvHitPowerCritical_2[g_SingleGameDifficulty];
+}
+
+float CWeaponKnife::GetHit1Impulse() {
+	return fHitImpulse_1;
+}
+
+float CWeaponKnife::GetHit2Impulse() {
+	return fHitImpulse_2;
+}
+
+void CWeaponKnife::SetHit1Power(float power) {
+	fvHitPower_1[egdMaster] = power;
+	fvHitPower_1[egdNovice] = fvHitPower_1[egdStalker] = fvHitPower_1[egdVeteran] = fvHitPower_1[egdMaster];
+}
+
+void CWeaponKnife::SetHit2Power(float power) {
+	fvHitPower_2[egdMaster] = power;
+	fvHitPower_2[egdNovice] = fvHitPower_2[egdStalker] = fvHitPower_2[egdVeteran] = fvHitPower_2[egdMaster];
+}
+
+void CWeaponKnife::SetHit1PowerCritical(float power) {
+	fvHitPowerCritical_1[egdMaster] = power;
+	fvHitPowerCritical_1[egdNovice] = fvHitPowerCritical_1[egdStalker] = fvHitPowerCritical_1[egdVeteran] = fvHitPowerCritical_1[egdMaster];
+}
+
+void CWeaponKnife::SetHit2PowerCritical(float power) {
+	fvHitPowerCritical_2[egdMaster] = power;
+	fvHitPowerCritical_2[egdNovice] = fvHitPowerCritical_2[egdStalker] = fvHitPowerCritical_2[egdVeteran] = fvHitPowerCritical_2[egdMaster];
+}
+
+void CWeaponKnife::SetHit1Impulse(float impulse) {
+	fHitImpulse_1 = impulse;
+}
+
+void CWeaponKnife::SetHit2Impulse(float impulse) {
+	fHitImpulse_2 = impulse;
 }
 
 bool CWeaponKnife::GetBriefInfo(II_BriefInfo& info)

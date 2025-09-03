@@ -91,11 +91,13 @@ void CObject::cNameVisual_set(shared_str N)
 		}
 		*/
 
+#ifdef OPTIMIZE_CALCULATE_BONES
 		if (new_k)
-			new_k->renderableParent = this;
+			new_k->spatialParent = this;
 
 		if (old_k)
-			old_k->renderableParent = nullptr;
+			old_k->spatialParent = nullptr;
+#endif
 
 		if (old_k && new_k)
 		{
@@ -107,13 +109,16 @@ void CObject::cNameVisual_set(shared_str N)
 	}
 	else
 	{
+
+#ifdef OPTIMIZE_CALCULATE_BONES
 		if (renderable.visual)
 		{
 			IKinematics* new_k = renderable.visual->dcast_PKinematics();
 			if (new_k)
-				new_k->renderableParent = nullptr;
+				new_k->spatialParent = nullptr;
 		}
-		
+#endif
+
 		::Render->model_Delete(renderable.visual);
 		NameVisual = 0;
 	}
@@ -384,7 +389,7 @@ void CObject::UpdateCL()
 void CObject::shedule_Update(u32 T)
 {
 	// consistency check
-	// Msg ("-SUB-:[%x][%s] CObject::shedule_Update",dynamic_cast<void*>(this),*cName());
+	// Msg ("-SUB-:[%x][%s] CObject::shedule_Update",fast_dynamic_cast<void*>(this),*cName());
 	ISheduled::shedule_Update(T);
 	spatial_update(base_spu_epsP * 1, base_spu_epsR * 1);
 

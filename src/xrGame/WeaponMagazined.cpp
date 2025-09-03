@@ -30,8 +30,7 @@
 extern ENGINE_API bool g_dedicated_server;
 ENGINE_API extern float psHUD_FOV_def;
 
-float g_gunsnd_indoor = 0.f;
-float g_gunsnd_indoor_volume = 1.f;
+BOOL g_auto_reload = FALSE;
 
 CUIXml* pWpnScopeXml = NULL;
 
@@ -72,9 +71,7 @@ CWeaponMagazined::~CWeaponMagazined()
 	}
 
 	// sounds
-	auto I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
-	if (I != Device.seqParallel.end())
-		Device.seqParallel.erase(I);
+	Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
 }
 
 void CWeaponMagazined::net_Destroy()
@@ -112,7 +109,6 @@ void CWeaponMagazined::Load(LPCSTR section)
 	m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
 	if (WeaponSoundExist(section, "snd_shoot_actor"))
 		m_sounds.LoadSound(section, "snd_shoot_actor", "sndShotActor", false, m_eSoundShot);
-
 	//-Alundaio
 	// Cyclic fire sounds
 	if (WeaponSoundExist(section, "snd_shoot_actor_first"))
@@ -123,18 +119,6 @@ void CWeaponMagazined::Load(LPCSTR section)
 		m_sounds.LoadSound(section, "snd_shot_misfire", "sndShotMisfire", false, m_eSoundShot);
 	if (WeaponSoundExist(section, "snd_shot_misfire_actor"))
 		m_sounds.LoadSound(section, "snd_shot_misfire_actor", "sndShotMisfireActor", false, m_eSoundShot);
-
-	// Indoor
-	if (WeaponSoundExist(section, "snd_shoot_indoor"))
-		m_sounds.LoadSound(section, "snd_shoot_indoor", "sndShotIndoor", false, m_eSoundShot);
-	if (WeaponSoundExist(section, "snd_shoot_actor_indoor"))
-		m_sounds.LoadSound(section, "snd_shoot_actor_indoor", "sndShotActorIndoor", false, m_eSoundShot);
-	if (WeaponSoundExist(section, "snd_shoot_actor_first_indoor"))
-		m_sounds.LoadSound(section, "snd_shoot_actor_first_indoor", "sndShotActorFirstIndoor", false, m_eSoundShot);
-	if (WeaponSoundExist(section, "snd_shot_misfire_indoor"))
-		m_sounds.LoadSound(section, "snd_shot_misfire_indoor", "sndShotMisfireIndoor", false, m_eSoundShot);
-	if (WeaponSoundExist(section, "snd_shot_misfire_actor_indoor"))
-		m_sounds.LoadSound(section, "snd_shot_misfire_actor_indoor", "sndShotMisfireActorIndoor", false, m_eSoundShot);
 
 	m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", true, m_eSoundEmptyClick);
 	m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
@@ -189,22 +173,7 @@ void CWeaponMagazined::Load(LPCSTR section)
 			m_sounds.LoadSound(section, "snd_silncer_shot_misfire", "sndSilencerShotMisfire", false, m_eSoundShot);
 		if (WeaponSoundExist(section, "snd_silncer_shot_misfire_actor"))
 			m_sounds.LoadSound(section, "snd_silncer_shot_misfire_actor", "sndSilencerShotMisfireActor", false, m_eSoundShot);
-
-		// Indoor
-		if (WeaponSoundExist(section, "snd_silncer_shot_indoor")) {
-			m_sounds.LoadSound(section, "snd_silncer_shot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
-		} else if (WeaponSoundExist(section, "snd_silncer_shoot_indoor")) {
-			m_sounds.LoadSound(section, "snd_silncer_shoot_indoor", "sndSilencerShotIndoor", false, m_eSoundShot);
-		} // Change section name from "shoot" to "shot" for consistency while keeping the old one for compatibility
 		
-		if (WeaponSoundExist(section, "snd_silncer_shot_actor_indoor"))
-			m_sounds.LoadSound(section, "snd_silncer_shot_actor_indoor", "sndSilencerShotActorIndoor", false, m_eSoundShot);
-		if (WeaponSoundExist(section, "snd_silncer_shoot_actor_first_indoor"))
-			m_sounds.LoadSound(section, "snd_silncer_shoot_actor_first_indoor", "sndSilencerShotActorFirstIndoor", false, m_eSoundShot);
-		if (WeaponSoundExist(section, "snd_silncer_shot_misfire_indoor"))
-			m_sounds.LoadSound(section, "snd_silncer_shot_misfire_indoor", "sndSilencerShotMisfireIndoor", false, m_eSoundShot);
-		if (WeaponSoundExist(section, "snd_silncer_shot_misfire_actor_indoor"))
-			m_sounds.LoadSound(section, "snd_silncer_shot_misfire_actor_indoor", "sndSilencerShotMisfireActorIndoor", false, m_eSoundShot);
 	}
 
 	m_iBaseDispersionedBulletsCount = READ_IF_EXISTS(pSettings, r_u8, section, "base_dispersioned_bullets_count", 0);
@@ -310,11 +279,14 @@ void CWeaponMagazined::FireEnd()
 {
 	inherited::FireEnd();
 
-	/* Alundaio: Removed auto-reload since it's widely asked by just about everyone who is a gun whore
-    CActor	*actor = smart_cast<CActor*>(H_Parent());
-    if (m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
-        Reload();
-	*/
+	// Alundaio: Removed auto-reload since it's widely asked by just about everyone who is a gun whore
+	// Lander: Reinstated as a cvar
+	if (g_auto_reload)
+	{
+		CActor	*actor = smart_cast<CActor*>(H_Parent());
+		if (m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
+			Reload();
+	}
 }
 
 void CWeaponMagazined::Reload()
@@ -720,50 +692,8 @@ BOOL mt_UpdateWeaponSounds = TRUE;
 void CWeaponMagazined::UpdateSoundsPositionsImpl()
 {
 	PROF_EVENT();
-
 	auto& P = get_LastFP();
-	m_sounds.SetPosition("sndShow", P);
-	m_sounds.SetPosition("sndHide", P);
-	m_sounds.SetPosition("sndReload", P);
-
-	// New Sounds
-	if (m_sounds.FindSoundItem("sndReloadEmpty", false))
-		m_sounds.SetPosition("sndReloadEmpty", P);
-	if (m_sounds.FindSoundItem("sndReloadMisfire", false))
-		m_sounds.SetPosition("sndReloadMisfire", P);
-	if (m_sounds.FindSoundItem("sndReloadActor", false))
-		m_sounds.SetPosition("sndReloadActor", P);
-	if (m_sounds.FindSoundItem("sndReloadEmptyActor", false))
-		m_sounds.SetPosition("sndReloadEmptyActor", P);
-	if (m_sounds.FindSoundItem("sndReloadMisfireActor", false))
-		m_sounds.SetPosition("sndReloadMisfireActor", P);
-	if (m_sounds.FindSoundItem("sndEmptyClickActor", false))
-		m_sounds.SetPosition("sndEmptyClickActor", P);
-	if (m_sounds.FindSoundItem("sndShowActor", false))
-		m_sounds.SetPosition("sndShowActor", P);
-	if (m_sounds.FindSoundItem("sndHideActor", false))
-		m_sounds.SetPosition("sndHideActor", P);
-	if (m_sounds.FindSoundItem("sndClickMisfire", false))
-		m_sounds.SetPosition("sndClickMisfire", P);
-	if (m_sounds.FindSoundItem("sndClickMisfireActor", false))
-		m_sounds.SetPosition("sndClickMisfireActor", P);
-	if (m_sounds.FindSoundItem("sndShotMisfire", false))
-		m_sounds.SetPosition("sndShotMisfire", P);
-	if (m_sounds.FindSoundItem("sndShotMisfireActor", false))
-		m_sounds.SetPosition("sndShotMisfireActor", P);
-	if (m_sounds.FindSoundItem("sndShotActorFirst", false))
-		m_sounds.SetPosition("sndShotActorFirst", P);
-	// Indoors
-	if (m_sounds.FindSoundItem("sndShotIndoor", false))
-		m_sounds.SetPosition("sndShotIndoor", P);
-	if (m_sounds.FindSoundItem("sndShotActorIndoor", false))
-		m_sounds.SetPosition("sndShotActorIndoor", P);
-	if (m_sounds.FindSoundItem("sndShotActorFirstIndoor", false))
-		m_sounds.SetPosition("sndShotActorFirstIndoor", P);
-	if (m_sounds.FindSoundItem("sndShotMisfireIndoor", false))
-		m_sounds.SetPosition("sndShotMisfireIndoor", P);
-	if (m_sounds.FindSoundItem("sndShotMisfireActorIndoor", false))
-		m_sounds.SetPosition("sndShotMisfireActorIndoor", P);
+	m_sounds.UpdateAllSoundsPositions(P);
 }
 
 void CWeaponMagazined::UpdateSoundsPositions()
@@ -918,51 +848,6 @@ void CWeaponMagazined::PlaySoundShot()
 {
 	if (ParentIsActor())
 	{
-		// INDOOR
-		if (g_gunsnd_indoor>0.f)
-		{	
-			if (bMisfire)
-			{
-				string128 sndNameMisfireActorIndoor;
-				strconcat(sizeof(sndNameMisfireActorIndoor), sndNameMisfireActorIndoor, m_sSndShotCurrent.c_str(), "MisfireActorIndoor");
-				if (m_sounds.FindSoundItem(sndNameMisfireActorIndoor, false))
-				{
-					m_sounds.PlaySound(sndNameMisfireActorIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor_volume);
-					return;
-				}
-			}
-
-			string128 sndNameActorFirstIndoor;
-			strconcat(sizeof(sndNameActorFirstIndoor), sndNameActorFirstIndoor, m_sSndShotCurrent.c_str(), "ActorFirstIndoor");
-			if (m_iShotNum == 1 && m_sounds.FindSoundItem(sndNameActorFirstIndoor, false))
-			{
-				m_sounds.PlaySound(sndNameActorFirstIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor * g_gunsnd_indoor_volume);
-
-				string128 sndNameFirst;
-				strconcat(sizeof(sndNameFirst), sndNameFirst, m_sSndShotCurrent.c_str(), "ActorFirst");
-				if (m_sounds.FindSoundItem(sndNameFirst, false) && g_gunsnd_indoor < 1.f)
-				{
-					m_sounds.PlaySound(sndNameFirst, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
-				}
-				return;
-			}
-
-			string128 sndNameActorIndoor;
-			strconcat(sizeof(sndNameActorIndoor), sndNameActorIndoor, m_sSndShotCurrent.c_str(), "ActorIndoor");
-			if (m_sounds.FindSoundItem(sndNameActorIndoor, false))
-			{	
-				m_sounds.PlaySound(sndNameActorIndoor, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, g_gunsnd_indoor * g_gunsnd_indoor_volume);
-
-				string128 sndName;
-				strconcat(sizeof(sndName), sndName, m_sSndShotCurrent.c_str(), "Actor");
-				if (m_sounds.FindSoundItem(sndName, false) && g_gunsnd_indoor < 1.f)
-				{
-					m_sounds.PlaySound(sndName, get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1, 1.f - g_gunsnd_indoor);
-				}
-				return;
-			}
-		}
-
 		if (bMisfire)
 		{
 			string128 sndNameMisfire;

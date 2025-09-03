@@ -30,6 +30,7 @@ public:
 #ifdef DEBUG
 	virtual shared_str	_BCL	getDebugName() = 0;
 #endif
+	virtual u32 _BCL getID() { return 1; }
 	virtual LPCSTR _BCL getDebugShader() { return nullptr; }
 	virtual LPCSTR _BCL getDebugTexture() { return nullptr; }
 	
@@ -37,6 +38,7 @@ public:
 	virtual LPCSTR _BCL getDebugTextureDef() { return nullptr; }
 
 	virtual xr_vector<IRenderVisual*>* get_children() { return nullptr; };
+	virtual xr_vector<IRenderVisual*>* get_children_invisible() { return nullptr; };
 
 	virtual void SetShaderTexture(LPCSTR shader, LPCSTR texture) {};
 	virtual void ResetShaderTexture() {};

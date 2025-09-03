@@ -49,7 +49,7 @@ public:
 	void dump();
 	void dump(IWriter* W);
 	void verify();
-	u32 stat_economy();
+	u32 stat_economy(u32& count);
 #ifdef PROFILE_CRITICAL_SECTIONS
     str_container ():cs(MUTEX_PROFILE_ID(str_container)) {}
 #endif // PROFILE_CRITICAL_SECTIONS
@@ -195,6 +195,67 @@ IC void xr_strlwr(shared_str& src)
 		src = lp;
 		xr_free(lp);
 	}
+}
+
+IC bool IsUTF8(const char* string)
+{
+	if (!string)
+		return true;
+
+	const unsigned char* bytes = (const unsigned char*)string;
+	int num;
+	while (*bytes != 0x00)
+	{
+		if ((*bytes & 0x80) == 0x00)
+		{
+			// U+0000 to U+007F
+			num = 1;
+		}
+		else if ((*bytes & 0xE0) == 0xC0)
+		{
+			// U+0080 to U+07FF
+			num = 2;
+		}
+		else if ((*bytes & 0xF0) == 0xE0)
+		{
+			// U+0800 to U+FFFF
+			num = 3;
+		}
+		else if ((*bytes & 0xF8) == 0xF0)
+		{
+			// U+10000 to U+10FFFF
+			num = 4;
+		}
+		else
+			return false;
+		bytes += 1;
+		for (int i = 1; i < num; ++i)
+		{
+			if ((*bytes & 0xC0) != 0x80)
+				return false;
+			bytes += 1;
+		}
+	}
+	return true;
+}
+
+IC xr_string UTF8_to_CP1251(xr_string const& utf8)
+{
+	if (!utf8.empty() && IsUTF8(utf8.data()))
+	{
+		int wchlen = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), utf8.size(), nullptr, 0);
+		if (wchlen > 0 && wchlen != 0xFFFD)
+		{
+			xr_vector<wchar_t> wbuf(wchlen);
+			MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), utf8.size(), &wbuf[0], wchlen);
+			xr_vector<char> buf(wchlen);
+			WideCharToMultiByte(1251, 0, &wbuf[0], wchlen, &buf[0], wchlen, 0, 0);
+
+			return xr_string(&buf[0], wchlen);
+		}
+	}
+
+	return utf8;
 }
 
 #pragma pack(pop)

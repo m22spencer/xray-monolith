@@ -5,6 +5,8 @@
 
 CMMSound::CMMSound()
 {
+	// Ncenka - fix for not playing random Main Menu music
+	m_random.seed(u32(CPU::QPC() & 0xffffffff));
 }
 
 CMMSound::~CMMSound()
@@ -44,7 +46,7 @@ bool CMMSound::check_file(LPCSTR fname)
 void CMMSound::whell_Play()
 {
 	if (m_whell._handle() && !m_whell._feedback())
-		m_whell.play(NULL, sm_Looped | sm_2D);
+		m_whell.play(NULL, sm_Looped | sm_Intro);
 }
 
 void CMMSound::whell_Stop()
@@ -56,7 +58,7 @@ void CMMSound::whell_Stop()
 void CMMSound::whell_Click()
 {
 	if (m_whell_click._handle())
-		m_whell_click.play(NULL, sm_2D);
+		m_whell_click.play(NULL, sm_Intro);
 }
 
 void CMMSound::whell_UpdateMoving(float frequency)
@@ -69,14 +71,16 @@ void CMMSound::music_Play()
 	if (m_play_list.empty())
 		return;
 
-	int i = Random.randI(m_play_list.size());
+	int i = 0;
+	if (m_bRandom)
+		i = m_random.randI(m_play_list.size());
 
 	string_path _path;
 	strconcat(sizeof(_path), _path, m_play_list[i].c_str(), ".ogg");
 	VERIFY(FS.exist("$game_sounds$", _path ));
 
 	m_music_stereo.create(_path, st_Music, sg_SourceType);
-	m_music_stereo.play(NULL, sm_2D);
+	m_music_stereo.play(NULL, sm_Intro);
 }
 
 void CMMSound::music_Update()

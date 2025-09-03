@@ -40,6 +40,9 @@ enum
 	STYPE_OBSTACLE = (1 << 6),
 	STYPE_SHAPE = (1 << 7),
 	STYPE_LIGHTSOURCEHEMI = (1 << 8),
+#ifdef SPATIAL_CHANGE
+	STYPE_FEELVISIONIGNORE = (1 << 9),
+#endif
 
 	STYPEFLAG_INVALIDSECTOR = (1 << 16)
 };
@@ -118,6 +121,9 @@ public:
 	virtual Feel::Sound* dcast_FeelSound() { return 0; }
 	virtual IRenderable* dcast_Renderable() { return 0; }
 	virtual IRender_Light* dcast_Light() { return 0; }
+
+	// demonized: Check if eligible for bone calc optimizations
+	virtual bool canOptimizeCalculateBones() { return true; }
 
 	ISpatial(ISpatial_DB* space);
 	virtual ~ISpatial();

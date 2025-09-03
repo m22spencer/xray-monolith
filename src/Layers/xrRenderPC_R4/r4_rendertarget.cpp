@@ -660,15 +660,12 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 		// RT Blur
 		rt_blur_h_2 = createUnique(r2_RT_blur_h_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
 		rt_blur_2 = createUnique(r2_RT_blur_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
-		rt_blur_2_zb = createUnique(r2_RT_blur_2_zb, u32(w/2), u32(h/2), D3DFMT_D24S8);
 
 		rt_blur_h_4 = createUnique(r2_RT_blur_h_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
 		rt_blur_4 = createUnique(r2_RT_blur_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
-		rt_blur_4_zb = createUnique(r2_RT_blur_4_zb, u32(w/4), u32(h/4), D3DFMT_D24S8);
 
 		rt_blur_h_8 = createUnique(r2_RT_blur_h_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
 		rt_blur_8 = createUnique(r2_RT_blur_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
-		rt_blur_8_zb = createUnique(r2_RT_blur_8_zb, u32(w/8), u32(h/8), D3DFMT_D24S8);
 
 		rt_pp_bloom = createUnique(r2_RT_pp_bloom, w, h, D3DFMT_A8R8G8B8);
 

@@ -43,6 +43,7 @@ void dxRender_Visual::Release()
 void dxRender_Visual::Load(const char* N, IReader* data, u32)
 {
 	dbg_name = N;
+	dbg_id = 1;
 	skinning = ::Render->m_skinning;
 
 	// header
@@ -164,6 +165,7 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 	PCOPY(desc);
 #endif
 	PCOPY(flags);
+	PCOPY(dbg_id);
 	PCOPY(dbg_name);
 	PCOPY(dbg_shader);
 	PCOPY(dbg_shader_def);

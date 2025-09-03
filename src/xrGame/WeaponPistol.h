@@ -11,7 +11,6 @@ public:
 
 	virtual void Load(LPCSTR section);
 
-	virtual void UpdateSoundsPositionsImpl();
 protected:
 	virtual bool AllowFireWhileWorking()
 	{

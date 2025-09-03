@@ -4,6 +4,8 @@
 using std::swap;
 
 #include <functional>
+#include <unordered_map>
+#include <unordered_set>
 #include "_type_traits.h"
 
 #ifdef __BORLANDC__
@@ -273,30 +275,38 @@ protected:
 	_C c;
 };
 
-#include <unordered_map>
-#include <unordered_set>
-
 #define USE_ROBINHOOD
+
 #ifdef USE_ROBINHOOD
-#include "robin_hood.h"
-template <typename K, class V>
-using xr_unordered_map = robin_hood::unordered_map<K, V>;
+
+#include <robin_hood/robin_hood.h>
+template <class T>
+using xr_hash = robin_hood::hash<T>;
+
+template <typename K, class V, class Hasher = xr_hash<K>>
+using xr_unordered_map = robin_hood::unordered_node_map<K, V, Hasher>;
 
 template <typename K, class V>
 using xr_pair = robin_hood::pair<K, V>;
 
-template <class T>
-using xr_unordered_set = robin_hood::unordered_set<T>;
+template <class T, class Hasher = xr_hash<T>>
+using xr_unordered_set = robin_hood::unordered_node_set<T, Hasher>;
+
 #else
-template <typename K, class V, class Hasher = std::hash<K>, class Traits = std::equal_to<K>,
+
+template <class T>
+using xr_hash = std::hash<T>;
+
+template <typename K, class V, class Hasher = xr_hash<K>, class Traits = std::equal_to<K>,
 	typename allocator = xalloc<std::pair<const K, V>>>
 using xr_unordered_map = std::unordered_map<K, V, Hasher, Traits, allocator>;
 
 template <typename K, class V>
 using xr_pair = std::pair<K, V>;
 
-template <class T>
-using xr_unordered_set = std::unordered_set<T>;
+template <class T, class Hasher = xr_hash<T>>
+using xr_unordered_set = std::unordered_set<T, Hasher>;
+
 #endif //USE_ROBINHOOD
 
 template <typename T, typename allocator = xalloc<T>>

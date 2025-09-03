@@ -29,8 +29,6 @@ public:
 	virtual float GetTransparency() { return 0.0; }		//--DSR-- HeatVision
 	virtual float GetGlowing() { return 0.0; }			//--DSR-- SilencerOverheat
 
-	// demonized: check if object is eligible for bone calc optimization
-	virtual bool canOptimizeCalculateBones() { return true; };
 };
 
 #endif // IRENDERABLE_H_INCLUDED

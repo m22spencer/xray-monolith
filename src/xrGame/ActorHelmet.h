@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
+#include <optional>
 
 struct SBoneProtections;
 
@@ -35,6 +36,9 @@ public:
 protected:
 	HitImmunity::HitTypeSVec m_HitTypeProtection;
 	SBoneProtections* m_boneProtection;
+
+	std::optional<float> m_fireWoundParam1 = std::nullopt;
+	std::optional<float> m_fireWoundParam2 = std::nullopt;
 	
 public:
 	float m_fPowerLoss;

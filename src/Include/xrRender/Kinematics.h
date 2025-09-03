@@ -10,7 +10,7 @@ class CBoneData;
 class IBoneData;
 class IKinematicsAnimated;
 class IRenderVisual;
-class IRenderable;
+class ISpatial;
 class CBoneInstance;
 struct SEnumVerticesCallback;
 
@@ -30,7 +30,11 @@ public:
 	};
 
 public:
-	IRenderable* renderableParent = nullptr;
+
+#ifdef OPTIMIZE_CALCULATE_BONES
+	ISpatial* spatialParent = nullptr;
+#endif
+
 	virtual void Bone_Calculate(CBoneData* bd, Fmatrix* parent) = 0;
 	virtual void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) = 0;
 
@@ -42,8 +46,6 @@ public:
 	virtual u16 _BCL LL_BoneID(LPCSTR B) = 0;
 	virtual u16 _BCL LL_BoneID(const shared_str& B) = 0;
 	virtual LPCSTR _BCL LL_BoneName_dbg(u16 ID) = 0;
-
-	virtual xr_vector<xr_pair<u16, shared_str>> list_bones() = 0;
 
 	virtual CInifile* _BCL LL_UserData() = 0;
 	virtual accel* LL_Bones() = 0;

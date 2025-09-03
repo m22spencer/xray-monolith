@@ -36,6 +36,7 @@ class demoplay_control;
 class demo_info;
 class CDebugRenderer;
 class DBG_ScriptObject;
+class script_attachment;
 
 extern float g_fov;
 
@@ -230,14 +231,22 @@ public:
 	};
 
 	Flags32 m_debug_render_flags;
-	xr_map<u16, DBG_ScriptObject*> m_debug_render_queue;
-	xr_map<u16, DBG_ScriptObject*>* getScriptRenderQueue() { return &m_debug_render_queue; }
+	xr_map<shared_str, DBG_ScriptObject*> m_debug_render_queue;
+	xr_map<shared_str, DBG_ScriptObject*>* getScriptRenderQueue() { return &m_debug_render_queue; }
 	void ScriptDebugRender();
 
 	virtual shared_str OpenDemoFile(const char* demo_file_name);
 	virtual void net_StartPlayDemo();
 	void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
 	void cl_Process_Spawn(NET_Packet& P);
+
+	script_attachment* add_attachment(LPCSTR name, script_attachment* att);
+	script_attachment* get_attachment(LPCSTR name);
+	void remove_child(LPCSTR name, bool destroy = false);
+	void remove_attachment(LPCSTR name) { remove_child(name, true); }
+	void remove_attachment(script_attachment* child);
+	void iterate_attachments(::luabind::functor<bool> functor);
+	xr_map<shared_str, script_attachment*>* GetAttachments() { return &m_script_attachments; }
 
 //AVO: used by SPAWN_ANTIFREEZE (by alpet)
 #ifdef SPAWN_ANTIFREEZE
@@ -335,6 +344,7 @@ public:
 
 protected:
 	CBulletManager* m_pBulletManager;
+	xr_map<shared_str, script_attachment*> m_script_attachments;
 
 public:
 	IC CBulletManager& BulletManager() { return *m_pBulletManager; }

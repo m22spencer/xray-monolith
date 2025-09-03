@@ -13,5 +13,8 @@
 #define SCOPE_PHASE_SHADOW 64
 #define SCOPE_PHASE_LENS 128
 
+// Hacky solution to fix jitter/ring around scope
+#define SCOPE_PHASE_JITTERFIX 256
+
 
 #endif

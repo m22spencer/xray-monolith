@@ -56,6 +56,8 @@
 #include "UICursor.h"
 #include "debug_renderer.h"
 #include "LevelDebugScript.h"
+#include "script_attachment_manager.h"
+#include "script_light_inline.h"
 
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
@@ -271,6 +273,7 @@ CLevel::~CLevel()
 {
 	//crash_saving::save_impl = nullptr; // CLevel not available, disable crash save
 	xr_delete(g_player_hud);
+	delete_data(m_script_attachments);
 	delete_data(hud_zones_list);
 	hud_zones_list = nullptr;
 	Msg("- Destroying level");
@@ -1070,6 +1073,7 @@ void CLevel::OnFrame()
 		else
 			m_level_sound_manager->Update();
 	}
+
 	// defer LUA-GC-STEP
 	if (!g_dedicated_server)
 	{
@@ -1085,6 +1089,9 @@ void CLevel::OnFrame()
 		pStatGraphR->AppendItem(float(m_dwRPC) * fRPC_Mult, 0xffff0000, 1);
 		pStatGraphR->AppendItem(float(m_dwRPS) * fRPS_Mult, 0xff00ff00, 0);
 	}
+
+	for (auto& pair : m_script_attachments)
+		pair.second->Update();
 }
 
 int psLUA_GCSTEP = 300;
@@ -1299,8 +1306,8 @@ void CLevel::ScriptDebugRender()
 		return;
 
 	bool hasVisibleObj = false;
-	xr_map<u16, DBG_ScriptObject*>::iterator it = m_debug_render_queue.begin();
-	xr_map<u16, DBG_ScriptObject*>::iterator it_e = m_debug_render_queue.end();
+	auto it = m_debug_render_queue.begin();
+	auto it_e = m_debug_render_queue.end();
 	for (; it != it_e; ++it)
 	{
 		DBG_ScriptObject* obj = (*it).second;
@@ -1313,6 +1320,61 @@ void CLevel::ScriptDebugRender()
 	// demonized: fix of showing console window when there are no visible gizmos 
 	if (hasVisibleObj)
 		DRender->OnFrameEnd();
+}
+
+script_attachment* CLevel::add_attachment(LPCSTR name, script_attachment* att)
+{
+	R_ASSERT(att);
+	remove_child(name, true);
+	m_script_attachments.emplace(mk_pair(name, att));
+	return att;
+}
+
+script_attachment* CLevel::get_attachment(LPCSTR name)
+{
+	if (m_script_attachments.size())
+	{
+		auto& att = m_script_attachments.find(name);
+		if (att != m_script_attachments.end())
+			return att->second;
+	}
+
+	return nullptr;
+}
+
+void CLevel::remove_child(LPCSTR name, bool destroy)
+{
+	script_attachment* attachment = get_attachment(name);
+	if (!attachment)
+		return;
+
+	if (destroy)
+		xr_delete(attachment);
+
+	m_script_attachments.erase(name);
+}
+
+void CLevel::remove_attachment(script_attachment* child)
+{
+	if (!child) return;
+	if (m_script_attachments.size())
+	{
+		script_attachment* attachment = get_attachment(child->GetName());
+		if (!attachment || attachment != child)
+			return;
+
+		remove_child(child->GetName(), true);
+	}
+}
+
+void CLevel::iterate_attachments(::luabind::functor<bool> functor)
+{
+	if (!m_script_attachments.size())
+		return;
+
+	for (auto& pair : m_script_attachments)
+		if (functor(pair.first.c_str(), pair.second) == true)
+			return;
 }
 
 void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2/**/)

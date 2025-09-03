@@ -3,6 +3,9 @@
 #include "script_game_object.h"
 #include "script_light_inline.h"
 
+#include "../xrcdb/ispatial.h"
+#include "../xrEngine/IRenderable.h"
+
 enum script_attachment_type
 {
 	eSA_HUD = 0,
@@ -42,15 +45,16 @@ struct script_attachment_bone_cb
 	~script_attachment_bone_cb() {}
 };
 
-class script_attachment
+class script_attachment :
+	public IRenderable,
+	public ISpatial
 {
 private:
 	shared_str m_name;
 
-	Fmatrix m_offset, m_transform;
+	Fmatrix m_offset;
 	Fvector m_attachment_offset[4];
 
-	IRenderVisual* m_model;
 	IKinematics* m_kinematics;
 	shared_str m_model_name;
 	shared_str m_current_motion;
@@ -72,6 +76,7 @@ private:
 	u16 m_type;
 	script_attachment* m_parent_attachment;
 	CGameObject* m_parent_object;
+	bool m_parent_level;
 	xr_map<shared_str, script_attachment*> m_children;
 	xr_map<u16, script_attachment_bone_cb*> m_bone_callbacks;
 
@@ -83,12 +88,20 @@ public:
 	script_attachment(LPCSTR name, LPCSTR model_name);
 	~script_attachment()
 	{
-		::Render->model_Delete(m_model);
-		m_model = nullptr;
+		spatial_unregister();
+		::Render->model_Delete(renderable.visual);
+		renderable.visual = nullptr;
 		delete_data(m_children);
 		delete_data(m_bone_callbacks);
 		xr_delete(m_userdata);
 	}
+
+	virtual void spatial_register();
+	virtual void spatial_unregister();
+	virtual void spatial_move();
+	virtual IRenderable* dcast_Renderable() { return this; }
+
+	virtual void renderable_Render();
 
 	void Render(IKinematics* model, Fmatrix* mat);
 	void Update();
@@ -123,6 +136,7 @@ public:
 	void SetParent(script_attachment* att);
 	void SetParent(CGameObject* obj);
 	void SetParent(CScriptGameObject* obj);
+	void SetParentLevel();
 	::luabind::object GetParent();
 
 	void SetParentBone(u16 bone_id) { m_parent_bone = bone_id; }
@@ -212,7 +226,7 @@ public:
 	void RemoveBoneCallback(u16 bone_id);
 	void RemoveBoneCallback(LPCSTR bone) { RemoveBoneCallback(bone_id(bone)); }
 
-	Fmatrix GetTransform() { return m_transform; }
+	Fmatrix GetTransform() { return renderable.xform; }
 	Fmatrix GetOffset() { return m_offset; }
 	Fvector GetCenter();
 	const Fbox& Box();

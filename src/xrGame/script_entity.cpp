@@ -202,14 +202,33 @@ CScriptEntityAction* CScriptEntity::GetCurrentAction()
 
 void __stdcall ActionCallback(IKinematics* tpKinematics)
 {
+	if (!tpKinematics)
+		return;
+
 	// sounds
 	CScriptEntity* l_tpScriptMonster = smart_cast<CScriptEntity*>(
 		(CGameObject*)(tpKinematics->GetUpdateCallbackParam()));
 	VERIFY(l_tpScriptMonster);
+
+	if (!l_tpScriptMonster)
+		return;
 	if (!l_tpScriptMonster->GetCurrentAction())
 		return;
-	l_tpScriptMonster->vfUpdateSounds();
-	l_tpScriptMonster->vfUpdateParticles();
+
+	/*l_tpScriptMonster->vfUpdateSounds();
+	l_tpScriptMonster->vfUpdateParticles();*/
+
+	// Fix crash due to lua gc in second thread
+	try
+	{
+		l_tpScriptMonster->vfUpdateSounds();
+		l_tpScriptMonster->vfUpdateParticles();
+	}
+	catch(...)
+	{
+
+	}
+	
 }
 
 void CScriptEntity::vfUpdateParticles()

@@ -338,6 +338,8 @@ void CUIActorMenu::script_register(lua_State* L)
 		.def("SetActiveDialog", &CUIPdaWnd::SetActiveDialog)
 		.def("GetActiveDialog", &CUIPdaWnd::GetActiveDialog)
 		.def("GetActiveSection", &CUIPdaWnd::GetActiveSection)
+		.def("SetPdaXml", &CUIPdaWnd::SetPdaXml)
+		.def("GetPdaXml", &CUIPdaWnd::GetPdaXml)
 		.def("GetTabControl", &CUIPdaWnd::GetTabControl),
 
 		class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
@@ -361,7 +363,12 @@ void CUIActorMenu::script_register(lua_State* L)
 		.def_readonly("m_ind_boost_weight", &CUIMainIngameWnd::m_ind_boost_weight)
 		.def_readonly("m_ind_boost_health", &CUIMainIngameWnd::m_ind_boost_health)
 		.def_readonly("m_ind_boost_power", &CUIMainIngameWnd::m_ind_boost_power)
-		.def_readonly("m_ind_boost_rad", &CUIMainIngameWnd::m_ind_boost_rad),
+		.def_readonly("m_ind_boost_rad", &CUIMainIngameWnd::m_ind_boost_rad)
+		.def("GetQuickSlotIcons", &CUIMainIngameWnd::GetQuickSlotIconsScript)
+		.def_readonly("m_QuickSlotText1", &CUIMainIngameWnd::m_QuickSlotText1)
+		.def_readonly("m_QuickSlotText2", &CUIMainIngameWnd::m_QuickSlotText2)
+		.def_readonly("m_QuickSlotText3", &CUIMainIngameWnd::m_QuickSlotText3)
+		.def_readonly("m_QuickSlotText4", &CUIMainIngameWnd::m_QuickSlotText4),
 
 		class_<CUIZoneMap>("CUIZoneMap")
 		.def(constructor<>())

@@ -118,6 +118,8 @@ extern BOOL g_ai_die_in_anomaly; //Alundaio
 
 extern BOOL g_telekinetic_objects_include_corpses; // Tosox
 
+extern BOOL binoculars_dynamic_zoom_check; //VodoXleb
+
 extern BOOL g_allow_weapon_control_inertion_factor; // momopate
 extern BOOL g_allow_outfit_control_inertion_factor;
 extern BOOL g_render_short_tracers;
@@ -151,8 +153,6 @@ extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
 extern BOOL g_freelook_while_reloading;
 extern BOOL useSeparateUBGLKeybind;
-extern float g_gunsnd_indoor;
-extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
@@ -160,6 +160,7 @@ extern BOOL fun_allowed;
 extern BOOL progressiveStaminaCost;
 extern BOOL NPCsLookAtActor;
 extern float NPCsLookAtActorMinDistance;
+extern BOOL interruptFireOnAimToggle;
 
 extern BOOL mt_UpdateWeaponSounds;
 
@@ -169,6 +170,7 @@ extern BOOL spawn_antifreeze;
 extern BOOL spawn_antifreeze_debug;
 
 extern float IK_CALC_DIST;
+extern float IK_CALC_SSA;
 extern float IK_ALWAYS_CALC_DIST;
 extern BOOL r_optimize_calculate_bones;
 
@@ -232,6 +234,13 @@ extern float wallmark_range_static;
 extern float wallmark_range_skeleton;
 
 ENGINE_API extern float g_console_sensitive;
+
+extern BOOL g_auto_reload;
+extern BOOL g_fire_reloads_ubgl;
+extern BOOL g_launcher_dynamic_range;
+extern BOOL g_launcher_dynamic_range_zoom;
+extern BOOL g_launcher_dynamic_range_mode;
+extern float g_launcher_dynamic_range_max;
 
 u32 g_dead_body_collision = 1;
 
@@ -306,7 +315,8 @@ static void full_memory_stats()
 	u32		_game_lua = game_lua_memory_usage();
 	u32		_render = ::Render->memory_usage();
 #endif // SEVERAL_ALLOCATORS
-	int _eco_strings = (int)g_pStringContainer->stat_economy();
+    u32 _eco_strings_count = 0;
+	int _eco_strings = (int)g_pStringContainer->stat_economy(_eco_strings_count);
 	int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
 	u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
 
@@ -324,7 +334,8 @@ static void full_memory_stats()
 	Msg("* [x-ray]: process heap[%u K], game lua[%d K], render[%d K]", _process_heap / 1024, _game_lua / 1024, _render / 1024);
 #endif // SEVERAL_ALLOCATORS
 
-	Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
+	Msg("* [x-ray]: shared strings: memory[%ld K], count[%lu]", _eco_strings / 1024, _eco_strings_count);
+	Msg("* [x-ray]: shared memory: memory[%ld K]", _eco_smem);
 
 #ifdef FS_DEBUG
 	Msg("* [x-ray]: file mapping: memory[%d K], count[%d]", g_file_mapped_memory / 1024, g_file_mapped_count);
@@ -2576,6 +2587,13 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
 
+	CMD4(CCC_Integer, "g_auto_reload", &g_auto_reload, 0, 1);
+	CMD4(CCC_Integer, "g_fire_reloads_ubgl", &g_fire_reloads_ubgl, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range", &g_launcher_dynamic_range, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_zoom", &g_launcher_dynamic_range_zoom, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_mode", &g_launcher_dynamic_range_mode, 0, 1);
+	CMD4(CCC_Float, "g_launcher_dynamic_range_max", &g_launcher_dynamic_range_max, 0.f, 1000.f);
+
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psCrosshair_Flags, CROSSHAIR_SHOW_ALWAYS);
 	CMD3(CCC_Mask, "g_crosshair_independent", &psCrosshair_Flags, CROSSHAIR_INDEPENDENT);
 	
@@ -2813,6 +2831,8 @@ void CCC_RegisterCommands()
 
 	CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
 
+	CMD4(CCC_Integer, "binoculars_dynamic_zoom_check", &binoculars_dynamic_zoom_check, 0, 1); //VodoXleb
+
 	CMD4(CCC_Integer, "pseudogiant_can_damage_objects_on_stomp", &pseudogiantCanDamageObjects, 0, 1);
 
 	CMD4(CCC_Integer, "telekinetic_objects_include_corpses", &g_telekinetic_objects_include_corpses, 0, 1); // Tosox
@@ -2839,12 +2859,14 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "spawn_antifreeze_debug", &spawn_antifreeze_debug, 0, 1);
 
 	CMD4(CCC_Float, "ik_calc_dist", &IK_CALC_DIST, 50, 150);
+	CMD4(CCC_Float, "ik_calc_ssa", &IK_CALC_SSA, 0.001f, 0.02f);
 	CMD4(CCC_Float, "ik_always_calc_dist", &IK_ALWAYS_CALC_DIST, 10, 50);
 	CMD4(CCC_Integer, "r__optimize_calculate_bones", &r_optimize_calculate_bones, 0, 1);
 
 	CMD4(CCC_Integer, "g_progressive_stamina_cost", &progressiveStaminaCost, 0, 1);
 	CMD4(CCC_Integer, "g_npcs_look_at_actor", &NPCsLookAtActor, 0, 1);
 	CMD4(CCC_Float, "g_npcs_look_at_actor_min_distance", &NPCsLookAtActorMinDistance, 1.f, 8.f);
+	CMD4(CCC_Integer, "g_interrupt_fire_on_aim_toggle", &interruptFireOnAimToggle, 0, 1);
 
 	// demonized: Restores fun physics bugs like lift
 	CMD4(CCC_Integer, "fun_allowed", &fun_allowed, 0, 1);
@@ -2980,9 +3002,6 @@ void CCC_RegisterCommands()
 
 	// Allows freelook during reload animations
 	CMD4(CCC_Integer, "freelook_while_reloading", &g_freelook_while_reloading, 0, 1);
-	// Indoor weapon sounds
-	CMD4(CCC_Float, "g_gunsnd_indoor", &g_gunsnd_indoor, 0.0f, 1.0f);
-	CMD4(CCC_Float, "g_gunsnd_indoor_volume", &g_gunsnd_indoor_volume, 0.0f, 5.0f);
 
 	// Draw pickup item names
 	CMD4(CCC_Integer, "g_draw_pickup_item_names", &drawPickupItemNames, 0, 1);

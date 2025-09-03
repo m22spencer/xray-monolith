@@ -1,11 +1,7 @@
 #ifndef xr_iniH
 #define xr_iniH
 
-#include "fastdelegate.h"
-
-#ifdef USE_ROBINHOOD
-#include "robin_hood.h"
-#endif
+#include <fastdelegate/fastdelegate.h>
 
 // refs
 class CInifile;
@@ -64,11 +60,6 @@ public:
 private:
 	string_path m_file_name;
 	Root DATA;
-
-	// demonized: cache read and written ini values
-	xr_unordered_map<std::string, xr_unordered_map<std::string, shared_str>> m_cache;
-	void cacheValue(LPCSTR S, LPCSTR L, shared_str& V);
-
 	void Load(IReader* F, LPCSTR path
 #ifndef _EDITOR
 	          , allow_include_func_t allow_include_func = NULL

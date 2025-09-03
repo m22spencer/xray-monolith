@@ -48,11 +48,14 @@ public:
 #ifdef _EDITOR
     ogf_desc					desc		;
 #endif
+	u32							dbg_id		;
 	shared_str					dbg_name	;
 	shared_str					dbg_shader	;
 	shared_str					dbg_texture	;
 	shared_str					dbg_shader_def	;
 	shared_str					dbg_texture_def	;
+	virtual void				setID(u32 id) { dbg_id = id; }
+	virtual u32 _BCL			getID() { return dbg_id; }
 	virtual shared_str	_BCL	getDebugName() { return dbg_name; }
 	virtual LPCSTR _BCL			getDebugShader() { return *dbg_shader; }
 	virtual LPCSTR _BCL			getDebugTexture() { return *dbg_texture; }
