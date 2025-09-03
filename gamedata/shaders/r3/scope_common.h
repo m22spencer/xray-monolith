@@ -182,12 +182,12 @@ Scope new_Scope(v_out v) {
     float tc_multiplier = texture_delta / screen_delta;
 
 	{
-		float mag = curMag();
+		float mag = curMag() / minMag();
 		// COMPUTE FFP
 		float2 ffp_tc = world_to_corrected_tc(v, scope_w_ffp);
 		float2 ffp_offset_tc = eye_tc - ffp_tc;
 
-		s.ffp = (v.tc0 + ffp_offset_tc*tc_multiplier - 0.5) / (mag*0.5) + 0.5 ;
+		s.ffp = (v.tc0 + ffp_offset_tc*tc_multiplier - 0.5) / mag + 0.5 ;
 	}
 
 	{
