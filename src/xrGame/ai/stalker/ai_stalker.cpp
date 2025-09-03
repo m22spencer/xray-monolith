@@ -1637,7 +1637,9 @@ void CAI_Stalker::BoneCallback(CBoneInstance* B)
 {
 	CAI_Stalker* self = static_cast<CAI_Stalker*>(B->callback_param());
 	self->LookAtActor(B);
-	R_ASSERT2(_valid(B->mTransform), "CAI_Stalker::BoneCallback");
+	
+	if (!_valid(B->mTransform))
+		B->mTransform.identity();
 }
 
 void CAI_Stalker::AdjustHeadOrientation(float targetPitch, float targetYaw, float targetRoll)
