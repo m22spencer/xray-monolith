@@ -132,6 +132,8 @@ private:
     u32 dTimeFSeen;
     u32 dTimeNfSeen;
 
+	bool INVALID_HEAD_BONE = false;
+
 private:
 	float m_fRankDisperison;
 	float m_fRankVisibility;

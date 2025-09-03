@@ -1637,9 +1637,19 @@ void CAI_Stalker::BoneCallback(CBoneInstance* B)
 {
 	CAI_Stalker* self = static_cast<CAI_Stalker*>(B->callback_param());
 	self->LookAtActor(B);
-	
-	if (!_valid(B->mTransform))
-		B->mTransform.identity();
+
+	if (!_valid(B->mTransform)) {
+		Msg("!ERROR: CAI_Stalker::BoneCallback, actor[%d] %s", self->ID(), self->Name());
+
+		// Prevent the invalid matrix from being used until destroyed
+		B->mTransform.identity();       
+		
+		if (!self->INVALID_HEAD_BONE) {
+			// To be safe, kill the actor as soon as possible
+			Level().Objects.register_object_to_destroy(self);
+			self->INVALID_HEAD_BONE = true;
+		}
+	}
 }
 
 void CAI_Stalker::AdjustHeadOrientation(float targetPitch, float targetYaw, float targetRoll)
