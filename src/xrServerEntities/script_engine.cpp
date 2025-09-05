@@ -143,10 +143,10 @@ CScriptEngine::CScriptEngine()
 
 #ifdef USE_DEBUGGER
 #	ifndef USE_LUA_STUDIO
-    m_scriptDebugger	= NULL;
-    restartDebugger		();
+	m_scriptDebugger = NULL;
+	restartDebugger();
 #	else //USE_LUA_STUDIO
-    m_lua_studio_world	= 0;
+	m_lua_studio_world = 0;
 #	endif //!USE_LUA_STUDIO
 #endif
 }

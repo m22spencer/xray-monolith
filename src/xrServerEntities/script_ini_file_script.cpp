@@ -186,7 +186,7 @@ void CScriptIniFile::script_register(lua_State* L)
 		.def("r_float", &CScriptIniFile::r_float)
 		.def("r_vector", &CScriptIniFile::r_fvector3)
 		.def("close", &CScriptIniFile::close)
-		.def("r_line", &::r_line, out_value(_4) + out_value(_5))
+		.def("r_line", &::r_line, out_value<4>() + out_value<5>())
 
 		// demonized: new exports
 		.def("get_filename", &CScriptIniFile::fname)
@@ -204,7 +204,7 @@ void CScriptIniFile::script_register(lua_State* L)
 #ifdef XRGAME_EXPORTS
 		def("game_ini", &get_game_ini),
 #endif // XRGAME_EXPORTS
-		def("create_ini_file", &create_ini_file, adopt(result)),
+		def("create_ini_file", &create_ini_file, adopt<result>()),
 
 		// demonized: get modded exes version
 		def("get_modded_exes_version", &get_modded_exes_version),

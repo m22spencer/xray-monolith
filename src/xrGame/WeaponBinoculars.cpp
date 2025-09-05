@@ -187,7 +187,7 @@ void CWeaponBinoculars::ZoomDec()
 		GetZoomData(m_zoom_params.m_fScopeZoomFactor, m_zoom_params.m_fZoomStepCount, m_zoom_params.m_fMinBaseZoomFactor, delta, min_zoom_factor);
 	}
 
-	float f = useNewZoomDeltaAlgorithm ? GetZoomFactor() / max(delta, 0.001f) : GetZoomFactor() + delta;
+	float f = useNewZoomDeltaAlgorithm ? GetZoomFactor() / std::max(delta, 0.001f) : GetZoomFactor() + delta;
 	clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
 	SetZoomFactor(f);
     czoom = f;

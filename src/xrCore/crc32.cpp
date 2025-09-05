@@ -39,7 +39,7 @@ void crc32_init()
 	}
 }
 
-u32 crc32(const void* P, u32 len)
+XRCORE_API u32 crc32(const void* P, u32 len)
 {
 	if (!crc32_ready)
 	{
@@ -69,7 +69,7 @@ u32 crc32(const void* P, u32 len)
 	return ulCRC ^ 0xffffffff;
 }
 
-u32 crc32(const void* P, u32 len, u32 starting_crc)
+XRCORE_API u32 crc32(const void* P, u32 len, u32 starting_crc)
 {
 	if (!crc32_ready)
 	{
@@ -86,7 +86,7 @@ u32 crc32(const void* P, u32 len, u32 starting_crc)
 	return ulCRC ^ 0xffffffff;
 }
 
-u32 path_crc32(const char* path, u32 len)
+XRCORE_API u32 path_crc32(const char* path, u32 len)
 {
 	if (!crc32_ready)
 	{
