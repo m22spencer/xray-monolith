@@ -1637,18 +1637,10 @@ void CAI_Stalker::BoneCallback(CBoneInstance* B)
 {
 	CAI_Stalker* self = static_cast<CAI_Stalker*>(B->callback_param());
 	self->LookAtActor(B);
-
+	
 	if (!_valid(B->mTransform)) {
-		Msg("!ERROR: CAI_Stalker::BoneCallback, actor[%d] %s", self->ID(), self->Name());
-
-		// Prevent the invalid matrix from being used until destroyed
-		B->mTransform.identity();       
-		
-		if (!self->INVALID_HEAD_BONE) {
-			// To be safe, kill the actor as soon as possible
-			Level().Objects.register_object_to_destroy(self);
-			self->INVALID_HEAD_BONE = true;
-		}
+		Msg("![CAI_Stalker::BoneCallback] invalid mTransform for %s, section %s, id %d", self->cName().c_str(), self->cNameSect().c_str(), self->ID());
+		R_ASSERT(false);
 	}
 }
 
