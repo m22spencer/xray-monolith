@@ -252,10 +252,7 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 
 void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
-	//LVutner: Sometimes CBuffers would be either empty or corrupted.
-	//That often happens with multipass CS setups. Needs more testing.
-	if(strstr(Core.Params, "-clear_cs_constants"))
-		ctable.clear();
+	ctable.clear();
 
 	dest.cs = DEV->_CreateCS(cs);
 
