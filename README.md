@@ -170,6 +170,15 @@ How to compile exes:
 7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.09.06**
+* Replaced luabind with non-Boost version (https://github.com/ixray-team/ixray-1.6-stcop/commit/2f61f5f781130468c945720b76d23ce4bbea95b1)
+* Disable `std::terminate` in luabind (https://github.com/ixray-team/ixray-1.6-stcop/commit/723fb65a8b9ebb89dda8f03cbb4b1bebceabacdc)
+* Removed Boost library
+* Added nullptr check in `CMonsterCorpseMemory::add_corpse`
+* LVutner:
+  * ADD: [Render] Added missing s_position samplers (https://github.com/themrdemonized/xray-monolith/pull/358)
+  * UPD: [Render] r_ComputePass fix (https://github.com/themrdemonized/xray-monolith/pull/359)
+
 **2025.08.30**
 * MFB: Smart covers now have fixed enter min/max distances (https://github.com/themrdemonized/xray-monolith/pull/352)
 * Lucy: Level Script Attachments (https://github.com/themrdemonized/xray-monolith/pull/353)
