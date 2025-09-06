@@ -9,13 +9,13 @@
 #ifndef RAT_STATE_MANAGER_H_INCLUDED
 #define RAT_STATE_MANAGER_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+
 #include "associative_vector.h"
 
 class rat_state_base;
 class CAI_Rat;
 
-class rat_state_manager : private boost::noncopyable
+class rat_state_manager : private xray::noncopyable
 {
 private:
 	typedef u32 state_id_type;

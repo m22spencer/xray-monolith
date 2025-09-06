@@ -19,7 +19,7 @@ namespace steering_behaviour
 	class alignment :
 		public base,
 		private debug::make_final<alignment>,
-		private boost::noncopyable
+		private xray::noncopyable
 	{
 	public:
 		alignment(CAI_Rat const* object);

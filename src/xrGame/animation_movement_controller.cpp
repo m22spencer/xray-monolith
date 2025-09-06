@@ -7,7 +7,7 @@
 #ifdef	 DEBUG
 #include "phdebug.h"
 #endif
-#include <boost/noncopyable.hpp>
+
 void DBG_DrawBones(const Fmatrix& xform, IKinematics* K);
 #ifdef	 DEBUG
 BOOL	dbg_draw_animation_movement_controller  = FALSE;
@@ -254,7 +254,7 @@ void animation_movement_controller::OnFrame()
 		{
 			m_control_blend->timeCurrent = 0;
 	
-			struct scb : public IterateBlendsCallback, private boost::noncopyable
+			struct scb : public IterateBlendsCallback, private xray::noncopyable
 			{
 				const CBlend &m_control_blend;
 				scb( const CBlend &B ): m_control_blend( B ){}

@@ -139,9 +139,9 @@ void CFPCamEffector::ema(Fvector &current, Fvector &target, unsigned int steps) 
 		return;
 	}
 
-	current.x = current.x + min(1.f, smoothing_alpha * (delta / steps)) * (target.x - current.x);
-	current.y = current.y + min(1.f, smoothing_alpha * (delta / steps)) * (target.y - current.y);
-	current.z = current.z + min(1.f, smoothing_alpha * (delta / steps)) * (target.z - current.z);
+	current.x = current.x + std::min(1.f, smoothing_alpha * (delta / steps)) * (target.x - current.x);
+	current.y = current.y + std::min(1.f, smoothing_alpha * (delta / steps)) * (target.y - current.y);
+	current.z = current.z + std::min(1.f, smoothing_alpha * (delta / steps)) * (target.z - current.z);
 }
 
 BOOL CFPCamEffector::ProcessCam(SCamEffectorInfo& info)

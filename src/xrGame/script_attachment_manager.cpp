@@ -109,7 +109,7 @@ void script_attachment::spatial_register()
 {
 	renderable.xform.transform_tiny(spatial.sphere.P, renderable.visual ? renderable.visual->getVisData().sphere.P : Fvector{ 0,0,0 });
 	Fvector& scale = m_attachment_offset[2];
-	spatial.sphere.R = renderable.visual ? renderable.visual->getVisData().sphere.R * max(scale.x, max(scale.y, scale.z)) : 0.f;
+	spatial.sphere.R = renderable.visual ? renderable.visual->getVisData().sphere.R * std::max(scale.x, std::max(scale.y, scale.z)) : 0.f;
 	ISpatial::spatial_register();
 }
 
@@ -123,7 +123,7 @@ void script_attachment::spatial_move()
 	if (!spatial.node_ptr) return;
 	renderable.xform.transform_tiny(spatial.sphere.P, renderable.visual->getVisData().sphere.P);
 	Fvector& scale = m_attachment_offset[2];
-	spatial.sphere.R = renderable.visual->getVisData().sphere.R * max(scale.x, max(scale.y, scale.z));
+	spatial.sphere.R = renderable.visual->getVisData().sphere.R * std::max(scale.x, std::max(scale.y, scale.z));
 	ISpatial::spatial_move();
 }
 

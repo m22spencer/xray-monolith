@@ -3,7 +3,7 @@
 #include "Physics.h"
 #include "phupdateobject.h"
 #include "IPHWorld.h"
-#include <boost/noncopyable.hpp>
+#include "../xrCore/_noncopyable.h"
 #include "physics_scripted.h"
 #include "../xrEngine/pure.h"
 // refs
@@ -34,7 +34,7 @@ class CObjectList;
 class CPHWorld : public pureFrame,
                  public IPHWorld,
                  public cphysics_scripted,
-                 private boost::noncopyable
+                 private xray::noncopyable
 #ifdef DEBUG
 					, public pureRender
 #endif

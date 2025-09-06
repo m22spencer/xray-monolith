@@ -1,6 +1,8 @@
-#ifndef xrSyncronizeH
-#define xrSyncronizeH
+#pragma once
 
+#include <mutex>
+#include <shared_mutex>
+#include "_noncopyable.h"
 #if 0//def DEBUG
 # define PROFILE_CRITICAL_SECTIONS
 #endif // DEBUG
@@ -18,7 +20,7 @@ void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 #endif // PROFILE_CRITICAL_SECTIONS
 
 // Desc: Simple wrapper for critical section
-class XRCORE_API xrCriticalSection
+class XRCORE_API xrCriticalSection : xray::noncopyable
 {
 public:
 	class XRCORE_API raii
@@ -32,9 +34,6 @@ public:
 	};
 
 private:
-	xrCriticalSection(xrCriticalSection const& copy)
-	{
-	}; //noncopyable
 	void* pmutex;
 #ifdef PROFILE_CRITICAL_SECTIONS
     LPCSTR m_id;
@@ -55,7 +54,7 @@ public:
 	bool IsValid() { return pmutex != nullptr; }
 };
 
-class xrCriticalSectionGuard
+class xrCriticalSectionGuard : xray::noncopyable
 {
 private:
 	xrCriticalSection* critical_section;
@@ -72,11 +71,7 @@ public:
 	xrCriticalSectionGuard(xrCriticalSection* cs) : critical_section(cs) { Enter(); }
 	xrCriticalSectionGuard(xrCriticalSection& cs) : critical_section(&cs) { Enter(); }
 
-	xrCriticalSectionGuard(xrCriticalSectionGuard const& copy) = delete; //noncopyable
-	xrCriticalSectionGuard& operator=(const xrCriticalSectionGuard& Other) = delete;
-	xrCriticalSectionGuard& operator=(xrCriticalSectionGuard&& Other) = delete;
-
 	~xrCriticalSectionGuard() { Leave(); }
 };
 
-#endif // xrSyncronizeH
+

@@ -4,7 +4,7 @@
 
 class Lock;
 
-class ScopeLock : Noncopyable
+class ScopeLock : xray::noncopyable
 {
 	Lock* syncObject;
 

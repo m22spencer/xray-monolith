@@ -1,14 +1,6 @@
 #pragma once
 #include <atomic>
 
-class Noncopyable
-{
-public:
-	Noncopyable() = default;
-	Noncopyable(Noncopyable&) = delete;
-	Noncopyable& operator=(Noncopyable&) = delete;
-};
-
 #ifdef CONFIG_PROFILE_LOCKS
 typedef void(*add_profile_portion_callback)(LPCSTR id, const u64& time);
 void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
@@ -17,7 +9,7 @@ void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 #define MUTEX_PROFILE_ID(a) MACRO_TO_STRING(CONCATENIZE(MUTEX_PROFILE_PREFIX_ID, a))
 #endif // CONFIG_PROFILE_LOCKS
 
-class Lock : Noncopyable
+class Lock : xray::noncopyable
 {
 	struct LockImpl* impl;
 public:

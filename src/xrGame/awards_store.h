@@ -2,7 +2,7 @@
 #define AWARD_SYSTEM_INCLUDED
 
 #include "../xrServerEntities/associative_vector.h"
-#include <boost/noncopyable.hpp>
+
 #include "profile_data_types.h"
 #include "gsc_dsigned_ltx.h"
 
@@ -17,7 +17,7 @@ struct SAKEField; // HACK, FAKE STRUCT TO PRETEND GAMESPY EXISTS
 
 namespace gamespy_profile
 {
-	class awards_store : boost::noncopyable
+	class awards_store : xray::noncopyable
 	{
 	public:
 		awards_store(CGameSpy_Full* fullgs);

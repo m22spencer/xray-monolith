@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="luabind\src\class.cpp" />
+    <ClCompile Include="luabind\src\class_info.cpp" />
+    <ClCompile Include="luabind\src\class_registry.cpp" />
+    <ClCompile Include="luabind\src\class_rep.cpp" />
+    <ClCompile Include="luabind\src\create_class.cpp" />
+    <ClCompile Include="luabind\src\error.cpp" />
+    <ClCompile Include="luabind\src\find_best_match.cpp" />
+    <ClCompile Include="luabind\src\function.cpp" />
+    <ClCompile Include="luabind\src\implicit_cast.cpp" />
+    <ClCompile Include="luabind\src\link_compatibility.cpp" />
+    <ClCompile Include="luabind\src\object.cpp" />
+    <ClCompile Include="luabind\src\object_rep.cpp" />
+    <ClCompile Include="luabind\src\open.cpp" />
+    <ClCompile Include="luabind\src\pcall.cpp" />
+    <ClCompile Include="luabind\src\ref.cpp" />
+    <ClCompile Include="luabind\src\scope.cpp" />
+    <ClCompile Include="luabind\src\stack_content_by_name.cpp" />
+    <ClCompile Include="luabind\src\weak_ref.cpp" />
+    <ClCompile Include="luabind\src\wrapper_base.cpp" />
+    <ClCompile Include="luabind_memory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="luabind\src\luabind_api.h" />
+    <ClInclude Include="adopt_policy.hpp" />
+    <ClInclude Include="back_reference.hpp" />
+    <ClInclude Include="back_reference_fwd.hpp" />
+    <ClInclude Include="class.hpp" />
+    <ClInclude Include="class_info.hpp" />
+    <ClInclude Include="config.hpp" />
+    <ClInclude Include="copy_policy.hpp" />
+    <ClInclude Include="dependency_policy.hpp" />
+    <ClInclude Include="detail\calc_arity.hpp" />
+    <ClInclude Include="detail\calc_has_arg.hpp" />
+    <ClInclude Include="detail\call.hpp" />
+    <ClInclude Include="detail\call_function.hpp" />
+    <ClInclude Include="detail\call_member.hpp" />
+    <ClInclude Include="detail\call_operator_iterate.hpp" />
+    <ClInclude Include="detail\class_cache.hpp" />
+    <ClInclude Include="detail\class_registry.hpp" />
+    <ClInclude Include="detail\class_rep.hpp" />
+    <ClInclude Include="detail\construct_rep.hpp" />
+    <ClInclude Include="detail\constructor.hpp" />
+    <ClInclude Include="detail\convert_to_lua.hpp" />
+    <ClInclude Include="detail\decorate_type.hpp" />
+    <ClInclude Include="detail\enum_maker.hpp" />
+    <ClInclude Include="detail\find_best_match.hpp" />
+    <ClInclude Include="detail\garbage_collector.hpp" />
+    <ClInclude Include="detail\get_overload_signature.hpp" />
+    <ClInclude Include="detail\get_signature.hpp" />
+    <ClInclude Include="detail\implicit_cast.hpp" />
+    <ClInclude Include="detail\link_compatibility.hpp" />
+    <ClInclude Include="detail\method_rep.hpp" />
+    <ClInclude Include="detail\object_funs.hpp" />
+    <ClInclude Include="detail\object_rep.hpp" />
+    <ClInclude Include="detail\open.hpp" />
+    <ClInclude Include="detail\operator_id.hpp" />
+    <ClInclude Include="detail\other.hpp" />
+    <ClInclude Include="detail\overload_rep.hpp" />
+    <ClInclude Include="detail\overload_rep_base.hpp" />
+    <ClInclude Include="detail\overload_rep_impl.hpp" />
+    <ClInclude Include="detail\pcall.hpp" />
+    <ClInclude Include="detail\pointee_sizeof.hpp" />
+    <ClInclude Include="detail\pointee_typeid.hpp" />
+    <ClInclude Include="detail\policy.hpp" />
+    <ClInclude Include="detail\policy_cons.hpp" />
+    <ClInclude Include="detail\primitives.hpp" />
+    <ClInclude Include="detail\property.hpp" />
+    <ClInclude Include="detail\ref.hpp" />
+    <ClInclude Include="detail\signature_match.hpp" />
+    <ClInclude Include="detail\stack_utils.hpp" />
+    <ClInclude Include="detail\typetraits.hpp" />
+    <ClInclude Include="discard_result_policy.hpp" />
+    <ClInclude Include="error.hpp" />
+    <ClInclude Include="function.hpp" />
+    <ClInclude Include="functor.hpp" />
+    <ClInclude Include="iterator_pair_policy.hpp" />
+    <ClInclude Include="iterator_policy.hpp" />
+    <ClInclude Include="lua_include.hpp" />
+    <ClInclude Include="luabind.hpp" />
+    <ClInclude Include="luabind_api.h" />
+    <ClInclude Include="luabind_delete.h" />
+    <ClInclude Include="luabind_memory.h" />
+    <ClInclude Include="luabind_memory_allocator.h" />
+    <ClInclude Include="luabind_memory_allocator_inline.h" />
+    <ClInclude Include="luabind_memory_manager_generator.h" />
+    <ClInclude Include="luabind_types.h" />
+    <ClInclude Include="object.hpp" />
+    <ClInclude Include="open.hpp" />
+    <ClInclude Include="operator.hpp" />
+    <ClInclude Include="out_value_policy.hpp" />
+    <ClInclude Include="prefix.hpp" />
+    <ClInclude Include="proxy_object.hpp" />
+    <ClInclude Include="raw_policy.hpp" />
+    <ClInclude Include="return_reference_to_policy.hpp" />
+    <ClInclude Include="scope.hpp" />
+    <ClInclude Include="weak_ref.hpp" />
+    <ClInclude Include="wrapper_base.hpp" />
+    <ClInclude Include="yield_policy.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{76148C6B-B507-3820-94DA-35F2BACC28C6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{AE537DF6-F083-303F-89A2-1F42884DF078}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
