@@ -1115,7 +1115,7 @@ int luabind::detail::class_rep::lua_class_gettable(lua_State* L)
 	const char* key		= lua_tostring(L, 2);
 	const char* _ok_	= "__ok";
 
-	if (key && ( *((unsigned*)key) == *((unsigned*)_ok_) ) && !key[4])
+	if (key && !std::strcmp(key, _ok_))
 	{
 		class_rep* pCrep = obj->crep();
 
