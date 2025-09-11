@@ -298,6 +298,14 @@ bool luabind::detail::class_rep::settable(lua_State* L)
 				msg += "\nand does not match: (";
 				msg += stack_content_by_name(L, 3);
 				msg += ")";
+
+				// log the callstack
+				luabind::object debug_space = luabind::get_globals(L)["debug"];
+				luabind::object traceback = debug_space["traceback"];
+				string_class tracebackstr = luabind::call_function<string_class>(traceback);
+				msg += "\n traceback: \n";
+				msg += tracebackstr;
+
 				lua_pushstring(L, msg.c_str());
 				return false;
 			}
@@ -316,6 +324,14 @@ bool luabind::detail::class_rep::settable(lua_State* L)
 			msg += ".";
 			msg += key;
 			msg += "' is read only";
+
+			// log the callstack
+			luabind::object debug_space = luabind::get_globals(L)["debug"];
+			luabind::object traceback = debug_space["traceback"];
+			string_class tracebackstr = luabind::call_function<string_class>(traceback);
+			msg += "\n traceback: \n";
+			msg += tracebackstr;
+
 			lua_pushstring(L, msg.c_str());
 			return false;
 		}
@@ -404,8 +420,21 @@ int luabind::detail::class_rep::operator_dispatcher(lua_State* L)
 		}
 	}
 
+	object_rep* obj = static_cast<object_rep*>(lua_touserdata(L, 1));
+	class_rep* crep = obj->crep();
+	auto ptr = lua_tostring(L, lua_upvalueindex(1));
+	if (ptr && std::strcmp(ptr, "__tostring") == 0)
+	{
+		lua_pop(L, lua_gettop(L));
+		lua_pushstring(L, crep->name());
+		return 1;
+	}
 	lua_pop(L, lua_gettop(L));
-	lua_pushstring(L, "No such operator defined");
+
+	char err_str[512];
+	sprintf(err_str, "! No such operator [%s] defined in class [%s]", ptr, crep->name());
+	lua_pushstring(L, err_str);
+
 	lua_error(L);
 
 	return 0;
@@ -452,6 +481,13 @@ int luabind::detail::class_rep::constructor_dispatcher(lua_State* L)
 
 			msg += get_overload_signatures(L, rep->overloads.begin(), rep->overloads.end(), crep->name());
 
+			// log the callstack
+			luabind::object debug_space = luabind::get_globals(L)["debug"];
+			luabind::object traceback = debug_space["traceback"];
+			string_class tracebackstr = luabind::call_function<string_class>(traceback);
+			msg += "\n traceback: \n";
+			msg += tracebackstr;
+
 			lua_pushstring(L, msg.c_str());
 		}
 		lua_error(L);
@@ -468,6 +504,13 @@ int luabind::detail::class_rep::constructor_dispatcher(lua_State* L)
 			vector_class<const overload_rep_base*> candidates;
 			find_exact_match(L, &rep->overloads.front(), rep->overloads.size(), sizeof(construct_rep::overload_t), min_match, num_params, candidates);
 			msg += get_overload_signatures_candidates(L, candidates.begin(), candidates.end(), crep->name());
+
+			// log the callstack
+			luabind::object debug_space = luabind::get_globals(L)["debug"];
+			luabind::object traceback = debug_space["traceback"];
+			string_class tracebackstr = luabind::call_function<string_class>(traceback);
+			msg += "\n traceback: \n";
+			msg += tracebackstr;
 
 			lua_pushstring(L, msg.c_str());
 		}
@@ -582,7 +625,8 @@ int luabind::detail::class_rep::function_dispatcher(lua_State* L)
 #endif
 
 		int num_params = lua_gettop(L) /*- 1*/;
-		found = find_best_match(L, &rep->overloads().front(), rep->overloads().size(), sizeof(overload_rep), ambiguous, min_match, match_index, num_params);
+		auto begin_value = rep->overloads().empty() ? 0 : &rep->overloads().front();
+		found = find_best_match(L, begin_value, rep->overloads().size(), sizeof(overload_rep), ambiguous, min_match, match_index, num_params);
 
 #ifdef LUABIND_NO_ERROR_CHECKING
 
@@ -608,6 +652,13 @@ int luabind::detail::class_rep::function_dispatcher(lua_State* L)
 
 			msg += get_overload_signatures(L, rep->overloads().begin(), rep->overloads().end(), function_name);
 
+			// log the callstack
+			luabind::object debug_space = luabind::get_globals(L)["debug"];
+			luabind::object traceback = debug_space["traceback"];
+			string_class tracebackstr = luabind::call_function<string_class>(traceback);
+			msg += "\n traceback: \n";
+			msg += tracebackstr;
+
 			lua_pushstring(L, msg.c_str());
 		}
 		lua_error(L);
@@ -632,6 +683,13 @@ int luabind::detail::class_rep::function_dispatcher(lua_State* L)
 			function_name += rep->name;
 
 			msg += get_overload_signatures_candidates(L, candidates.begin(), candidates.end(), function_name);
+
+			// log the callstack
+			luabind::object debug_space = luabind::get_globals(L)["debug"];
+			luabind::object traceback = debug_space["traceback"];
+			string_class tracebackstr = luabind::call_function<string_class>(traceback);
+			msg += "\n traceback: \n";
+			msg += tracebackstr;
 
 			lua_pushstring(L, msg.c_str());
 		}
