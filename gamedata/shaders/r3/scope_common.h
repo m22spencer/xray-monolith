@@ -74,6 +74,8 @@ uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
 float isSVPFrame() { return m_hud_params.w > 0.5; }
 
+#define SCOPE_TO_FRAMEBUFFER_RATIO (isSVPFrame() ? 2.0 : 1.0)
+
 
 float zoomRotateFactor() { return m_hud_params.x; }
 
