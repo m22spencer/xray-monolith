@@ -72,6 +72,7 @@ int scope_debug;
 
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
+float isSVPFrame() { return m_hud_params.w > 0.5; }
 
 
 float zoomRotateFactor() { return m_hud_params.x; }
