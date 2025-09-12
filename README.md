@@ -169,6 +169,10 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.09.12**
+* OXR: Replace shared_str with xr_string for log and fs, fixed https://github.com/themrdemonized/xray-monolith/issues/366
+* Fix https://github.com/themrdemonized/xray-monolith/issues/369
+
 **2025.09.10**
 * ProfLander: Fix CALifeMonsterBrain::process_task segfault (https://github.com/themrdemonized/xray-monolith/pull/364)
 
