@@ -16,5 +16,7 @@
 // Hacky solution to fix jitter/ring around scope
 #define SCOPE_PHASE_JITTERFIX 256
 
+#define SCOPE_APPLY_DISTORTION 512
+#define SCOPE_CLEAR_DISTORTION 1024
 
 #endif

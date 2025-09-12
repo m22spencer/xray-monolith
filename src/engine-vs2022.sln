@@ -229,6 +229,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "r3", "r3", "{AAE035C4-0F51-
 		..\gamedata\shaders\r3\postprocess_cm.ps = ..\gamedata\shaders\r3\postprocess_cm.ps
 		..\gamedata\shaders\r3\simple_color.ps = ..\gamedata\shaders\r3\simple_color.ps
 		..\gamedata\shaders\r3\yuv2rgb.ps = ..\gamedata\shaders\r3\yuv2rgb.ps
+		..\gamedata\shaders\r3\distortion.h = ..\gamedata\shaders\r3\distortion.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "materials", "materials", "{5768CC9B-FEF6-4F20-B5D6-2E22E8A6D962}"
@@ -425,6 +426,7 @@ Global
 		{D0843040-7706-4FBF-A931-582748BAFBB1} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{4DDC8F7A-3B57-4250-9404-D2EE1991BE78} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{10D13331-3282-43F9-BEA0-150D80388B52} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{5F2BA13F-C083-4786-A7CD-1E9543385ECD} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76CF157A-A169-443B-AE3A-F17AD29325C6}

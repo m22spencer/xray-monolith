@@ -348,6 +348,8 @@ void CRenderTarget::phase_3DSSReticle()
 	PIX_EVENT(PHASE_SCOPE_RETICLE);
 	HW.pContext->CopyResource(rt_Generic_2->pTexture->surface_get(), RImplementation.Target->rt_Position->pTexture->surface_get());
 
+	bool isSVP = Device.m_SecondViewport.IsSVPActive();
+
 	if (!Device.m_SecondViewport.IsSVPActive())
 		HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 
@@ -367,8 +369,8 @@ void CRenderTarget::phase_3DSSReticle()
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
-		draw_scope(s_scope_color_write, [](auto N) -> void {
-			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
+		draw_scope(s_scope_color_write, [&](auto N) -> void {
+			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE | (bDistort && !isSVP ? SCOPE_APPLY_DISTORTION : 0));
 
 			auto P = Device.m_SecondViewport;
 			Fvector up = {0,1,0};
@@ -384,9 +386,11 @@ void CRenderTarget::phase_3DSSReticle()
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_RETICLE);
+		u_setrt(RImplementation.Target->rt_Generic_0, bDistort ? rt_Generic_1 : nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
-			RCache.set_c("scope_phase", SCOPE_PHASE_RETICLE);
+			RCache.set_c("scope_phase", SCOPE_PHASE_RETICLE | SCOPE_CLEAR_DISTORTION);
 		});
+		u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
 	}
 
 	{   PIX_EVENT(SCOPE_PHASE_SHADOW);
@@ -455,6 +459,7 @@ void CRenderTarget::phase_svp_capture()
 	RCache.set_Element(s_scope_preprocess->E[1]);
 	RCache.set_c("scope_render_phase", 1);  // PREPASS
 	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
+	RCache.set_c("scope_phase", bDistort ? SCOPE_APPLY_DISTORTION : 0);
 
 	
 	{   // Draw fullscreen triangle.

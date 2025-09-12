@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "scope_defines.h"
+#include "distortion.h"
 
 #define ASPECT_CORRECT_TC(tc) (tc - 0.5) * float2(screen_res.x/screen_res.y, 1.0) + 0.5;
 #define ASPECT_UNCORRECT_TC(tc) (tc - 0.5) * float2(screen_res.y/screen_res.x, 1.0) + 0.5;
@@ -72,7 +73,7 @@ int scope_debug;
 
 uniform int scope_svp;
 float isSVPActive() { return scope_svp; }
-
+float isSVPFrame() { return m_hud_params.w > 0.5; }
 
 float zoomRotateFactor() { return m_hud_params.x; }
 
@@ -127,6 +128,12 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 }
 
 float3 SampleBackbuffer(float2 tc) {
+    if (scope_phase & SCOPE_APPLY_DISTORTION) {
+		// svp is currently halved in size compared to screencoords, so a 2x multiplier is needed
+		const float svp_to_screen_ratio = 2.0;
+        tc = distortion_tc(tc, isSVPFrame() ? svp_to_screen_ratio : 1.0); 
+    }
+
 	return isSVPActive() 
         ? s_pip_tex.Sample(smp_base, tc).rgb
         : s_3dss_tex.Sample(smp_base, tc).rgb;

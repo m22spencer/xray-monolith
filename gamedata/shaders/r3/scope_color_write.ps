@@ -1,6 +1,8 @@
 // DO NOT EDIT, OR INCLUDE IN MODS
 
 #include "scope_common.h"
+#include "distortion.h"
+
 
 // Forward declare functions for better error messages
 float3 scope_custom_image(Scope s);
@@ -15,41 +17,52 @@ float scope_custom_shadow(Scope s);
 float4 scope_custom_lens(Scope s);
 #include "scope_custom_lens.h"
 
-float4 main(v_out I) : SV_Target 
+struct PS_OUT {
+    float4 color : SV_Target0;
+    float4 target1 : SV_Target1;
+};
+
+PS_OUT main(v_out I) : SV_Target 
 {
     scope = new_Scope(I);
 
     bool valid = VALID(scope.sfp);
 
-    float4 o;
+    PS_OUT o;
+
     if (scope_phase == 0) {
         discard;
     }
 
     if (scope_phase & SCOPE_PHASE_JITTERFIX) {
-        return float4(0,0,0,1);
+        o.color = float4(0,0,0,1);
+        return o;
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
-        o = valid
+        o.color = valid
             ? isSVPActive()
                 ? float4(s_pip_tex.Sample(smp_base, SCOPECOORD_TO_TEXCOORD(scope.sfp)).rgb, 1.0) // Hack for heatvision
                 : float4(scope_custom_image(scope), 1.0)
             : float4(0,0,0,1);
     }
     if (scope_phase & SCOPE_PHASE_RETICLE) {
-        o = scope_custom_reticle(scope);
+        o.color = scope_custom_reticle(scope);
         if (scope_debug >= 3 && scope.dbg.a > 0.5)
-            o = scope.dbg;
+            o.color = scope.dbg;
+    }
+
+    if (scope_phase & SCOPE_CLEAR_DISTORTION) {
+        o.target1 = float4(.5,.5,0,1);
     }
 
     if (scope_phase & SCOPE_PHASE_SHADOW) {
         float c = scope_custom_shadow(scope);
-        o = float4(0,0,0,c);
+        o.color = float4(0,0,0,c);
     }
 
     if (scope_phase & SCOPE_PHASE_LENS) {
-        o = scope_custom_lens(scope);
+        o.color = scope_custom_lens(scope);
     }
 
     return o;
