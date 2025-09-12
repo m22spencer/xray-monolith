@@ -22,8 +22,5 @@
 
 #pragma once
 
-extern "C" {
-	#include <luajit-2/src/lua.h>
-	#include <luajit-2/src/lauxlib.h>
-	#include <luajit-2/src/lualib.h>
-} // extern "C"
+//AVO: use luajit 2 headers (switch to Release_LuaJit_One to use old headers)
+#include "lua.hpp"
