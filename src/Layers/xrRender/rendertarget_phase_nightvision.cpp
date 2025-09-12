@@ -260,6 +260,35 @@ void ffp_sfp(bool drawDebug) {
 	Device.m_SecondViewport.w_sfp = Fvector(p_c2).add(p_o).mul(0.5);
 }
 
+void CRenderTarget::draw_reflex() {
+	PIX_EVENT(RENDER_REFLEX_SIGHTS);
+
+	
+	Fmatrix FTold = Device.mFullTransform;
+
+	Device.mFullTransform = Device.mFullTransformHud;
+	RCache.set_xform_project(Device.mProjectHud);
+
+	// Rendering
+	RImplementation.rmNear();
+	for (auto N : RImplementation.mapReflexHUDSorted) {
+		
+		RCache.set_Element(N.val.se);
+		
+		RCache.set_xform_world(N.val.Matrix);
+		RImplementation.apply_object(N.val.pObject);
+		RImplementation.apply_lmaterial();
+		
+		N.val.pVisual->Render(0);
+	}
+	
+	RImplementation.rmNormal();
+
+	// Restore projection
+	Device.mFullTransform = FTold;
+	RCache.set_xform_project(Device.mProject);
+}
+
 void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
 {
 	auto elem = se ? se->E[0] : nullptr;
@@ -355,9 +384,12 @@ void CRenderTarget::phase_3DSSReticle()
 
 	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 
+
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
+
+	draw_reflex();
 
 	{   PIX_EVENT(SCOPE_PHASE_JITTERFIX);
 
@@ -423,26 +455,42 @@ void CRenderTarget::phase_3DSSReticle()
   */
 void CRenderTarget::phase_3DSSReticle_fixup()
 {
-	return;
-	PIX_EVENT(PHASE_SCOPE_FIXUP);
-	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
-	auto mvec = RImplementation.Target->rt_ssfx_motion_vectors;
-	auto distort = bDistort ? RImplementation.Target->rt_Generic_1 : 0;
+	PIX_EVENT(PHASE_SCOPE_APPLY_DISTORTION);
 
-	// Do not set color or position buffers, as these are done in the prior phase.
-	u_setrt(0, 0, mvec, distort, baseZB);
-
-	RCache.set_CullMode(CULL_CCW);
+	RCache.set_CullMode(CULL_NONE);
 	RCache.set_Stencil(FALSE);
-	RCache.set_ColorWriteEnable();
 
-	for (auto N : RImplementation.mapScopeHUDSorted) {
-		RCache.set_Element(N.val.se);
-		RCache.set_c("scope_render_phase", 3);  // Fixup
-		RCache.set_c("bDistort", bDistort);
+	RCache.set_Element(s_distort->E[1]);
+	RCache.set_c("scope_render_phase", 1);  // PREPASS
+	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
+
+	
+	// Draw fullscreen triangle.
+	u32 Offset = 0;
+	u32 C = color_rgba(0, 0, 0, 255);
+
+	float d_Z = EPS_S;
+	float d_W = 1.0f;
+	float w = float(Device.dwWidth);
+	float h = float(Device.dwHeight);
+
+	Fvector2 tc;
+	tc.set(1.0, 1.0);
+	FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
+	pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
+	pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
+	pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
+	RCache.Vertex.Unlock(3, g_combine->vb_stride);
+	RCache.set_Geometry(g_combine);
+	
+	if (bDistort) {
+		u_setrt(rt_Color, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
+		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+
+		bDistort = FALSE;
+
+		HW.pContext->CopyResource(rt_Generic_0->pSurface, rt_Color->pSurface);
 	}
-
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, RImplementation.Target->baseZB);
 };
 
 /** Run scope preprocesson the current frame and store in svp rt.

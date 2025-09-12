@@ -511,12 +511,14 @@ void CRenderTarget::phase_combine()
 	if (ssfx_PrevPos_Requiered)
 		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
 
+	phase_3DSSReticle_fixup();
+
 	if (scope_3D_fake_enabled && !Device.m_SecondViewport.IsSVPFrame())
 	{
 		
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
 
-		phase_3DSSReticle_fixup();
+		//phase_3DSSReticle_fixup();
 	}
 
 	//Compute blur textures

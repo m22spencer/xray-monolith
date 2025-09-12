@@ -40,17 +40,31 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
 #if defined(USE_DX11) //  Redotix99: for 3D Shader Based Scopes 
 	if (nullptr != sh && sh->flags.iScopeLense > 0) {
 		// Only want a single lens, if rendering the player HUD (bCaptureScopeLens)
-		if (RImplementation.Target->bCaptureScopeLens && sh->flags.iScopeLense == 3 && mapScopeHUDSorted.empty()) {
-			// We must detect the lens surface immediately, ignoring all culling.
-			float distSQ;
-			float SSA = CalcSSA(distSQ, Center, pVisual);
-			mapSorted_Node N;
-			N.val.ssa = 0;
-			N.val.pObject = RI.val_pObject;
-			N.val.pVisual = pVisual;
-			N.val.Matrix = *RI.val_pTransform;
+		if (RImplementation.Target->bCaptureScopeLens) {
+			if (sh->flags.iScopeLense == 3 && mapScopeHUDSorted.empty()) {
+				// We must detect the lens surface immediately, ignoring all culling.
+				float distSQ;
+				float SSA = CalcSSA(distSQ, Center, pVisual);
+				mapSorted_Node N;
+				N.val.ssa = 0;
+				N.val.pObject = RI.val_pObject;
+				N.val.pVisual = pVisual;
+				N.val.Matrix = *RI.val_pTransform;
 			
-			mapScopeHUDSorted.push_back(N);
+				mapScopeHUDSorted.push_back(N);
+			}
+			else if (sh->flags.iScopeLense == 10) {
+				float distSQ;
+				float SSA = CalcSSA(distSQ, Center, pVisual);
+				mapSorted_Node N;
+				N.val.ssa = 0;
+				N.val.pObject = RI.val_pObject;
+				N.val.pVisual = pVisual;
+				N.val.Matrix = *RI.val_pTransform;
+				N.val.se = sh;
+			
+				mapReflexHUDSorted.push_back(N);
+			}
 		}
 		return;
 	}
