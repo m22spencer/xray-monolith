@@ -758,7 +758,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 
 	s_fakescope.create(b_fakescope, "r2\\fakescope"); //crookr
 	s_scope_preprocess.create("scope_preprocess");
-	s_distort.create("distort_pass");
+	s_distort.create("distortion_pass_r4");
 	s_scope_debug.create("scope_debug");
 	s_scope_color_write.create("scope_color_write");
 	s_scope_depth_write.create("scope_depth_write");

@@ -36,6 +36,47 @@ void CRenderTarget::DoAsyncScreenshot()
 
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
+// This function only distorts the color buffer, and as a result corrupts the g-buffer.
+//   Potentially worth applying distortion to the full g-buffer, at cost of vram and bandwidth.
+//   Motion vectors should not be used after invoking this function.
+void CRenderTarget::phase_apply_distortion()
+{
+	if (bDistort) {
+		PIX_EVENT(PHASE_APPLY_DISTORTION);
+
+		RCache.set_CullMode(CULL_NONE);
+		RCache.set_Stencil(FALSE);
+
+		RCache.set_Element(s_distort->E[1]);
+	
+		// Draw fullscreen triangle.
+		u32 Offset = 0;
+		u32 C = color_rgba(0, 0, 0, 255);
+
+		float d_Z = EPS_S;
+		float d_W = 1.0f;
+		float w = float(Device.dwWidth);
+		float h = float(Device.dwHeight);
+
+		Fvector2 tc;
+		tc.set(1.0, 1.0);
+		FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
+		pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
+		pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
+		pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
+		RCache.Vertex.Unlock(3, g_combine->vb_stride);
+		RCache.set_Geometry(g_combine);
+	
+		u_setrt(rt_Color, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
+		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+
+		// Ensure the later combine pass does not apply distortion
+		bDistort = FALSE;
+
+		HW.pContext->CopyResource(rt_Generic_0->pSurface, rt_Color->pSurface);
+	}
+};
+
 void CRenderTarget::phase_combine()
 {
 	PIX_EVENT(phase_combine);
@@ -511,14 +552,12 @@ void CRenderTarget::phase_combine()
 	if (ssfx_PrevPos_Requiered)
 		HW.pContext->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
 
-	phase_3DSSReticle_fixup();
+	phase_apply_distortion();
 
 	if (scope_3D_fake_enabled && !Device.m_SecondViewport.IsSVPFrame())
 	{
 		
 		phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
-
-		//phase_3DSSReticle_fixup();
 	}
 
 	//Compute blur textures

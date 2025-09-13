@@ -447,48 +447,6 @@ void CRenderTarget::phase_3DSSReticle()
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 };
 
-/** Mask motion vectors & clear distortion rt
-  */
-void CRenderTarget::phase_3DSSReticle_fixup()
-{
-	PIX_EVENT(PHASE_SCOPE_APPLY_DISTORTION);
-
-	RCache.set_CullMode(CULL_NONE);
-	RCache.set_Stencil(FALSE);
-
-	RCache.set_Element(s_distort->E[1]);
-	RCache.set_c("scope_render_phase", 1);  // PREPASS
-	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
-
-	
-	// Draw fullscreen triangle.
-	u32 Offset = 0;
-	u32 C = color_rgba(0, 0, 0, 255);
-
-	float d_Z = EPS_S;
-	float d_W = 1.0f;
-	float w = float(Device.dwWidth);
-	float h = float(Device.dwHeight);
-
-	Fvector2 tc;
-	tc.set(1.0, 1.0);
-	FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
-	pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
-	pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
-	pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
-	RCache.Vertex.Unlock(3, g_combine->vb_stride);
-	RCache.set_Geometry(g_combine);
-	
-	if (bDistort) {
-		u_setrt(rt_Color, nullptr, nullptr, nullptr, RImplementation.Target->baseZB);
-		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-
-		bDistort = FALSE;
-
-		HW.pContext->CopyResource(rt_Generic_0->pSurface, rt_Color->pSurface);
-	}
-};
-
 /** Run scope preprocesson the current frame and store in svp rt.
   * (Handle anything that needs to read from the g-buffer here.)
   */

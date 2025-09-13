@@ -460,7 +460,7 @@ public:
 	//--DSR-- HeatVision
 	void draw_scope(ref_shader e, std::function<void(R_dsgraph::mapSorted_Node* N)> bind);
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
-	void phase_3DSSReticle_fixup();
+	void phase_apply_distortion();
 	void phase_svp_capture();
 	void phase_lut();
 	void phase_smaa();

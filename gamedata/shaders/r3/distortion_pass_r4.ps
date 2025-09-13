@@ -1,7 +1,9 @@
 #include "common.h"
 
-#ifndef DISTORTION_H
-#define DISTORTION_H
+float4 m_hud_params;
+float isSVPFrame() { return m_hud_params.w > 0.5; }
+
+#define SVP_SCALE_FACTOR 2.0
 
 // Taken from combine_2_naa
 
@@ -26,4 +28,7 @@ float2 distortion_tc(float2 tc, float distortion_scale = 1.0) {
 	return center;
 }
 
-#endif
+float4 main(v2p_TL I) : SV_Target
+{
+    return s_image.Sample(smp_base, distortion_tc(I.Tex0, isSVPFrame() ? SVP_SCALE_FACTOR : 1.0));
+} 
