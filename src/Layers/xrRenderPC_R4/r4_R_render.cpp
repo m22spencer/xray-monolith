@@ -764,9 +764,10 @@ void CRender::Render()
 
 	// Clear the stored lenses
 	RImplementation.mapScopeHUDSorted.clear();
+  RImplementation.mapReflexHUDSorted.clear();
 	mapEmissive.clear();
 	mapHUDEmissive.clear();
-
+  
 	Device.m_SecondViewport.eyepiece.radius = 0;
 	Device.m_SecondViewport.objective.radius = 0;
 

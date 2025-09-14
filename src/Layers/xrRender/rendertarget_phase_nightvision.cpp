@@ -260,6 +260,35 @@ void ffp_sfp(bool drawDebug) {
 	Device.m_SecondViewport.w_sfp = Fvector(p_c2).add(p_o).mul(0.5);
 }
 
+void CRenderTarget::draw_reflex() {
+	PIX_EVENT(RENDER_REFLEX_SIGHTS);
+
+	
+	Fmatrix FTold = Device.mFullTransform;
+
+	Device.mFullTransform = Device.mFullTransformHud;
+	RCache.set_xform_project(Device.mProjectHud);
+
+	// Rendering
+	RImplementation.rmNear();
+	for (auto N : RImplementation.mapReflexHUDSorted) {
+		
+		RCache.set_Element(N.val.se);
+		
+		RCache.set_xform_world(N.val.Matrix);
+		RImplementation.apply_object(N.val.pObject);
+		RImplementation.apply_lmaterial();
+		
+		N.val.pVisual->Render(0);
+	}
+	
+	RImplementation.rmNormal();
+
+	// Restore projection
+	Device.mFullTransform = FTold;
+	RCache.set_xform_project(Device.mProject);
+}
+
 void CRenderTarget::draw_scope(ref_shader se, std::function<void(R_dsgraph::mapSorted_Node *N)> bind)
 {
 	auto elem = se ? se->E[0] : nullptr;
@@ -353,9 +382,12 @@ void CRenderTarget::phase_3DSSReticle()
 
 	u_setrt(RImplementation.Target->rt_Generic_0, nullptr, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
 
+
 	RCache.set_CullMode(CULL_CCW);
 	RCache.set_Stencil(FALSE);
 	RCache.set_ColorWriteEnable();
+
+	draw_reflex();
 
 	{   PIX_EVENT(SCOPE_PHASE_JITTERFIX);
 
@@ -413,32 +445,6 @@ void CRenderTarget::phase_3DSSReticle()
 	}
 
 	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, RImplementation.Target->baseZB);
-};
-
-/** Mask motion vectors & clear distortion rt
-  */
-void CRenderTarget::phase_3DSSReticle_fixup()
-{
-	return;
-	PIX_EVENT(PHASE_SCOPE_FIXUP);
-	auto svp_rendering_main_view = Device.m_SecondViewport.IsSVPActive() && !Device.m_SecondViewport.IsSVPFrame();
-	auto mvec = RImplementation.Target->rt_ssfx_motion_vectors;
-	auto distort = bDistort ? RImplementation.Target->rt_Generic_1 : 0;
-
-	// Do not set color or position buffers, as these are done in the prior phase.
-	u_setrt(0, 0, mvec, distort, baseZB);
-
-	RCache.set_CullMode(CULL_CCW);
-	RCache.set_Stencil(FALSE);
-	RCache.set_ColorWriteEnable();
-
-	for (auto N : RImplementation.mapScopeHUDSorted) {
-		RCache.set_Element(N.val.se);
-		RCache.set_c("scope_render_phase", 3);  // Fixup
-		RCache.set_c("bDistort", bDistort);
-	}
-
-	u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Position, nullptr, nullptr, RImplementation.Target->baseZB);
 };
 
 /** Run scope preprocesson the current frame and store in svp rt.
