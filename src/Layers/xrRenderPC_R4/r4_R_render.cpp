@@ -609,6 +609,13 @@ void CRender::renderGBuffer() {
 
 void CRender::combineLightingAndBloom()
 {
+	// FIXME: SVP: Hack to force SRVSManager to unbind the first slot.
+	//  Required until more robust state invalidation is in place.
+	auto unbind_s_base = []() -> void {
+		ID3D11ShaderResourceView* crv[1] = {nullptr};
+		HW.pContext->PSSetShaderResources(0, 1, crv);
+	};
+
 	{
 		PIX_EVENT(DEFER_SELF_ILLUM);
 		Target->phase_accumulator();
@@ -625,6 +632,9 @@ void CRender::combineLightingAndBloom()
 		//RCache.set_Stencil				(TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
 		RCache.set_CullMode(CULL_CCW);
 		RCache.set_ColorWriteEnable();
+
+		unbind_s_base();
+
 		RImplementation.r_dsgraph_render_emissive(RImplementation.o.ssfx_bloom ? false : true);
 	}
 
@@ -634,6 +644,9 @@ void CRender::combineLightingAndBloom()
 		FLOAT ColorRGBA[4] = { 0,0,0,0 };
 		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_bloom_emissive->pRT, ColorRGBA);
 		Target->u_setrt(Target->rt_ssfx_bloom_emissive, NULL, NULL, !RImplementation.o.dx10_msaa ? Target->baseZB : Target->rt_MSAADepth->pZRT);
+
+		unbind_s_base();
+
 		RImplementation.r_dsgraph_render_emissive(true, true);
 	}
 }
@@ -751,7 +764,10 @@ void CRender::Render()
 
 	// Clear the stored lenses
 	RImplementation.mapScopeHUDSorted.clear();
-	RImplementation.mapReflexHUDSorted.clear();
+  RImplementation.mapReflexHUDSorted.clear();
+	mapEmissive.clear();
+	mapHUDEmissive.clear();
+  
 	Device.m_SecondViewport.eyepiece.radius = 0;
 	Device.m_SecondViewport.objective.radius = 0;
 
