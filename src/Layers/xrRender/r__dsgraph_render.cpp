@@ -747,8 +747,6 @@ void R_dsgraph_structure::r_dsgraph_render_emissive(bool clear, bool renderHUD)
 #if	RENDER!=R_R1
 	// Sorted (back to front)
 	mapEmissive.traverseLR(sorted_L1);
-	if (clear)
-		mapEmissive.clear();
 
 	// Change projection
 	Fmatrix FTold = Device.mFullTransform;
@@ -761,9 +759,6 @@ void R_dsgraph_structure::r_dsgraph_render_emissive(bool clear, bool renderHUD)
 	// Sorted (back to front)
 	mapHUDEmissive.traverseLR(sorted_L1);
 	
-	if (clear)
-		mapHUDEmissive.clear();
-
 	if (renderHUD)
 		mapHUDSorted.traverseRL(sorted_L1);
 
