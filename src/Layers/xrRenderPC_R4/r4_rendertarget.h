@@ -288,6 +288,7 @@ private:
 	ref_shader s_nightvision;
 	ref_shader s_fakescope; //crookr
 	ref_shader s_scope_preprocess;
+	ref_shader s_distort;
 	ref_shader s_scope_debug;
 	ref_shader s_heatvision; //--DSR-- HeatVision
 	ref_shader s_smaa;
@@ -454,10 +455,12 @@ public:
 	void phase_gasmask_dudv();
 	void phase_nightvision();
 	void phase_fakescope(); //crookr
-	void phase_heatvision(); //--DSR-- HeatVision
+	void phase_heatvision();
+	void draw_reflex();
+	//--DSR-- HeatVision
 	void draw_scope(ref_shader e, std::function<void(R_dsgraph::mapSorted_Node* N)> bind);
 	void phase_3DSSReticle(); // Redotix99: for 3D Shader Based Scopes
-	void phase_3DSSReticle_fixup();
+	void phase_apply_distortion();
 	void phase_svp_capture();
 	void phase_lut();
 	void phase_smaa();
