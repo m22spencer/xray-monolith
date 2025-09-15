@@ -145,7 +145,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 * Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
 
 <!----><a name="script_debugger_instructions"></a>
-* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform. How to use it: https://igigog.github.io/anomaly-modding-book/tutorials/addons/lua-debugger.html
+* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform. How to use it: https://anomaly-modding-book.netlify.app/docs/tutorials/addons/lua-debugger
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
