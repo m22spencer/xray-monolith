@@ -398,9 +398,42 @@ void CRenderTarget::phase_3DSSReticle()
 		});
 	}
 
+	{   // Remap gbuffer bindings to where the scope was rendered
+		ref_texture secondVP;
+		secondVP.create(r2_RT_secondVP);
+		secondVP->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
+			? RImplementation.TargetSVP->rt_secondVP->pTexture._get() 
+			: rt_secondVP->pTexture._get());
+
+		ref_texture rt_pos_tmp;
+		rt_pos_tmp.create(r2_RT_generic2);
+		rt_pos_tmp->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
+			? RImplementation.TargetSVP->rt_Position->pTexture._get() 
+			: rt_Generic_2->pTexture._get());
+
+		ref_texture rt_heat_tmp;
+		rt_heat_tmp.create(r2_RT_heat);
+		rt_heat_tmp->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
+			? RImplementation.TargetSVP->rt_Heat->pTexture._get() 
+			: rt_Heat->pTexture._get());
+
+		RCache.Invalidate();
+		u_setrt(RImplementation.TargetMain->rt_Generic_0, nullptr, RImplementation.TargetMain->rt_Position, RImplementation.TargetMain->baseZB);
+	}
+
 	{   PIX_EVENT(SCOPE_PHASE_IMAGE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
+
+			{	// Set screen_res to the gbuffer size
+				auto t = Device.m_SecondViewport.IsSVPActive() ? RImplementation.TargetSVP : RImplementation.TargetMain;
+				RCache.set_c("screen_res", Fvector4({(float)t->Width, (float)t->Height, 1.0f/(float)t->Width, 1.0f/(float)t->Height}));
+			}
+
+			{	// Resolution of the view we are rendering into
+				auto t = RImplementation.TargetMain;
+				RCache.set_c("output_res", Fvector4({(float)t->Width, (float)t->Height, 1.0f/(float)t->Width, 1.0f/(float)t->Height}));
+			}
 
 			auto P = Device.m_SecondViewport;
 			Fvector up = {0,1,0};
@@ -414,6 +447,9 @@ void CRenderTarget::phase_3DSSReticle()
 			RCache.set_c("hack_tex_angle", angle);
 		});
 	}
+	
+	RImplementation.TargetMain->SetActive(true); // Force set main target to fully invalidate rcache
+	u_setrt(RImplementation.TargetMain->rt_Generic_0, nullptr, RImplementation.TargetMain->rt_Position, RImplementation.TargetMain->baseZB);
 
 	{   PIX_EVENT(SCOPE_PHASE_RETICLE);
 		draw_scope(s_scope_color_write, [](auto N) -> void {
@@ -453,36 +489,7 @@ void CRenderTarget::phase_3DSSReticle()
 void CRenderTarget::phase_svp_capture()
 {
 	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
-	u_setrt(rt_secondVP, nullptr, nullptr, nullptr, nullptr);
-
-	RCache.set_CullMode(CULL_NONE);
-	RCache.set_Stencil(FALSE);
-
-	RCache.set_Element(s_scope_preprocess->E[1]);
-	RCache.set_c("scope_render_phase", 1);  // PREPASS
-	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
-
-	
-	{   // Draw fullscreen triangle.
-		u32 Offset = 0;
-		u32 C = color_rgba(0, 0, 0, 255);
-
-		float d_Z = EPS_S;
-		float d_W = 1.0f;
-		float w = float(Device.dwWidth);
-		float h = float(Device.dwHeight);
-
-		Fvector2 tc;
-		tc.set(1.0, 1.0);
-		FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
-		pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
-		pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
-		pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
-		RCache.Vertex.Unlock(3, g_combine->vb_stride);
-		RCache.set_Geometry(g_combine);
-		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-	}
-
-//	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
+	// This copy is not necessary, remove in the future and read directly from rt_Generic_0
+	HW.pContext->CopyResource(RImplementation.TargetSVP->rt_secondVP->pSurface, RImplementation.TargetSVP->rt_Generic_0->pSurface);
 };
 #endif

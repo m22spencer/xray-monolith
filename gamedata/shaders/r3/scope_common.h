@@ -18,6 +18,7 @@ struct Scope
 	// To get a valid texture sample coordinate call: SCOPECOORD_TO_TEXCOORD
 	float2 ffp;
 	float2 sfp;
+
 	float2 exit_pupil;
 	float2 center;
 	float radius;
@@ -48,10 +49,6 @@ struct v_out {
 	float2 ssp_jitter : TEXCOORD1;
 };
 
-
-
-Texture2D s_pip_tex;
-Texture2D s_3dss_tex;
 Texture2D s_reticle;
 
 float4 m_hud_params;
@@ -64,6 +61,8 @@ uniform float4 s3ds_param_4;
 uniform float4 markswitch_current;
 uniform float4 markswitch_color;
 uniform float4 shader_param_8;
+
+uniform float4 output_res;
 
 float4 scope_w_ffp;
 float4 scope_w_sfp;
@@ -110,7 +109,7 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 	if (!isSVPActive() && scope_phase & SCOPE_PHASE_IMAGE) {
 		// This is fake pip mode, so we have to correct the coordinates
 		// FIXME: These coordinates need to be rotated to align with eye up
-		float screen_delta  = length(ddy(scope.hpos.xy * screen_res.zw));
+		float screen_delta  = length(ddy(scope.hpos.xy * output_res.zw));
 		float texture_delta = length(ddy(scope.tc0.xy));
 		float tc_multiplier = texture_delta / screen_delta;
 
@@ -130,9 +129,7 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 }
 
 float3 SampleBackbuffer(float2 tc) {
-	return isSVPActive() 
-        ? s_pip_tex.Sample(smp_base, tc).rgb
-        : s_3dss_tex.Sample(smp_base, tc).rgb;
+	return s_image.Sample(smp_base, tc).rgb;
 }
 
 bool VALID(float2 scopecoord) {
@@ -141,7 +138,7 @@ bool VALID(float2 scopecoord) {
 }
 
 float dbg_wp(v_out v, float4 p, float d) {
-	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * screen_res.zw;
+	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * output_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, p));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
 
@@ -152,7 +149,7 @@ float dbg_wp(v_out v, float4 p, float d) {
 }
 
 float2 world_to_corrected_tc(v_out v, float4 w_P) {
-	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * screen_res.zw;
+	float2 screen_tc = (v.hpos.xy - v.ssp_jitter) * output_res.zw;
 	float2 ffp_ndc = ndc2(mul(m_VP, w_P));
 	float2 ffp_tc  = ffp_ndc * float2(0.5, -0.5) + 0.5;
 
@@ -180,7 +177,7 @@ Scope new_Scope(v_out v) {
 
 	float2 eye_tc = world_to_corrected_tc(v, scope_w_eyepiece);
 	
-    float screen_delta  = length(ddy((v.hpos.xy - v.ssp_jitter) * screen_res.zw));
+    float screen_delta  = length(ddy((v.hpos.xy - v.ssp_jitter) * output_res.zw));
     float texture_delta = length(ddy(v.tc0.xy));
     float tc_multiplier = texture_delta / screen_delta;
 
