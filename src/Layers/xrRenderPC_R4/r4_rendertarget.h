@@ -287,7 +287,6 @@ private:
 	ref_shader s_gasmask_dudv;
 	ref_shader s_nightvision;
 	ref_shader s_fakescope; //crookr
-	ref_shader s_scope_preprocess;
 	ref_shader s_distort;
 	ref_shader s_scope_debug;
 	ref_shader s_heatvision; //--DSR-- HeatVision

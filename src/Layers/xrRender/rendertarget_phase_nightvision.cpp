@@ -489,38 +489,7 @@ void CRenderTarget::phase_3DSSReticle()
 void CRenderTarget::phase_svp_capture()
 {
 	PIX_EVENT(PHASE_SCOPE_SVP_CAPTURE);
+	// This copy is not necessary, remove in the future and read directly from rt_Generic_0
 	HW.pContext->CopyResource(RImplementation.TargetSVP->rt_secondVP->pSurface, RImplementation.TargetSVP->rt_Generic_0->pSurface);
-
-	return;
-
-	RCache.set_CullMode(CULL_NONE);
-	RCache.set_Stencil(FALSE);
-
-	RCache.set_Element(s_scope_preprocess->E[1]);
-	RCache.set_c("scope_render_phase", 1);  // PREPASS
-	RCache.set_c("scope_svp", Device.m_SecondViewport.IsSVPActive());
-
-	
-	{   // Draw fullscreen triangle.
-		u32 Offset = 0;
-		u32 C = color_rgba(0, 0, 0, 255);
-
-		float d_Z = EPS_S;
-		float d_W = 1.0f;
-		float w = float(Device.dwWidth);
-		float h = float(Device.dwHeight);
-
-		Fvector2 tc;
-		tc.set(1.0, 1.0);
-		FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(3, g_combine->vb_stride, Offset);
-		pv->set(0, 0, d_Z, d_W, C, 0, 0); pv++;
-		pv->set(w * 2, 0, d_Z, d_W, C, tc.x * 2, 0); pv++;
-		pv->set(0, h * 2, d_Z, d_W, C, 0, tc.y * 2); pv++;
-		RCache.Vertex.Unlock(3, g_combine->vb_stride);
-		RCache.set_Geometry(g_combine);
-		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-	}
-
-//	HW.pContext->CopyResource(rt_secondVP->pTexture->surface_get(), rt_Color->pTexture->surface_get());
 };
 #endif
