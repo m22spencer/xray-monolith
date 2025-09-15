@@ -21,7 +21,7 @@
 #ifdef DEBUG
 #include "PHDebug.h"
 #endif
-#include "3rd party/luabind/luabind/luabind.hpp"
+#include <luabind/luabind.hpp>
 #include "script_game_object.h"
 
 void CActor::OnEvent(NET_Packet& P, u16 type)

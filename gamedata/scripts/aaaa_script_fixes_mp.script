@@ -607,3 +607,11 @@ function trans_outfit.transparent_gg()
 		end 
 	end
 end
+
+-- Lander:
+-- Implement missing `CSE_ALifeSmartZone::task()` bind.
+-- Fixes segfault inside `CALifeMonsterBrain::process_task`,
+-- which was preventing offline monsters (+ stalkers) from pathfinding.
+function smart_terrain.se_smart_terrain:task()
+	return self.smart_alife_task
+end

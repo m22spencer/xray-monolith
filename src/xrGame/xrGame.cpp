@@ -20,7 +20,6 @@
 #endif
 //#include "lua/library_linkage.h"
 //-AVO
-#include "luabind/library_linkage.h"
 
 //#pragma comment(lib,"ode.lib")
 //#pragma comment(lib,"xrEngine.lib")

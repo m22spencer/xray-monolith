@@ -655,6 +655,7 @@
     <ClInclude Include="_fbox.h" />
     <ClInclude Include="_fbox2.h" />
     <ClInclude Include="_flags.h" />
+    <ClInclude Include="_noncopyable.h" />
     <ClInclude Include="_math.h" />
     <ClInclude Include="_matrix.h" />
     <ClInclude Include="_matrix33.h" />

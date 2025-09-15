@@ -286,7 +286,7 @@ void SStmBarrel::OnShellDrop(const Fvector &play_pos, const Fvector &parent_vel)
 
 void SStmBarrel::SetAmmoElapsed(int num)
 {
-    iAmmoElapsed = max(num, 0);
+    iAmmoElapsed = std::max(num, 0);
 }
 
 /*----------------------------------------------------------------------------------------------------

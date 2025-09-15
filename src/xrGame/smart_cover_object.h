@@ -10,7 +10,7 @@
 #define SMART_COVER_OBJECT_H_INCLUDED
 
 #include "gameobject.h"
-#include <boost/noncopyable.hpp>
+
 #include "script_export_space.h"
 
 namespace smart_cover
@@ -19,7 +19,7 @@ namespace smart_cover
 
 	class object :
 		public CGameObject,
-		private boost::noncopyable
+		private xray::noncopyable
 	{
 	private:
 		typedef CGameObject inherited;

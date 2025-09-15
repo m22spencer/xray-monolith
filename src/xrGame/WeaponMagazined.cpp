@@ -725,7 +725,7 @@ void CWeaponMagazined::UpdateSounds()
 bool CWeaponMagazined::cycleDownCheck() {
 	s8 maxBurstAmount = 0;
 	for (const auto& fm : m_aFireModes) {
-		maxBurstAmount = max(maxBurstAmount, fm);
+		maxBurstAmount = std::max(maxBurstAmount, fm);
 	}
 	return bCycleDown && maxBurstAmount > 1 && m_iShotNum < (maxBurstAmount - 1);
 }

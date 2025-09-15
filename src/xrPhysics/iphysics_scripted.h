@@ -2,8 +2,7 @@
 #define	_IPHYSICS_SCRIPTED_
 
 #pragma once
-//#include <boost/noncopyable.hpp>
-
+#include "../xrCore/_noncopyable.h"
 
 class iphysics_scripted;
 
@@ -44,29 +43,10 @@ protected:
 #endif
 };
 
-namespace non_copy
-{
-	class noncopyable
-	{
-	protected:
-		noncopyable()
-		{
-		}
-
-		~noncopyable()
-		{
-		}
-
-	private: // emphasize the following members are private
-		noncopyable(const noncopyable&);
-		const noncopyable& operator=(const noncopyable&);
-	};
-};
-
 template <class T>
 class cphysics_game_scripted :
 	public iphysics_game_scripted,
-	private non_copy::noncopyable
+	private xray::noncopyable
 {
 	T& impl;
 public:

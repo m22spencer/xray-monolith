@@ -69,8 +69,8 @@ CPatrolPath& CPatrolPath::load_from_config(CInifile* ini_paths, LPCSTR patrol_na
 		Msg("[PP] Linking point for %s", point_name);
 
 		// Verify if point has links (links are optional)
-		shared_str links_csv_key = FormatString("%s:%s", point_name, "links");
-		if (!ini_paths->line_exist(patrol_name, links_csv_key))
+		xr_string links_csv_key = FormatString("%s:%s", point_name, "links");
+		if (!ini_paths->line_exist(patrol_name, links_csv_key.c_str()))
 		{
 			continue;
 		}

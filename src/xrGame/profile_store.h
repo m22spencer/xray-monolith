@@ -1,7 +1,7 @@
 #ifndef GAMESPY_PROFILE_STORE
 #define GAMESPY_PROFILE_STORE
 
-#include <boost/noncopyable.hpp>
+
 #include "../xrEngine/ISheduled.h"
 #include "profile_data_types.h"
 #include "script_export_space.h"
@@ -23,7 +23,7 @@ namespace gamespy_profile
 
 	class profile_store :
 		public ISheduled,
-		private boost::noncopyable
+		private xray::noncopyable
 	{
 	public:
 		explicit profile_store(CGameSpy_Full* fullgs_obj);

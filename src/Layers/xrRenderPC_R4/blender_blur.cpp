@@ -280,7 +280,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp);
 		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
-
+		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_linear");
@@ -292,7 +292,7 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
 
 		C.r_dx10Texture("ao_image", r2_RT_ssfx_temp3);
 		C.r_dx10Texture("s_motion_vectors", r2_RT_ssfx_motion_vectors);
-
+		C.r_dx10Texture("s_position", r2_RT_P);
 		C.r_dx10Sampler("smp_rtlinear");
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_linear");

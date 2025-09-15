@@ -145,7 +145,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 * Commits from IX-Ray Engine: https://github.com/ixray-team/ixray-1.6-stcop
 
 <!----><a name="script_debugger_instructions"></a>
-* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform. How to use it: https://igigog.github.io/anomaly-modding-book/tutorials/addons/lua-debugger.html
+* Debug scripts with VSCode and LuaPanda, support by IX-Ray Platform. How to use it: https://anomaly-modding-book.netlify.app/docs/tutorials/addons/lua-debugger
 
 * All settings can be edited from the game options in "Modded Exes" tab
 ![image](http://puu.sh/JC40Y/9315119150.jpg)
@@ -161,15 +161,36 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 ## How to make my own modded exe?
 
 How to compile exes:
-1. Fork this xray-monolith
-2. Clone the fork onto your pc
-3. Run `git submodule update --init --recursive` to pull git submodules
-4. Select all-in-one-vs2022-wpo branch
-5. Compile the engine-vs2022.sln solution with VS2022
-6. For batch builds of all configurations use `batch_build.bat` in xray-monolith repo
-7. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
+1. Fork this xray-monolith repo, the main branch is `all-in-one-vs2022-wpo`
+2. Download the fork onto your pc
+3. Open Git Bash or terminal in the downloaded folder and run `git submodule update --init --recursive` to pull git submodules
+4. Compile the engine-vs2022.sln solution with VS2022
+5. For batch builds of all configurations use `batch_build.bat`
+6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.09.15**
+* Various Luabind fixes and improvements
+* Simplify `script_callback_ex` templates
+* Fix `PHItemList` compile warning
+* SaloEater: Update link to new wiki (https://github.com/themrdemonized/xray-monolith/pull/372)
+
+**2025.09.12**
+* OXR: Replace shared_str with xr_string for log and fs, fixed https://github.com/themrdemonized/xray-monolith/issues/366
+* Fix https://github.com/themrdemonized/xray-monolith/issues/369
+
+**2025.09.10**
+* ProfLander: Fix CALifeMonsterBrain::process_task segfault (https://github.com/themrdemonized/xray-monolith/pull/364)
+
+**2025.09.06**
+* Replaced luabind with non-Boost version (https://github.com/ixray-team/ixray-1.6-stcop/commit/2f61f5f781130468c945720b76d23ce4bbea95b1)
+* Disable `std::terminate` in luabind (https://github.com/ixray-team/ixray-1.6-stcop/commit/723fb65a8b9ebb89dda8f03cbb4b1bebceabacdc)
+* Removed Boost library
+* Added nullptr check in `CMonsterCorpseMemory::add_corpse`
+* LVutner:
+  * ADD: [Render] Added missing s_position samplers (https://github.com/themrdemonized/xray-monolith/pull/358)
+  * UPD: [Render] r_ComputePass fix (https://github.com/themrdemonized/xray-monolith/pull/359)
+
 **2025.08.30**
 * MFB: Smart covers now have fixed enter min/max distances (https://github.com/themrdemonized/xray-monolith/pull/352)
 * Lucy: Level Script Attachments (https://github.com/themrdemonized/xray-monolith/pull/353)

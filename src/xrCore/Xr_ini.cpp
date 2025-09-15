@@ -993,12 +993,13 @@ void CInifile::Load(IReader* F, LPCSTR path
 	if (OverrideData.size())
 	{
 		//Debug.fatal(DEBUG_INFO, "Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s", OverrideData.begin()->first.c_str(), m_file_name);
-		for (auto i = OverrideData.begin(); i != OverrideData.end(); i++) {
-			auto override_filenames = OverrideToFilename.find(i->first);
-			if (override_filenames != OverrideToFilename.end()) {
-				for (auto &override_filename : override_filenames->second) {
-					if (print_dltx_warnings)
-						Msg("~[DLTX] WARNING: Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", i->first.c_str(), m_file_name, override_filename.first.c_str());
+		if (print_dltx_warnings) {
+			for (const auto& [k, v] : OverrideData) {
+				auto override_filenames = OverrideToFilename.find(k);
+				if (override_filenames != OverrideToFilename.end()) {
+					for (const auto& override_filename : override_filenames->second) {
+						Msg("~[DLTX] WARNING: Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", k.c_str(), m_file_name, override_filename.first.c_str());
+					}
 				}
 			}
 		}

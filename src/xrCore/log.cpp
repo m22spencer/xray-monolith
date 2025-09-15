@@ -25,23 +25,23 @@ static xrCriticalSection logCS(MUTEX_PROFILE_ID(log));
 #else // PROFILE_CRITICAL_SECTIONS
 static xrCriticalSection logCS;
 #endif // PROFILE_CRITICAL_SECTIONS
-xr_vector<shared_str>* LogFile = NULL;
+xr_vector<xr_string> LogFile;
 static LogCallback LogCB = 0;
 
 void FlushLog()
 {
 	PROF_EVENT();
 
-	if (!no_log && LogFile != nullptr)
+	if (!no_log)
 	{
 		PROF_EVENT("Flushing");
 		logCS.Enter();
 		IWriter* f = FS.w_open(logFName);
 		if (f)
 		{
-			for (u32 it = 0; it < LogFile->size(); it++)
+			for (const auto& i : LogFile)
 			{
-				LPCSTR s = *((*LogFile)[it]);
+				LPCSTR s = i.c_str();
 				f->w_string(s ? s : "");
 			}
 			FS.w_close(f);
@@ -90,8 +90,6 @@ extern bool is_console_mark(Console_mark type);
 
 void AddOne(const char* split)
 {
-	if (!LogFile)
-		return;
 
 	logCS.Enter();
 
@@ -130,13 +128,13 @@ void AddOne(const char* split)
 			tmp += std::to_string(items_count).c_str();
 			tmp += "]";
 
-			LogFile->erase(LogFile->end()-1);
-			LogFile->push_back(shared_str(tmp.c_str()));
+			LogFile.erase(LogFile.end()-1);
+			LogFile.push_back(xr_string(tmp.c_str()));
 		}
 		else
 		{
 			// DUMP_PHASE;
-			LogFile->push_back(temp);
+			LogFile.push_back(xr_string(temp.c_str()));
 			last_str = temp;
 			items_count = 0;
 		}
@@ -277,9 +275,7 @@ LPCSTR log_name()
 
 void InitLog()
 {
-	R_ASSERT(LogFile == NULL);
-	LogFile = xr_new<xr_vector<shared_str>>();
-	LogFile->reserve(1000);
+	LogFile.reserve(10000);
 }
 
 void CreateLog(BOOL nl)
@@ -307,11 +303,10 @@ void CreateLog(BOOL nl)
 void CloseLog(void)
 {
 	FlushLog();
-	LogFile->clear();
-	xr_delete(LogFile);
+	LogFile.clear();
 }
 
-shared_str FormatString(LPCSTR fmt, ...)
+xr_string FormatString(LPCSTR fmt, ...)
 {
 	va_list mark;
 	string2048 buf;
@@ -319,6 +314,6 @@ shared_str FormatString(LPCSTR fmt, ...)
 	int sz = _vsnprintf(buf, sizeof(buf) - 1, fmt, mark);
 	buf[sizeof(buf) - 1] = 0;
 	va_end(mark);
-	if (sz) return shared_str(buf);
-	return shared_str(0);
+	if (sz) return xr_string(buf);
+	return xr_string("");
 }

@@ -348,7 +348,7 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 }
 
 #if USE_DX11 
-void CRenderTarget::SetActive() {	
+void CRenderTarget::SetActive(bool force) {	
 	auto isMain = this == RImplementation.TargetMain;
 	if (isMain) {
 		// Ensure that baseRT/baseZB *always* point to the HW targets
@@ -359,7 +359,7 @@ void CRenderTarget::SetActive() {
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
-	if (RImplementation.Target == this)
+	if (!force && RImplementation.Target == this)
 		return;
 
 	auto m = Device.matrices[isMain ? 0 : 1];
@@ -757,7 +757,7 @@ CRenderTarget::CRenderTarget(LPCSTR name, u32 width, u32 height)
 	s_nightvision.create(b_nightvision, "r2\\nightvision");
 
 	s_fakescope.create(b_fakescope, "r2\\fakescope"); //crookr
-	s_scope_preprocess.create("scope_preprocess");
+	s_distort.create("distortion_pass_r4");
 	s_scope_debug.create("scope_debug");
 	s_scope_color_write.create("scope_color_write");
 	s_scope_depth_write.create("scope_depth_write");

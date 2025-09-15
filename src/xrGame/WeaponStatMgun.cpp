@@ -1155,7 +1155,7 @@ void CWeaponStatMgun::UpdateCamera()
 		Fvector pos = Camera()->Position();
 		Fvector dir = Camera()->Direction();
 		collide::rq_result &R = HUD().GetRQ();
-		Fvector vec = Fvector().mad(pos, dir, max(R.range, 30.0F));
+		Fvector vec = Fvector().mad(pos, dir, std::max(R.range, 30.0F));
 		SetParam(eWpnDesiredDir, Fvector().sub(vec, pos).normalize());
 	}
 }
@@ -1298,7 +1298,7 @@ Fvector2 CWeaponStatMgun::GetTraverseLimitHorz()
 
 void CWeaponStatMgun::SetTraverseLimitHorz(Fvector2 vec)
 {
-	m_lim_y_rot.set(min(deg2rad(-vec.y), 0.0F), max(deg2rad(-vec.x), 0.0F));
+	m_lim_y_rot.set(std::min(deg2rad(-vec.y), 0.0F), std::max(deg2rad(-vec.x), 0.0F));
 	clamp(m_lim_y_rot.x, -PI, PI);
 	clamp(m_lim_y_rot.y, -PI, PI);
 }
@@ -1310,7 +1310,7 @@ Fvector2 CWeaponStatMgun::GetTraverseLimitVert()
 
 void CWeaponStatMgun::SetTraverseLimitVert(Fvector2 vec)
 {
-	m_lim_x_rot.set(min(deg2rad(-vec.y), 0.0F), max(deg2rad(-vec.x), 0.0F));
+	m_lim_x_rot.set(std::min(deg2rad(-vec.y), 0.0F), std::max(deg2rad(-vec.x), 0.0F));
 	clamp(m_lim_x_rot.x, -PI_DIV_2, PI_DIV_2);
 	clamp(m_lim_x_rot.y, -PI_DIV_2, PI_DIV_2);
 }
