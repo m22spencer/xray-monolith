@@ -21,7 +21,7 @@ XRCORE_API xrCore Core;
 extern XRCORE_API u32 build_id;
 extern XRCORE_API LPCSTR build_date;
 
-auto PIP_VER = "PiP v14";
+auto PIP_VER = "PiP 0.0.14";
 
 namespace CPU
 {
