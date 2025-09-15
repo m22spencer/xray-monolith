@@ -1165,8 +1165,6 @@ int stack_overflow_exception_filter(int exception_code)
 		return EXCEPTION_CONTINUE_SEARCH;
 }
 
-#include <boost/crc.hpp>
-
 //extern BOOL DllMainOpenAL32(HANDLE module, DWORD reason, LPVOID reserved);
 extern BOOL DllMainXrCore(HANDLE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved);
 extern BOOL DllMainXrPhysics(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);

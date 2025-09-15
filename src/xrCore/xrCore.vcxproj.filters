@@ -607,6 +607,9 @@
     </ClInclude>
     <ClInclude Include="..\3rd party\robin_hood\robin_hood.h" />
     <ClInclude Include="..\3rd party\fastdelegate\fastdelegate.h" />
+    <ClInclude Include="_noncopyable.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc" />

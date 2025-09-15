@@ -12,7 +12,7 @@
 	cls##_wrapper
 
 #define DEFINE_LUA_WRAPPER_HEADER_0(cls)												\
-	struct MAKE_WRAPPER_NAME(cls) : public cls, public ::luabind::wrap_base {				\
+	struct MAKE_WRAPPER_NAME(cls) : public cls, public luabind::wrap_base {				\
 		typedef cls inherited;                                                          \
 		typedef MAKE_WRAPPER_NAME(cls) self_type;										\
 		MAKE_WRAPPER_NAME(cls) ():inherited() {}
@@ -20,20 +20,20 @@
 #define DEFINE_LUA_WRAPPER_FOOTER(cls)													\
 	};
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_0(a,b,c) \
-	::luabind::class_<a,b >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_0(type, wrapper, name) \
+	luabind::class_<type, luabind::no_bases, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_1(a,b,c,d) \
-	::luabind::class_<a,b,d >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_1(type, wrapper, name, base1) \
+	luabind::class_<type, base1, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_2(a,b,c,d,e) \
-	::luabind::class_<a,b,bases<d,e > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_2(type, wrapper, name, base1, base2) \
+	luabind::class_<type, bases<base1, base2>, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_3(a,b,c,d,e,f) \
-	::luabind::class_<a,b,bases<d,e,f > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_3(type, wrapper, name, base1, base2, base3) \
+	luabind::class_<type, bases<base1, base2, base3>, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_4(a,b,c,d,e,f,g) \
-	::luabind::class_<a,b,bases<d,e,f,g > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_4(type, wrapper, name, base1, base2, base3, base4) \
+	luabind::class_<type, bases<base1, base2, base3, base4>, wrapper>(name)
 
 #define DEFINE_LUABIND_VIRTUAL_FUNCTION(a,b,c) \
 	.def(#c, &a::c, &b::c##_static)
@@ -45,12 +45,12 @@
 	.def(#c, (d (a::*)(e))(&a::c), (d (*)(b*,f))(&b::c##_static))
 
 #ifdef DEBUG
-#	ifdef LUABIND_NO_EXCEPTIONS
+#	ifdef LUABIND_NO_EXCEPTIONS 
 #	define CAST_FAILED(v_func_name,ret_type)
 #	else
 #	define CAST_FAILED(v_func_name,ret_type) \
-		catch(::luabind::cast_failed exception) {										\
-			ai().script_engine().script_log (ScriptStorage::eLuaMessageTypeError,"SCRIPT RUNTIME ERROR : ::luabind::cast_failed in function %s (%s)!",#v_func_name,#ret_type);\
+		catch(luabind::cast_failed exception) {										\
+			ai().script_engine().script_log (ScriptStorage::eLuaMessageTypeError,"SCRIPT RUNTIME ERROR : luabind::cast_failed in function %s (%s)!",#v_func_name,#ret_type);\
 			return ((ret_type)(0));													\
 		}
 #	endif

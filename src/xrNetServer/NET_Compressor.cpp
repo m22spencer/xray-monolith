@@ -17,7 +17,7 @@
 #		pragma warning(pop)
 #	endif // DEBUG
 
-#	include <boost/crc.hpp>
+#	include "xrCore.h"
 
 #	if NET_USE_LZO_COMPRESSION
 #		define	ENCODE	rtc9_compress
@@ -381,9 +381,7 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 		*dest = NET_TAG_COMPRESSED;
 
 #if NET_USE_COMPRESSION_CRC
-		boost::crc_32_type temp;
-		temp.process_block(dest + offset, dest + compressed_size);
-		u32 crc = temp.checksum();
+		u32 crc = crc32(dest + offset, compressed_size);
 
 		*((u32*)(dest + 1)) = crc;
 #endif // NET_USE_COMPRESSION_CRC
@@ -497,9 +495,7 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
 #endif // NET_USE_COMPRESSION_CRC
 
 #if NET_USE_COMPRESSION_CRC
-	boost::crc_32_type temp;
-	temp.process_block(src + offset, src + count);
-	u32 crc = temp.checksum();
+	u32 crc = crc32(src + offset, count);
 	//	Msg					("decompressed %d -> ? [0x%08x]",count,crc);
 	if (crc != *((u32*)(src + 1)))
 		Msg("!CRC mismatch");

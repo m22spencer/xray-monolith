@@ -9,7 +9,7 @@
 #define SMART_COVER_PLANNER_ACTIONS_H_INCLUDED
 
 #include "smart_cover_detail.h"
-#include <boost/noncopyable.hpp>
+
 #include "stalker_combat_action_base.h"
 #include "debug_make_final.hpp"
 
@@ -25,7 +25,7 @@ namespace smart_cover
 
 	class action_base :
 		public CStalkerActionCombatBase,
-		private boost::noncopyable
+		private xray::noncopyable
 	{
 	private:
 		typedef CStalkerActionCombatBase inherited;

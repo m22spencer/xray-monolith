@@ -8,14 +8,14 @@
 #ifndef EDIT_ACTIONS_H_INCLUDED
 #define EDIT_ACTIONS_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+
 
 namespace text_editor
 {
 	enum key_state;
 	class line_edit_control;
 
-	class base : private boost::noncopyable
+	class base : private xray::noncopyable
 	{
 	public:
 		base();

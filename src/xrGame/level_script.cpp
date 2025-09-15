@@ -2598,8 +2598,8 @@ void CLevel::script_register(lua_State* L)
 		.def("setHMSms", &xrTime::setHMSms)
 		.def("set", &xrTime::set)
 		.def("get", &xrTime::get,
-		     out_value(_2) + out_value(_3) + out_value(_4) + out_value(_5) + out_value(_6) + out_value(_7) +
-		     out_value(_8))
+		     out_value<2>() + out_value<3>() + out_value<4>() + out_value<5>() + out_value<6>() + out_value<7>() +
+		     out_value<8>())
 		.def("dateToString", &xrTime::dateToString)
 		.def("timeToString", &xrTime::timeToString),
 		// declarations
@@ -2634,10 +2634,10 @@ void CLevel::script_register(lua_State* L)
 		def("prefetch_model", prefetch_model),
 		def("get_visual_userdata", GetVisualUserdata),
 		def("world2ui", world2ui),
-		def("ui2world", (void (*)(Fvector2, Fvector&, u16&))&ui2world, pure_out_value(_2) + pure_out_value(_3)),
-		def("ui2world", (void (*)(Fvector&, Fvector&, u16&))&ui2world, pure_out_value(_2) + pure_out_value(_3)),
-		def("ui2world_offscreen", (void (*)(Fvector2, Fvector&, u16&))& ui2world_offscreen, pure_out_value(_2) + pure_out_value(_3)),
-		def("ui2world_offscreen", (void (*)(Fvector&, Fvector&, u16&))& ui2world_offscreen, pure_out_value(_2) + pure_out_value(_3)),
+		def("ui2world", (void (*)(Fvector2, Fvector&, u16&))&ui2world, pure_out_value<2>() + pure_out_value<3>()),
+		def("ui2world", (void (*)(Fvector&, Fvector&, u16&))&ui2world, pure_out_value<2>() + pure_out_value<3>()),
+		def("ui2world_offscreen", (void (*)(Fvector2, Fvector&, u16&))& ui2world_offscreen, pure_out_value<2>() + pure_out_value<3>()),
+		def("ui2world_offscreen", (void (*)(Fvector&, Fvector&, u16&))& ui2world_offscreen, pure_out_value<2>() + pure_out_value<3>()),
 		
 		// demonized: adjust game news time
 		def("change_game_news_show_time", &change_game_news_show_time),

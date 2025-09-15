@@ -19,7 +19,7 @@ ObjectFactory::CLIENT_BASE_CLASS* CObjectItemScript::client_object() const
 	try
 	{
 		object = ::luabind::object_cast<ObjectFactory::CLIENT_SCRIPT_BASE_CLASS*>(
-			m_client_creator(), ::luabind::adopt(::luabind::result));
+			m_client_creator(), ::luabind::adopt<::luabind::result>());
 	}
 	catch (...)
 	{
@@ -55,7 +55,7 @@ ObjectFactory::SERVER_BASE_CLASS* CObjectItemScript::server_object(LPCSTR sectio
 			return (0);
 		}
 		object = ::luabind::object_cast<ObjectFactory::SERVER_SCRIPT_BASE_CLASS*>(
-			*instance, ::luabind::adopt(::luabind::result));
+			*instance, ::luabind::adopt<::luabind::result>());
 		xr_delete(instance);
 	}
 	catch (const std::exception& e)

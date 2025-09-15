@@ -1278,8 +1278,6 @@ public:
 	}
 };
 
-#include <boost/crc.hpp>
-
 static inline bool match_shader_id(LPCSTR const debug_shader_id, LPCSTR const full_shader_id,
                                    FS_FileSet const& file_set, string_path& result);
 
@@ -1800,63 +1798,63 @@ HRESULT CRender::shader_compile(
 		++len;
 	}
 
-	xr_sprintf(c_ssr_quality, "%d", u8(min(max(ps_ssfx_ssr_quality, 0), 5)));
+	xr_sprintf(c_ssr_quality, "%d", u8(std::min(std::max(ps_ssfx_ssr_quality, 0), 5)));
 	defines[def_it].Name = "SSFX_SSR_QUALITY";
 	defines[def_it].Definition = c_ssr_quality;
 	def_it++;
 	xr_strcat(sh_name, c_ssr_quality);
 	len += xr_strlen(c_ssr_quality);
 
-	xr_sprintf(c_ssfx_water, "%d", u8(min(max(ps_ssfx_water_quality.x, 0.0f), 4.0f)));
+	xr_sprintf(c_ssfx_water, "%d", u8(std::min(std::max(ps_ssfx_water_quality.x, 0.0f), 4.0f)));
 	defines[def_it].Name = "SSFX_WATER_QUALITY";
 	defines[def_it].Definition = c_ssfx_water;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_water);
 	len += xr_strlen(c_ssfx_water);
 
-	xr_sprintf(c_ssfx_water_parallax, "%d", u8(min(max(ps_ssfx_water_quality.y, 0.0f), 3.0f)));
+	xr_sprintf(c_ssfx_water_parallax, "%d", u8(std::min(std::max(ps_ssfx_water_quality.y, 0.0f), 3.0f)));
 	defines[def_it].Name = "SSFX_WATER_PARALLAX";
 	defines[def_it].Definition = c_ssfx_water_parallax;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_water_parallax);
 	len += xr_strlen(c_ssfx_water_parallax);
 
-	xr_sprintf(c_ssfx_il, "%d", u8(min(max(ps_ssfx_il_quality, 0), 64)));
+	xr_sprintf(c_ssfx_il, "%d", u8(std::min(std::max(ps_ssfx_il_quality, 0), 64)));
 	defines[def_it].Name = "SSFX_IL_QUALITY";
 	defines[def_it].Definition = c_ssfx_il;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_il);
 	len += xr_strlen(c_ssfx_il);
 
-	xr_sprintf(c_ssfx_ao, "%d", u8(min(max(ps_ssfx_ao_quality, 2), 8)));
+	xr_sprintf(c_ssfx_ao, "%d", u8(std::min(std::max(ps_ssfx_ao_quality, 2), 8)));
 	defines[def_it].Name = "SSFX_AO_QUALITY";
 	defines[def_it].Definition = c_ssfx_ao;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_ao);
 	len += xr_strlen(c_ssfx_ao);
 
-	xr_sprintf(c_ssfx_pom_refine, "%d", u8(min(max(ps_ssfx_pom_refine, 0), 1)));
+	xr_sprintf(c_ssfx_pom_refine, "%d", u8(std::min(std::max(ps_ssfx_pom_refine, 0), 1)));
 	defines[def_it].Name = "SSFX_POM_REFINE";
 	defines[def_it].Definition = c_ssfx_pom_refine;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_pom_refine);
 	len += xr_strlen(c_ssfx_pom_refine);
 
-	xr_sprintf(c_ssfx_terrain_pom_refine, "%d", u8(min(max(ps_ssfx_terrain_pom_refine, 0), 1)));
+	xr_sprintf(c_ssfx_terrain_pom_refine, "%d", u8(std::min(std::max(ps_ssfx_terrain_pom_refine, 0), 1)));
 	defines[def_it].Name = "SSFX_TERRA_POM_REFINE";
 	defines[def_it].Definition = c_ssfx_terrain_pom_refine;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_terrain_pom_refine);
 	len += xr_strlen(c_ssfx_terrain_pom_refine);
 
-	xr_sprintf(c_ssfx_sss_dir_quality, "%d", u8(min(max((int)ps_ssfx_sss_quality.x, 1), 24)));
+	xr_sprintf(c_ssfx_sss_dir_quality, "%d", u8(std::min(std::max((int)ps_ssfx_sss_quality.x, 1), 24)));
 	defines[def_it].Name = "SSFX_SSS_DIR_QUALITY";
 	defines[def_it].Definition = c_ssfx_sss_dir_quality;
 	def_it++;
 	xr_strcat(sh_name, c_ssfx_sss_dir_quality);
 	len += xr_strlen(c_ssfx_sss_dir_quality);
 
-	xr_sprintf(c_ssfx_sss_omni_quality, "%d", u8(min(max((int)ps_ssfx_sss_quality.y, 1), 12)));
+	xr_sprintf(c_ssfx_sss_omni_quality, "%d", u8(std::min(std::max((int)ps_ssfx_sss_quality.y, 1), 12)));
 	defines[def_it].Name = "SSFX_SSS_OMNI_QUALITY";
 	defines[def_it].Definition = c_ssfx_sss_omni_quality;
 	def_it++;
@@ -2046,9 +2044,7 @@ HRESULT CRender::shader_compile(
 			u32 crc = 0;
 			crc = file->r_u32();
 
-			boost::crc_32_type processor;
-			processor.process_block(file->pointer(), ((char*)file->pointer()) + file->elapsed());
-			u32 const real_crc = processor.checksum();
+			u32 const real_crc = crc32(file->pointer(), file->elapsed());
 
 			if (real_crc == crc)
 			{
@@ -2079,10 +2075,7 @@ HRESULT CRender::shader_compile(
 		{
 			IWriter* file = FS.w_open(file_name);
 
-			boost::crc_32_type processor;
-			processor.process_block(pShaderBuf->GetBufferPointer(),
-			                        ((char*)pShaderBuf->GetBufferPointer()) + pShaderBuf->GetBufferSize());
-			u32 const crc = processor.checksum();
+			u32 const crc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
 
 			file->w_u32(crc);
 			file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());

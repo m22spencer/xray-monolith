@@ -302,9 +302,15 @@ DEFINE_VECTOR(xr_rtoken, RTokenVec, RTokenVecIt);
 #include "FileSystem.h"
 #include "FTimer.h"
 #include <fastdelegate/fastdelegate.h>
+#include "_noncopyable.h"
 #include "intrusive_ptr.h"
 
 #include "net_utils.h"
+
+// CRC32 functions
+XRCORE_API u32 crc32(const void* P, u32 len);
+XRCORE_API u32 crc32(const void* P, u32 len, u32 starting_crc);
+XRCORE_API u32 path_crc32(const char* path, u32 len);
 
 // destructor
 template <class T>

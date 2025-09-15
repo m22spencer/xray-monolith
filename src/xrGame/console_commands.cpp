@@ -1159,7 +1159,7 @@ public:
 
 	virtual void Execute(LPCSTR)
 	{
-		LogFile->clear_not_free();
+		LogFile.clear_not_free();
 		FlushLog();
 		Msg("* Log file has been cleaned successfully!");
 	}

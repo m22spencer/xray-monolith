@@ -3200,7 +3200,7 @@ void CWeapon::ZoomDec()
 
 	float f = GetZoomFactor() * power + delta;
 	if (useNewZoomDeltaAlgorithm)
-		f = GetZoomFactor() * power / max(delta, 0.001f);
+		f = GetZoomFactor() * power / std::max(delta, 0.001f);
 
 	clamp(f, m_zoom_params.m_fScopeZoomFactor * power, min_zoom_factor);
 	SetZoomFactor(f / power);

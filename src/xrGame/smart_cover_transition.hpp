@@ -23,7 +23,7 @@ namespace smart_cover
 
 		class action :
 			private debug::make_final<action>,
-			private boost::noncopyable
+			private xray::noncopyable
 		{
 		public:
 			typedef xr_vector<animation_action *> Animations;
