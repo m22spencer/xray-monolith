@@ -18,6 +18,8 @@ struct Scope
 	// To get a valid texture sample coordinate call: SCOPECOORD_TO_TEXCOORD
 	float2 ffp;
 	float2 sfp;
+	float2 eyepiece;
+
 	float2 exit_pupil;
 	float2 center;
 	float radius;
@@ -48,10 +50,6 @@ struct v_out {
 	float2 ssp_jitter : TEXCOORD1;
 };
 
-
-
-Texture2D s_pip_tex;
-Texture2D s_3dss_tex;
 Texture2D s_reticle;
 
 float4 m_hud_params;
@@ -130,9 +128,7 @@ float2 SCOPECOORD_TO_TEXCOORD(float2 sc) {
 }
 
 float3 SampleBackbuffer(float2 tc) {
-	return isSVPActive() 
-        ? s_pip_tex.Sample(smp_base, tc).rgb
-        : s_3dss_tex.Sample(smp_base, tc).rgb;
+	return s_image.Sample(smp_base, tc).rgb;
 }
 
 bool VALID(float2 scopecoord) {
@@ -183,6 +179,8 @@ Scope new_Scope(v_out v) {
     float screen_delta  = length(ddy((v.hpos.xy - v.ssp_jitter) * screen_res.zw));
     float texture_delta = length(ddy(v.tc0.xy));
     float tc_multiplier = texture_delta / screen_delta;
+
+	s.eyepiece = eye_tc;
 
 	{
 		float mag = curMag() / minMag();

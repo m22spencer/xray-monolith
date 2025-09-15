@@ -348,7 +348,7 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 }
 
 #if USE_DX11 
-void CRenderTarget::SetActive() {	
+void CRenderTarget::SetActive(bool force) {	
 	auto isMain = this == RImplementation.TargetMain;
 	if (isMain) {
 		// Ensure that baseRT/baseZB *always* point to the HW targets
@@ -359,7 +359,7 @@ void CRenderTarget::SetActive() {
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
-	if (RImplementation.Target == this)
+	if (!force && RImplementation.Target == this)
 		return;
 
 	auto m = Device.matrices[isMain ? 0 : 1];

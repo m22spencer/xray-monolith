@@ -7,5 +7,7 @@ float4 main(v2p_TL I) : SV_Target
 {
 	Scope s;
 	s.sfp = I.Tex0;
+	s.center = float2(0.5, 0.5);
+	s.radius = 0.5;
 	return float4(scope_custom_image(s), 1.0);
 } 

@@ -422,7 +422,7 @@ public:
 	CRenderTarget();
 	CRenderTarget(LPCSTR name, u32 width, u32 height);
 	~CRenderTarget();
-	void SetActive();
+	void SetActive(bool force = false);
 	void accum_point_geom_create();
 	void accum_point_geom_destroy();
 	void accum_omnip_geom_create();

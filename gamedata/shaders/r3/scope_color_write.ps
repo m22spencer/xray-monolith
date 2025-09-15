@@ -4,6 +4,7 @@
 
 // Forward declare functions for better error messages
 float3 scope_custom_image(Scope s);
+float3 scope_custom_image_postprocess(Scope s, float3 color);
 #include "scope_custom_image.h"
 
 float4 scope_custom_reticle(Scope s);
@@ -31,10 +32,10 @@ float4 main(v_out I) : SV_Target
     }
 
     if (scope_phase & SCOPE_PHASE_IMAGE) {
+        float3 color = scope_custom_image(scope).rgb;
+
         o = valid
-            ? isSVPActive()
-                ? float4(s_pip_tex.Sample(smp_base, SCOPECOORD_TO_TEXCOORD(scope.sfp)).rgb, 1.0) // Hack for heatvision
-                : float4(scope_custom_image(scope), 1.0)
+            ? float4(scope_custom_image_postprocess(scope, color), 1.0)
             : float4(0,0,0,1);
     }
     if (scope_phase & SCOPE_PHASE_RETICLE) {
