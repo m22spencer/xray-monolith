@@ -425,13 +425,13 @@ void CRenderTarget::phase_3DSSReticle()
 		draw_scope(s_scope_color_write, [](auto N) -> void {
 			RCache.set_c("scope_phase", SCOPE_PHASE_IMAGE);
 
-			if (Device.m_SecondViewport.IsSVPActive()) {
-				// Set screen_res to the gbuffer size
-				auto t = RImplementation.TargetSVP;
+			{	// Set screen_res to the gbuffer size
+				auto t = Device.m_SecondViewport.IsSVPActive() ? RImplementation.TargetSVP : RImplementation.TargetMain;
 				RCache.set_c("screen_res", Fvector4({(float)t->Width, (float)t->Height, 1.0f/(float)t->Width, 1.0f/(float)t->Height}));
+			}
 
-				// Resolution of the view we are rendering into
-				t = RImplementation.TargetMain;
+			{	// Resolution of the view we are rendering into
+				auto t = RImplementation.TargetMain;
 				RCache.set_c("output_res", Fvector4({(float)t->Width, (float)t->Height, 1.0f/(float)t->Width, 1.0f/(float)t->Height}));
 			}
 
