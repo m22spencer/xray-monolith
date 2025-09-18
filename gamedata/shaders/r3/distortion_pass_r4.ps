@@ -8,10 +8,11 @@ float isSVPFrame() { return m_hud_params.w > 0.5; }
 // Taken from combine_2_naa
 
 Texture2D 			s_distort;
-#define	EPSDEPTH	0.001
+#define	EPSDEPTH	 0.001
+#define PIXEL_OFFSET 0.75    // Fix one pixel shift for texture loads
 
 float2 distortion_tc(float2 tc, float distortion_scale = 1.0) {
-	float2 sc = tc * screen_res.xy;
+	float2 sc = tc * screen_res.xy + PIXEL_OFFSET;
 
 	gbuffer_data gbd	= gbuffer_load_data(tc, sc);
 	
@@ -30,5 +31,6 @@ float2 distortion_tc(float2 tc, float distortion_scale = 1.0) {
 
 float4 main(v2p_TL I) : SV_Target
 {
-    return s_image.Sample(smp_base, distortion_tc(I.Tex0, isSVPFrame() ? SVP_SCALE_FACTOR : 1.0));
+	float2 d_tc = distortion_tc(I.Tex0, isSVPFrame() ? SVP_SCALE_FACTOR : 1.0);
+    return s_image.Load(int3(d_tc * screen_res.xy + PIXEL_OFFSET, 0),0);
 } 
