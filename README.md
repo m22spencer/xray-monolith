@@ -169,6 +169,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.09.19**
+* Possible fix for issue https://github.com/themrdemonized/xray-monolith/issues/375
+
 **2025.09.15**
 * Various Luabind fixes and improvements
 * Simplify `script_callback_ex` templates
