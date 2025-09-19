@@ -211,8 +211,6 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
 	if (IsGameTypeSingle())
 	{
-		xr_vector<shared_str> ammo_types;
-
 		CWeapon* weapon = cur_wpn.cast_weapon();
 		if (!weapon)
 			return;
@@ -238,25 +236,18 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 		xr_sprintf(str, sizeof(str), "%d", ammo_count);
 		m_textAmmoCount2.SetText(str);
 
-		ammo_types = weapon->m_ammoTypes;
+		const auto& ammo_types = weapon->m_ammoTypes;
 		if (ammo_types.empty())
 			return;
 
 		xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
 		m_textAmmoUsedType.SetTextST(str);
 
-		int counter = 0;
 		xr_vector<shared_str> good_ammo;
-
-		xr_vector<shared_str>::iterator it = ammo_types.begin();
-		for (; it != ammo_types.end();)
+		for (const auto& ammo_type : ammo_types)
 		{
-			if (ammo_types[counter] != NULL && !strstr(ammo_types[counter].c_str(), "_bad") && !strstr(
-				ammo_types[counter].c_str(), "_verybad"))
-				good_ammo.push_back(ammo_types[counter].c_str());
-
-			it++;
-			counter++;
+			if (ammo_type != NULL && !strstr(ammo_type.c_str(), "_bad") && !strstr(ammo_type.c_str(), "_verybad"))
+				good_ammo.push_back(ammo_type.c_str());
 		}
 
 		// Выводим иконки патронов --#SM+#--
