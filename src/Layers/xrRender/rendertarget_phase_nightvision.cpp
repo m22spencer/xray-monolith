@@ -399,25 +399,18 @@ void CRenderTarget::phase_3DSSReticle()
 	}
 
 	{   // Remap gbuffer bindings to where the scope was rendered
-		ref_texture secondVP;
-		secondVP.create(r2_RT_secondVP);
-		secondVP->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
-			? RImplementation.TargetSVP->rt_secondVP->pTexture._get() 
-			: rt_secondVP->pTexture._get());
+		auto f = [&](LPCSTR name, ref_rt& target) -> void {
+			ref_texture t;
+			t.create(name);
+			RCache.override_Texture(t->cName, target->pTexture);
+		};
 
-		ref_texture rt_pos_tmp;
-		rt_pos_tmp.create(r2_RT_generic2);
-		rt_pos_tmp->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
-			? RImplementation.TargetSVP->rt_Position->pTexture._get() 
-			: rt_Generic_2->pTexture._get());
+		auto svp = Device.m_SecondViewport.IsSVPActive();
+		
+		f(r2_RT_secondVP, svp ? RImplementation.TargetSVP->rt_secondVP : RImplementation.TargetMain->rt_secondVP);		
+		f(r2_RT_generic2, svp ? RImplementation.TargetSVP->rt_Position : RImplementation.TargetMain->rt_Generic_2);
+		f(r2_RT_heat,     svp ? RImplementation.TargetSVP->rt_Heat : RImplementation.TargetMain->rt_Heat);
 
-		ref_texture rt_heat_tmp;
-		rt_heat_tmp.create(r2_RT_heat);
-		rt_heat_tmp->fast_set_unsafe(Device.m_SecondViewport.IsSVPActive() 
-			? RImplementation.TargetSVP->rt_Heat->pTexture._get() 
-			: rt_Heat->pTexture._get());
-
-		RCache.Invalidate();
 		u_setrt(RImplementation.TargetMain->rt_Generic_0, nullptr, RImplementation.TargetMain->rt_Position, RImplementation.TargetMain->baseZB);
 	}
 

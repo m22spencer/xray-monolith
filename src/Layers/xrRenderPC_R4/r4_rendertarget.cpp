@@ -359,8 +359,12 @@ void CRenderTarget::SetActive(bool force) {
 	HW.pBaseRT = baseRT;
 	HW.pBaseZB = baseZB;
 
-	if (!force && RImplementation.Target == this)
+	if (!force && RImplementation.Target == this) {
+		for (auto rt : RenderTargetRemaps) {
+			RCache.override_Texture(rt.first->cName, rt.second->pTexture);
+		}
 		return;
+	}
 
 	auto m = Device.matrices[isMain ? 0 : 1];
 	if (g_pGamePersistent) {
@@ -370,9 +374,7 @@ void CRenderTarget::SetActive(bool force) {
 	}
 	RImplementation.Target = this;
 
-	for (auto rt : RenderTargetRemaps) {
-		rt.first->fast_set_unsafe(rt.second->pTexture._get());
-	}
+
 
 	RImplementation.ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 	RImplementation.View = 0;
@@ -385,6 +387,11 @@ void CRenderTarget::SetActive(bool force) {
 	Device.fHeight_2 = Height >> 1;
 	
 	RCache.Invalidate();
+
+	for (auto rt : RenderTargetRemaps) {
+		RCache.override_Texture(rt.first->cName, rt.second->pTexture);
+	}
+
 	set_viewport_size(HW.pContext, custom_viewport->Width, custom_viewport->Height);
 	RCache.set_RT(baseRT, 0);
 	RCache.set_RT(nullptr, 1);

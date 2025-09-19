@@ -697,6 +697,8 @@ void CRender::Render()
 
 	rmNormal();
 
+	TargetMain->SetActive();
+
 	bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
 	if (_menu_pp)
 	{
