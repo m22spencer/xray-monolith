@@ -145,6 +145,7 @@ private:
 	ID3D11HullShader* hs;
 	ID3D11DomainShader* ds;
 	ID3D11ComputeShader* cs;
+	xr_map<shared_str, ref_texture> textureOverrides;
 #	endif
 #endif	//	USE_DX10
 
@@ -271,6 +272,10 @@ public:
 
 	IC void set_Constants(R_constant_table* C);
 	IC void set_Constants(ref_ctable& C) { set_Constants(&*C); }
+
+#if defined(USE_DX11)
+	void override_Texture(shared_str name, ref_texture texture);
+#endif
 
 	void set_Textures(STextureList* T);
 	IC void set_Textures(ref_texture_list& T) { set_Textures(&*T); }

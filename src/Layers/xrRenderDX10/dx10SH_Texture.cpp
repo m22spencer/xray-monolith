@@ -52,20 +52,6 @@ CTexture::~CTexture()
 	DEV->_DeleteTexture(this);
 }
 
-void CTexture::fast_set_unsafe(CTexture* source) {
-	if (!source) return;
-
-	if (!unsafe_set) {
-		_RELEASE(m_pSRView);
-		_RELEASE(pSurface);
-		unsafe_set = true;
-	}
-
-	m_pSRView = source->m_pSRView;
-	pSurface = source->pSurface;
-	desc_cache = source->desc_cache;
-}
-
 void CTexture::surface_set(ID3DBaseTexture* surf)
 {
 	if (surf) surf->AddRef();
