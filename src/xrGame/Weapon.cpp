@@ -1576,7 +1576,7 @@ bool CWeapon::Action(u16 cmd, u32 flags)
 			}
 			return true;
 		}
-	case kCUSTOM16:
+	case kCUSTOM21:
 		if (useSeparateUBGLKeybind && flags & CMD_START && !IsPending())
 		{
 			if (pActor && pActor->is_safemode())
