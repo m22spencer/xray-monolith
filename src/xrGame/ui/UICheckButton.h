@@ -30,7 +30,7 @@ public:
 
 	void InitCheckButton(Fvector2 pos, Fvector2 size, LPCSTR texture_name);
 
-	//состояние кнопки
+	//СЃРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРєРё
 	IC bool GetCheck() const { return GetButtonState() == BUTTON_PUSHED; }
 	IC void SetCheck(bool ch)
 	{

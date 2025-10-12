@@ -254,6 +254,11 @@ public:
 	IC void set_xform_world(const Fmatrix& M);
 	IC void set_xform_view(const Fmatrix& M);
 	IC void set_xform_project(const Fmatrix& M);
+
+	IC void set_xform_world_prev(const Fmatrix& M);
+	IC void set_xform_view_prev(const Fmatrix& M);
+	IC void set_xform_project_prev(const Fmatrix& M);
+
 	IC const Fmatrix& get_xform_world();
 	IC const Fmatrix& get_xform_view();
 	IC const Fmatrix& get_xform_project();

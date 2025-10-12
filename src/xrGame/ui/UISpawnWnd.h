@@ -34,10 +34,10 @@ public:
 protected:
 	void InitTeamLogo();
 
-	// Установка нового режима отображения
+	// РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ СЂРµР¶РёРјР° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 	//	void SetDisplayMode(bool bDual = false);
 
-	// -1 - еще не нажималась, 0 - primary (левая), 1 - secondary (правая)
+	// -1 - РµС‰Рµ РЅРµ РЅР°Р¶РёРјР°Р»Р°СЃСЊ, 0 - primary (Р»РµРІР°СЏ), 1 - secondary (РїСЂР°РІР°СЏ)
 	//	int GetPressingResult() { return 1; }
 
 	//	void	SetCallbackFunc (ButtonClickCallback pFunc);

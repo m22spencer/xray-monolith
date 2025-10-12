@@ -4,7 +4,7 @@
 
 #include "pch_script.h"
 #include "script_game_object.h"
-using namespace luabind;
+
 
 float psHUDSoundVolume = 1.0f;
 float psHUDStepSoundVolume = 1.0f;
@@ -284,22 +284,33 @@ void HUD_SOUND_COLLECTION_LAYERED::SetPosition(LPCSTR alias, const Fvector& pos)
 	}
 }
 
+void HUD_SOUND_COLLECTION_LAYERED::UpdateAllSoundsPositions(const Fvector& P)
+{
+	for (auto& i : m_sound_items)
+	{
+		for (auto& s : i.m_sound_items)
+		{
+			s.set_position(P);
+		}
+	}
+}
+
 void HUD_SOUND_COLLECTION_LAYERED::PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent,
                                              bool hud_mode, bool looped, u8 index, float volume_mult)
 {
 	LPCSTR alias_to_play = alias;
-	luabind::functor<luabind::object> funct;
+	::luabind::functor<::luabind::object> funct;
 	if (ai().script_engine().functor("_G.COnBeforePlayHudSound", funct))
 	{
 		const CGameObject* parent_game_object = smart_cast<const CGameObject*>(parent);
 		if (parent_game_object)
 		{
 			auto parent_lua_game_object = parent_game_object->lua_game_object();
-			luabind::object output = funct(alias, parent_lua_game_object);
+			::luabind::object output = funct(alias, parent_lua_game_object);
 			if (output && output.type() == LUA_TTABLE)
 			{
-				LPCSTR section = luabind::object_cast<LPCSTR>(output["section"]);
-				LPCSTR line = luabind::object_cast<LPCSTR>(output["line"]);
+				LPCSTR section = ::luabind::object_cast<LPCSTR>(output["section"]);
+				LPCSTR line = ::luabind::object_cast<LPCSTR>(output["line"]);
 				if (!section)
 				{
 					Msg("!_G.COnBeforePlayHudSound callback, HUD_SOUND_COLLECTION_LAYERED::PlaySound, failed to override sound item %s, no section specified", alias);

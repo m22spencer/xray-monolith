@@ -71,6 +71,7 @@ public:
 	virtual void set_color(float r, float g, float b) = 0;
 	virtual void set_hud_mode(bool b) = 0;
 	virtual bool get_hud_mode() = 0;
+	virtual void set_is_playerlight(bool b) = 0;
 	virtual ~IRender_Light();
 };
 
@@ -327,8 +328,9 @@ public:
 	// virtual void model_Delete (IRender_DetailModel* & F) = 0;
 	virtual void model_Logging(BOOL bEnable) = 0;
 	virtual void models_Prefetch() = 0;
-	virtual void models_PrefetchOne(LPCSTR name) = 0;
-	virtual void models_Clear(BOOL b_complete) = 0;
+	virtual void models_PrefetchOne(LPCSTR name, bool assert = true) = 0;
+	virtual void models_Clear(BOOL b_complete) = 0; 
+	virtual bool models_Exists(LPCSTR name) = 0;
 
 	// Occlusion culling
 	virtual BOOL occ_visible(vis_data& V) = 0;

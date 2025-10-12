@@ -6,6 +6,11 @@
 
 #include "../xrRenderDX10/dx10BufferUtils.h"
 
+// Vars to store wind prev frame data ( Motion vectors )
+static u32 prev_frame = -1;
+static float prev_time = 0;
+static Fvector4	prev_dir1 = { 0, 0, 0 }, prev_dir2 = { 0, 0, 0 };
+
 const int quant = 16384;
 const int c_hdr = 10;
 const int c_size = 4;
@@ -89,35 +94,49 @@ void CDetailManager::hw_Render()
 
 	// Wave0
 	float scale = 1.f / float(quant);
-	Fvector4 wave;
+	Fvector4 wave, prev_wave;
 	Fvector4 consts;
 	consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
 	//wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
+	prev_wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, prev_time);
 	//RCache.set_c			(&*hwc_consts,	scale,		scale,		ps_r__Detail_l_aniso,	ps_r__Detail_l_ambient);				// consts
 	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
 	//RCache.set_c			(&*hwc_wind,	dir1);																					// wind-dir
 	//hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, 1, 0);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, prev_wave.div(PI_MUL_2), prev_dir1, 1, 0);
 
 	// Wave1
 	//wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
+	prev_wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, prev_time);
 	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
 	//RCache.set_c			(&*hwc_wind,	dir2);																					// wind-dir
 	//hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 2, 0);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, prev_wave.div(PI_MUL_2), prev_dir2, 2, 0);
 
 	// Still
 	consts.set(scale, scale, scale, 1.f);
 	//RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
 	//RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
 	//hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
-	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 0, 1);
+	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, prev_wave.div(PI_MUL_2), prev_dir2, 0, 1);
+
+	if (prev_frame != Device.dwFrame) 
+	{
+		prev_frame = Device.dwFrame;
+		
+		// Prev Frame swing time
+		prev_time = m_time_pos;
+
+		// Prev frame dir
+		prev_dir1.set(dir1);
+		prev_dir2.set(dir2);
+	}
 }
 
-void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
-                                    u32 lod_id)
+void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, 
+									const Fvector4& prev_wave, const Fvector4& prev_wind, u32 var_id, u32 lod_id)
 {
 	static shared_str strConsts("consts");
 	static shared_str strWave("wave");
@@ -125,6 +144,12 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 	static shared_str strArray("array");
 	static shared_str strXForm("xform");
 
+	// Vanilla grass/trees wind
+	static shared_str strWavePrev("wave_prev");
+	static shared_str strDir2DPrev("dir2D_prev");
+
+	// Grass Benders
+	static shared_str strPrevPos("benders_prevpos");
 	static shared_str strPos("benders_pos");
 	static shared_str strGrassSetup("benders_setup");
 
@@ -177,6 +202,9 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 				RCache.set_c(strXForm, Device.mFullTransform);
 				RCache.set_c(strGrassAlign, ps_ssfx_terrain_grass_align);
 
+				RCache.set_c(strWavePrev, prev_wave);
+				RCache.set_c(strDir2DPrev, prev_wind);
+
 				if (ps_ssfx_grass_interactive.y > 0)
 				{
 					RCache.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
@@ -198,6 +226,23 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 						{
 							c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
 							c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+						}
+					}
+
+					Fvector4* c_prev_grass;
+					{
+						void* prev_GrassData;
+						RCache.get_ConstantDirect(strPrevPos, BendersQty * sizeof(Fvector4) * 2, &prev_GrassData, 0, 0);
+						c_prev_grass = (Fvector4*)prev_GrassData;
+					}
+					VERIFY(c_prev_grass);
+
+					if (c_prev_grass)
+					{
+						for (int Bend = 0; Bend < BendersQty; Bend++)
+						{
+							c_prev_grass[Bend].set(GData.prev_pos[Bend]);
+							c_prev_grass[Bend + 16].set(GData.prev_dir[Bend]);
 						}
 					}
 				}

@@ -432,8 +432,8 @@ void IReader::r(void* p, int cnt)
 	advance(cnt);
 #ifdef DEBUG
     BOOL bShow = FALSE;
-    if (dynamic_cast<CFileReader*>(this)) bShow = TRUE;
-    if (dynamic_cast<CVirtualFileReader*>(this)) bShow = TRUE;
+    if (fast_dynamic_cast<CFileReader*>(this)) bShow = TRUE;
+    if (fast_dynamic_cast<CVirtualFileReader*>(this)) bShow = TRUE;
     if (bShow)
     {
         FS.dwOpenCounter++;

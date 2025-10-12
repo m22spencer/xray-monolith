@@ -113,7 +113,7 @@ add_to_type_list(CSE_ALifeItem)
 
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch, CSE_ALifeItem)
 
-	//флаги
+	//С„Р»Р°РіРё
 	enum EStats
 	{
 		eTorchActive = (1 << 0),
@@ -151,7 +151,7 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon, CSE_ALifeItem)
 
 	typedef ALife::EWeaponAddonStatus EWeaponAddonStatus;
 
-	//текущее состояние аддонов
+	//С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р°РґРґРѕРЅРѕРІ
 	enum EWeaponAddonState
 	{
 		eWeaponAddonScope = 0x01,

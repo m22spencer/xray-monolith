@@ -25,7 +25,7 @@
 
 using namespace ALife;
 #ifdef	ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
-using namespace luabind; //Alundaio
+ //Alundaio
 #endif
 
 extern string_path g_last_saved_game;
@@ -162,7 +162,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 		return (false);
 
 #ifdef	ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.CALifeUpdateManager__on_before_change_level", funct))
 		funct(&net_packet);
 #endif

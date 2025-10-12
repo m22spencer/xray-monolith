@@ -30,8 +30,15 @@
 
 CUIProgressShape* g_MissileForceShape = NULL;
 
+#ifdef SPAWN_ANTIFREEZE
+xrCriticalSection force_progress_cs;
+#endif
 void create_force_progress()
 {
+#ifdef SPAWN_ANTIFREEZE
+	xrCriticalSectionGuard g(force_progress_cs);
+#endif
+
 	VERIFY(!g_MissileForceShape);
 	CUIXml uiXml;
 	uiXml.Load(CONFIG_PATH, UI_PATH, "grenade.xml");
@@ -264,14 +271,9 @@ void CMissile::UpdateCL()
 	Fvector P;
 	Center(P);
 
-	if (m_sounds.FindSoundItem("sndShow", false))
-		m_sounds.SetPosition("sndShow", P);
-	if (m_sounds.FindSoundItem("sndHide", false))
-		m_sounds.SetPosition("sndHide", P);
+	m_sounds.UpdateAllSoundsPositions(P);
 	if (m_sounds.FindSoundItem("sndThrow", false) && m_fake_missile)
 		m_sounds.SetPosition("sndThrow", m_fake_missile->Position());
-	if (m_sounds.FindSoundItem("sndCheckout", false))
-		m_sounds.SetPosition("sndCheckout", P);
 }
 
 void CMissile::shedule_Update(u32 dt)

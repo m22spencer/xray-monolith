@@ -90,6 +90,9 @@ jobs:
       uses: actions/checkout@v4
       # with:
       #   ref: all-in-one-vs2022
+      
+    - name: Init submodules
+      uses: snickerbockers/submodules-init@v4
 
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1.3.1

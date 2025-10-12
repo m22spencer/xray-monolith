@@ -58,7 +58,7 @@ public:
 	bool see_enemy_recently(const CEntityAlive* enemy);
 	bool enemy_see_me_now();
 
-	// вернуть количество врагов
+	// РІРµСЂРЅСѓС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РІСЂР°РіРѕРІ
 	u32 get_enemies_count();
 
 	void add_enemy(const CEntityAlive*);
@@ -66,7 +66,7 @@ public:
 
 	bool is_enemy(const CEntityAlive* obj);
 
-	// обновить врага в соответствии с врагом у monster
+	// РѕР±РЅРѕРІРёС‚СЊ РІСЂР°РіР° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ РІСЂР°РіРѕРј Сѓ monster
 	void transfer_enemy(CBaseMonster* friend_monster);
 
 	u32 get_my_vertex_enemy_last_seen() { return my_vertex_enemy_last_seen; }

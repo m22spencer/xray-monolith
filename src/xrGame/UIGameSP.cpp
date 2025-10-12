@@ -115,7 +115,7 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
 		{
 			if (!psActorFlags.test(AF_3D_PDA) && !pActor->inventory_disabled())
 			{
-				luabind::functor<bool> funct;
+				::luabind::functor<bool> funct;
 				if (ai().script_engine().functor("pda.pda_use", funct))
 				{
 					if (funct())
@@ -169,7 +169,7 @@ void CUIGameSP::StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOw
 	//.	if( MainInputReceiver() )	return;
 
 	//---- before trade mode ---------------------------
-	luabind::functor<bool> funct1;
+	::luabind::functor<bool> funct1;
 	if (ai().script_engine().functor("actor_menu_inventory.CUIActorMenu_OnMode_Trade", funct1))
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(pOtherOwner);
@@ -190,7 +190,7 @@ void CUIGameSP::StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech)
 	//.	if( MainInputReceiver() )	return;
 	
 	//---- before upgrade mode ---------------------------
-	luabind::functor<bool> funct1;
+	::luabind::functor<bool> funct1;
 	if (ai().script_engine().functor("actor_menu_inventory.CUIActorMenu_OnMode_Upgrade", funct1))
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(pMech);
@@ -221,7 +221,7 @@ void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOther
 	if (TopInputReceiver()) return;
 	
 	//---- before Loot mode ---------------------------
-	luabind::functor<bool> funct1;
+	::luabind::functor<bool> funct1;
 	if (ai().script_engine().functor("actor_menu_inventory.CUIActorMenu_OnMode_DeadBodySearch", funct1))
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(pOtherOwner);
@@ -242,7 +242,7 @@ void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryBox* pBox) //
 	if (TopInputReceiver()) return;
 	
 	//---- before Loot mode ---------------------------
-	luabind::functor<bool> funct1;
+	::luabind::functor<bool> funct1;
 	if (ai().script_engine().functor("actor_menu_inventory.CUIActorMenu_OnMode_DeadBodySearch", funct1))
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(pBox);

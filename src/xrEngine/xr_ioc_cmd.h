@@ -12,7 +12,7 @@ class ENGINE_API IConsole_Command
 {
 public:
 	friend class CConsole;
-	typedef char TInfo[256];
+	typedef char TInfo[512];
 	typedef char TStatus[256];
 	typedef xr_vector<shared_str> vecTips;
 	typedef xr_vector<shared_str> vecLRU;
@@ -220,11 +220,13 @@ public:
 	{
 		I[0] = 0;
 		xr_token* tok = tokens;
-		while (tok->name)
+		for (int Iter = 0;; Iter++)
 		{
+			if (tok[Iter].name == nullptr)
+				break;
+
 			if (I[0]) xr_strcat(I, "/");
-			xr_strcat(I, tok->name);
-			tok++;
+			xr_strcat(I, tok[Iter].name);
 		}
 	}
 

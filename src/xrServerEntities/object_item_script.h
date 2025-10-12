@@ -17,21 +17,21 @@ protected:
 	typedef CObjectItemAbstract inherited;
 
 protected:
-	luabind::object m_client_creator;
-	luabind::object m_server_creator;
+	::luabind::object m_client_creator;
+	::luabind::object m_server_creator;
 
 public:
 	CObjectItemScript(
 #ifndef NO_XR_GAME
-		luabind::object client_creator,
+		::luabind::object client_creator,
 #endif
-		luabind::object server_creator,
+		::luabind::object server_creator,
 		const CLASS_ID& clsid,
 		LPCSTR script_clsid
 	);
 #ifndef NO_XR_GAME
 	CObjectItemScript(
-		luabind::object creator,
+		::luabind::object creator,
 		const CLASS_ID& clsid,
 		LPCSTR script_clsid
 	);

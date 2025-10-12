@@ -1,11 +1,10 @@
-#ifndef SoundRender_CoreH
-#define SoundRender_CoreH
 #pragma once
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
-#include "soundrender_environment.h"
+
+class CNotificationClient;
 
 class CSoundRender_Core : public CSound_manager_interface
 {
@@ -13,20 +12,22 @@ class CSoundRender_Core : public CSound_manager_interface
 protected:
 	virtual void _create_data(ref_sound_data& S, LPCSTR fName, esound_type sound_type, int game_type);
 	virtual void _destroy_data(ref_sound_data& S);
+	CNotificationClient* pSysNotification = nullptr;
 protected:
 	BOOL bListenerMoved;
 
 	CSoundRender_Environment e_current;
-	CSoundRender_Environment e_target;
+	CSoundRender_Environment e_identity;
+	CSoundRender_Environment* e_target_ptr;
+
 public:
 	typedef std::pair<ref_sound_data_ptr, float> event;
 	xr_vector<event> s_events;
 public:
 	BOOL bPresent;
 	BOOL bUserEnvironment;
-	BOOL bEAX; // Boolean variable to indicate presence of EAX Extension 
-	BOOL bDeferredEAX;
 	BOOL bReady;
+	bool m_is_supported; // Boolean variable to indicate presence of EFX Extension
 
 	CTimer Timer;
 	float fTimer_Value;
@@ -56,9 +57,7 @@ public:
 	// Cache
 	CSoundRender_Cache cache;
 	u32 cache_bytes_per_line;
-protected:
-	virtual void i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) =0;
-	virtual void i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) =0;
+
 public:
 	CSoundRender_Core();
 	virtual ~CSoundRender_Core();
@@ -93,12 +92,12 @@ public:
 	virtual void statistic(CSound_stats* dest, CSound_stats_ext* ext);
 
 	// listener
-	//	virtual const Fvector&				listener_position		( )=0;
-	virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) =0;
-	// eax listener
-	void i_eax_commit_setting();
-	void i_eax_listener_set(CSound_environment* E);
-	void i_eax_listener_get(CSound_environment* E);
+	virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)=0;
+	
+	//  EFX listener
+	virtual void set_listener(const CSoundRender_Environment& env)=0;
+	virtual void get_listener(CSoundRender_Environment& env)=0;
+	virtual void commit()=0;
 
 #ifdef _EDITOR
 	virtual SoundEnvironment_LIB*		get_env_library			()																{ return s_environment; }
@@ -131,4 +130,3 @@ public:
 };
 
 extern CSoundRender_Core* SoundRender;
-#endif

@@ -6,7 +6,7 @@
 ICollidable::ICollidable()
 {
 	collidable.model = NULL;
-	ISpatial* self = dynamic_cast<ISpatial*>(this);
+	ISpatial* self = fast_dynamic_cast<ISpatial*>(this);
 	if (self) self->spatial.type |= STYPE_COLLIDEABLE;
 };
 

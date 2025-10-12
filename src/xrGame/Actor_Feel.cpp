@@ -87,7 +87,7 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 	}
 	else
 	{
-		//ïîëó÷èòü òðåóãîëüíèê è óçíàòü åãî ìàòåðèàë
+		//Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ‚Ñ€ÐµÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸Ðº Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ ÐµÐ³Ð¾ Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð°Ð»
 		CDB::TRI* T = Level().ObjectSpace.GetStaticTris() + result.element;
 		if (GMLib.GetMaterialByIdx(T->material)->Flags.is(SGameMtl::flPassable))
 			return TRUE;
@@ -124,14 +124,14 @@ CActor::pickup_result_t CActor::PickupModeUpdate()
 	if (!m_bPickupMode) return {true, false}; // kUSE key pressed
 	if (!IsGameTypeSingle()) return {true, false};
 
-	//ïîäáèðàíèå îáúåêòà
+	//Ð¿Ð¾Ð´Ð±Ð¸Ñ€Ð°Ð½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°
 	bool callback_handled = false;
 	if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
 		m_pObjectWeLookingAt->cast_inventory_item()->Useful() && m_pUsableObject &&
 		m_pUsableObject->nonscript_usable() && !Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
 	{
 		//Tronex: ability to prevent item picking up if the export returns false
-		luabind::functor<bool> func;
+		::luabind::functor<bool> func;
 		if (ai().script_engine().functor("bind_stalker_ext.actor_on_item_before_pickup", func))
 		{
 			callback_handled = true;
@@ -240,7 +240,7 @@ void CActor::PickupModeUpdate_COD(pickup_result_t pickup_result)
 	CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
 
 	{
-		luabind::functor<void> func;
+		::luabind::functor<void> func;
 		if (ai().script_engine().functor("_G.CPickupModeUpdate_COD", func))
 		{
 			func(pNearestItem && pNearestItem->cast_game_object() ? pNearestItem->cast_game_object()->lua_game_object() : nullptr);
@@ -252,7 +252,7 @@ void CActor::PickupModeUpdate_COD(pickup_result_t pickup_result)
 		//Tronex: ability to prevent item picking up if the export returns false
 		if (!pickup_result.callback_handled)
 		{
-			luabind::functor<bool> func;
+			::luabind::functor<bool> func;
 			if (ai().script_engine().functor("bind_stalker_ext.actor_on_item_before_pickup", func))
 			{
 				bool allow_pickup = func(pNearestItem->cast_game_object()->lua_game_object());

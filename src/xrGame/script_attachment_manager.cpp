@@ -402,9 +402,9 @@ void script_attachment::SetParent(CScriptGameObject* obj)
 	m_parent_object->add_attachment(GetName(), this);
 }
 
-luabind::object script_attachment::GetParent()
+::luabind::object script_attachment::GetParent()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["object"] = m_parent_object ? m_parent_object->lua_game_object() : nullptr;
 	table["attachment"] = m_parent_attachment ? m_parent_attachment : nullptr;
 	return table;
@@ -524,6 +524,9 @@ void script_attachment::SetBoneVisible(u16 bone_id, bool bVisibility, bool bRecu
 		bool bVisibleNow = m_kinematics->LL_GetBoneVisible(bone_id);
 		if (bVisibleNow != bVisibility)
 			m_kinematics->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+
+		m_kinematics->CalculateBones_Invalidate();
+		m_kinematics->CalculateBones(TRUE);
 	}
 }
 
@@ -607,13 +610,13 @@ LPCSTR script_attachment::bone_name(u16 bone_id)
 }
 
 // demonized: list all bones
-luabind::object script_attachment::list_bones()
+::luabind::object script_attachment::list_bones()
 {
-	luabind::object result = luabind::newtable(ai().script_engine().lua());
+	::luabind::object result = ::luabind::newtable(ai().script_engine().lua());
 
-	auto bones = m_kinematics->list_bones();
-	for (const auto& bone : bones)
-		result[bone.first] = bone.second.c_str();
+	auto bones = m_kinematics->LL_Bones();
+	for (const auto& bone : *bones)
+		result[bone.second] = bone.first.c_str();
 
 	return result;
 }
@@ -697,7 +700,7 @@ void script_attachment::SetName(LPCSTR name)
 	m_name = name;
 }
 
-const luabind::object& script_attachment::GetUserdata() const
+const ::luabind::object& script_attachment::GetUserdata() const
 {
 	if (!m_userdata)
 	{
@@ -731,7 +734,7 @@ void script_attachment::SetScriptUI(LPCSTR ui_func)
 {
 	if (m_script_ui_func != nullptr && 0 == xr_strcmp(m_script_ui_func, ui_func)) return;
 
-	luabind::functor<CUIDialogWndEx*> funct;
+	::luabind::functor<CUIDialogWndEx*> funct;
 
 	if (ai().script_engine().functor(ui_func, funct))
 	{
@@ -857,7 +860,7 @@ void script_attachment::SetBoneCallback(u16 bone_id, u16 parent_bone, bool overw
 	m_kinematics->LL_GetBoneInstance(bone_id).set_callback(bctCustom, ScriptAttachmentBoneCallback, m_bone_callbacks[bone_id], overwrite);
 }
 
-void script_attachment::SetBoneCallback(u16 bone_id, const luabind::functor<Fmatrix>& func, bool overwrite)
+void script_attachment::SetBoneCallback(u16 bone_id, const ::luabind::functor<Fmatrix>& func, bool overwrite)
 {
 	if (bone_id >= m_kinematics->LL_BoneCount())
 	{
@@ -899,9 +902,9 @@ Fvector script_attachment::GetCenter()
 	return { 0,0,0 };
 }
 
-luabind::object script_attachment::GetShaders()
+::luabind::object script_attachment::GetShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -910,33 +913,39 @@ luabind::object script_attachment::GetShaders()
 	}
 
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShader();
 		subtable["texture"] = m_model->getDebugTexture();
 		table[1] = subtable;
 		return table;
 	}
 
-	int i = 1;
-
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShader();
 		subtable["texture"] = child->getDebugTexture();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShader();
+		subtable["texture"] = child->getDebugTexture();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
 }
 
-luabind::object script_attachment::GetDefaultShaders()
+::luabind::object script_attachment::GetDefaultShaders()
 {
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 
 	if (!m_model)
 	{
@@ -945,25 +954,31 @@ luabind::object script_attachment::GetDefaultShaders()
 	}
 
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = m_model->getDebugShaderDef();
 		subtable["texture"] = m_model->getDebugTextureDef();
 		table[1] = subtable;
 		return table;
 	}
 
-	int i = 1;
-
 	for (auto* child : *children)
 	{
-		luabind::object subtable = luabind::newtable(ai().script_engine().lua());
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
 		subtable["shader"] = child->getDebugShaderDef();
 		subtable["texture"] = child->getDebugTextureDef();
-		table[i] = subtable;
-		++i;
+		table[child->getID()] = subtable;
+	}
+
+	for (auto* child : *children_invisible)
+	{
+		::luabind::object subtable = ::luabind::newtable(ai().script_engine().lua());
+		subtable["shader"] = child->getDebugShaderDef();
+		subtable["texture"] = child->getDebugTextureDef();
+		table[child->getID()] = subtable;
 	}
 
 	return table;
@@ -973,50 +988,76 @@ void script_attachment::SetShaderTexture(int id, LPCSTR shader, LPCSTR texture)
 {
 	if (!m_model) return;
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		m_model->SetShaderTexture(shader, texture);
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->SetShaderTexture(shader, texture);
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->SetShaderTexture(shader, texture);
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->SetShaderTexture(shader, texture);
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->SetShaderTexture(shader, texture);
+		return;
+	}
 }
 
 void script_attachment::ResetShaderTexture(int id)
 {
 	if (!m_model) return;
 	xr_vector<IRenderVisual*>* children = m_model->get_children();
+	xr_vector<IRenderVisual*>* children_invisible = m_model->get_children_invisible();
 
-	if (!children)
+	if (!children && !children_invisible)
 	{
 		m_model->ResetShaderTexture();
 		return;
 	}
 
-	if (id == -1)
+	if (id < 1)
 	{
 		for (auto* child : *children)
+		{
+			child->ResetShaderTexture();
+		}
+		for (auto* child : *children_invisible)
 		{
 			child->ResetShaderTexture();
 		}
 		return;
 	}
 
-	id--;
-
-	if (id >= 0 && children->size() > id)
-		children->at(id)->ResetShaderTexture();
+	for (auto* child : *children)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
+	for (auto* child : *children_invisible)
+	{
+		if (child->getID() != id) continue;
+		child->ResetShaderTexture();
+		return;
+	}
 }

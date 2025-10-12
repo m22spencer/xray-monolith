@@ -97,7 +97,7 @@ dxRender_Visual* CModelPool::Instance_Duplicate(dxRender_Visual* V)
 	return N;
 }
 
-dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
+dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register, bool assert)
 {
 	dxRender_Visual* V;
 	string_path fn;
@@ -117,7 +117,10 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
 				Msg("!Can't find model file '%s'.",name);
                 return 0;
 #else
-				Debug.fatal(DEBUG_INFO, "Can't find model file '%s'.", name);
+				if (assert)	
+					Debug.fatal(DEBUG_INFO, "Can't find model file '%s'.", name);
+				else
+					return nullptr;
 #endif
 			}
 	}
@@ -229,7 +232,7 @@ dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 	return Model;
 }
 
-dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
+dxRender_Visual* CModelPool::Create(const char* name, IReader* data, bool assert)
 {
 #ifdef _EDITOR
 	if (!name||!name[0])	return 0;
@@ -260,7 +263,12 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 			// 2. If not found
 			bAllowChildrenDuplicate = FALSE;
 			if (data) Base = Instance_Load(low_name, data, TRUE);
-			else Base = Instance_Load(low_name, TRUE);
+			else Base = Instance_Load(low_name, TRUE, assert);
+			if (!Base)
+			{
+				// If not found and assert is false, return nullptr
+				return nullptr;
+			}
 			bAllowChildrenDuplicate = TRUE;
 #ifdef _EDITOR
 			if (!Base)		return 0;
@@ -417,10 +425,40 @@ void CModelPool::Prefetch()
 	Logging(TRUE);
 }
 
-void CModelPool::Prefetch_One(LPCSTR N)
+void CModelPool::Prefetch_One(LPCSTR N, bool assert)
 {
-	dxRender_Visual* V = Create(N);
-	Delete(V,FALSE);
+	dxRender_Visual* V = Create(N, 0, assert);
+	if (V)
+		Delete(V,FALSE);
+}
+
+bool CModelPool::Exists(LPCSTR N)
+{
+	string_path low_name;
+	VERIFY(xr_strlen(N) < sizeof(low_name));
+	xr_strcpy(low_name, N);
+	strlwr(low_name);
+	if (strext(low_name)) *strext(low_name) = 0;
+
+	// Search pool and return early if exists
+	POOL_IT it = Pool.find(low_name);
+	if (it != Pool.end())
+		return true;
+
+	// Search for already loaded model (reference, base model) and return early if exists
+	dxRender_Visual* Base = Instance_Find(low_name);
+	if (Base)
+		return true;
+
+	// Prefetch model
+	dxRender_Visual* V = Create(N, 0, false);
+	if (V) 
+	{
+		Delete(V, FALSE);
+		return true;
+	}
+
+	return false;
 }
 
 dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)
@@ -497,7 +535,7 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
 	for (; it != en; ++it)
 	{
 		dxRender_Visual* ptr = it->model;
-		Fvisual* vis_ptr = dynamic_cast<Fvisual*>(ptr);
+		Fvisual* vis_ptr = fast_dynamic_cast<Fvisual*>(ptr);
 
 		if (vis_ptr == NULL)
 			continue;
@@ -565,7 +603,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            CKinematics* pV		= dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
+            CKinematics* pV		= fast_dynamic_cast<CKinematics*>(m_pVisual); VERIFY(pV);
             if (fis_zero(m_fLOD,EPS)&&pV->m_lod){
 		        if (_IsValidShader(pV->m_lod,priority,strictB2F)){
 	                RCache.set_Shader		(pV->m_lod->shader?pV->m_lod->shader:EDevice.m_WireShader);
@@ -587,7 +625,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
     }break;
     case MT_HIERRARHY:{
         if (_IsBoxVisible(m_pVisual,mTransform)){
-            FHierrarhyVisual* pV		= dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
+            FHierrarhyVisual* pV		= fast_dynamic_cast<FHierrarhyVisual*>(m_pVisual); VERIFY(pV);
             I = pV->children.begin		();
             E = pV->children.end		();
             for (; I!=E; I++){
@@ -600,7 +638,7 @@ void 	CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, 
         }
     }break;
     case MT_PARTICLE_GROUP:{
-        PS::CParticleGroup* pG			= dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
+        PS::CParticleGroup* pG			= fast_dynamic_cast<PS::CParticleGroup*>(m_pVisual); VERIFY(pG);
 //		if (_IsBoxVisible(m_pVisual,mTransform))
         {
             RCache.set_xform_world	  		(mTransform);

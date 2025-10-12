@@ -1,20 +1,20 @@
 ///////////////////////////////////////////////////////////////
 // ini_id_loader.h
-// темплейтовый класс, который загружает из ini файла 
-// строку с текстовыми id, потом присваивает каждому текстовому
-// id уникальный index
+// С‚РµРјРїР»РµР№С‚РѕРІС‹Р№ РєР»Р°СЃСЃ, РєРѕС‚РѕСЂС‹Р№ Р·Р°РіСЂСѓР¶Р°РµС‚ РёР· ini С„Р°Р№Р»Р° 
+// СЃС‚СЂРѕРєСѓ СЃ С‚РµРєСЃС‚РѕРІС‹РјРё id, РїРѕС‚РѕРј РїСЂРёСЃРІР°РёРІР°РµС‚ РєР°Р¶РґРѕРјСѓ С‚РµРєСЃС‚РѕРІРѕРјСѓ
+// id СѓРЅРёРєР°Р»СЊРЅС‹Р№ index
 ///////////////////////////////////////////////////////////////
 
 #pragma once
 
-//T_ID, T_INDEX -	тип индекса и id
+//T_ID, T_INDEX -	С‚РёРї РёРЅРґРµРєСЃР° Рё id
 
-//ITEM_DATA		-	структура с полями id и index типа T_ID и T_INDEX,
-//					обязательно имеет конструктор с параметрами (T_INDEX index, T_ID id, LPCSTR r1, ..., LPCSTR rN)
-//					N = ITEM_REC_NUM - число доп. параметров в ITEM_DATA 
+//ITEM_DATA		-	СЃС‚СЂСѓРєС‚СѓСЂР° СЃ РїРѕР»СЏРјРё id Рё index С‚РёРїР° T_ID Рё T_INDEX,
+//					РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РёРјРµРµС‚ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё (T_INDEX index, T_ID id, LPCSTR r1, ..., LPCSTR rN)
+//					N = ITEM_REC_NUM - С‡РёСЃР»Рѕ РґРѕРї. РїР°СЂР°РјРµС‚СЂРѕРІ РІ ITEM_DATA 
 
-//T_INIT		-	класс где определена статическая InitIdToIndex
-//					функция инициализации section_name и line_name
+//T_INIT		-	РєР»Р°СЃСЃ РіРґРµ РѕРїСЂРµРґРµР»РµРЅР° СЃС‚Р°С‚РёС‡РµСЃРєР°СЏ InitIdToIndex
+//					С„СѓРЅРєС†РёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё section_name Рё line_name
 
 #define TEMPLATE_SPECIALIZATION		template<u32 ITEM_REC_NUM, typename ITEM_DATA, typename T_ID, typename T_INDEX, typename T_INIT>
 #define CSINI_IdToIndex CIni_IdToIndex	<ITEM_REC_NUM, ITEM_DATA, T_ID, T_INDEX, T_INIT>
@@ -68,7 +68,7 @@ protected:
 		}
 	}
 
-	//имя секции и линии откуда будут загружаться id
+	//РёРјСЏ СЃРµРєС†РёРё Рё Р»РёРЅРёРё РѕС‚РєСѓРґР° Р±СѓРґСѓС‚ Р·Р°РіСЂСѓР¶Р°С‚СЊСЃСЏ id
 	static LPCSTR section_name;
 	static LPCSTR line_name;
 
@@ -94,7 +94,7 @@ public:
 
 	static const T_INDEX GetMaxIndex() { return m_pItemDataVector->size() - 1; }
 
-	//удаление статичекого массива
+	//СѓРґР°Р»РµРЅРёРµ СЃС‚Р°С‚РёС‡РµРєРѕРіРѕ РјР°СЃСЃРёРІР°
 	static void DeleteIdToIndexData();
 };
 

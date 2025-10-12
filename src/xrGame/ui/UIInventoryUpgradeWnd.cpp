@@ -38,7 +38,7 @@
 #include "script_game_object.h" //Alundaio
 #include "ActorBackpack.h"
 
-using namespace luabind; //Alundaio
+ //Alundaio
 // -----
 
 const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";
@@ -108,7 +108,7 @@ void CUIInventoryUpgradeWnd::InitInventory(CInventoryItem* item, bool can_upgrad
 {
 	m_inv_item = item;
 	bool is_shader = false;
-	// Загружаем картинку
+	// Р—Р°РіСЂСѓР¶Р°РµРј РєР°СЂС‚РёРЅРєСѓ
 	if (smart_cast<CWeapon*>(item))
 	{
 		is_shader = true;
@@ -352,7 +352,7 @@ void CUIInventoryUpgradeWnd::OnMesBoxYes()
 		if (parent_wnd)
 		{
 			//Alundaio: tell script that item has been upgraded
-			luabind::functor<void> funct;
+			::luabind::functor<void> funct;
 			ai().script_engine().functor("inventory_upgrades.effect_upgrade_item", funct);
 			if (funct)
 			{

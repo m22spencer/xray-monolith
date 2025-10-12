@@ -39,7 +39,7 @@ public:
 	BOOL m_can_fire;
 	bool m_need_to_reparse_loopholes;
 #ifndef AI_COMPILER
-	luabind::object m_available_loopholes;
+	::luabind::object m_available_loopholes;
 #endif // #ifndef AI_COMPILER
 
 #ifdef XRSE_FACTORY_EXPORTS
@@ -66,7 +66,7 @@ public:
 	virtual bool interactive() const;
 	LPCSTR description() const;
 #ifndef AI_COMPILER
-	void set_available_loopholes(luabind::object table);
+	void set_available_loopholes(::luabind::object table);
 #endif // #ifndef AI_COMPILER
 #ifdef XRSE_FACTORY_EXPORTS
 	virtual void 		__stdcall	on_render				(CDUInterface* du, ISE_AbstractLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F);

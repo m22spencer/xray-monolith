@@ -28,6 +28,7 @@ public:
 	virtual float GetHotness() { return 0.0; }			//--DSR-- HeatVision
 	virtual float GetTransparency() { return 0.0; }		//--DSR-- HeatVision
 	virtual float GetGlowing() { return 0.0; }			//--DSR-- SilencerOverheat
+
 };
 
 #endif // IRENDERABLE_H_INCLUDED

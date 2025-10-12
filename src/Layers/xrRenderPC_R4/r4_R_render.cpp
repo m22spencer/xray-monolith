@@ -336,7 +336,7 @@ void CRender::Render()
 	r_pmask(true, false); // disable priority "1"
 	Device.Statistic->RenderCALC.End();
 	
-	if (RImplementation.o.ssfx_core)
+	/*if (RImplementation.o.ssfx_core) // SSS23: DEPRECATED
 	{
 		// HUD Masking rendering
 		FLOAT ColorRGBA[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -347,6 +347,22 @@ void CRender::Render()
 
 		// Reset Depth
 		HW.pContext->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH, 1.0f, 0);
+	}*/
+
+	if (RImplementation.o.ssfx_motionvectors)
+	{
+		Target->u_setrt(Device.dwWidth, Device.dwHeight, 0, 0, Target->rt_ssfx_motion_vectors->pRT, 0);
+
+		FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		HW.pContext->ClearRenderTargetView(Target->rt_ssfx_motion_vectors->pRT, ColorRGBA);
+
+		RCache.set_Stencil(FALSE);
+		g_pGamePersistent->Environment().RenderSky(true);
+
+		RCache.Index.Flush();
+		RCache.Vertex.Flush();
+
+		RCache.set_xform_world(Fidentity);
 	}
 
 	if (ps_r2_ls_flags.test(R2FLAG_TERRAIN_PREPASS))

@@ -79,7 +79,7 @@ void CControlPathBuilder::update_schedule()
 		{
 			detail().set_path_type(eDetailPathTypeSmooth);
 
-			// установить direction
+			// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ direction
 			detail().set_use_dest_orientation(m_data.use_dest_orientation);
 			if (m_data.use_dest_orientation) detail().set_dest_direction(m_data.dest_orientation);
 
@@ -143,7 +143,7 @@ bool CControlPathBuilder::build_special(const Fvector& target, u32 node, u32 vel
 
 	if (node == u32(-1))
 	{
-		// нода в прямой видимости?
+		// РЅРѕРґР° РІ РїСЂСЏРјРѕР№ РІРёРґРёРјРѕСЃС‚Рё?
 		restrictions().add_border(object().Position(), target);
 		node = ai().level_graph().check_position_in_direction(object().ai_location().level_vertex_id(),
 		                                                      object().Position(), target);

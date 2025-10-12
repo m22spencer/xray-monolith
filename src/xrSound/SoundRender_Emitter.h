@@ -29,6 +29,9 @@ public:
 		stFORCEDWORD = u32(-1)
 	};
 
+private:
+	bool need_preplay_update;
+
 public:
 #ifdef DEBUG
 	u32							dbg_ID;
@@ -51,12 +54,11 @@ public:
 	u32 m_stream_cursor;
 	u32 m_cur_handle_cursor;
 	CSound_params p_source;
-	CSoundRender_Environment e_current;
-	CSoundRender_Environment e_target;
 
 	int iPaused;
 	BOOL bMoved;
 	BOOL b2D;
+	bool bIntro;
 	BOOL bStopping;
 	BOOL bRewind;
 	float fTimeStarted; // time of "Start"
@@ -77,6 +79,7 @@ public:
 
 	virtual BOOL is_2D() { return b2D; }
 	virtual void switch_to_2D();
+	virtual void switch_to_Intro() override;
 	virtual void switch_to_3D();
 	virtual void set_position(const Fvector& pos);
 
@@ -84,6 +87,11 @@ public:
 	{
 		VERIFY(_valid(scale));
 		p_source.freq = scale;
+
+		// demonized: if the sound is short, apply pitch variation, so that stuff like music and most of speech won't be randomized
+		if (get_length_sec() < 10)
+			p_source.freq *= (1.f + p_source.pitch_variation);
+
 		if (fTimeToStop != 0.f)
 			fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSpeedOfSound));
 	}

@@ -18,8 +18,8 @@ public:
 protected:
 	virtual bool BlowoutState();
 	virtual void UpdateSecondaryHit();
-	//для того чтобы blowout обновился один раз
-	//после того как зона перключилась в другое состояние
+	//РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ blowout РѕР±РЅРѕРІРёР»СЃСЏ РѕРґРёРЅ СЂР°Р·
+	//РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє Р·РѕРЅР° РїРµСЂРєР»СЋС‡РёР»Р°СЃСЊ РІ РґСЂСѓРіРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 	bool m_bLastBlowoutUpdate;
 
 DECLARE_SCRIPT_REGISTER_FUNCTION

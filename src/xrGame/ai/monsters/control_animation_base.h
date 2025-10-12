@@ -19,19 +19,19 @@ class CControlAnimationBase : public CControl_ComBase
 	typedef CControl_ComBase inherited;
 protected:
 
-	REPLACED_ANIM m_tReplacedAnims; // анимации подмены
+	REPLACED_ANIM m_tReplacedAnims; // Р°РЅРёРјР°С†РёРё РїРѕРґРјРµРЅС‹
 
-	// сохранённые анимации 
+	// СЃРѕС…СЂР°РЅС‘РЅРЅС‹Рµ Р°РЅРёРјР°С†РёРё 
 	EMotionAnim prev_motion;
 
-	// исправления сосояния 'бега на месте'
+	// РёСЃРїСЂР°РІР»РµРЅРёСЏ СЃРѕСЃРѕСЏРЅРёСЏ 'Р±РµРіР° РЅР° РјРµСЃС‚Рµ'
 	TTime time_start_stand;
 
-	// работа с анимациями атаки
-	TTime aa_time_last_attack; // время последнего нанесения хита
+	// СЂР°Р±РѕС‚Р° СЃ Р°РЅРёРјР°С†РёСЏРјРё Р°С‚Р°РєРё
+	TTime aa_time_last_attack; // РІСЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РЅР°РЅРµСЃРµРЅРёСЏ С…РёС‚Р°
 
 	// -------------------------------------------------------------------------
-	u32 spec_params; // дополнительные параметры
+	u32 spec_params; // РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 
 	TTime fx_time_last_play;
 
@@ -41,7 +41,7 @@ protected:
 	struct
 	{
 		bool active;
-		bool enable_braking; // не использовать при торможении
+		bool enable_braking; // РЅРµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїСЂРё С‚РѕСЂРјРѕР¶РµРЅРёРё
 
 		EAccelType type;
 
@@ -55,8 +55,8 @@ protected:
 
 	EMotionAnim spec_anim;
 
-	MOTION_ITEM_MAP m_tMotions; // карта соответсвий EAction к SMotionItem
-	TRANSITION_ANIM_VECTOR m_tTransitions; // вектор переходов из одной анимации в другую
+	MOTION_ITEM_MAP m_tMotions; // РєР°СЂС‚Р° СЃРѕРѕС‚РІРµС‚СЃРІРёР№ EAction Рє SMotionItem
+	TRANSITION_ANIM_VECTOR m_tTransitions; // РІРµРєС‚РѕСЂ РїРµСЂРµС…РѕРґРѕРІ РёР· РѕРґРЅРѕР№ Р°РЅРёРјР°С†РёРё РІ РґСЂСѓРіСѓСЋ
 
 	t_fx_index default_fx_indexes;
 	FX_MAP_STRING fx_map_string;
@@ -95,14 +95,14 @@ public:
 
 	void ScheduledInit();
 
-	// создание карты анимаций (выполнять на Monster::Load)
+	// СЃРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹ Р°РЅРёРјР°С†РёР№ (РІС‹РїРѕР»РЅСЏС‚СЊ РЅР° Monster::Load)
 	void AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s);
 	void AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s, LPCSTR fx_front, LPCSTR fx_back,
 	             LPCSTR fx_left, LPCSTR fx_right);
 
 	// -------------------------------------
 
-	// добавить анимацию перехода (A - Animation, S - Position)
+	// РґРѕР±Р°РІРёС‚СЊ Р°РЅРёРјР°С†РёСЋ РїРµСЂРµС…РѕРґР° (A - Animation, S - Position)
 	void AddTransition(EMotionAnim from, EMotionAnim to, EMotionAnim trans, bool chain, bool skip_aggressive = false);
 	void AddTransition(EMotionAnim from, EPState to, EMotionAnim trans, bool chain, bool skip_aggressive = false);
 	void AddTransition(EPState from, EMotionAnim to, EMotionAnim trans, bool chain, bool skip_aggressive = false);
@@ -125,7 +125,7 @@ public:
 
 	EMotionAnim GetCurAnim() { return cur_anim_info().get_motion(); }
 
-	// работа с анимациями атак
+	// СЂР°Р±РѕС‚Р° СЃ Р°РЅРёРјР°С†РёСЏРјРё Р°С‚Р°Рє
 	void AA_reload(LPCSTR section);
 	SAAParam& AA_GetParams(LPCSTR anim_name);
 	SAAParam& AA_GetParams(MotionID motion, float time_perc);
@@ -139,11 +139,11 @@ protected:
 
 	void UpdateAnimCount();
 
-	// работа с анимациями атак
+	// СЂР°Р±РѕС‚Р° СЃ Р°РЅРёРјР°С†РёСЏРјРё Р°С‚Р°Рє
 	void AA_Clear();
 	void AA_SwitchAnimation(EMotionAnim a, u32 i3);
 
-	// дополнительные функции
+	// РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 	EPState GetState(EMotionAnim a);
 	void CheckReplacedAnim();
 
@@ -221,7 +221,7 @@ public:
 	shared_str GetAnimTranslation(const MotionID& motion);
 public:
 
-	// информация о текущей анимации
+	// РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµР№ Р°РЅРёРјР°С†РёРё
 	SCurrentAnimationInfo m_cur_anim;
 	SCurrentAnimationInfo& cur_anim_info() { return m_cur_anim; }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
+#include <optional>
 
 struct SBoneProtections;
 
@@ -14,12 +15,12 @@ public:
 
 	virtual void Load(LPCSTR section);
 
-	//уменьшенная версия хита, для вызова, когда костюм надет на персонажа
+	//СѓРјРµРЅСЊС€РµРЅРЅР°СЏ РІРµСЂСЃРёСЏ С…РёС‚Р°, РґР»СЏ РІС‹Р·РѕРІР°, РєРѕРіРґР° РєРѕСЃС‚СЋРј РЅР°РґРµС‚ РЅР° РїРµСЂСЃРѕРЅР°Р¶Р°
 	virtual void Hit(float P, ALife::EHitType hit_type);
 
-	//коэффициенты на которые домножается хит
-	//при соответствующем типе воздействия
-	//если на персонаже надет костюм
+	//РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ РЅР° РєРѕС‚РѕСЂС‹Рµ РґРѕРјРЅРѕР¶Р°РµС‚СЃСЏ С…РёС‚
+	//РїСЂРё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРј С‚РёРїРµ РІРѕР·РґРµР№СЃС‚РІРёСЏ
+	//РµСЃР»Рё РЅР° РїРµСЂСЃРѕРЅР°Р¶Рµ РЅР°РґРµС‚ РєРѕСЃС‚СЋРј
 	float GetHitTypeProtection(ALife::EHitType hit_type, s16 element);
 	float GetDefHitTypeProtection(ALife::EHitType hit_type);
 	float GetBoneArmor(s16 element);
@@ -37,6 +38,10 @@ protected:
 	shared_str m_ActorVisual;
 	shared_str m_full_icon_name;
 	SBoneProtections* m_boneProtection;
+
+	std::optional<float> m_fireWoundParam1 = std::nullopt;
+	std::optional<float> m_fireWoundParam2 = std::nullopt;
+
 protected:
 	u32 m_ef_equipment_type;
 	u32 m_artefact_count;

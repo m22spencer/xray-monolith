@@ -79,6 +79,9 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{174aeeed-7a9a-4510-853f-081b4ce9cbc9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profiling">
+      <UniqueIdentifier>{e9143689-02a9-4cce-90da-0630f2b61420}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -273,14 +276,18 @@
     <ClCompile Include="os_clipboard.cpp">
       <Filter>OS</Filter>
     </ClCompile>
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="Lock.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
     <ClCompile Include="ScopeLock.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="mezz_stringbuffer.cpp" />
+    <ClCompile Include="xrSyncronize.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="mezz_stringbuffer.cpp">
+      <Filter>shared memory/string library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -395,9 +402,6 @@
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="clsid.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="fastdelegate.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="string_concatenations.h">
@@ -580,7 +584,6 @@
     <ClInclude Include="os_clipboard.h">
       <Filter>OS</Filter>
     </ClInclude>
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="..\build_config_defines.h" />
     <ClInclude Include="client_id.h" />
     <ClInclude Include="ChooseTypes.H" />
@@ -590,12 +593,23 @@
     <ClInclude Include="ScopeLock.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
-    <ClInclude Include="mezz_stringbuffer.h" />
+    <ClInclude Include="..\3rd party\stackwalker\include\StackWalker.h">
+      <Filter>Debug core</Filter>
+    </ClInclude>
+    <ClInclude Include="xrSyncronize.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="mezz_stringbuffer.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="profiler.h">
+      <Filter>Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3rd party\robin_hood\robin_hood.h" />
+    <ClInclude Include="..\3rd party\fastdelegate\fastdelegate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="xrCore.rc">
-      <Filter>Kernel</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="xrCore.rc" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FileSystem.h">
@@ -604,5 +618,10 @@
     <CustomBuild Include="LocatorAPI_Notifications.h">
       <Filter>FS</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\3rd party\stackwalker\lib\StackWalker.lib">
+      <Filter>Debug core</Filter>
+    </Library>
   </ItemGroup>
 </Project>

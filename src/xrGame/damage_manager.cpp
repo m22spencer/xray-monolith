@@ -35,7 +35,7 @@ void CDamageManager::reload(LPCSTR section, CInifile const* ini)
 
 	bool section_exist = ini && ini->section_exist(section);
 
-	// прочитать дефолтные параметры
+	// РїСЂРѕС‡РёС‚Р°С‚СЊ РґРµС„РѕР»С‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 	if (section_exist)
 	{
 		string32 buffer;
@@ -47,10 +47,10 @@ void CDamageManager::reload(LPCSTR section, CInifile const* ini)
 		}
 	}
 
-	//инициализировать default параметрами
+	//РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ default РїР°СЂР°РјРµС‚СЂР°РјРё
 	init_bones(section, ini);
 
-	// записать поверху прописанные параметры
+	// Р·Р°РїРёСЃР°С‚СЊ РїРѕРІРµСЂС…Сѓ РїСЂРѕРїРёСЃР°РЅРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 	if (section_exist)
 	{
 		load_section(section, ini);
@@ -119,7 +119,7 @@ void CDamageManager::HitScale(const int element, float& hit_scale, float& wound_
 {
 	if (BI_NONE == u16(element))
 	{
-		//считаем что параметры для BI_NONE заданы как 1.f 
+		//СЃС‡РёС‚Р°РµРј С‡С‚Рѕ РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ BI_NONE Р·Р°РґР°РЅС‹ РєР°Рє 1.f 
 		hit_scale = 1.f * m_default_hit_factor;
 		wound_scale = 1.f * m_default_wound_factor;
 		return;

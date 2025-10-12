@@ -287,6 +287,15 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		                                               fd.m_FireParticlesXForm.i);
 
 		VERIFY(_valid(fd.m_FireParticlesXForm));
+		
+		// demonized: transforms for fire bone/point silencer, they should be identical to above if they dont exist
+		{
+			Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
+			fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
+			m_item_transform.transform_tiny(fd.vLastFPSilencer);
+			fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
+			VERIFY(_valid(fd.vLastFPSilencer));
+		}
 	}
 
 	if (m_measures.m_prop_flags.test(hud_item_measures::e_fire_point2))
@@ -305,12 +314,6 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 		m_item_transform.transform_tiny(fd.vLastSP);
 		VERIFY(_valid(fd.vLastSP));
 	}
-
-	Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_fire_bone_silencer);
-	fire_mat.transform_tiny(fd.vLastFPSilencer, m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[0][0] : m_measures.m_fire_point_silencer);
-	m_item_transform.transform_tiny(fd.vLastFPSilencer);
-	fd.vLastFD.set(m_parent->m_adjust_mode ? m_parent->m_adjust_firepoint_shell[1][0] : m_measures.m_fire_direction);
-	VERIFY(_valid(fd.vLastFPSilencer));
 }
 
 bool attachable_hud_item::need_renderable()
@@ -1835,7 +1838,7 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 			m_attached_items[SCOPE_ATTACH_IDX]->m_parent_hud_item->OnMovementChanged(cmd);
 	}
 
-	luabind::functor<void> func;
+	::luabind::functor<void> func;
 	if (ai().script_engine().functor("_g.player_hud__OnMovementChanged", func))
 	{
 		func(cmd);
@@ -1846,21 +1849,21 @@ void player_hud::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 
 bool nearwall_callback(int target, float ofs, const Fvector& dir, Fmatrix& mat)
 {
-	luabind::functor<void> on_nearwall;
+	::luabind::functor<void> on_nearwall;
 	if (!ai().script_engine().functor("_G.CActorHudOnNearWall", on_nearwall))
 	{
 		return false;
 	}
 
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	table["target"] = target;
 	table["offset"] = ofs;
 	table["direction"] = dir;
 	table["matrix"] = mat;
 	table["override"] = false;
 	on_nearwall(table);
-	mat = luabind::object_cast<Fmatrix>(table["matrix"]);
-	return luabind::object_cast<bool>(table["override"]);
+	mat = ::luabind::object_cast<Fmatrix>(table["matrix"]);
+	return ::luabind::object_cast<bool>(table["override"]);
 }
 
 void update_nearwall(int target, const attachable_hud_item* item, Fmatrix& nearwall)

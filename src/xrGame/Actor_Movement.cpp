@@ -20,10 +20,10 @@
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
-static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
-static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
+static const float s_fLandingTime1 = 0.1f; // С‡РµСЂРµР· СЃРєРѕР»СЊРєРѕ СЃРЅСЏС‚СЊ С„Р»Р°Рі Landing1 (С‚.Рµ. РІРєР»СЋС‡РёС‚СЊ СЃР»РµРґСѓСЋС‰СѓСЋ Р°РЅРёРјР°С†РёСЋ)
+static const float s_fLandingTime2 = 0.3f; // С‡РµСЂРµР· СЃРєРѕР»СЊРєРѕ СЃРЅСЏС‚СЊ С„Р»Р°Рі Landing2 (С‚.Рµ. РІРєР»СЋС‡РёС‚СЊ СЃР»РµРґСѓСЋС‰СѓСЋ Р°РЅРёРјР°С†РёСЋ)
 static const float s_fJumpTime = 0.3f;
-static const float s_fJumpGroundTime = 0.1f; // для снятия флажка Jump если на земле
+static const float s_fJumpGroundTime = 0.1f; // РґР»СЏ СЃРЅСЏС‚РёСЏ С„Р»Р°Р¶РєР° Jump РµСЃР»Рё РЅР° Р·РµРјР»Рµ
 const float s_fFallTime = 0.2f;
 
 IC static void generate_orthonormal_basis1(const Fvector& dir, Fvector& updir, Fvector& right)
@@ -56,7 +56,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 	if (mstate_real & (mcJump | mcFall | mcLanding | mcLanding2))
 		mstate_real &= ~mcLookout;
 
-	// закончить приземление
+	// Р·Р°РєРѕРЅС‡РёС‚СЊ РїСЂРёР·РµРјР»РµРЅРёРµ
 	if (mstate_real & (mcLanding | mcLanding2))
 	{
 		m_fLandingTime -= dt;
@@ -66,7 +66,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 			mstate_real &= ~ (mcFall | mcJump);
 		}
 	}
-	// закончить падение
+	// Р·Р°РєРѕРЅС‡РёС‚СЊ РїР°РґРµРЅРёРµ
 	if (character_physics_support()->movement()->gcontact_Was)
 	{
 		if (mstate_real & mcFall)
@@ -85,7 +85,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 				}
 			}
 
-			luabind::functor<bool> on_land;
+			::luabind::functor<bool> on_land;
 			if (ai().script_engine().functor("_G.CActor_on_land", on_land))
 				on_land(character_physics_support()->movement()->GetContactSpeed());
 		}
@@ -96,7 +96,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 	if ((mstate_wf & mcJump) == 0)
 		m_bJumpKeyPressed = FALSE;
 
-	// Зажало-ли меня/уперся - не двигаюсь
+	// Р—Р°Р¶Р°Р»Рѕ-Р»Рё РјРµРЅСЏ/СѓРїРµСЂСЃСЏ - РЅРµ РґРІРёРіР°СЋСЃСЊ
 	if (((character_physics_support()->movement()->GetVelocityActual() < 0.2f) && (!(mstate_real & (mcFall | mcJump | mcLanding | mcLanding2)) || (!(mstate_real & mcClimb) && character_physics_support()->movement()->Environment() == CPHMovementControl::peAtWall)))
 		|| character_physics_support()->movement()->bSleep)
 	{
@@ -105,7 +105,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 	if (character_physics_support()->movement()->Environment() == CPHMovementControl::peOnGround ||
 		character_physics_support()->movement()->Environment() == CPHMovementControl::peAtWall)
 	{
-		// если на земле гарантированно снимать флажок Jump
+		// РµСЃР»Рё РЅР° Р·РµРјР»Рµ РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕ СЃРЅРёРјР°С‚СЊ С„Р»Р°Р¶РѕРє Jump
 		if (((s_fJumpTime - m_fJumpTime) > s_fJumpGroundTime) && (mstate_real & mcJump))
 		{
 			mstate_real &= ~ mcJump;
@@ -224,11 +224,11 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 			Jump = m_fJumpSpeed;
 			m_fJumpTime = s_fJumpTime;
 
-			luabind::functor<bool> on_jump;
+			::luabind::functor<bool> on_jump;
 			if (ai().script_engine().functor("_G.CActor_on_jump", on_jump))
 				on_jump();
 
-			//уменьшить силу игрока из-за выполненого прыжка
+			//СѓРјРµРЅСЊС€РёС‚СЊ СЃРёР»Сѓ РёРіСЂРѕРєР° РёР·-Р·Р° РІС‹РїРѕР»РЅРµРЅРѕРіРѕ РїСЂС‹Р¶РєР°
 			if (!GodMode())
 				conditions().ConditionJump(inventory().TotalWeight() / MaxCarryWeight());
 		}
@@ -525,7 +525,7 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
 		r_torso.pitch = unaffected_r_torso.pitch + dangle.x;
 	}
 
-	// если есть движение - выровнять модель по камере
+	// РµСЃР»Рё РµСЃС‚СЊ РґРІРёР¶РµРЅРёРµ - РІС‹СЂРѕРІРЅСЏС‚СЊ РјРѕРґРµР»СЊ РїРѕ РєР°РјРµСЂРµ
 	if (mstate_rl & mcAnyMove)
 	{
 		r_model_yaw = angle_normalize(r_torso.yaw);
@@ -668,7 +668,7 @@ bool CActor::is_jump()
 	return ((mstate_real & (mcJump | mcFall | mcLanding | mcLanding2)) != 0);
 }
 
-//максимальный переносимы вес
+//РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РїРµСЂРµРЅРѕСЃРёРјС‹ РІРµСЃ
 #include "CustomOutfit.h"
 
 float CActor::MaxCarryWeight() const

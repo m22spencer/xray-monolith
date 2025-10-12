@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-// character_community.h:	структура представления группировки
+// character_community.h:	СЃС‚СЂСѓРєС‚СѓСЂР° РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РіСЂСѓРїРїРёСЂРѕРІРєРё
 //							
 //////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +48,7 @@ private:
 	static void InitIdToIndex();
 
 public:
-	//отношение между группировками
+	//РѕС‚РЅРѕС€РµРЅРёРµ РјРµР¶РґСѓ РіСЂСѓРїРїРёСЂРѕРІРєР°РјРё
 	static CHARACTER_GOODWILL relation(CHARACTER_COMMUNITY_INDEX from, CHARACTER_COMMUNITY_INDEX to);
 	CHARACTER_GOODWILL relation(CHARACTER_COMMUNITY_INDEX to);
 
@@ -69,7 +69,7 @@ private:
 	friend GOODWILL_TABLE;
 	static GOODWILL_TABLE m_relation_table;
 
-	//таблица коэффициентов "сочуствия" между участниками группировки
+	//С‚Р°Р±Р»РёС†Р° РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ "СЃРѕС‡СѓСЃС‚РІРёСЏ" РјРµР¶РґСѓ СѓС‡Р°СЃС‚РЅРёРєР°РјРё РіСЂСѓРїРїРёСЂРѕРІРєРё
 	typedef CIni_Table<float, CHARACTER_COMMUNITY> SYMPATHY_TABLE;
 	friend SYMPATHY_TABLE;
 	static SYMPATHY_TABLE m_sympathy_table;

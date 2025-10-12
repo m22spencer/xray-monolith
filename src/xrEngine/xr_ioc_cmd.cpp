@@ -1043,9 +1043,18 @@ void CCC_Register()
 	CMD2(CCC_Float, "snd_volume_music", &psSoundVMusic);
 	CMD1(CCC_SND_Restart, "snd_restart");
 	CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
-	CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
+	CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EFX);
+	CMD4(CCC_Float, "snd_efx_environment_change_time", &snd_efx_environment_change_time, 0.f, 3.f);
 	CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 32, 1024);
 	CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 8, 256);
+
+	// Distance based delay power
+	CMD4(CCC_Float, "snd_distance_based_delay_power", &soundSmoothingParams::distanceBasedDelayPower, 0.f, 2.f);
+	CMD4(CCC_Float, "snd_distance_based_delay_min_distance", &soundSmoothingParams::distanceBasedDelayMinDistance, 15.f, 100.f);
+
+	// Pitch variation power
+	CMD4(CCC_Float, "snd_pitch_variation_power", &soundSmoothingParams::pitchVariationPower, 0.f, 4.f);
+
 	// Doppler effect power
 	CMD4(CCC_Float, "snd_doppler_power", &soundSmoothingParams::power, 0.f, 5.f);
 	CMD4(CCC_SoundParamsSmoothing, "snd_doppler_smoothing", &soundSmoothingParams::steps, 1, 100);

@@ -18,6 +18,10 @@ local tostring 		= tostring
 local tonumber 		= tonumber
 local unpack 		= unpack
 
+_G.printf_me = function(s, ...)
+	printf("[Modded Exes] " .. s, ...)
+end
+
 -- UTILS
 -- str_explode with limit on items to split
 -- n is the amount of times to split
@@ -665,4 +669,25 @@ _G.IsLauncher = function(o, c)
 		[clsid.wpn_ssrs_s] 				= true,
 	}
 	return c and launcher[c] or false
+end
+
+-- VodoXleb: get_object_squad fix
+function _G.get_object_squad(object,caller)
+	if not (object) then
+		return
+	end
+	if (object.group_id ~= nil and object.group_id ~= 65535) then
+		return alife_object(object.group_id)
+	end
+	local sim = alife()
+	local se_obj = type(object.id) == "function" and sim:object(object:id())
+	return se_obj and se_obj.group_id ~= nil and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id) or nil
+end
+
+log = _G.log
+_G.log = function(str)
+	log(str)
+	if DebuggerMode then
+        LuaPanda.printToVSCode(str,1,2)
+    end
 end

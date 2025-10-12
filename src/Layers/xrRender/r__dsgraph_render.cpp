@@ -130,7 +130,7 @@ void __fastcall water_node(mapSorted_Node* N)
 	V->Render(calcLOD(N->key, V->vis.sphere.R));
 }
 
-void __fastcall hud_node(mapSorted_Node* N)
+/*void __fastcall hud_node(mapSorted_Node* N)
 {
 	VERIFY(N);
 	dxRender_Visual* V = N->val.pVisual;
@@ -157,7 +157,7 @@ void __fastcall hud_node(mapSorted_Node* N)
 #ifdef USE_DX11
 	RImplementation.Target->RVelocity = false;
 #endif
-}
+}*/
 
 IC bool cmp_vs_nrm(mapNormalVS::TNode* N1, mapNormalVS::TNode* N2)
 {
@@ -585,6 +585,10 @@ void R_dsgraph_structure::r_dsgraph_render_hud(bool NoPS)
 	Device.mFullTransform = Device.mFullTransformHud;
 	RCache.set_xform_project(Device.mProjectHud);
 
+	// Apply HUD Matrix
+	Fmatrix Pold_prev = Device.mProject_prev;
+	RCache.set_xform_project_prev(Device.mProjectHud);
+
 	// Rendering
 	rmNear();
 	if (!NoPS)
@@ -598,11 +602,14 @@ void R_dsgraph_structure::r_dsgraph_render_hud(bool NoPS)
 
 		if (scope_3D_fake_enabled)
 		{
-			RCache.set_RT(RImplementation.Target->rt_ssfx_hud->pRT, 3);
-
+			RCache.set_RT(RImplementation.Target->rt_ssfx_temp->pRT, 3); // Render scope_3D to any buffer
+			
 			mapScopeHUD.traverseLR(sorted_L1);
 
-			RCache.set_RT(NULL, 3);
+			if (!RImplementation.o.ssfx_motionvectors)
+				RCache.set_RT(NULL, 3);
+			else
+				RCache.set_RT(RImplementation.Target->rt_ssfx_motion_vectors->pRT, 3);
 		}
 		mapScopeHUD.clear();
 #endif
@@ -628,7 +635,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud(bool NoPS)
 			rmNormal();
 		}
 	}
-	else
+	/*else
 	{
 		HUDMask.traverseLR(hud_node);
 		HUDMask.clear();
@@ -653,12 +660,15 @@ void R_dsgraph_structure::r_dsgraph_render_hud(bool NoPS)
 		}
 
 		rmNormal();
-	}
+	}*/
 
 
 	// Restore projection
 	Device.mFullTransform = FTold;
 	RCache.set_xform_project(Device.mProject);
+
+	// Restore Prev Matrix
+	RCache.set_xform_project_prev(Pold_prev);
 }
 
 void R_dsgraph_structure::r_dsgraph_render_hud_ui()

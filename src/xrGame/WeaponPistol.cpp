@@ -19,9 +19,3 @@ void CWeaponPistol::Load(LPCSTR section)
 
 	m_sounds.LoadSound(section, "snd_close", "sndClose", false, m_eSoundClose);
 }
-
-void CWeaponPistol::UpdateSounds()
-{
-	inherited::UpdateSounds();
-	m_sounds.SetPosition("sndClose", get_LastFP());
-}

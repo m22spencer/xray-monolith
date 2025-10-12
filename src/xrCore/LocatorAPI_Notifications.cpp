@@ -6,6 +6,7 @@
 #pragma hdrstop
 
 #include "LocatorAPI_Notifications.h"
+#include "profiler.h"
 
 void CThread::startup(void* P)
 {
@@ -62,6 +63,8 @@ void CFS_PathNotificator::RegisterPath(FS_Path& path)
 
 void CFS_PathNotificator::Execute(void)
 {
+	PROF_EVENT();
+
 	EnterCriticalSection(&CS);
 	for (PathIt it = events.begin(); it != events.end(); it++)
 	{

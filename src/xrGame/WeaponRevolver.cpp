@@ -48,9 +48,3 @@ void CWeaponRevolver::PlayAnimReload()
 		PlayHUDMotion("anm_reload", TRUE, this, GetState());
 	}
 }
-
-void CWeaponRevolver::UpdateSounds()
-{
-	inherited::UpdateSounds();
-	m_sounds.SetPosition("sndClose", get_LastFP());
-}

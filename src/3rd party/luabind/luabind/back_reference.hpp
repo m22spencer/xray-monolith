@@ -28,6 +28,8 @@
 #include <boost/type_traits/is_polymorphic.hpp>
 #include <boost/mpl/if.hpp>
 
+#include <fast_dynamic_cast/fast_dynamic_cast.hpp>
+
 namespace luabind {
 
 #if !(defined(BOOST_MSVC) && BOOST_MSVC <= 1300)
@@ -74,13 +76,13 @@ namespace luabind {
 
         static wrap_base const* extract_impl(T const* ptr, boost::mpl::true_)
         {
-            return dynamic_cast<wrap_base const*>(
+            return fast_dynamic_cast<wrap_base const*>(
                 get_pointer(*ptr));
         }
 
         static wrap_base const* extract_impl(T const* ptr, boost::mpl::false_)
         {
-            return dynamic_cast<wrap_base const*>(ptr);
+            return fast_dynamic_cast<wrap_base const*>(ptr);
         }
 
         static wrap_base* extract(T* ptr)
@@ -90,23 +92,23 @@ namespace luabind {
 
         static wrap_base* extract_impl(T* ptr, boost::mpl::true_)
         {
-            return dynamic_cast<wrap_base*>(
+            return fast_dynamic_cast<wrap_base*>(
                 get_pointer(*ptr));
         }
 
         static wrap_base* extract_impl(T* ptr, boost::mpl::false_)
         {
-            return dynamic_cast<wrap_base*>(ptr);
+            return fast_dynamic_cast<wrap_base*>(ptr);
         }
 # else       
        static wrap_base const* extract(T const* ptr)
         {
-            return dynamic_cast<wrap_base const*>(get_pointer(*ptr));
+            return fast_dynamic_cast<wrap_base const*>(get_pointer(*ptr));
         }
 
         static wrap_base* extract(T* ptr)
         {
-            return dynamic_cast<wrap_base*>(get_pointer(*ptr));
+            return fast_dynamic_cast<wrap_base*>(get_pointer(*ptr));
         }
 # endif
     };

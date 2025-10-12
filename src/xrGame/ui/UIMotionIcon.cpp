@@ -141,7 +141,7 @@ void SetActorVisibility(u16 who_id, float value)
 	if (!IsGameTypeSingle())
 		return;
 
-	if (g_pMotionIcon && g_pMotionIcon->IsShown())
+	if (g_pMotionIcon)
 		g_pMotionIcon->SetActorVisibility(who_id, value);
 }
 
@@ -160,8 +160,9 @@ float GetActorLuminosity()
 
 void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)
 {
-	if (!IsShown())
-		return;
+	// demonized: commented out to always update 
+	/*if (!IsShown())
+		return;*/
 
 	clamp(value, 0.f, 1.f);
 	value *= 100.f;

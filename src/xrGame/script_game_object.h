@@ -198,6 +198,10 @@ public:
 	float GetPsyFactor() const;
 	void SetPsyFactor(float val);
 
+	// Added by Ncenka - allow turn on/off devices
+	_DECLARE_FUNCTION10(IsDeviceEnabled, bool);
+	_DECLARE_FUNCTION11(SetDeviceEnabled, void, bool);
+
 	// CEntity
 	_DECLARE_FUNCTION10(DeathTime, u32);
 	_DECLARE_FUNCTION10(MaxHealth, float);
@@ -350,7 +354,7 @@ public:
 	bool inv_box_can_take(bool status);
 	bool inv_box_can_take_status();
 
-	//передача порции информации InventoryOwner
+	//РїРµСЂРµРґР°С‡Р° РїРѕСЂС†РёРё РёРЅС„РѕСЂРјР°С†РёРё InventoryOwner
 	bool GiveInfoPortion(LPCSTR info_id);
 	bool DisableInfoPortion(LPCSTR info_id);
 	void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
@@ -360,10 +364,10 @@ public:
 	{
 	};
 	void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
-	//предикаты наличия/отсутствия порции информации у персонажа
+	//РїСЂРµРґРёРєР°С‚С‹ РЅР°Р»РёС‡РёСЏ/РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїРѕСЂС†РёРё РёРЅС„РѕСЂРјР°С†РёРё Сѓ РїРµСЂСЃРѕРЅР°Р¶Р°
 	bool HasInfo(LPCSTR info_id);
 	bool DontHasInfo(LPCSTR info_id);
-	//работа с заданиями
+	//СЂР°Р±РѕС‚Р° СЃ Р·Р°РґР°РЅРёСЏРјРё
 	ETaskState GetGameTaskState(LPCSTR task_id);
 	void SetGameTaskState(ETaskState state, LPCSTR task_id);
 	void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting, u32 t_timer);
@@ -389,10 +393,10 @@ public:
 
 	void ActorLookAtPoint(Fvector point);
 	void ActorStopLookAtPoint();
-	void IterateInventory(luabind::functor<bool> functor, luabind::object object);
-	void IterateRuck(luabind::functor<bool> functor, luabind::object object);
-	void IterateBelt(luabind::functor<bool> functor, luabind::object object);
-	void IterateInventoryBox(luabind::functor<bool> functor, luabind::object object);
+	void IterateInventory(::luabind::functor<bool> functor, ::luabind::object object);
+	void IterateRuck(::luabind::functor<bool> functor, ::luabind::object object);
+	void IterateBelt(::luabind::functor<bool> functor, ::luabind::object object);
+	void IterateInventoryBox(::luabind::functor<bool> functor, ::luabind::object object);
 	void MarkItemDropped(CScriptGameObject* item, bool flag);
 	bool MarkedDropped(CScriptGameObject* item);
 	void UnloadMagazine(bool bKeepAmmo);
@@ -403,7 +407,7 @@ public:
 
 	void DropItem(CScriptGameObject* pItem);
 	void DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
-	void ForEachInventoryItems(const luabind::functor<bool>& functor);
+	void ForEachInventoryItems(const ::luabind::functor<bool>& functor);
 	void TransferItem(CScriptGameObject* pItem, CScriptGameObject* pForWho);
 	void TakeItem(CScriptGameObject* pItem);
 	void TransferMoney(int money, CScriptGameObject* pForWho);
@@ -458,7 +462,7 @@ public:
 	LPCSTR CharacterName();
 	LPCSTR CharacterIcon();
 	LPCSTR CharacterCommunity();
-	luabind::object CharacterDialogs();
+	::luabind::object CharacterDialogs();
 	int CharacterRank();
 	int CharacterReputation();
 
@@ -480,17 +484,17 @@ public:
 
 
 	// Callbacks			
-	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor);
-	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor,
-	                 const luabind::object& object);
+	void SetCallback(GameObject::ECallbackType type, const ::luabind::functor<void>& functor);
+	void SetCallback(GameObject::ECallbackType type, const ::luabind::functor<void>& functor,
+	                 const ::luabind::object& object);
 	void SetCallback(GameObject::ECallbackType type);
 
-	void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor);
-	void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor, const luabind::object& object);
+	void set_patrol_extrapolate_callback(const ::luabind::functor<bool>& functor);
+	void set_patrol_extrapolate_callback(const ::luabind::functor<bool>& functor, const ::luabind::object& object);
 	void set_patrol_extrapolate_callback();
 
-	void set_enemy_callback(const luabind::functor<bool>& functor);
-	void set_enemy_callback(const luabind::functor<bool>& functor, const luabind::object& object);
+	void set_enemy_callback(const ::luabind::functor<bool>& functor);
+	void set_enemy_callback(const ::luabind::functor<bool>& functor, const ::luabind::object& object);
 	void set_enemy_callback();
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -499,7 +503,7 @@ public:
 	void SetTipTextDefault();
 	void SetNonscriptUsable(bool nonscript_usable);
 	///////////////////////////////////////////////////////////////////////////////////////////
-	void set_fastcall(const luabind::functor<bool>& functor, const luabind::object& object);
+	void set_fastcall(const ::luabind::functor<bool>& functor, const ::luabind::object& object);
 	void set_const_force(const Fvector& dir, float value, u32 time_interval);
 	//////////////////////////////////////////////////////////////////////////
 
@@ -821,8 +825,8 @@ public:
 	void set_smart_cover_target();
 
 	void set_smart_cover_target_selector();
-	void set_smart_cover_target_selector(luabind::functor<void> functor);
-	void set_smart_cover_target_selector(luabind::functor<void> functor, luabind::object object);
+	void set_smart_cover_target_selector(::luabind::functor<void> functor);
+	void set_smart_cover_target_selector(::luabind::functor<void> functor, ::luabind::object object);
 
 	void set_smart_cover_target_idle();
 	void set_smart_cover_target_lookout();
@@ -940,7 +944,7 @@ public:
 	void StartTrade(CScriptGameObject* obj);
 	void StartUpgrade(CScriptGameObject* obj);
 	void SetWeight(float w);
-	void IterateFeelTouch(luabind::functor<void> functor);
+	void IterateFeelTouch(::luabind::functor<void> functor);
 	u32 GetSpatialType();
 	void DestroyObject();
 	void SetSpatialType(u32 sptype);
@@ -978,7 +982,7 @@ public:
 	//Weapon & Outfit
 	bool InstallUpgrade(LPCSTR upgrade);
 	bool HasUpgrade(LPCSTR upgrade);
-	void IterateInstalledUpgrades(const luabind::functor<bool>& functor);
+	void IterateInstalledUpgrades(const ::luabind::functor<bool>& functor);
 	bool WeaponInGrenadeMode();
 
 	//Car
@@ -1026,7 +1030,7 @@ public:
 	u16 bone_parent(LPCSTR bone_name, bool bHud) { return bone_parent(bone_id(bone_name, bHud), bHud); }
 	u16 bone_parent(LPCSTR bone_name) { return bone_parent(bone_id(bone_name), false); }
 
-	luabind::object list_bones(bool bHud = false);
+	::luabind::object list_bones(bool bHud = false);
 
 	bool IsBoneVisible(LPCSTR bone_name, bool bHud = false);	
 	void SetBoneVisible(LPCSTR bone_name, bool bVisibility, bool bRecursive = true, bool bHud = false);	
@@ -1124,7 +1128,7 @@ public:
 	CScriptGameObject* get_talking_npc();
 
 	// demonized: get and set scope UI
-	luabind::object get_scope_ui();
+	::luabind::object get_scope_ui();
 	void set_scope_ui(LPCSTR scope_texture);
 #endif
 	//-Alundaio
@@ -1139,6 +1143,7 @@ public:
 	void RemoveAttachment(LPCSTR name);
 	void RemoveAttachment(script_attachment* child);
 	void IterateAttachments(::luabind::functor<bool> functor);
+	void memory_remove_links(const CScriptGameObject* tpLuaGameObject);
 
 	doors::door* m_door;
 

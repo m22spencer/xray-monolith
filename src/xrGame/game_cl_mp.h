@@ -8,7 +8,7 @@
 #include "configs_dumper.h"
 #include "configs_dump_verifyer.h"
 #include "screenshot_server.h"
-#include "../xrCore/fastdelegate.h"
+#include <fastdelegate/fastdelegate.h>
 
 class CUIWindow;
 class CUISpeechMenu;
@@ -46,7 +46,7 @@ struct SND_Message
 
 struct cl_TeamStruct
 {
-	shared_str caSection; // имя секции комманды
+	shared_str caSection; // РёРјСЏ СЃРµРєС†РёРё РєРѕРјРјР°РЅРґС‹
 	//-----------------------------------
 	ui_shader IndicatorShader;
 	ui_shader InvincibleShader;

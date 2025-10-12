@@ -16,10 +16,10 @@
 //#	include <strstream>
 #endif
 
-xr_string to_string					(luabind::object const& o)
+xr_string to_string					(::luabind::object const& o)
 {
 	using namespace luabind;
-	if (o.type() == LUA_TSTRING) return object_cast<luabind::internal_string>(o).c_str();
+	if (o.type() == LUA_TSTRING) return object_cast<::luabind::internal_string>(o).c_str();
 	lua_State* L = o.lua_state();
 	LUABIND_CHECK_STACK(L);
 
@@ -51,7 +51,7 @@ xr_string &process_signature				(xr_string &str)
 	return			(str);
 }
 
-xr_string member_to_string			(luabind::object const& e, LPCSTR function_signature)
+xr_string member_to_string			(::luabind::object const& e, LPCSTR function_signature)
 {
 #if 1 || !defined(LUABIND_NO_ERROR_CHECKING)
     using namespace luabind;
@@ -89,7 +89,7 @@ xr_string member_to_string			(luabind::object const& e, LPCSTR function_signatur
 			for (std::vector<detail::overload_rep>::const_iterator i = m->overloads().begin();
 				i != m->overloads().end(); ++i)
 			{
-				luabind::internal_string str;
+				::luabind::internal_string str;
 				i->get_signature(L, str);
 				if (i != m->overloads().begin())
 					s += "\n";
@@ -110,14 +110,14 @@ xr_string member_to_string			(luabind::object const& e, LPCSTR function_signatur
 #endif
 }
 
-void print_class						(lua_State *L, luabind::detail::class_rep *crep)
+void print_class						(lua_State *L, ::luabind::detail::class_rep *crep)
 {
 	xr_string			S;
 	// print class and bases
 	{
-		S				= (crep->get_class_type() != luabind::detail::class_rep::cpp_class) ? "LUA class " : "C++ class ";
+		S				= (crep->get_class_type() != ::luabind::detail::class_rep::cpp_class) ? "LUA class " : "C++ class ";
 		S.append		(crep->name());
-		typedef luabind::internal_vector<luabind::detail::class_rep::base_info> BASES;
+		typedef ::luabind::internal_vector<::luabind::detail::class_rep::base_info> BASES;
 		const BASES &bases = crep->bases();
 		BASES::const_iterator	I = bases.begin(), B = I;
 		BASES::const_iterator	E = bases.end();
@@ -132,9 +132,9 @@ void print_class						(lua_State *L, luabind::detail::class_rep *crep)
 	}
 	// print class constants
 	{
-		const luabind::detail::class_rep::STATIC_CONSTANTS	&constants = crep->static_constants();
-		luabind::detail::class_rep::STATIC_CONSTANTS::const_iterator	I = constants.begin();
-		luabind::detail::class_rep::STATIC_CONSTANTS::const_iterator	E = constants.end();
+		const ::luabind::detail::class_rep::STATIC_CONSTANTS	&constants = crep->static_constants();
+		::luabind::detail::class_rep::STATIC_CONSTANTS::const_iterator	I = constants.begin();
+		::luabind::detail::class_rep::STATIC_CONSTANTS::const_iterator	E = constants.end();
 		for ( ; I != E; ++I)
 #ifndef USE_NATIVE_LUA_STRINGS
 			Msg		("    const %s = %d;",(*I).first,(*I).second);
@@ -147,9 +147,9 @@ void print_class						(lua_State *L, luabind::detail::class_rep *crep)
 	// print class properties
 	{
 #ifndef USE_NATIVE_LUA_STRINGS
-		typedef luabind::internal_map<const char*, luabind::detail::class_rep::callback, luabind::detail::ltstr> PROPERTIES;
+		typedef ::luabind::internal_map<const char*, ::luabind::detail::class_rep::callback, ::luabind::detail::ltstr> PROPERTIES;
 #else
-		typedef luabind::detail::class_rep::callback_map PROPERTIES;
+		typedef ::luabind::detail::class_rep::callback_map PROPERTIES;
 #endif
 		const PROPERTIES &properties = crep->properties();
 		PROPERTIES::const_iterator	I = properties.begin();
@@ -165,12 +165,12 @@ void print_class						(lua_State *L, luabind::detail::class_rep *crep)
 	}
 	// print class constructors
 	{
-		typedef luabind::internal_vector<luabind::detail::construct_rep::overload_t> Constructors;
+		typedef ::luabind::internal_vector<::luabind::detail::construct_rep::overload_t> Constructors;
 		const Constructors &constructors = crep->constructors().overloads;
 		Constructors::const_iterator	I = constructors.begin();
 		Constructors::const_iterator	E = constructors.end();
 		for ( ; I != E; ++I) {
-			luabind::internal_string luaS;
+			::luabind::internal_string luaS;
 			(*I).get_signature(L,luaS);
 			xr_string S(luaS.c_str());
 			strreplaceall	(S,"custom [","");
@@ -186,10 +186,10 @@ void print_class						(lua_State *L, luabind::detail::class_rep *crep)
 	// print class methods
 	{
 		crep->get_table	(L);
-		luabind::object	table(L);
+		::luabind::object	table(L);
 		table.set		();
-		for (luabind::object::iterator i = table.begin(); i != table.end(); ++i) {
-			luabind::object	object = *i;
+		for (::luabind::object::iterator i = table.begin(); i != table.end(); ++i) {
+			::luabind::object	object = *i;
 			xr_string	S;
 			S			= "    function ";
 			S.append	(to_string(i.key()).c_str());
@@ -210,16 +210,16 @@ void print_class						(lua_State *L, luabind::detail::class_rep *crep)
 	Msg			("};\n");
 }
 
-void print_free_functions				(lua_State *L, const luabind::object &object, LPCSTR header, const xr_string &indent)
+void print_free_functions				(lua_State *L, const ::luabind::object &object, LPCSTR header, const xr_string &indent)
 {
 	u32							count = 0;
-	luabind::object::iterator	I = object.begin();
-	luabind::object::iterator	E = object.end();
+	::luabind::object::iterator	I = object.begin();
+	::luabind::object::iterator	E = object.end();
 	for ( ; I != E; ++I) {
 		if ((*I).type() != LUA_TFUNCTION)
 			continue;
 		(*I).pushvalue();
-		luabind::detail::free_functions::function_rep* rep = 0;
+		::luabind::detail::free_functions::function_rep* rep = 0;
 		if (lua_iscfunction(L, -1))
 		{
 			if (lua_getupvalue(L, -1, 2) != 0)
@@ -232,11 +232,11 @@ void print_free_functions				(lua_State *L, const luabind::object &object, LPCST
 						if (!count)
 							Msg("\n%snamespace %s {",indent.c_str(),header);
 						++count;
-						rep = static_cast<luabind::detail::free_functions::function_rep*>(lua_touserdata(L, -1));
-						std::vector<luabind::detail::free_functions::overload_rep>::const_iterator	i = rep->overloads().begin();
-						std::vector<luabind::detail::free_functions::overload_rep>::const_iterator	e = rep->overloads().end();
+						rep = static_cast<::luabind::detail::free_functions::function_rep*>(lua_touserdata(L, -1));
+						std::vector<::luabind::detail::free_functions::overload_rep>::const_iterator	i = rep->overloads().begin();
+						std::vector<::luabind::detail::free_functions::overload_rep>::const_iterator	e = rep->overloads().end();
 						for ( ; i != e; ++i) {
-							luabind::internal_string luaS;
+							::luabind::internal_string luaS;
 							(*i).get_signature(L,luaS);
 							xr_string	S(luaS.c_str());
 							Msg("    %sfunction %s%s;",indent.c_str(),rep->name(),process_signature(S).c_str());
@@ -258,7 +258,7 @@ void print_free_functions				(lua_State *L, const luabind::object &object, LPCST
 			if (lua_type(L, -1) == LUA_TTABLE) {
 				LPCSTR			S = lua_tostring(L, -2);
 				if (xr_strcmp("_G",S) && xr_strcmp("package",S)) {
-					luabind::object		object(L);
+					::luabind::object		object(L);
 					object.set			();
 					if (!xr_strcmp("security",S)) {
 						S = S;
@@ -282,10 +282,10 @@ void print_free_functions				(lua_State *L, const luabind::object &object, LPCST
 void print_help							(lua_State *L)
 {
 	Msg					("\nList of the classes exported to LUA\n");
-	luabind::detail::class_registry::get_registry(L)->iterate_classes(L,&print_class);
+	::luabind::detail::class_registry::get_registry(L)->iterate_classes(L,&print_class);
 	Msg					("End of list of the classes exported to LUA\n");
 	Msg					("\nList of the namespaces exported to LUA\n");
-	print_free_functions(L,luabind::get_globals(L),"","");
+	print_free_functions(L,::luabind::get_globals(L),"","");
 	Msg					("End of list of the namespaces exported to LUA\n");
 }
 #else

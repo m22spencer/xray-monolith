@@ -14,6 +14,8 @@
 #include <sstream>
 #include <string>
 
+#include "profiler.h"
+
 extern BOOL LogExecCB = TRUE;
 static string_path logFName = "engine.log";
 static string_path log_file_name = "engine.log";
@@ -28,8 +30,11 @@ static LogCallback LogCB = 0;
 
 void FlushLog()
 {
+	PROF_EVENT();
+
 	if (!no_log && LogFile != nullptr)
 	{
+		PROF_EVENT("Flushing");
 		logCS.Enter();
 		IWriter* f = FS.w_open(logFName);
 		if (f)

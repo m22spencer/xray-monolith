@@ -34,7 +34,7 @@ void CRenderTarget::phase_blur()
 	h = float(Device.dwHeight) * 0.5f;
 
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_h_2, 0, 0, rt_blur_2_zb->pZRT);
+	u_setrt(rt_blur_h_2, 0, 0, 0);
 #else
 	u_setrt(rt_blur_h_2, 0, 0, rt_blur_2_zb);
 #endif
@@ -58,7 +58,7 @@ void CRenderTarget::phase_blur()
 	////Final blur
 	///////////////////////////////////////////////////////////////////////////////////
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_2, 0, 0, rt_blur_2_zb->pZRT);
+	u_setrt(rt_blur_2, 0, 0, 0);
 #else
 	u_setrt(rt_blur_2, 0, 0, rt_blur_2_zb);
 #endif
@@ -85,7 +85,7 @@ void CRenderTarget::phase_blur()
 	h = float(Device.dwHeight) * 0.25f;
 
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_h_4, 0, 0, rt_blur_4_zb->pZRT);
+	u_setrt(rt_blur_h_4, 0, 0, 0);
 #else
 	u_setrt(rt_blur_h_4, 0, 0, rt_blur_4_zb);
 #endif
@@ -109,7 +109,7 @@ void CRenderTarget::phase_blur()
 	////Final blur
 	///////////////////////////////////////////////////////////////////////////////////
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_4, 0, 0, rt_blur_4_zb->pZRT);
+	u_setrt(rt_blur_4, 0, 0, 0);
 #else
 	u_setrt(rt_blur_4, 0, 0, rt_blur_4_zb);
 #endif
@@ -136,7 +136,7 @@ void CRenderTarget::phase_blur()
 	h = float(Device.dwHeight) * 0.125f;
 
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_h_8, 0, 0, rt_blur_8_zb->pZRT);
+	u_setrt(rt_blur_h_8, 0, 0, 0);
 #else
 	u_setrt(rt_blur_h_8, 0, 0, rt_blur_8_zb);
 #endif
@@ -160,7 +160,7 @@ void CRenderTarget::phase_blur()
 	////Final blur
 	///////////////////////////////////////////////////////////////////////////////////
 #if defined(USE_DX10) || defined(USE_DX11)
-	u_setrt(rt_blur_8, 0, 0, rt_blur_8_zb->pZRT);
+	u_setrt(rt_blur_8, 0, 0, 0);
 #else
 	u_setrt(rt_blur_8, 0, 0, rt_blur_8_zb);
 #endif
@@ -879,6 +879,114 @@ void CRenderTarget::phase_ssfx_sss_ext(light_Package& LP)
 
 	RCache.set_Geometry(g_combine);
 	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+}
+
+
+void CRenderTarget::phase_ssfx_fog_scattering()
+{
+	u32 Offset = 0;
+	Fvector2 p0, p1;
+
+	u32 C = color_rgba(255, 255, 255, 255);
+	float w = float(Device.dwWidth);
+	float h = float(Device.dwHeight);
+
+	p0.set(0.0f, 0.0f);
+	p1.set(1.0f, 1.0f);
+
+	FVF::TL* pv;
+
+	ref_rt* rt_Blur[2] = {&rt_blur_4, &rt_blur_2};
+	
+	for (int blurp = 0; blurp < 2; blurp++)
+	{
+		int SampleScale = 1 << (2 - blurp); // 0 = 4 -> 1 = 2
+
+		set_viewport_size(HW.pContext, w / SampleScale, h / SampleScale);
+
+		u_setrt(*rt_Blur[blurp], 0, 0, NULL);
+		RCache.set_CullMode(CULL_NONE);
+		RCache.set_Stencil(FALSE);
+
+		// Fill vertex buffer
+		pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+		pv->set(0, h, EPS_S, 1.0f, C, 0.0f, 1.0f); pv++;
+		pv->set(0, 0, EPS_S, 1.0f, C, 0.0f, 0.0f); pv++;
+		pv->set(w, h, EPS_S, 1.0f, C, 1.0f, 1.0f); pv++;
+		pv->set(w, 0, EPS_S, 1.0f, C, 1.0f, 0.0f); pv++;
+		RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+		// Draw COLOR
+		RCache.set_Element(s_ssfx_fog_scattering->E[2 + blurp]);
+		RCache.set_c("blur_setup", w / SampleScale, h / SampleScale, 0, 0);
+		RCache.set_Geometry(g_combine);
+		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+	}
+
+	set_viewport_size(HW.pContext, w, h);
+
+	ref_rt& dest_rt = RImplementation.o.dx10_msaa ? rt_Generic : rt_Color;
+
+	// Fog Scattering
+	u_setrt(dest_rt, nullptr, nullptr, nullptr);
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+	pv->set(0, h, EPS_S, 1.0f, C, 0.0f, 1.0f); pv++;
+	pv->set(0, 0, EPS_S, 1.0f, C, 0.0f, 0.0f); pv++;
+	pv->set(w, h, EPS_S, 1.0f, C, 1.0f, 1.0f); pv++;
+	pv->set(w, 0, EPS_S, 1.0f, C, 1.0f, 0.0f); pv++;
+	RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+	// Draw COLOR
+	RCache.set_Element(s_ssfx_fog_scattering->E[0]);
+	RCache.set_c("ssfx_scattering_setup", ps_ssfx_fog_scattering,0,0,0);
+
+	RCache.set_Geometry(g_combine);
+
+	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+	HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());
+
+}
+
+void CRenderTarget::phase_ssfx_motion_blur()
+{
+	u32 Offset = 0;
+	Fvector2 p0, p1;
+
+	u32 C = color_rgba(255, 255, 255, 255);
+	float w = float(Device.dwWidth);
+	float h = float(Device.dwHeight);
+
+	p0.set(0.0f, 0.0f);
+	p1.set(1.0f, 1.0f);
+
+	ref_rt& dest_rt = RImplementation.o.dx10_msaa ? rt_Generic : rt_Color;
+
+	// Motion Blur
+	u_setrt(dest_rt, nullptr, nullptr, nullptr);
+	RCache.set_CullMode(CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+	pv->set(0, h, EPS_S, 1.0f, C, 0.0f, 1.0f); pv++;
+	pv->set(0, 0, EPS_S, 1.0f, C, 0.0f, 0.0f); pv++;
+	pv->set(w, h, EPS_S, 1.0f, C, 1.0f, 1.0f); pv++;
+	pv->set(w, 0, EPS_S, 1.0f, C, 1.0f, 0.0f); pv++;
+	RCache.Vertex.Unlock(4, g_combine->vb_stride);
+
+	// Draw COLOR
+	RCache.set_Element(s_ssfx_motion_blur->E[0]);
+
+	RCache.set_c("m_current", Matrix_current);
+	RCache.set_c("m_previous", Matrix_previous);
+
+	RCache.set_Geometry(g_combine);
+	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+	HW.pContext->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());
 }
 
 #endif

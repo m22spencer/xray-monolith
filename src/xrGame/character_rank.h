@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
-// character_rank.h:	структура представления рангов и отношений между 
-//						ними		
+// character_rank.h:	СЃС‚СЂСѓРєС‚СѓСЂР° РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ СЂР°РЅРіРѕРІ Рё РѕС‚РЅРѕС€РµРЅРёР№ РјРµР¶РґСѓ 
+//						РЅРёРјРё		
 //////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -54,7 +54,7 @@ private:
 
 	static void InitIdToIndex();
 public:
-	//отношение между рангами
+	//РѕС‚РЅРѕС€РµРЅРёРµ РјРµР¶РґСѓ СЂР°РЅРіР°РјРё
 	static CHARACTER_GOODWILL relation(int from, int to);
 	CHARACTER_GOODWILL relation(int to);
 
@@ -73,7 +73,7 @@ private:
 	friend GOODWILL_TABLE;
 	static GOODWILL_TABLE m_relation_table;
 
-	//очки рейтинга которые прибавляются за убийство персонажа с определенным рангом
+	//РѕС‡РєРё СЂРµР№С‚РёРЅРіР° РєРѕС‚РѕСЂС‹Рµ РїСЂРёР±Р°РІР»СЏСЋС‚СЃСЏ Р·Р° СѓР±РёР№СЃС‚РІРѕ РїРµСЂСЃРѕРЅР°Р¶Р° СЃ РѕРїСЂРµРґРµР»РµРЅРЅС‹Рј СЂР°РЅРіРѕРј
 	typedef CIni_Table<CHARACTER_RANK_VALUE, CHARACTER_RANK> RANK_KILL_TABLE;
 	friend RANK_KILL_TABLE;
 	static RANK_KILL_TABLE m_rank_kill_table;

@@ -196,7 +196,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 	IBlender::Compile(C);
 
 	//*************** codepath is the same, only shaders differ
-	LPCSTR tvs;
+	LPCSTR tvs, tps = "base";
 	LPCSTR tvs_s;
 	if (oNotAnTree.value)
 	{
@@ -220,12 +220,18 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 #if defined(USE_DX11)
 		// Is a branch/bush. Use a different VS
 		if (oBlend.value && RImplementation.o.ssfx_branches)
+		{
 			tvs = "tree_branch";
+			tps = "tree_branch";
+		}
 #endif
 
 		if (bUseATOC)
 		{
-			uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true);
+			string256 tps_atoc;
+			strconcat(sizeof(tps_atoc), tps_atoc, tvs, "_atoc");
+
+			uber_deffer(C, true, tvs, tps_atoc, oBlend.value, 0, true);
 			C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 			C.r_ColorWriteEnable(false, false, false, false);
 			C.r_StencilRef(0x01);
@@ -234,7 +240,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 			C.r_End();
 		}
 
-		uber_deffer(C, true, tvs, "base", oBlend.value, 0, true);
+		uber_deffer(C, true, tvs, tps, oBlend.value, 0, true);
 		C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 		C.r_StencilRef(0x01);
 

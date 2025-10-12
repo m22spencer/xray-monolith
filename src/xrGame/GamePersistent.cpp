@@ -537,7 +537,7 @@ void CGamePersistent::game_loaded()
 
 			// demonized
 			// Callback for when loading screen happens and "Press Any Key to Continue" prompt appears
-			luabind::functor<void> funct;
+			::luabind::functor<void> funct;
 			if (ai().script_engine().functor("_G.OnLoadingScreenKeyPrompt", funct))
 			{
 				funct();
@@ -551,7 +551,7 @@ void CGamePersistent::game_loaded()
 		{
 			Msg("intro_start game_loaded");
 
-			luabind::functor<void> funct;
+			::luabind::functor<void> funct;
 			if (ai().script_engine().functor("_G.OnLoadingScreenKeyPrompt", funct))
 			{
 				funct();
@@ -578,7 +578,7 @@ void CGamePersistent::update_game_loaded()
 	crash_saving::save_impl = &crash_saving::_save_impl;
 
 	// Callback for when player dismisses loading screen after "Press Any Key to Continue" pressed
-	luabind::functor<void> funct;
+	::luabind::functor<void> funct;
 	if (ai().script_engine().functor("_G.OnLoadingScreenDismissed", funct))
 	{
 		funct();
@@ -779,7 +779,7 @@ void CGamePersistent::ImGui_OnRender(LPCSTR name)
 {
 	if (!g_pGameLevel || !g_pGameLevel->bReady) return;
 
-	luabind::functor<void> imgui_render;
+	::luabind::functor<void> imgui_render;
 	if (ai().script_engine().functor("callbacks_gameobject.on_imgui_render", imgui_render))
 	{
 		imgui_render(name);
@@ -918,7 +918,7 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 	{
 		string512 buff;
 		u8 tip_num;
-		luabind::functor<u8> m_functor;
+		::luabind::functor<u8> m_functor;
 		bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
 		if (is_single)
 		{

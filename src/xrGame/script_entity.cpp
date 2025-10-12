@@ -155,8 +155,8 @@ bool CScriptEntity::CheckObjectVisibility(const CGameObject* tpObject)
 	return (m_monster->memory().visual().visible_now(tpObject));
 }
 
-//определяет видимость определенного типа объектов, 
-//заданного через section_name
+//РѕРїСЂРµРґРµР»СЏРµС‚ РІРёРґРёРјРѕСЃС‚СЊ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР° РѕР±СЉРµРєС‚РѕРІ, 
+//Р·Р°РґР°РЅРЅРѕРіРѕ С‡РµСЂРµР· section_name
 bool CScriptEntity::CheckTypeVisibility(const char* section_name)
 {
 	if (!m_monster)
@@ -202,14 +202,33 @@ CScriptEntityAction* CScriptEntity::GetCurrentAction()
 
 void __stdcall ActionCallback(IKinematics* tpKinematics)
 {
+	if (!tpKinematics)
+		return;
+
 	// sounds
 	CScriptEntity* l_tpScriptMonster = smart_cast<CScriptEntity*>(
 		(CGameObject*)(tpKinematics->GetUpdateCallbackParam()));
 	VERIFY(l_tpScriptMonster);
+
+	if (!l_tpScriptMonster)
+		return;
 	if (!l_tpScriptMonster->GetCurrentAction())
 		return;
-	l_tpScriptMonster->vfUpdateSounds();
-	l_tpScriptMonster->vfUpdateParticles();
+
+	/*l_tpScriptMonster->vfUpdateSounds();
+	l_tpScriptMonster->vfUpdateParticles();*/
+
+	// Fix crash due to lua gc in second thread
+	try
+	{
+		l_tpScriptMonster->vfUpdateSounds();
+		l_tpScriptMonster->vfUpdateParticles();
+	}
+	catch(...)
+	{
+
+	}
+	
 }
 
 void CScriptEntity::vfUpdateParticles()
@@ -335,7 +354,7 @@ void CScriptEntity::ProcessScripts()
 			object().callback(GameObject::eActionTypeMovement)(object().lua_game_object(), u32(eActionTypeMovement),
 			                                                   -1);
 
-		// Установить выбранную анимацию
+		// РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РІС‹Р±СЂР°РЅРЅСѓСЋ Р°РЅРёРјР°С†РёСЋ
 		if (!l_tpEntityAction->m_tAnimationAction.m_bCompleted)
 			bfScriptAnimation();
 

@@ -728,9 +728,9 @@ CScriptGameObject* CScriptGameObject::get_talking_npc() {
 }
 
 // demonized: get scope UI
-luabind::object CScriptGameObject::get_scope_ui() {
+::luabind::object CScriptGameObject::get_scope_ui() {
 	CWeapon* weapon = smart_cast<CWeapon*>(&object());
-	luabind::object table = luabind::newtable(ai().script_engine().lua());
+	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
 	if (!weapon)
 	{
 		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,
@@ -745,7 +745,7 @@ luabind::object CScriptGameObject::get_scope_ui() {
 		return table;
 	}
 
-	luabind::object staticChildren = luabind::newtable(ai().script_engine().lua());
+	::luabind::object staticChildren = ::luabind::newtable(ai().script_engine().lua());
 
 	for (int i = 0; i < zoomTextureWndList.size(); i++) {
 		CUIStatic* staticWnd = smart_cast<CUIStatic*>(zoomTextureWndList[i]);

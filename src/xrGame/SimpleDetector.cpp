@@ -65,7 +65,7 @@ void CSimpleDetector::UpdateAf()
 	float fRelPow = (dist / m_fAfDetectRadius);
 	clamp(fRelPow, 0.f, 1.f);
 
-	//îïðåäåëèòü òåêóùóþ ÷àñòîòó ñðàáàòûâàíèÿ ñèãíàëà
+	//Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÑŒ Ñ‚ÐµÐºÑƒÑ‰ÑƒÑŽ Ñ‡Ð°ÑÑ‚Ð¾Ñ‚Ñƒ ÑÑ€Ð°Ð±Ð°Ñ‚Ñ‹Ð²Ð°Ð½Ð¸Ñ ÑÐ¸Ð³Ð½Ð°Ð»Ð°
 	af_info.cur_period = item_type->freq.x +
 		(item_type->freq.y - item_type->freq.x) * (fRelPow * fRelPow);
 

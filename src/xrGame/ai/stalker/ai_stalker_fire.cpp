@@ -56,7 +56,7 @@
 #include "../../xrServerEntities/script_engine.h"
 
 using namespace StalkerSpace;
-using namespace luabind;
+
 
 static float const DANGER_DISTANCE = 3.f;
 static u32 const DANGER_INTERVAL = 120000;
@@ -132,7 +132,7 @@ float CAI_Stalker::GetWeaponAccuracy() const
 			base *= (m_disp_run_stand * g_dispersion_factor + g_dispersion_base); // fallback to worst aim if state could not determined, this should never happen (tm)
 	}
 
-	luabind::functor<float> func;
+	::luabind::functor<float> func;
 	if (ai().script_engine().functor("_g.CAI_Stalker__GetWeaponAccuracy", func))
 	{
 		base = func(lua_game_object(), W ? W->lua_game_object() : nullptr, base, movement().body_state(), movement().movement_type());
@@ -264,7 +264,7 @@ void CAI_Stalker::g_WeaponBones(int& L, int& R1, int& R2)
 
 void CAI_Stalker::Hit(SHit* pHDS)
 {
-	//õèò ìîæåò ìåíÿòüñÿ â çàâèñèìîñòè îò ðàíãà (íîâè÷êè ïîëó÷àþò áîëüøå õèòà, ÷åì âåòåðàíû)
+	//Ñ…Ð¸Ñ‚ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¼ÐµÐ½ÑÑ‚ÑŒÑÑ Ð² Ð·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ÑÑ‚Ð¸ Ð¾Ñ‚ Ñ€Ð°Ð½Ð³Ð° (Ð½Ð¾Ð²Ð¸Ñ‡ÐºÐ¸ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÑŽÑ‚ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ…Ð¸Ñ‚Ð°, Ñ‡ÐµÐ¼ Ð²ÐµÑ‚ÐµÑ€Ð°Ð½Ñ‹)
 	SHit HDS = *pHDS;
 	HDS.add_wound = true;
 
@@ -311,7 +311,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 			}
 		}
 
-		if (wounded()) //óæå ëåæèò => äîáèâàíèå
+		if (wounded()) //ÑƒÐ¶Ðµ Ð»ÐµÐ¶Ð¸Ñ‚ => Ð´Ð¾Ð±Ð¸Ð²Ð°Ð½Ð¸Ðµ
 		{
 			hit_power = 1000.f;
 		}
@@ -399,7 +399,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 	{
 		CScriptHit tLuaHit(&HDS);
 
-		luabind::functor<bool>	funct;
+		::luabind::functor<bool>	funct;
 		if (ai().script_engine().functor("_G.CAI_Stalker__BeforeHitCallback", funct))
 		{
 			if (!funct(this->lua_game_object(), &tLuaHit, HDS.boneID))
@@ -459,7 +459,7 @@ void CAI_Stalker::update_best_item_info()
 
 void CAI_Stalker::update_best_item_info_impl()
 {
-	luabind::functor<CScriptGameObject*> funct;
+	::luabind::functor<CScriptGameObject*> funct;
 	if (ai().script_engine().functor("_g.update_best_weapon", funct))
 	{
 		CGameObject* cur_itm = smart_cast<CGameObject*>(m_best_item_to_kill);
@@ -1152,7 +1152,7 @@ void CAI_Stalker::update_throw_params()
 #else
 	m_throw_position = Position();
 
-	CMissile* const pMissile = dynamic_cast<CMissile*>(inventory().ActiveItem());
+	CMissile* const pMissile = fast_dynamic_cast<CMissile*>(inventory().ActiveItem());
 	if (pMissile)
 	{
 		static const LPCSTR third_person_offset_id = "third_person_throw_point_offset";

@@ -41,8 +41,13 @@ namespace dx10TextureUtils
 		//D3DFMT_L6V5U5 Not available 
 		//D3DFMT_X8L8V8U8 Not available 
 		{D3DFMT_Q8W8V8U8, DXGI_FORMAT_R8G8B8A8_SNORM},
-		{D3DFMT_V16U16, DXGI_FORMAT_R16G16_SNORM},
-		//D3DFMT_W11V11U10 Not available 
+		//{D3DFMT_V16U16, DXGI_FORMAT_R16G16_SNORM},
+		//D3DFMT_W11V11U10 Not available
+		
+		//LVutner: this one is a cheap hack, so that fx modders can use smaller format for HDR (32bits vs 64 [rgba16f...]). 
+		//we cannot use DXGI format in x - ray without more edits, so we gotta hack that shit until I find enough spare time
+		{D3DFMT_V16U16, DXGI_FORMAT_R11G11B10_FLOAT}, 
+
 		//D3DFMT_A2W10V10U10 Not available 
 		//D3DFMT_UYVY Not available 
 		//D3DFMT_R8G8_B8G8 DXGI_FORMAT_G8R8_G8B8_UNORM (in DX9 the data was scaled up by 255.0f, but this can be handled in shader code). 

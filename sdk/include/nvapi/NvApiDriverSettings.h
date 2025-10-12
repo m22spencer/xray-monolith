@@ -105,7 +105,7 @@
 #define WKS_MEMORY_ALLOCATION_POLICY_STRING        L"Memory Allocation Policy"
 #define WKS_STEREO_DONGLE_SUPPORT_STRING           L"Stereo - Dongle Support"
 #define WKS_STEREO_SUPPORT_STRING                  L"Stereo - Enable"
-#define WKS_STEREO_SWAP_MODE_STRING                L"Stereo – swap mode"
+#define WKS_STEREO_SWAP_MODE_STRING                L"Stereo â€“ swap mode"
 #define AO_MODE_STRING                             L"Ambient Occlusion"
 #define AO_MODE_ACTIVE_STRING                      L"NVIDIA Predefined Ambient Occlusion Usage"
 #define AUTO_LODBIASADJUST_STRING                  L"Texture filtering - Driver Controlled LOD Bias"

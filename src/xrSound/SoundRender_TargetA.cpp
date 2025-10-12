@@ -6,16 +6,23 @@
 #include "soundrender_source.h"
 
 xr_vector<u8> g_target_temp_data;
+xr_vector<u8> g_target_temp_data_16;
 
 CSoundRender_TargetA::CSoundRender_TargetA(): CSoundRender_Target()
 {
 	cache_gain = 0.f;
 	cache_pitch = 1.f;
 	pSource = 0;
+	Slot = u32(-1);
 }
 
 CSoundRender_TargetA::~CSoundRender_TargetA()
 {
+}
+
+void CSoundRender_TargetA::SetSlot(ALuint NewSlot)
+{
+	Slot = NewSlot;
 }
 
 BOOL CSoundRender_TargetA::_initialize()
@@ -62,6 +69,7 @@ void CSoundRender_TargetA::start(CSoundRender_Emitter* E)
 	// Calc storage
 	buf_block = sdef_target_block * E->source()->m_wformat.nAvgBytesPerSec / 1000;
 	g_target_temp_data.resize(buf_block);
+	g_target_temp_data_16.resize(buf_block * 2);
 }
 
 void CSoundRender_TargetA::render()
@@ -69,8 +77,17 @@ void CSoundRender_TargetA::render()
 	for (u32 buf_idx = 0; buf_idx < sdef_target_count; buf_idx++)
 		fill_block(pBuffers[buf_idx]);
 
-	A_CHK(alSourceQueueBuffers (pSource, sdef_target_count, pBuffers));
-	A_CHK(alSourcePlay (pSource));
+	A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
+	if (Slot != u32(-1) && !m_pEmitter->bIntro)
+	{
+		A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, Slot, 0, AL_FILTER_NULL));
+	}
+	// demonized: explicitly disable effects by sending sounds to null slot, ie. not sending
+	else
+	{
+		A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, AL_EFFECTSLOT_NULL, 0, NULL));
+	}
+	A_CHK(alSourcePlay(pSource));
 
 	inherited::render();
 }
@@ -191,11 +208,17 @@ void CSoundRender_TargetA::fill_parameters()
 void CSoundRender_TargetA::fill_block(ALuint BufferID)
 {
 	R_ASSERT(m_pEmitter);
-
-	m_pEmitter->fill_block(&g_target_temp_data.front(), buf_block);
 	ALuint format = (m_pEmitter->source()->m_wformat.nChannels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
-	A_CHK(alBufferData(BufferID, format, &g_target_temp_data.front(), buf_block, m_pEmitter->source()->m_wformat.
-		nSamplesPerSec));
+	if (format == AL_FORMAT_MONO16)
+	{
+		m_pEmitter->fill_block(&g_target_temp_data.front(), g_target_temp_data.size());
+		A_CHK(alBufferData(BufferID, format, &g_target_temp_data.front(), g_target_temp_data.size(), m_pEmitter->source()->m_wformat.nSamplesPerSec));
+	}
+	else
+	{
+		m_pEmitter->fill_block(&g_target_temp_data_16.front(), g_target_temp_data.size());
+		A_CHK(alBufferData(BufferID, format, &g_target_temp_data_16.front(), g_target_temp_data.size(), m_pEmitter->source()->m_wformat.nSamplesPerSec));
+	}
 }
 
 void CSoundRender_TargetA::source_changed()

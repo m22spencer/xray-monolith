@@ -1,7 +1,7 @@
 #pragma once
 #include "weaponmagazined.h"
 #include "rocketlauncher.h"
-
+#include "WeaponGrenadeLauncher.h"
 
 class CWeaponFakeGrenade;
 
@@ -10,6 +10,10 @@ class CWeaponMagazinedWGrenade : public CWeaponMagazined,
                                  public CRocketLauncher
 {
 	typedef CWeaponMagazined inherited;
+
+private:
+	virtual bool is_grenade(const char* sect);
+
 public:
 	CWeaponMagazinedWGrenade(ESoundTypes eSoundType = SOUND_TYPE_WEAPON_SUBMACHINEGUN);
 	virtual ~CWeaponMagazinedWGrenade();
@@ -35,7 +39,6 @@ public:
 	virtual bool UseScopeTexture();
 	virtual float CurrentZoomFactor();
 	virtual u8 GetCurrentHudOffsetIdx();
-	virtual void FireEnd();
 	void LaunchGrenade();
 
 	virtual void OnStateSwitch(u32 S, u32 oldState);
@@ -51,8 +54,6 @@ public:
 	virtual void ReloadMagazine();
 
 	virtual bool Action(u16 cmd, u32 flags);
-
-	virtual void UpdateSounds();
 
 	//переключение в режим подствольника
 	virtual bool SwitchMode(bool force = false);
@@ -75,7 +76,7 @@ public:
 
 	//Script exports
 	void SetAmmoElapsed2(int ammo_count);
-	void AmmoTypeForEach2(const luabind::functor<bool>& funct);
+	void AmmoTypeForEach2(const ::luabind::functor<bool>& funct);
 	virtual void SetAmmoType2(u8 type) { m_ammoType2 = type; };
 	u8 GetAmmoType2() { return m_ammoType2; };
 	int GetAmmoCount2(u8 ammo2_type) const;

@@ -1,7 +1,7 @@
 #pragma once
 
 template <typename T>
-struct CWrapperBase : public T, public luabind::wrap_base
+struct CWrapperBase : public T, public ::luabind::wrap_base
 {
 	typedef T inherited;
 	typedef CWrapperBase<T> self_type;
@@ -40,4 +40,4 @@ struct CWrapperBase : public T, public luabind::wrap_base
 typedef CWrapperBase<CUIDialogWndEx> WrapType;
 typedef CUIDialogWndEx BaseType;
 
-typedef luabind::class_<CUIDialogWndEx, WrapType, luabind::bases<CUIDialogWnd, DLL_Pure>> export_class;
+typedef ::luabind::class_<CUIDialogWndEx, WrapType, ::luabind::bases<CUIDialogWnd, DLL_Pure>> export_class;

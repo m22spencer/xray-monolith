@@ -9,7 +9,7 @@ class CGameTaskManager;
 class CMapLocation;
 class CGameTask;
 
-typedef xr_vector<luabind::functor<bool>> task_state_functors;
+typedef xr_vector<::luabind::functor<bool>> task_state_functors;
 
 class SScriptTaskHelper : public IPureSerializeObject<IReader, IWriter>
 {

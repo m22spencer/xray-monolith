@@ -187,7 +187,7 @@ void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
 //-- Tronex
 LPCSTR CUIItemInfo::GetItemName(CInventoryItem& pInvItem, LPCSTR m_item_name)
 {
-	luabind::functor<LPCSTR> functorGetName;
+	::luabind::functor<LPCSTR> functorGetName;
 	if (ai().script_engine().functor("ui_item.item_name", functorGetName))
 	{
 		CGameObject* GO = pInvItem.cast_game_object();
@@ -199,7 +199,7 @@ LPCSTR CUIItemInfo::GetItemName(CInventoryItem& pInvItem, LPCSTR m_item_name)
 
 LPCSTR CUIItemInfo::GetItemShortName(CInventoryItem& pInvItem, LPCSTR m_item_short_name)
 {
-	luabind::functor<LPCSTR> functorGetShortName;
+	::luabind::functor<LPCSTR> functorGetShortName;
 	if (ai().script_engine().functor("ui_item.item_short_name", functorGetShortName))
 	{
 		CGameObject* GO = pInvItem.cast_game_object();
@@ -211,7 +211,7 @@ LPCSTR CUIItemInfo::GetItemShortName(CInventoryItem& pInvItem, LPCSTR m_item_sho
 
 LPCSTR CUIItemInfo::GetItemDescription(CInventoryItem& pInvItem, LPCSTR m_item_description)
 {
-	luabind::functor<LPCSTR> functorGetDescription;
+	::luabind::functor<LPCSTR> functorGetDescription;
 	if (ai().script_engine().functor("ui_item.item_description", functorGetDescription))
 	{
 		CGameObject* GO = pInvItem.cast_game_object();
@@ -255,7 +255,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
 
 		if (!weight)
 		{
-			if (CWeaponAmmo* ammo = dynamic_cast<CWeaponAmmo*>(pInvItem))
+			if (CWeaponAmmo* ammo = fast_dynamic_cast<CWeaponAmmo*>(pInvItem))
 			{
 				// its helper item, m_boxCur is zero, so recalculate via CInventoryItem::Weight()
 				weight = pInvItem->CInventoryItem::Weight();
@@ -365,7 +365,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
 	}
 	if (UIItemImage)
 	{
-		// Çàãðóæàåì êàðòèíêó
+		// Ð—Ð°Ð³Ñ€ÑƒÐ¶Ð°ÐµÐ¼ ÐºÐ°Ñ€Ñ‚Ð¸Ð½ÐºÑƒ
 		if (pSettings->line_exist(m_pInvItem->m_section_id.c_str(), "icons_texture"))
 		{
 			LPCSTR icons_texture = pSettings->r_string(m_pInvItem->m_section_id.c_str(), "icons_texture");

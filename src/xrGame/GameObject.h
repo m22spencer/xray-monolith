@@ -45,6 +45,7 @@ class ai_obstacle;
 class CFlashlight;
 class IKinematics;
 class script_attachment;
+class CMissile;
 
 template <typename _return_type>
 class CScriptCallbackEx;
@@ -61,7 +62,7 @@ class CGameObject :
 	ALife::_STORY_ID m_story_id;
 	animation_movement_controller* m_anim_mov_ctrl;
 protected:
-	//время удаления объекта
+	//РІСЂРµРјСЏ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 	bool m_bObjectRemoved;
 	xr_map<shared_str, script_attachment*> m_script_attachments;
 public:
@@ -140,7 +141,7 @@ public:
 	virtual BOOL BonePassBullet(int boneID) { return FALSE; }
 
 
-	//игровое имя объекта
+	//РёРіСЂРѕРІРѕРµ РёРјСЏ РѕР±СЉРµРєС‚Р°
 	virtual LPCSTR Name() const;
 
 	//virtual void			OnH_A_Independent	();

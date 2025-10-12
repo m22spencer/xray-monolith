@@ -97,7 +97,7 @@ CSE_Abstract* xrServer::Process_spawn(NET_Packet& P, ClientID sender, BOOL bSpaw
 			E->ID = PerformIDgen(0xffff);
 			E->owner = CL; //		= SelectBestClientToMigrateTo	(E);
 			E->s_flags.set(M_SPAWN_OBJECT_PHANTOM,FALSE);
-			entities.insert(mk_pair(E->ID, E));
+			entities.insert({ E->ID, E });
 		}
 		else
 		{
@@ -111,7 +111,7 @@ CSE_Abstract* xrServer::Process_spawn(NET_Packet& P, ClientID sender, BOOL bSpaw
 			}
 			E->ID = PerformIDgen(E->ID);
 			E->owner = CL;
-			entities.insert(mk_pair(E->ID, E));
+			entities.insert({ E->ID, E });
 		}
 	}
 

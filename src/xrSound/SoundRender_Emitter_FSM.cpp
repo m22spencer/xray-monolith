@@ -16,7 +16,7 @@ XRSOUND_API extern float psSoundCull;
 inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTimeTotal, const WAVEFORMATEX& wfx)
 {
 	if (fTime < fTimeStarted)
-		fTime = fTimeStarted; // Àíäðþõà ïîñîâåòîâàë, àññåðò ÷òî íèæå âûëåòåë èç çà ïàóçû êàê òî õèòðî
+		fTime = fTimeStarted; // ÐÐ½Ð´Ñ€ÑŽÑ…Ð° Ð¿Ð¾ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð», Ð°ÑÑÐµÑ€Ñ‚ Ñ‡Ñ‚Ð¾ Ð½Ð¸Ð¶Ðµ Ð²Ñ‹Ð»ÐµÑ‚ÐµÐ» Ð¸Ð· Ð·Ð° Ð¿Ð°ÑƒÐ·Ñ‹ ÐºÐ°Ðº Ñ‚Ð¾ Ñ…Ð¸Ñ‚Ñ€Ð¾
 	R_ASSERT((fTime-fTimeStarted)>=0.0f);
 	while ((fTime - fTimeStarted) > fTimeTotal) //looped
 	{
@@ -49,6 +49,70 @@ void CSoundRender_Emitter::update(float dt)
 		m_current_state = stStopped;
 	}
 
+	// demonized: add preplay update, calculate delay based on distance and speed of sound
+	// Adaptation for user experience
+	// For distances < 30m (configurable via cvar), no delay
+	// Then gradually ramp up to delay calculated by math
+	// Starting at 90m, full delay kicks in
+	// Don't apply delay to already delayed sounds, they are most likely already handled in respective parts of code and scripts
+	if (need_preplay_update && m_current_state < stPlaying && starting_delay == 0.f)
+	{
+		if (_valid(p_source.position) && !p_source.position.similar(Fvector().set(0.f, 0.f, 0.f)) && owner_data && source() && source()->channels_num() == 1)
+		{
+			//Smooth Ramp Using Hermite(Smootherstep)
+			static auto CalculateSmoothSoundDelay = [](float distance, float speedOfSound, float rampStart, float rampRange)
+			{
+				if (distance <= rampStart)
+					return 0.0f;
+
+				float delay = distance / speedOfSound;
+
+				// Ramp factor from 0 to 1 between rampStart and rampStart + rampRange
+				float t = std::clamp((distance - rampStart) / rampRange, 0.0f, 1.0f);
+
+				// Smootherstep for smooth transition
+				float smoothT = t * t * t * (t * (t * 6 - 15) + 10);
+
+				return delay * smoothT;
+			};
+
+			float speedOfSound = 343.f;
+			float oldDelay = starting_delay;
+			auto oldState = m_current_state;
+			auto delay = CalculateSmoothSoundDelay(p_source.position.distance_to(SoundRender->listener_position()), speedOfSound, soundSmoothingParams::distanceBasedDelayMinDistance, 60);
+
+			// clamp delay in case of strange result
+			delay = std::clamp(delay, 0.f, 3.5f);
+
+			// apply cvar power
+			delay *= soundSmoothingParams::distanceBasedDelayPower;
+			if (delay > 0.f)
+			{
+				if (m_current_state == stStarting || m_current_state == stStartingLooped)
+				{
+					starting_delay = delay;
+					m_current_state = m_current_state == stStarting ? stStartingDelayed : stStartingLoopedDelayed;
+				}
+				else
+				{
+					starting_delay += delay;
+				}
+				need_preplay_update = false;
+				/*Msg("CSoundRender_Emitter::update, file %s, state %s, need_preplay_update, distance %.2f, old delay %.2f, delay %.2f",
+					owner_data && source() && source()->file_name() ? source()->file_name() : "null",
+					magic_enum::enum_name(oldState).data(),
+					p_source.position.distance_to(SoundRender->listener_position()),
+					oldDelay,
+					starting_delay
+				);*/
+			}
+		}
+	}
+	else
+	{
+		need_preplay_update = false;
+	}
+
 	switch (m_current_state)
 	{
 	case stStopped:
@@ -69,7 +133,6 @@ void CSoundRender_Emitter::update(float dt)
 		smooth_volume = p_source.base_volume * p_source.volume * (owner_data->s_type == st_Effect
 			                                                          ? psSoundVEffects * psSoundVFactor
 			                                                          : psSoundVMusic * psSoundVMusicFactor) * (b2D ? 1.f : occluder_volume);
-		e_current = e_target = *SoundRender->get_environment(p_source.position);
 		if (update_culling(dt))
 		{
 			m_current_state = stPlaying;
@@ -95,7 +158,6 @@ void CSoundRender_Emitter::update(float dt)
 		smooth_volume = p_source.base_volume * p_source.volume * (owner_data->s_type == st_Effect
 			                                                          ? psSoundVEffects * psSoundVFactor
 			                                                          : psSoundVMusic * psSoundVMusicFactor) * (b2D ? 1.f : occluder_volume);
-		e_current = e_target = *SoundRender->get_environment(p_source.position);
 		if (update_culling(dt))
 		{
 			m_current_state = stPlayingLooped;
@@ -334,8 +396,6 @@ float CSoundRender_Emitter::priority()
 void CSoundRender_Emitter::update_environment(float dt)
 {
 	if (bMoved) {
-		e_target = *SoundRender->get_environment(p_source.position);
 		p_source.update_velocity(dt);
 	}
-	e_current.lerp(e_current, e_target, dt);
 }

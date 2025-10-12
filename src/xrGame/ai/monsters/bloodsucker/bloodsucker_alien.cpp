@@ -124,7 +124,7 @@ CAlienEffector::CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj) :
 
 BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
 {
-	// Инициализация
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 	Fmatrix Mdef;
 	Mdef.identity();
 	Mdef.j.set(info.n);
@@ -177,7 +177,7 @@ BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
 	info.fFov = m_current_fov;
 	//////////////////////////////////////////////////////////////////////////
 
-	// Установить углы смещения
+	// РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СѓРіР»С‹ СЃРјРµС‰РµРЅРёСЏ
 	Fmatrix R;
 	R.setHPB(dangle_current.x, dangle_current.y, dangle_current.z);
 

@@ -79,7 +79,10 @@ extern u64 g_qwEStartGameTime;
 ENGINE_API
 extern float psHUD_FOV_def;
 extern float psSqueezeVelocity;
+
+// Lua
 extern int psLUA_GCSTEP;
+extern BOOL lua_debug;
 
 float g_end_modif = 0.f;
 
@@ -115,6 +118,8 @@ extern BOOL g_ai_die_in_anomaly; //Alundaio
 
 extern BOOL g_telekinetic_objects_include_corpses; // Tosox
 
+extern BOOL binoculars_dynamic_zoom_check; //VodoXleb
+
 extern BOOL g_allow_weapon_control_inertion_factor; // momopate
 extern BOOL g_allow_outfit_control_inertion_factor;
 extern BOOL g_render_short_tracers;
@@ -142,6 +147,7 @@ extern float f_Freelook_cam_limit;
 extern int MOUSEBUFFERSIZE;
 extern int KEYBOARDBUFFERSIZE;
 extern BOOL print_bone_warnings;
+extern BOOL print_dltx_warnings;
 extern BOOL poltergeist_spawn_corpse_on_death;
 extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
@@ -152,6 +158,23 @@ extern float g_gunsnd_indoor_volume;
 extern int g_nearwall;
 extern int g_nearwall_trace;
 extern BOOL drawPickupItemNames;
+extern BOOL fun_allowed;
+extern BOOL progressiveStaminaCost;
+extern BOOL NPCsLookAtActor;
+extern float NPCsLookAtActorMinDistance;
+extern BOOL interruptFireOnAimToggle;
+
+extern BOOL mt_UpdateWeaponSounds;
+
+extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
+
+extern BOOL spawn_antifreeze;
+extern BOOL spawn_antifreeze_debug;
+
+extern float IK_CALC_DIST;
+extern float IK_CALC_SSA;
+extern float IK_ALWAYS_CALC_DIST;
+extern BOOL r_optimize_calculate_bones;
 
 extern CrosshairSettings g_crosshair_camera_near;
 extern CrosshairSettings g_crosshair_camera_far;
@@ -213,6 +236,13 @@ extern float wallmark_range_static;
 extern float wallmark_range_skeleton;
 
 ENGINE_API extern float g_console_sensitive;
+
+extern BOOL g_auto_reload;
+extern BOOL g_fire_reloads_ubgl;
+extern BOOL g_launcher_dynamic_range;
+extern BOOL g_launcher_dynamic_range_zoom;
+extern BOOL g_launcher_dynamic_range_mode;
+extern float g_launcher_dynamic_range_max;
 
 u32 g_dead_body_collision = 1;
 
@@ -2415,8 +2445,10 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "ai_dbg_lua", &psAI_Flags, aiLua);
 #endif // MASTER_GOLD
 
-        // Moved lua_gcstep outside of DEBUG to allow for easier experimentation.
+    // Moved lua_gcstep outside of DEBUG to allow for easier experimentation.
 	CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+	CMD4(CCC_Integer, "lua_debug", &lua_debug, 0, 1);
+
 #ifdef DEBUG
 	CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
 	CMD3(CCC_Mask, "ai_dbg_brain", &psAI_Flags, aiBrain);
@@ -2554,6 +2586,13 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "g_aimpos_zoom", &psActorFlags, AF_AIMPOS_ZOOM);
 	CMD4(CCC_Integer, "g_nearwall", &g_nearwall, 0, 2);
 	CMD4(CCC_Integer, "g_nearwall_trace", &g_nearwall_trace, 0, 1);
+
+	CMD4(CCC_Integer, "g_auto_reload", &g_auto_reload, 0, 1);
+	CMD4(CCC_Integer, "g_fire_reloads_ubgl", &g_fire_reloads_ubgl, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range", &g_launcher_dynamic_range, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_zoom", &g_launcher_dynamic_range_zoom, 0, 1);
+	CMD4(CCC_Integer, "g_launcher_dynamic_range_mode", &g_launcher_dynamic_range_mode, 0, 1);
+	CMD4(CCC_Float, "g_launcher_dynamic_range_max", &g_launcher_dynamic_range_max, 0.f, 1000.f);
 
 	CMD3(CCC_Mask, "g_crosshair_show_always", &psCrosshair_Flags, CROSSHAIR_SHOW_ALWAYS);
 	CMD3(CCC_Mask, "g_crosshair_independent", &psCrosshair_Flags, CROSSHAIR_INDEPENDENT);
@@ -2792,6 +2831,8 @@ void CCC_RegisterCommands()
 
 	CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
 
+	CMD4(CCC_Integer, "binoculars_dynamic_zoom_check", &binoculars_dynamic_zoom_check, 0, 1); //VodoXleb
+
 	CMD4(CCC_Integer, "pseudogiant_can_damage_objects_on_stomp", &pseudogiantCanDamageObjects, 0, 1);
 
 	CMD4(CCC_Integer, "telekinetic_objects_include_corpses", &g_telekinetic_objects_include_corpses, 0, 1); // Tosox
@@ -2811,6 +2852,24 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask, "weapon_sway", &psDeviceFlags2, rsAimSway);
 
 	CMD3(CCC_Mask, "blend_move_anims", &psDeviceFlags2, rsBlendMoveAnims);
+
+	CMD4(CCC_Integer, "mt_update_weapon_sounds", &mt_UpdateWeaponSounds, 0, 1);
+
+	CMD4(CCC_Integer, "spawn_antifreeze", &spawn_antifreeze, 0, 1);
+	CMD4(CCC_Integer, "spawn_antifreeze_debug", &spawn_antifreeze_debug, 0, 1);
+
+	CMD4(CCC_Float, "ik_calc_dist", &IK_CALC_DIST, 50, 150);
+	CMD4(CCC_Float, "ik_calc_ssa", &IK_CALC_SSA, 0.001f, 0.02f);
+	CMD4(CCC_Float, "ik_always_calc_dist", &IK_ALWAYS_CALC_DIST, 10, 50);
+	CMD4(CCC_Integer, "r__optimize_calculate_bones", &r_optimize_calculate_bones, 0, 1);
+
+	CMD4(CCC_Integer, "g_progressive_stamina_cost", &progressiveStaminaCost, 0, 1);
+	CMD4(CCC_Integer, "g_npcs_look_at_actor", &NPCsLookAtActor, 0, 1);
+	CMD4(CCC_Float, "g_npcs_look_at_actor_min_distance", &NPCsLookAtActorMinDistance, 1.f, 8.f);
+	CMD4(CCC_Integer, "g_interrupt_fire_on_aim_toggle", &interruptFireOnAimToggle, 0, 1);
+
+	// demonized: Restores fun physics bugs like lift
+	CMD4(CCC_Integer, "fun_allowed", &fun_allowed, 0, 1);
 
 #ifdef DEBUG
 	//extern BOOL g_use_new_ballistics;
@@ -2905,6 +2964,12 @@ void CCC_RegisterCommands()
 
 	// Print warnings when using bone_position and bone_direction functions and encounter invalid bones
 	CMD4(CCC_Integer, "print_bone_warnings", &print_bone_warnings, 0, 1);
+
+	// Print DLTX warnings when "override section which doesn't exist"
+	CMD4(CCC_Integer, "print_dltx_warnings", &print_dltx_warnings, 0, 1);
+
+	// Ignore "no renderer type set for hanging-lamp" error
+	CMD4(CCC_Integer, "hanging_lamp_ignore_match_configuration", &alifeObjectHangingLampIgnoreMatchConfiguration, 0, 1);
 
 	// Poltergeists spawn corpses on death
 	CMD4(CCC_Integer, "poltergeist_spawn_corpse_on_death", &poltergeist_spawn_corpse_on_death, 0, 1);

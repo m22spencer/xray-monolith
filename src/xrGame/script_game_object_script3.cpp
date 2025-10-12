@@ -68,6 +68,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 		.def("best_cover", &CScriptGameObject::best_cover)
 		.def("safe_cover", &CScriptGameObject::safe_cover)
 		.def("spawn_ini", &CScriptGameObject::spawn_ini)
+		.def("memory_remove_links", &CScriptGameObject::memory_remove_links)
 		.def("memory_visible_objects", &CScriptGameObject::memory_visible_objects, return_stl_iterator)
 		.def("memory_sound_objects", &CScriptGameObject::memory_sound_objects, return_stl_iterator)
 		.def("memory_hit_objects", &CScriptGameObject::memory_hit_objects, return_stl_iterator)

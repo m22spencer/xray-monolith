@@ -16,8 +16,8 @@ class CController : public CBaseMonster,
 	typedef CBaseMonster inherited;
 
 	u8 m_max_controlled_number;
-	ref_sound control_start_sound; // звук, который играется в голове у актера
-	ref_sound control_hit_sound; // звук, который играется в голове у актера
+	ref_sound control_start_sound; // Р·РІСѓРє, РєРѕС‚РѕСЂС‹Р№ РёРіСЂР°РµС‚СЃСЏ РІ РіРѕР»РѕРІРµ Сѓ Р°РєС‚РµСЂР°
+	ref_sound control_hit_sound; // Р·РІСѓРє, РєРѕС‚РѕСЂС‹Р№ РёРіСЂР°РµС‚СЃСЏ РІ РіРѕР»РѕРІРµ Сѓ Р°РєС‚РµСЂР°
 
 	ref_sound m_sound_hit_fx;
 	SndShockEffector* m_sndShockEffector;
@@ -107,7 +107,7 @@ public:
 	void TakeUnderControl(CEntity*);
 	void UpdateControlled();
 	void FreeFromControl();
-	void OnFreedFromControl(const CEntity*); // если монстр сам себя освободил (destroyed || die)
+	void OnFreedFromControl(const CEntity*); // РµСЃР»Рё РјРѕРЅСЃС‚СЂ СЃР°Рј СЃРµР±СЏ РѕСЃРІРѕР±РѕРґРёР» (destroyed || die)
 
 	void set_controlled_task(u32 task);
 

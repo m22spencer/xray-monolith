@@ -37,7 +37,7 @@ class CActionPlanner :
 	>
 {
 public:
-	typedef CProblemSolver<
+	using CProblemSolver = CProblemSolver<
 		GraphEngineSpace::CWorldProperty,
 		GraphEngineSpace::CWorldState,
 		_world_operator,
@@ -46,9 +46,16 @@ public:
 		_reverse_search,
 		_world_operator_ptr,
 		_condition_evaluator_ptr
-	> CProblemSolver;
-	typedef CProblemSolver inherited;
-	typedef typename inherited::_edge_type _action_id_type;
+	>;
+	using inherited = CProblemSolver;
+	using _action_id_type = typename inherited::_edge_type;
+	using _condition_type = typename inherited::_condition_type;
+	using COperator = typename inherited::COperator;
+	using CConditionEvaluator = typename inherited::CConditionEvaluator;
+	using _value_type = typename inherited::_value_type;
+	using _edge_type = typename inherited::_edge_type;
+	using _operator_ptr = typename inherited::_operator_ptr;
+
 	typedef GraphEngineSpace::CWorldProperty CWorldProperty;
 	typedef GraphEngineSpace::CWorldState CWorldState;
 	typedef _world_operator _world_operator;

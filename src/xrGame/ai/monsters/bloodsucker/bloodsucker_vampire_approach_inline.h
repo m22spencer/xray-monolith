@@ -26,7 +26,7 @@ void CStateBloodsuckerVampireApproachAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireApproachAbstract::execute()
 {
-	// óñòàíîâêà ïàðàìåòðîâ ôóíêöèîíàëüíûõ áëîêîâ
+	// ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð±Ð»Ð¾ÐºÐ¾Ð²
 	object->set_action(ACT_RUN);
 	object->anim().accel_activate(eAT_Aggressive);
 	object->anim().accel_set_braking(false);

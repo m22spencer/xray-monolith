@@ -105,16 +105,16 @@ private:
 	void type_convert_class(char* buffer, unsigned int size, lua_State* state, int index);
 	bool type_convert_instance(char* buffer, unsigned int size, lua_State* state, int index);
 	void type_convert_userdata(char* buffer, unsigned int size, lua_State* state, int index);
-	static char* class_name(char* buffer, unsigned int size, luabind::detail::class_rep& class_rep);
+	static char* class_name(char* buffer, unsigned int size, ::luabind::detail::class_rep& class_rep);
 
 private:
 	void fill_class_info(cs::lua_studio::backend& backend, char* buffer, unsigned int size,
-	                     luabind::detail::object_rep* object, luabind::detail::class_rep* class_rep, lua_State* state);
+	                     ::luabind::detail::object_rep* object, ::luabind::detail::class_rep* class_rep, lua_State* state);
 	void value_convert_class(cs::lua_studio::backend& backend, char* buffer, unsigned int size,
-	                         luabind::detail::class_rep* class_rep, lua_State* state, int index,
+	                         ::luabind::detail::class_rep* class_rep, lua_State* state, int index,
 	                         cs::lua_studio::icon_type& icon_type, bool full_description);
 	bool value_convert_instance(cs::lua_studio::backend& backend, char* buffer, unsigned int size,
-	                            luabind::detail::object_rep* object, lua_State* state);
+	                            ::luabind::detail::object_rep* object, lua_State* state);
 	bool value_convert_instance(cs::lua_studio::backend& backend, char* buffer, unsigned int size, lua_State* state,
 	                            int index, cs::lua_studio::icon_type& icon_type, bool full_description);
 

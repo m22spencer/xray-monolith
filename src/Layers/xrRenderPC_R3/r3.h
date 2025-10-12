@@ -347,8 +347,9 @@ public:
 	virtual void model_Delete(IRender_DetailModel* & F);
 	virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
 	virtual void models_Prefetch();
-	virtual void models_PrefetchOne(LPCSTR name);
+	virtual void models_PrefetchOne(LPCSTR name, bool assert = true);
 	virtual void models_Clear(BOOL b_complete);
+	virtual bool models_Exists(LPCSTR name);
 
 	// Occlusion culling
 	virtual BOOL occ_visible(vis_data& V);

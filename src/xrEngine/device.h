@@ -23,6 +23,9 @@
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
+// demonized: toggle bone optimization
+#define OPTIMIZE_CALCULATE_BONES
+
 #include "../Include/xrRender/FactoryPtr.h"
 #include "../Include/xrRender/RenderDeviceRender.h"
 #include "imgui_base.h"
@@ -74,6 +77,12 @@ public:
 	Fmatrix mProjectHud;
 	Fmatrix mFullTransform;
 	Fmatrix mFullTransformHud;
+
+	Fmatrix mView_prev;
+	Fmatrix mProject_prev;
+
+	Fvector4 wind_anim_prev;
+	Fvector4 wind_anim_saved;
 
 	// Copies of corresponding members. Used for synchronization.
 	Fvector vCameraPosition_saved;
@@ -428,6 +437,24 @@ public:
 	IC u32 frame_elapsed()
 	{
 		return frame_timer.GetElapsed_ms();
+	}
+
+	// demonized: Perceivable distance depending on FOV, so that objects will behave normal in binoculars
+	IC float GetPerceivedDist(const Fvector& p, float* real_dist = nullptr)
+	{
+		float dist = vCameraPosition.distance_to(p);
+		float fov_rad = deg2rad(fFOV);
+		float perceived_dist = dist * tanf(fov_rad * 0.5f);
+		if (real_dist) *real_dist = dist;
+		return perceived_dist;
+	}
+
+	IC float CalcSSADynamic(const Fvector& C, float R)
+	{
+		Fvector4 v_res1, v_res2;
+		mFullTransform.transform(v_res1, C);
+		mFullTransform.transform(v_res2, Fvector(C).mad(vCameraRight, R));
+		return v_res1.sub(v_res2).magnitude();
 	}
 
 public:

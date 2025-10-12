@@ -21,7 +21,7 @@ using smart_cover::detail::parse_bool;
 namespace smart_cover
 {
 	shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-	shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
+	shared_str parse_vertex(::luabind::object const& table, LPCSTR identifier, bool const& in);
 } // namespace smart_cover
 
 class id_predicate
@@ -41,7 +41,7 @@ public:
 };
 
 
-loophole::loophole(luabind::object const& description) :
+loophole::loophole(::luabind::object const& description) :
 	m_fov(0.f),
 	m_range(0.f)
 {
@@ -81,17 +81,17 @@ loophole::loophole(luabind::object const& description) :
 	else
 		m_enter_direction.normalize();
 
-	luabind::object actions;
+	::luabind::object actions;
 	parse_table(description, "actions", actions);
 
-	typedef luabind::object::iterator iterator;
+	typedef ::luabind::object::iterator iterator;
 	iterator I = actions.begin();
 	iterator E = actions.end();
 	for (; I != E; ++I)
 	{
 		VERIFY(I.key().type() == LUA_TSTRING);
-		LPCSTR action_type = luabind::object_cast<LPCSTR>(I.key());
-		luabind::object table = *I;
+		LPCSTR action_type = ::luabind::object_cast<LPCSTR>(I.key());
+		::luabind::object table = *I;
 		if (table.type() != LUA_TTABLE)
 		{
 			VERIFY(table.type() != LUA_TNIL);
@@ -105,7 +105,7 @@ loophole::loophole(luabind::object const& description) :
 	if (!m_usable)
 		return;
 
-	luabind::object transitions;
+	::luabind::object transitions;
 	parse_table(description, "transitions", transitions);
 
 	fill_transitions(transitions);
@@ -115,7 +115,7 @@ loophole::loophole(luabind::object const& description) :
 	m_range = parse_float(description, "range", 0.f);
 }
 
-void loophole::add_action(LPCSTR type, luabind::object const& table)
+void loophole::add_action(LPCSTR type, ::luabind::object const& table)
 {
 	VERIFY(table.type() == LUA_TTABLE);
 	smart_cover::action* action = xr_new<smart_cover::action>(table);
@@ -136,32 +136,32 @@ loophole::~loophole()
 	delete_data(m_transitions);
 }
 
-void loophole::fill_transitions(luabind::object const& transitions_table)
+void loophole::fill_transitions(::luabind::object const& transitions_table)
 {
 	VERIFY2(transitions_table.type() == LUA_TTABLE, "invalid loophole description passed");
-	luabind::object::iterator I = transitions_table.begin();
-	luabind::object::iterator E = transitions_table.end();
+	::luabind::object::iterator I = transitions_table.begin();
+	::luabind::object::iterator E = transitions_table.end();
 	for (; I != E; ++I)
 	{
-		luabind::object table = *I;
+		::luabind::object table = *I;
 		VERIFY2(table.type() == LUA_TTABLE, "invalid loophole description passed");
 		shared_str action_from = parse_vertex(table, "action_from", true);
 		shared_str action_to = parse_vertex(table, "action_to", false);
-		luabind::object result;
+		::luabind::object result;
 		parse_table(table, "animations", result);
 		TransitionData tmp;
-		luabind::object::iterator i = result.begin();
-		luabind::object::iterator e = result.end();
+		::luabind::object::iterator i = result.begin();
+		::luabind::object::iterator e = result.end();
 		for (; i != e; ++i)
 		{
-			luabind::object string = *i;
+			::luabind::object string = *i;
 			if (string.type() != LUA_TSTRING)
 			{
 				VERIFY(string.type() != LUA_TNIL);
 				continue;
 			}
 
-			shared_str animation = luabind::object_cast<LPCSTR>(string);
+			shared_str animation = ::luabind::object_cast<LPCSTR>(string);
 			VERIFY2(
 				std::find(
 					tmp.begin(),

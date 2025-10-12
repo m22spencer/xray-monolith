@@ -4,6 +4,8 @@
 using std::swap;
 
 #include <functional>
+#include <unordered_map>
+#include <unordered_set>
 #include "_type_traits.h"
 
 #ifdef __BORLANDC__
@@ -273,30 +275,38 @@ protected:
 	_C c;
 };
 
-#include <unordered_map>
-#include <unordered_set>
-
 #define USE_ROBINHOOD
+
 #ifdef USE_ROBINHOOD
-#include "robin_hood.h"
-template <typename K, class V>
-using xr_unordered_map = robin_hood::unordered_map<K, V>;
+
+#include <robin_hood/robin_hood.h>
+template <class T>
+using xr_hash = robin_hood::hash<T>;
+
+template <typename K, class V, class Hasher = xr_hash<K>>
+using xr_unordered_map = robin_hood::unordered_map<K, V, Hasher>;
 
 template <typename K, class V>
 using xr_pair = robin_hood::pair<K, V>;
 
-template <class T>
-using xr_unordered_set = robin_hood::unordered_set<T>;
+template <class T, class Hasher = xr_hash<T>>
+using xr_unordered_set = robin_hood::unordered_set<T, Hasher>;
+
 #else
-template <typename K, class V, class Hasher = std::hash<K>, class Traits = std::equal_to<K>,
+
+template <class T>
+using xr_hash = std::hash<T>;
+
+template <typename K, class V, class Hasher = xr_hash<K>, class Traits = std::equal_to<K>,
 	typename allocator = xalloc<std::pair<const K, V>>>
 using xr_unordered_map = std::unordered_map<K, V, Hasher, Traits, allocator>;
 
 template <typename K, class V>
 using xr_pair = std::pair<K, V>;
 
-template <class T>
-using xr_unordered_set = std::unordered_set<T>;
+template <class T, class Hasher = xr_hash<T>>
+using xr_unordered_set = std::unordered_set<T, Hasher>;
+
 #endif //USE_ROBINHOOD
 
 template <typename T, typename allocator = xalloc<T>>
@@ -320,14 +330,14 @@ public:
 	u32 size() const { return (u32)__super::size(); }
 };
 
-template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<const K, V>>>
 class xr_map : public std::map<K, V, P, allocator>
 {
 public:
 	u32 size() const { return (u32)__super::size(); }
 };
 
-template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<const K, V>>>
 class xr_multimap : public std::multimap<K, V, P, allocator>
 {
 public:
@@ -342,7 +352,7 @@ template <typename K, class V, class _HashFcn = std::hash<K>, class _EqualKey = 
 template <typename K, class V, class _HashFcn = std::hash<K>, class _EqualKey = std::equal_to<K>, typename allocator = xalloc<std::pair<K, V> > > class xr_hash_multimap : public std::hash_multimap < K, V, _HashFcn, _EqualKey, allocator > { public: u32 size() const { return (u32)__super::size(); } };
 #else
 template <typename K, class V, class _Traits = stdext::hash_compare<K, std::less<K>>, typename allocator = xalloc<std::
-	          pair<K, V>>>
+	          pair<const K, V>>>
 class xr_hash_map : public stdext::hash_map<K, V, _Traits, allocator>
 {
 public:
@@ -355,12 +365,12 @@ public:
 template <class _Ty1, class _Ty2>
 inline std::pair<_Ty1, _Ty2> mk_pair(_Ty1 _Val1, _Ty2 _Val2) { return (std::pair<_Ty1, _Ty2>(_Val1, _Val2)); }
 
-struct pred_str : public std::binary_function<char*, char*, bool>
+struct pred_str
 {
 	IC bool operator()(const char* x, const char* y) const { return xr_strcmp(x, y) < 0; }
 };
 
-struct pred_stri : public std::binary_function<char*, char*, bool>
+struct pred_stri
 {
 	IC bool operator()(const char* x, const char* y) const { return stricmp(x, y) < 0; }
 };

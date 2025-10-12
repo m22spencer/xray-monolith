@@ -34,7 +34,7 @@ CGameFont* GetFontDI()
 	return mngr().pFontDI;
 }
 
-//шрифты для интерфейса
+//С€СЂРёС„С‚С‹ РґР»СЏ РёРЅС‚РµСЂС„РµР№СЃР°
 CGameFont* GetFontGraffiti19Russian()
 {
 	return mngr().pFontGraffiti19Russian;
@@ -162,7 +162,8 @@ void CUIWindow::script_register(lua_State* L)
 		.def("GetHolder", &CUIDialogWnd::GetHolder)
 		.def("AllowMovement", &CUIDialogWnd::AllowMovement)
 		.def("AllowCursor", &CUIDialogWnd::AllowCursor)
-		.def("AllowCenterCursor", &CUIDialogWnd::AllowCenterCursor),
+		.def("AllowCenterCursor", &CUIDialogWnd::AllowCenterCursor)
+		.def("AllowWorkInPause", &CUIDialogWnd::AllowWorkInPause),
 
 		class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
 		.def(constructor<>())

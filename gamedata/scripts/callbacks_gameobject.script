@@ -26,11 +26,28 @@ end
 
 -- Game objects registry
 gameobjects_registry = {}
+_G.gameobjects_registry = gameobjects_registry -- backwards compatibility
 function game_object_on_net_spawn(obj)
 	gameobjects_registry[obj:id()] = obj
 end
 function game_object_on_net_destroy(obj)
 	gameobjects_registry[obj:id()] = nil
+
+	-- Fix dynamic_news_manager loot table
+	local instance = dynamic_news_manager and dynamic_news_manager.get_dynamic_news and dynamic_news_manager.get_dynamic_news()
+	if instance and instance.loot then
+		for i = #instance.loot, 1, -1 do
+			local item = instance.loot[i]
+			if type(item) == "userdata" and item:id() == obj:id() then
+				table.remove(instance.loot, i)
+			end
+		end
+	end
+
+	-- Fix self.response containing deleted object
+	if instance and instance.response and instance.response["who"] and type(instance.response["who"]) == "userdata" and instance.response["who"]:id() == obj:id() then
+		instance.response["who"] = nil
+	end
 end
 
 -- Game objects iterator
@@ -39,6 +56,19 @@ _G.game_objects_iter = function()
 	local obj = nil
 	return function()
 		k, obj = next(gameobjects_registry, k)
+		return obj
+	end
+end
+
+-- Game objects without actor
+_G.game_objects_without_actor_iter = function()
+	local k = nil
+	local obj = nil
+	return function()
+		k, obj = next(gameobjects_registry, k)
+		if k == AC_ID then
+			k, obj = next(gameobjects_registry, k)
+		end
 		return obj
 	end
 end
@@ -80,6 +110,7 @@ AddScriptCallback("bullet_on_remove")
 -- target_id = game object id of entity the bullet hit (it will be 65535 if bullet hit the terrain or vanished)
 -- material = name of material that bullet hit
 -- life_time = time of bullet fly
+-- element - bone_id if the target hit is object, triangle number if its static geometry. -1 if nothing was hit
 
 -- Called when bullet is shot from the weapon
 _G.CBulletOnInit = function(bullet)
@@ -117,9 +148,9 @@ end
 
 -- function on_game_start()
 -- 	RegisterScriptCallback("rocket_on_update", function(rocket)
--- 		printf("rocket is flying")
+-- 		printf_me("rocket is flying")
 -- 		local speed = rocket.speed
--- 		printf("speed %s", speed)
+-- 		printf_me("speed %s", speed)
 -- 		-- rocket.engine_active = true
 -- 		if rocket.engine_active then
 -- 			rocket.speed = 15
@@ -278,12 +309,18 @@ body_state = {
 	move.stand,
 }
 --]]
-local csbs_flags = {}
 AddScriptCallback("npc_on_combat_set_body_state")
 function _G.CAI_Stalker__CombatSetBodyState(npc,world_operator,body_state)
-	csbs_flags.body_state = body_state
+	local csbs_flags = {body_state = body_state}
 	SendScriptCallback("npc_on_combat_set_body_state",npc,world_operator,body_state,csbs_flags)
 	return csbs_flags.body_state
+end
+
+AddScriptCallback("npc_on_before_look_at_actor")
+_G.CNPCBeforeLookAtActor = function(npc, distance)
+	local flags = {ret_value = true}
+	SendScriptCallback("npc_on_before_look_at_actor", npc, distance)
+	return flags.ret_value
 end
 
 -- actor_on_task_callback
@@ -404,7 +441,6 @@ end
 
 -- NLTP_ASHES & demonized : Actor on death callback
 AddScriptCallback("actor_on_death")
-
 function actor_on_first_update()
 	db.actor:set_callback(callback.death, function()
 		SendScriptCallback("actor_on_death")
@@ -415,6 +451,15 @@ end
 AddScriptCallback("imgui_on_render")
 function on_imgui_render(name)
 	SendScriptCallback("imgui_on_render", name)
+end
+
+--on GAME path build fail callback (can be used when npc tries to get to currently unavailable smart), 
+--can be used to intercept and redirect squad to available smart, also can suppress error message with flags.ret_value = false
+AddScriptCallback("npc_on_game_path_build_fail")
+_G.CAI_Stalker__PathBuildFailCallback = function(npc)
+	local flags = {ret_value = true}
+	SendScriptCallback("npc_on_game_path_build_fail",npc,flags)
+	return flags.ret_value
 end
 
 -- Improve NPCs pathfinding by reducing actual anomaly damage radius
@@ -456,8 +501,50 @@ function ActorMenu_on_item_after_move(npc_id, obj, mode, bag_from)
     end
 end
 
+-- Prefetch HUD visual when moving item to slot
+function actor_item_to_slot_prefetch(item)
+	local hudSec = SYS_GetParam(0, item:section(), "hud")
+	if hudSec then
+		local visual = SYS_GetParam(0, hudSec, "item_visual")
+		if visual then
+			game.prefetch_model(visual)
+		end
+	end
+end
+
+-- Prefetch current items
+function actor_on_first_update_prefetch()
+	db.actor:iterate_inventory(function(npc, item)
+		local ui_texture = SYS_GetParam(0, item:section(), "icons_texture", "ui\\ui_icon_equipment")
+		game.prefetch_texture(ui_texture)
+
+		if item_backpack.is_in_slot(item) then
+			local hudSec = SYS_GetParam(0, item:section(), "hud")
+			if hudSec then
+				local visual = SYS_GetParam(0, hudSec, "item_visual")
+				if visual then
+					game.prefetch_model(visual)
+				end
+			end
+		end
+	end, db.actor)
+end
+
+-- Force update close enough traders
+function npc_on_update(npc)
+	if npc:position():distance_to_sqr(db.actor:position()) < 30^2 then
+		trade_manager.update(npc)
+	end
+end
+
 function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+
+	-- Prefetch callbacks. Disabled for now, conflict with SSS
+	-- RegisterScriptCallback("actor_item_to_slot", actor_item_to_slot_prefetch)
+	-- RegisterScriptCallback("actor_on_first_update", actor_on_first_update_prefetch)
+	
+	RegisterScriptCallback("npc_on_update", npc_on_update)
 	RegisterScriptCallback("ActorMenu_on_item_after_move", ActorMenu_on_item_after_move)
 	RegisterScriptCallback("anomaly_on_before_activate", anomaly_on_before_activate)
 	RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)

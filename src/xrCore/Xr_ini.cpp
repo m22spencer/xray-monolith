@@ -15,6 +15,8 @@
 XRCORE_API CInifile const* pSettings = NULL;
 XRCORE_API CInifile const* pSettingsAuth = NULL;
 
+BOOL print_dltx_warnings = FALSE;
+
 //#define INICACHE_PRINT_DEBUG
 
 CInifile* CInifile::Create(const char* szFileName, BOOL ReadOnly)
@@ -39,7 +41,7 @@ bool item_pred(const CInifile::Item& x, LPCSTR val)
 }
 
 //------------------------------------------------------------------------------
-//Òåëî ôóíêöèé Inifile
+//Ð¢ÐµÐ»Ð¾ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¹ Inifile
 //------------------------------------------------------------------------------
 XRCORE_API BOOL _parse(LPSTR dest, LPCSTR src)
 {
@@ -368,7 +370,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 					if (!bIsCurrentSectionOverride)
 					{
 
-						Debug.fatal(DEBUG_INFO, "Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *Current->Name, *Current->Name, m_file_name, SectionToFilename[std::string(Current->Name.c_str())].c_str(), currentFileName);
+						Debug.fatal(DEBUG_INFO, "[DLTX] Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *Current->Name, *Current->Name, m_file_name, SectionToFilename[std::string(Current->Name.c_str())].c_str(), currentFileName);
 					}
 
 					//Overwrite existing override data
@@ -834,11 +836,13 @@ void CInifile::Load(IReader* F, LPCSTR path
 		}
 
 		//Delete entries that are still marked DLTX_DELETE
+		xr_unordered_set<xr_string> deletedItems;
 		for (auto It = CurrentSect->Data.rbegin(); It != CurrentSect->Data.rend(); ++It)
 		{
 			if (IsStringDLTXDelete(It->second))
 			{
 				CurrentSect->Data.erase(It.base() - 1);
+				deletedItems.insert(It->first.c_str());
 			}
 		}
 
@@ -847,12 +851,19 @@ void CInifile::Load(IReader* F, LPCSTR path
 			for (auto It = OverrideModifyListData[std::string(CurrentSect->Name.c_str())].begin(); It != OverrideModifyListData[std::string(CurrentSect->Name.c_str())].end(); ++It) {
 				CInifile::Item &I = *It;
 
-				// If section exists with item list, split list and perform operation
+				// Get list mode operation (add or delete)
 				char dltx_listmode = I.first[0];
 				I.first = I.first.c_str() + 1;
 
+				// Find existing item list if exists
 				CInifile::SectIt_ sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), *I.first, item_pred);
-				if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(I.first)) {
+
+				// If item list doesn't exist and wasn't deleted by previous operation, insert as is
+				if (I.second != NULL && !deletedItems.contains(I.first.c_str()) && dltx_listmode == '>' && (sect_it == CurrentSect->Data.end() || !sect_it->first.equal(I.first))) {
+					CurrentSect->Data.insert(sect_it, I);	
+
+				// If item list exists, split existing list and perform operation
+				} else if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(I.first)) {
 
 					//Msg("%s has dltx_listmode %s", I.first.c_str(), std::string(1, dltx_listmode).c_str());
 
@@ -924,7 +935,6 @@ void CInifile::Load(IReader* F, LPCSTR path
 				}
 			}
 		}
-		
 
 		//Pop from stack
 		auto LastElement = PreviousEvaluations->end();
@@ -989,7 +999,8 @@ void CInifile::Load(IReader* F, LPCSTR path
 			auto override_filenames = OverrideToFilename.find(i->first);
 			if (override_filenames != OverrideToFilename.end()) {
 				for (auto &override_filename : override_filenames->second) {
-					Msg("!!!DLTX ERROR Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", i->first.c_str(), m_file_name, override_filename.first.c_str());
+					if (print_dltx_warnings)
+						Msg("~[DLTX] WARNING: Attemped to override section '%s', which doesn't exist. Ensure that a base section with the same name is loaded first. Check this file and its DLTX mods: %s, mod file %s", i->first.c_str(), m_file_name, override_filename.first.c_str());
 				}
 			}
 		}

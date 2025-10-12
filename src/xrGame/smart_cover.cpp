@@ -38,7 +38,7 @@ cover::cover(
 	DescriptionPtr description,
 	bool const is_combat_cover,
 	bool const can_fire,
-	luabind::object const& loopholes_availability
+	::luabind::object const& loopholes_availability
 ) :
 	inherited(object.Position(), object.ai_location().level_vertex_id()),
 	m_object(object),
@@ -54,15 +54,15 @@ cover::cover(
 	Loopholes::const_iterator E = m_description->loopholes().end();
 	for (; I != E; ++I)
 	{
-		luabind::object::iterator i = loopholes_availability.begin();
-		luabind::object::iterator e = loopholes_availability.end();
+		::luabind::object::iterator i = loopholes_availability.begin();
+		::luabind::object::iterator e = loopholes_availability.end();
 		for (; i != e; ++i)
 		{
-			LPCSTR const loophole_id = luabind::object_cast<LPCSTR>(i.key());
+			LPCSTR const loophole_id = ::luabind::object_cast<LPCSTR>(i.key());
 			if (xr_strcmp(loophole_id, (*I)->id()))
 				continue;
 
-			if (!luabind::object_cast<bool>(*i))
+			if (!::luabind::object_cast<bool>(*i))
 				break;
 
 			m_loopholes.push_back(*I);
