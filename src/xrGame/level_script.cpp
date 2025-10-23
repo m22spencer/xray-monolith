@@ -1617,7 +1617,7 @@ void AddBullet(::luabind::object t)
 	}
 }
 
-const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
+const Fvector3 world2ui_with_depth(Fvector pos, bool hud = false, bool allow_offscreen = false)
 {
 	Fmatrix world, res;
 	world.identity();
@@ -1627,7 +1627,7 @@ const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = fa
 		res.mul(Device.mFullTransformHud, world);
 	else
 		res.mul(Device.mFullTransform, world);
-	
+
 	Fvector4 v_res;
 
 	v_res.w = res._44;
@@ -1650,7 +1650,15 @@ const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = fa
 	x /= width_fk;
 	y /= height_fk;
 
-	return { x,y };
+	float depth = v_res.w < 0 ? -1 : 1;
+
+	return {x, y, depth};
+}
+
+const Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
+{
+	Fvector3 res = world2ui_with_depth(pos, hud, allow_offscreen);
+	return {res.x, res.y};
 }
 
 // demonized: unproject ui coordinates (ie mouse cursor coordinates) to world coordinates
@@ -2634,6 +2642,7 @@ void CLevel::script_register(lua_State* L)
 		def("prefetch_model", prefetch_model),
 		def("get_visual_userdata", GetVisualUserdata),
 		def("world2ui", world2ui),
+		def("world2ui_with_depth", world2ui_with_depth),
 		def("ui2world", (void (*)(Fvector2, Fvector&, u16&))&ui2world, pure_out_value<2>() + pure_out_value<3>()),
 		def("ui2world", (void (*)(Fvector&, Fvector&, u16&))&ui2world, pure_out_value<2>() + pure_out_value<3>()),
 		def("ui2world_offscreen", (void (*)(Fvector2, Fvector&, u16&))& ui2world_offscreen, pure_out_value<2>() + pure_out_value<3>()),

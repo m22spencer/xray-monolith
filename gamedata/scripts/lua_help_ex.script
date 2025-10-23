@@ -101,6 +101,7 @@
 
     game {
         Fvector2 world2ui(Fvector pos, bool hud = false, bool allow_offscreen = false)
+        Fvector2 world2ui_with_depth(Fvector pos, bool hud = false, bool allow_offscreen = false)
         function ui2world(Fvector2 pos) -> Fvector result, u16 object_id
         function ui2world_offscreen(Fvector2 pos) -> Fvector result, u16 object_id
         change_game_news_show_time(CUIWindow* UIWindow, float show_time)
