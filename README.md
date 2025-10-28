@@ -171,6 +171,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.10.28**
+* Temporary revert https://github.com/themrdemonized/xray-monolith/pull/326 to fix issue https://github.com/themrdemonized/xray-monolith/issues/387#issuecomment-3453531244
+
 **2025.10.23**
 * Added `bolt` and `bolt_bullet` to spawn antifreeze ignore list
 * SaloEater: World2UI With Depth lua method (https://github.com/themrdemonized/xray-monolith/pull/386)
