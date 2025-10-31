@@ -2595,9 +2595,9 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Float, "g_recon_show_speed", &recon_show_speed, 0.f, 20.f);
 	CMD4(CCC_Float, "g_recon_hide_speed", &recon_hide_speed, 0.f, 20.f);
 	CMD4(CCC_Float, "g_recon_mindist", &recon_mindist, 0.f, 300.f);
-	CMD4(CCC_Float, "g_recon_maxdist", &recon_mindist, 0.f, 300.f);
-	CMD4(CCC_Float, "g_recon_minspeed", &recon_mindist, .1f, 20.f);
-	CMD4(CCC_Float, "g_recon_maxspeed", &recon_mindist, .1f, 20.f);
+	CMD4(CCC_Float, "g_recon_maxdist", &recon_maxdist, 0.f, 300.f);
+	CMD4(CCC_Float, "g_recon_minspeed", &recon_minspeed, .1f, 20.f);
+	CMD4(CCC_Float, "g_recon_maxspeed", &recon_maxspeed, .1f, 20.f);
 
 	CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);
 	CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
