@@ -685,21 +685,18 @@ void CWeaponStatMgun::UpdateBarrelDir()
 		ClampRotationHorz(m_tgt_y_rot, m_cur_y_rot, -m_lim_y_rot.y, -m_lim_y_rot.x);
 	}
 
-	if (OwnerActor())
+	switch (GetState())
 	{
-		switch (GetState())
-		{
-		case eStateIdle:
-		case eStateFire:
-			m_cur_x_rot = angle_inertion_var(m_cur_x_rot, m_tgt_x_rot, m_rotate_x_speed, m_rotate_x_speed, PI, Device.fTimeDelta);
-			m_cur_y_rot = angle_inertion_var(m_cur_y_rot, m_tgt_y_rot, m_rotate_y_speed, m_rotate_y_speed, PI, Device.fTimeDelta);
-			break;
-		case eStateReload:
-			m_cur_x_rot = m_bind_x_rot;
-			break;
-		default:
-			break;
-		}
+	case eStateIdle:
+	case eStateFire:
+		m_cur_x_rot = angle_inertion_var(m_cur_x_rot, m_tgt_x_rot, m_rotate_x_speed, m_rotate_x_speed, PI, Device.fTimeDelta);
+		m_cur_y_rot = angle_inertion_var(m_cur_y_rot, m_tgt_y_rot, m_rotate_y_speed, m_rotate_y_speed, PI, Device.fTimeDelta);
+		break;
+	case eStateReload:
+		m_cur_x_rot = m_bind_x_rot;
+		break;
+	default:
+		break;
 	}
 #else
 	XFi.transform_dir(dep, m_destEnemyDir);
@@ -1177,7 +1174,7 @@ bool CWeaponStatMgun::IsCameraZoom()
 
 void CWeaponStatMgun::UpdateSound()
 {
-	if (IsActive())
+	if (IsActive() && (GetState() == eStateIdle || GetState() == eStateFire))
 	{
 		m_sound_mgr.RotatePlay(true);
 		bool play = false;
