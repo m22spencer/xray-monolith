@@ -11,7 +11,11 @@ void CCar::script_register(lua_State* L)
 {
 	module(L)
 	[
+#ifdef CAR_NEW
+		class_<CCar, bases<CGameObject, CHolderCustom, CExplosive>>("CCar")
+#else
 		class_<CCar, bases<CGameObject, CHolderCustom>>("CCar")
+#endif
 		.enum_("wpn_action")
 		[
 			value("eWpnDesiredDir", int(CCarWeapon::eWpnDesiredDir)),
@@ -53,14 +57,16 @@ void CCar::script_register(lua_State* L)
 		.def("GetRPM", &CCar::GetRPM)
 		.def("SetRPM", &CCar::SetRPM)
 		/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
-		
+
 #ifdef CAR_NEW
 		.def("SetUseAction", &CCar::SetUseAction)
-		.def("SetInitiator", &CCar::SetInitiator)
-		.def("LoadExplosiveSection", &CCar::LoadExplosiveSection)
-		.def("InitExplosiveSection", &CCar::InitExplosiveSection)
 		.def("GetFlyWeightAdd", &CCar::GetFlyWeightAdd)
 		.def("SetFlyWeightAdd", &CCar::SetFlyWeightAdd)
+
+		.def("GetControlEle", &CCar::GetControlEle)
+		.def("GetControlYaw", &CCar::GetControlYaw)
+		.def("GetControlPit", &CCar::GetControlPit)
+		.def("GetControlRol", &CCar::GetControlRol)
 #endif
 		.def(constructor<>())
 	];

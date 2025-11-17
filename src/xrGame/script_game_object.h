@@ -702,9 +702,6 @@ public:
 
 	CHolderCustom* get_custom_holder();
 	CHolderCustom* get_current_holder(); //actor only
-#ifdef HOLDERCUSTOM_NEW
-	CScriptGameObject *get_holder_owner();
-#endif
 
 	void start_particles(LPCSTR pname, LPCSTR bone);
 	void stop_particles(LPCSTR pname, LPCSTR bone);

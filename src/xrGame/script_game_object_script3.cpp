@@ -372,9 +372,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		.def("get_physics_shell", &CScriptGameObject::get_physics_shell)
 		.def("get_holder_class", &CScriptGameObject::get_custom_holder)
 		.def("get_current_holder", &CScriptGameObject::get_current_holder)
-#ifdef HOLDERCUSTOM_NEW
-		.def("get_holder_owner", &CScriptGameObject::get_holder_owner)
-#endif
 		//usable object
 		.def("set_tip_text", &CScriptGameObject::SetTipText)
 		.def("set_tip_text_default", &CScriptGameObject::SetTipTextDefault)

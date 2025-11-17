@@ -866,3 +866,15 @@ bool CExplosive::Useful() const
 {
 	return m_explosion_flags.flags == 0;
 }
+
+#ifdef CEXPLOSIVE_CHANGE
+void CExplosive::LoadExplosiveSection(LPCSTR section)
+{
+	CExplosive::Load(pSettings, section);
+}
+
+void CExplosive::LoadExplosiveSection(CInifile *ini, LPCSTR section)
+{
+	CExplosive::Load(ini, section);
+}
+#endif

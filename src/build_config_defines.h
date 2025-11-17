@@ -46,6 +46,7 @@
 #define CAR_NEW                                         // Upgrade CCar.
 #define STATIONARYMGUN_NEW								// Upgrade CSE_ALifeStationaryMgun and CWeaponStatMgun.
 #define SPATIAL_CHANGE									// Upgrade spatial and feel_vision.
+#define EXPLOSIVE_CHANGE								// Upgrade CExplosive and its relatives.
 
 /*LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.

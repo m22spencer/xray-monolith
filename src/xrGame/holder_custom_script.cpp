@@ -2,6 +2,8 @@
 #include "holder_custom.h"
 #include "HolderEntityObject.h"
 
+#include "script_game_object.h"
+
 using namespace luabind;
 
 #pragma optimize("s",on)
@@ -16,5 +18,9 @@ void CHolderCustom::script_register(lua_State* L)
 		.def("SetParam", (void (CHolderCustom::*)(int, Fvector))&CHolderCustom::SetParam)
 		.def("SetEnterLocked", &CHolderCustom::SetEnterLocked)
 		.def("SetExitLocked", &CHolderCustom::SetExitLocked)
+
+#ifdef HOLDERCUSTOM_NEW
+		.def("Owner", &CHolderCustom::Owner_script)
+#endif
 	];
 }
