@@ -15,3 +15,10 @@ void CHolderCustom::detach_Actor()
 	m_owner = NULL;
 	m_ownerActor = NULL;
 }
+
+#ifdef HOLDERCUSTOM_NEW
+CScriptGameObject *CHolderCustom::Owner_script()
+{
+	return (m_owner) ? m_owner->lua_game_object() : nullptr;
+}
+#endif

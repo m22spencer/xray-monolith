@@ -743,6 +743,23 @@ private:
 	float m_rotor_force_max;
 	float m_rotor_speed_max;
 
+	bool m_control_press_ele_up; /* Up */
+	bool m_control_press_ele_dw; /* Down */
+	bool m_control_press_yaw_rs; /* Strafe right */
+	bool m_control_press_yaw_ls; /* Strafe left */
+	bool m_control_press_pit_fs; /* Move forward */
+	bool m_control_press_pit_bs; /* Move backward */
+	bool m_control_press_rol_rs; /* Rotate right */
+	bool m_control_press_rol_ls; /* Rotate left */
+	void ControlPressEleUp(bool status);
+	void ControlPressEleDw(bool status);
+	void ControlPressYawRs(bool status);
+	void ControlPressYawLs(bool status);
+	void ControlPressPitFs(bool status);
+	void ControlPressPitBs(bool status);
+	void ControlPressRolRs(bool status);
+	void ControlPressRolLs(bool status);
+
 	u16 m_control_ele; /* Elevating */
 	u16 m_control_pit; /* Pitch */
 	u16 m_control_rol; /* Roll */
@@ -779,9 +796,6 @@ public:
 	virtual bool is_ai_obstacle() const;
 	u16 GetType() { return m_type; }
 	void SetUseAction(LPCSTR txt);
-	virtual void SetInitiator(u16 id) { CExplosive::SetInitiator(id); }
-	void LoadExplosiveSection(LPCSTR section, bool is_load_from_model_custom_data = false);
-	void InitExplosiveSection();
 
 	enum eCarType
 	{
@@ -831,7 +845,7 @@ public:
 	void SetControlPitScale(float val) { m_control_pit_max = val; };
 	void SetControlRolScale(float val) { m_control_rol_max = val; };
 
-	void FlyResetControl();
+	void ControlReset();
 	bool IsCameraZoom();
 	bool IsRemoteControl() { return m_remote_control; };
 	float GetFlyWeightAdd() { return m_fly_weight_add; };

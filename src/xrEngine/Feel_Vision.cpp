@@ -53,7 +53,7 @@ namespace Feel
 	IC BOOL feel_vision_test_callback(const collide::ray_defs &rd, CObject *object, LPVOID user_data)
 	{
 		/* Return FALSE to see through object. */
-		if (object->spatial.type | STYPE_FEELVISIONIGNORE)
+		if (object->spatial.type & STYPE_FEELVISIONIGNORE)
 		{
 			return FALSE;
 		}
@@ -274,6 +274,15 @@ namespace Feel
 						continue;
 
 					CObject const* object = (*i)->dcast_CObject();
+
+#ifdef SPATIAL_CHANGE
+					if (object && object->spatial.type & STYPE_FEELVISIONIGNORE)
+					{
+						/* See through objects that have the flag. */
+						continue;
+					}
+#endif
+
 					RQR.r_clear();
 					if (object && object->collidable.model && !object->collidable.model->_RayQuery(RD, RQR))
 						continue;
