@@ -1235,7 +1235,7 @@ void CWeaponStatMgun::UpdateAnimation()
 			}
 		}
 
-		if (anim_body && strlen(anim_legs))
+		if (anim_legs && strlen(anim_legs))
 		{
 			MotionID mid_legs = A->ID_Cycle(anim_legs);
 			if (mid_legs.idx != OwnerActor()->m_current_legs.idx)
@@ -1267,7 +1267,7 @@ void CWeaponStatMgun::UpdateAnimation()
 				stalker->CStepManager::on_animation_start(MotionID(), nullptr);
 			}
 		}
-		if (anim_body && strlen(anim_legs))
+		if (anim_legs && strlen(anim_legs))
 		{
 			MotionID mid_legs = A->ID_Cycle(anim_legs);
 			if (mid_legs.idx != stalker->animation().legs().animation().idx)
