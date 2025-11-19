@@ -438,10 +438,12 @@ Fmatrix CScriptGameObject::bone_transform(u16 bone_id, bool bHud)
 
 	// demonized: backwards compatibility with scripts, get root bone if bone_id is BI_NONE
 	if (bone_id == BI_NONE) {
+#ifdef BONE_POSITION_WARNING
 		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
 			Msg("![bone_position] Incorrect bone_id provided for %s (%d), fallback to root bone", object().cNameSect_str(), object().ID());
 			ai().script_engine().print_stack();
 		}
+#endif
 		bone_id = k->LL_GetBoneRoot();
 	}
 
