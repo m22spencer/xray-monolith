@@ -174,6 +174,10 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.11.17**
+* Fixed `g_recon_maxdist`, minspeed and maxspeed commands to set proper variables
+* GhenTuong: Small tweak and fix bugs for CCar, CExplosive, CWeaponStatMgun, SPATIAL_CHANGE.
+
 **2025.10.28**
 * Temporary revert https://github.com/themrdemonized/xray-monolith/pull/326 to fix issue https://github.com/themrdemonized/xray-monolith/issues/387#issuecomment-3453531244
 

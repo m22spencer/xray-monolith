@@ -90,6 +90,9 @@ void xrDebug::backend(const char* reason, const char* expression, const char* ar
 	FlushLog();
 	if (handler) handler();
 
+	if (IsDebuggerPresent())
+		DebugBreak();
+
 	// Call the dialog
 	dlgExpr = reason;
 	xr_sprintf()
@@ -311,6 +314,9 @@ LONG WINAPI UnhandledFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
 	{
 		szResult = "DBGHELP.DLL not found";
 	}
+
+	if (IsDebuggerPresent())
+		DebugBreak();
 
 	string1024 reason;
 	xr_sprintf(reason, "*** Internal Error ***\n%s", szResult);

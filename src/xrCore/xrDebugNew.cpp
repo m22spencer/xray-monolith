@@ -274,6 +274,9 @@ void xrDebug::backend(const char* expression, const char* description, const cha
 
 	FlushLog();
 
+    if (IsDebuggerPresent())
+        DebugBreak();
+
 	ShowCursor(true);
 	ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
 	MessageBox(
@@ -850,6 +853,9 @@ LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
 # ifdef USE_OWN_MINI_DUMP
 	save_mini_dump(pExceptionInfo);
 # endif // USE_OWN_MINI_DUMP
+
+    if (IsDebuggerPresent())
+        DebugBreak();
 
 	ShowCursor(true);
 	ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
