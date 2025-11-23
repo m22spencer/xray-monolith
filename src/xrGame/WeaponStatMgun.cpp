@@ -744,10 +744,8 @@ void CWeaponStatMgun::cam_Update(float dt, float fov)
 		}
 		Fmatrix xfm = Visual()->dcast_PKinematics()->LL_GetTransform(bone_id);
 		XFORM().transform_tiny(P, xfm.c);
-		if (OwnerActor())
-			OwnerActor()->Orientation().yaw = -cam->yaw;
-		if (OwnerActor())
-			OwnerActor()->Orientation().pitch = -cam->pitch;
+		OwnerActor()->Orientation().yaw = -cam->yaw;
+		OwnerActor()->Orientation().pitch = -cam->pitch;
 	}
 	break;
 	case eCamChase:
@@ -1139,9 +1137,6 @@ void CWeaponStatMgun::UpdateCamera()
 	cam_Update(Device.fTimeDelta, g_fov);
 	OwnerActor()->Cameras().UpdateFromCamera(Camera());
 	OwnerActor()->Cameras().ApplyDevice(R_VIEWPORT_NEAR);
-
-	OwnerActor()->Orientation().yaw = 0;
-	OwnerActor()->Orientation().pitch = 0;
 
 	if (IsCameraZoom())
 	{
