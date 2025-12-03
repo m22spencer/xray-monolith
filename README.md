@@ -174,6 +174,9 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.12.02**
+* Antglobes: Export Screenshot Func + variable resolution & encoding (https://github.com/themrdemonized/xray-monolith/pull/394)
+
 **2025.11.17**
 * Fixed `g_recon_maxdist`, minspeed and maxspeed commands to set proper variables
 * GhenTuong: Small tweak and fix bugs for CCar, CExplosive, CWeaponStatMgun, SPATIAL_CHANGE.
