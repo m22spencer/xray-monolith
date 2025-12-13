@@ -39,6 +39,10 @@
 #include "Missile.h"
 #include "WeaponKnife.h"
 
+#ifdef PROJECTOR_NEW
+#include "searchlight.h"
+#endif
+
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -114,6 +118,9 @@ class script_attachment;
 
 #ifdef STATIONARYMGUN_NEW
 class CWeaponStatMgun;
+#endif
+#ifdef PROJECTOR_NEW
+class CProjector;
 #endif
 
 #ifdef DEBUG
@@ -692,6 +699,9 @@ public:
 	CCar* get_car();
 #ifdef STATIONARYMGUN_NEW
 	CWeaponStatMgun *get_stmgun();
+#endif
+#ifdef PROJECTOR_NEW
+	CProjector *get_projector();
 #endif
 	//LAMP
 	CHangingLamp* get_hanging_lamp();

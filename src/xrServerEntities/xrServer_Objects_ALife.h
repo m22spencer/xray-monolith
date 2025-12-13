@@ -550,10 +550,24 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeObjectHangingLamp)
 #define script_type_list save_type_list(CSE_ALifeObjectHangingLamp)
 
+#ifdef PROJECTOR_NEW
+SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectProjector, CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton)
+#else
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeObjectProjector, CSE_ALifeDynamicObjectVisual)
+#endif
 	CSE_ALifeObjectProjector(LPCSTR caSection);
 	virtual ~CSE_ALifeObjectProjector();
 	virtual bool used_ai_locations() const;
+
+#ifdef PROJECTOR_NEW
+	virtual CSE_Abstract *cast_abstract() { return this; }
+	virtual void load(NET_Packet &tNetPacket);
+	virtual bool can_save() const;
+protected:
+	virtual void data_load(NET_Packet &tNetPacket);
+	virtual void data_save(NET_Packet &tNetPacket);
+#endif
+
 SERVER_ENTITY_DECLARE_END
 
 add_to_type_list(CSE_ALifeObjectProjector)
