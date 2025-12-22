@@ -1,8 +1,8 @@
 --[[
-Create a new section for projector object by adding class = S_SEARCH:
+Create a new section for projector object by adding class = _S_SEARCH:
 
 [projector_object]
-class = S_SEARCH
+class = _S_SEARCH
 --]]
 
 function _G.IsProjector(o,c)

@@ -1,8 +1,8 @@
 --[[
-Create a new section for stationary machine gun object by adding class = S_STMGUN:
+Create a new section for stationary machine gun object by adding class = _S_STMGUN:
 
 [stm_object]
-class = S_STMGUN
+class = _S_STMGUN
 --]]
 
 function _G.IsStmgun(o,c)
