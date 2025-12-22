@@ -26,7 +26,10 @@ T& CALifeRegistryContainer::get()
     else if constexpr (std::is_same_v<T, CActorStatisticRegistry>)
         return m_actor_statistics;
     else
-        static_assert(false, "Unsupported registry type");
+    {
+        VERIFY(!"no entry");
+        return {};//static_assert(false, "Unsupported registry type");
+    }
 }
 
 template <typename T>
@@ -47,5 +50,8 @@ const T& CALifeRegistryContainer::get() const
     else if constexpr (std::is_same_v<T, CActorStatisticRegistry>)
         return m_actor_statistics;
     else
-        static_assert(false, "Unsupported registry type");
+    {
+        VERIFY(!"no entry");
+        return {};//static_assert(false, "Unsupported registry type");
+    }
 }
