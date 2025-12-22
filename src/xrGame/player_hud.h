@@ -439,8 +439,4 @@ public:
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
-add_to_type_list(player_hud)
-#undef script_type_list
-#define script_type_list save_type_list(player_hud)
-
 extern player_hud* g_player_hud;
