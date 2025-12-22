@@ -671,12 +671,10 @@ extern BOOL print_bone_warnings;
 Fmatrix script_attachment::bone_transform(u16 bone_id)
 {
 	if (bone_id == BI_NONE || bone_id >= m_kinematics->LL_BoneCount()) {
-#ifdef BONE_POSITION_WARNING
 		if (strstr(Core.Params, "-dbg") && print_bone_warnings) {
 			Msg("![bone_position] Incorrect bone_id provided for %s (%s), fallback to root bone", GetName(), GetModelScript());
 			ai().script_engine().print_stack();
 		}
-#endif
 		bone_id = m_kinematics->LL_GetBoneRoot();
 	}
 

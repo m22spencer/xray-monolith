@@ -41,7 +41,6 @@
 //#define FP_DEATH										// first person death view (Note: It's fixed to position and does not follow corpse)
 #define NEW_ANIMS										// use new animations. Please enclose any new animation addions with this define
 //-TWEAKS
-#define BONE_POSITION_WARNING							// Modder can turn it off if it spams too much.
 
 #define HOLDERCUSTOM_NEW								// Upgrade CHolderCustom.
 #define CAR_NEW											// Upgrade CCar.
