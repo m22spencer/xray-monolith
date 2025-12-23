@@ -2,7 +2,7 @@
 Create a new section for projector object by adding class = _S_SEARCH:
 
 [projector_object]
-class = _S_SEARCH
+class = _S_SEARC
 --]]
 
 function _G.IsProjector(o,c)

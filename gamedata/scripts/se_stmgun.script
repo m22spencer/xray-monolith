@@ -2,7 +2,7 @@
 Create a new section for stationary machine gun object by adding class = _S_STMGUN:
 
 [stm_object]
-class = _S_STMGUN
+class = _S_STMGU
 --]]
 
 function _G.IsStmgun(o,c)
