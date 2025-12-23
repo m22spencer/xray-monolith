@@ -174,6 +174,15 @@ How to compile exes:
 6. For successful compilation, **the latest build tools with MFC and ATL libraries is required**
 
 ## Changelog
+**2025.12.23**
+* Removed dependency on obsolete `Loki` library, reduced size of exe and pdb files (https://github.com/ixray-team/ixray-1.6-stcop/commit/4dc52310a94829c254ea03019399afac12f77450, https://github.com/ixray-team/ixray-1.6-stcop/commit/8e916f28fbc293628b61d8b3270e33b91294f31a)
+* Crows will fly towards recently killed NPCs (https://github.com/ixray-team/ixray-1.6-stcop/commit/0392ea1ae4e7454dd8a7d38e1868e03558c42093)
+* Fixed sound volume calculation from emitter to player (https://github.com/ixray-team/ixray-1.6-stcop/commit/dddeb09cb90190d151b23bcba15a389175ed686f)
+* Print warnings in console if invalid fire_bone, fire_bone2 or shell_bone is provided
+* Fixed compiled warnings for player_hud functions
+* Fixed `g_target_temp_data_16` allocation size in xrSound
+* GhenTuong: Development changes for CProjector, CWeaponStatMgun, bind_monster.script (https://github.com/themrdemonized/xray-monolith/pull/396)
+
 **2025.12.02**
 * Antglobes: Export Screenshot Func + variable resolution & encoding (https://github.com/themrdemonized/xray-monolith/pull/394)
 
