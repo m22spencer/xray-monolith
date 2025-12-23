@@ -130,12 +130,6 @@ DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 #ifdef PROJECTOR_NEW
-add_to_type_list(CProjector)
-#undef script_type_list
-#define script_type_list save_type_list(CProjector)
-#endif
-
-#ifdef PROJECTOR_NEW
 	struct SProjectorLight
 {
 	shared_str m_sec;
