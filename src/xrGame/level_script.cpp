@@ -58,6 +58,8 @@
 #include "ui\UILogsWnd.h"
 #include "game_news.h"
 #include "alife_registry_wrappers.h"
+#include "cover_manager.h"
+#include "cover_point.h"
 
 using namespace luabind;
 
@@ -290,6 +292,28 @@ void change_game_time(u32 days, u32 hours, u32 mins)
 		g_pGamePersistent->Environment().ChangeGameTime(fValue);
 		tpGame->alife().time_manager().change_game_time(value);
 	}
+}
+
+::luabind::object get_nearby_covers(const Fvector &pos, float radius)
+{
+	xr_vector<CCoverPoint *> nearby_covers;
+	nearby_covers.clear();
+	ai().cover_manager().covers().nearest(pos, radius, nearby_covers);
+	::luabind::object lua_table = ::luabind::newtable(ai().script_engine().lua());
+	for (auto &I : nearby_covers)
+	{
+		lua_table[I->level_vertex_id()] = true;
+	}
+	return lua_table;
+}
+
+u32 vertex_link(u32 level_vertex_id, int index)
+{
+	if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+	{
+		return u32(-1);
+	}
+	return ai().level_graph().vertex(level_vertex_id)->link(index);
 }
 
 float high_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
@@ -2390,6 +2414,8 @@ void CLevel::script_register(lua_State* L)
 			def("get_time_minutes", get_time_minutes),
 			def("change_game_time", change_game_time),
 
+			def("get_nearby_covers", get_nearby_covers),
+			def("vertex_link", vertex_link),
 			def("high_cover_in_direction", high_cover_in_direction),
 			def("low_cover_in_direction", low_cover_in_direction),
 			def("vertex_in_direction", vertex_in_direction),
