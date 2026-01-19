@@ -188,7 +188,7 @@ CInifile::~CInifile()
 		xr_delete(*I);
 }
 
-void CInifile::insert_item(CInifile::Sect* tgt, const CInifile::Item& I)
+void CInifile::insert_item(Sect* tgt, const Item& I)
 {
 	// demonized
 	// DLTX: add or remove item from the section parameter if it has a structure of "name = item1, item2, item3, ..."
@@ -422,28 +422,28 @@ void CInifile::LTXLoad (
 
 	// Optimized regex match with caching
 	static auto GetRegexMatch = [](const shared_str& InputString, const shared_str& PatternString)
+	{
+		const std::regex& Pattern = GetCachedRegex(PatternString);
+		std::smatch MatchResult;
+		xr_string input = InputString.c_str();
+
+		std::regex_search(input, MatchResult, Pattern);
+
+		if (MatchResult.begin() == MatchResult.end())
 		{
-			const std::regex& Pattern = GetCachedRegex(PatternString);
-			std::smatch MatchResult;
-			xr_string input = InputString.c_str();
+			return xr_string();
+		}
 
-			std::regex_search(input, MatchResult, Pattern);
-
-			if (MatchResult.begin() == MatchResult.end())
-			{
-				return xr_string();
-			}
-
-			xr_string result = MatchResult.begin()->str().c_str();
-			return result;
-		};
+		xr_string result = MatchResult.begin()->str().c_str();
+		return result;
+	};
 
 	// Optimized regex full match with caching
 	static auto IsFullRegexMatch = [](const shared_str& InputString, const shared_str& PatternString)
-		{
-			const std::regex& Pattern = GetCachedRegex(PatternString);
-			return std::regex_match(InputString.c_str(), Pattern);
-		};
+	{
+		const std::regex& Pattern = GetCachedRegex(PatternString);
+		return std::regex_match(InputString.c_str(), Pattern);
+	};
 
 	xr_set<shared_str> sectionsMarkedForCreate;
 
@@ -492,22 +492,23 @@ void CInifile::LTXLoad (
 				shared_str ModFileName = It->name.c_str();
 
 				// Determine if we should load this mod file, or if it's meant for a different root file
-				BOOL bIsModfileMeantForMe = [&]()
+				static auto bIsModfileMeantForMeFunc = [](FS_FileSet AmbiguousFiles, shared_str ModFileName)
+				{
+					for (auto It2 = AmbiguousFiles.begin(); It2 != AmbiguousFiles.end(); ++It2)
 					{
-						for (auto It2 = AmbiguousFiles.begin(); It2 != AmbiguousFiles.end(); ++It2)
+						shared_str name = It2->name.c_str();
+						xr_string AmbiguousFileName = xr_string(GetRegexMatch(name, "^.+(?=.ltx$)").c_str());
+						xr_string AmbiguousFileMatchPattern = xr_string("mod_") + AmbiguousFileName + xr_string("_.+.ltx");
+
+						if (IsFullRegexMatch(ModFileName, AmbiguousFileMatchPattern.c_str()))
 						{
-							shared_str name = It2->name.c_str();
-							xr_string AmbiguousFileName = xr_string(GetRegexMatch(name, "^.+(?=.ltx$)").c_str());
-							xr_string AmbiguousFileMatchPattern = xr_string("mod_") + AmbiguousFileName + xr_string("_.+.ltx");
-
-							if (IsFullRegexMatch(ModFileName, AmbiguousFileMatchPattern.c_str()))
-							{
-								return false;
-							}
+							return false;
 						}
+					}
 
-						return true;
-					}();
+					return true;
+				};
+				bool bIsModfileMeantForMe = bIsModfileMeantForMeFunc(AmbiguousFiles, ModFileName);
 
 				if (!bIsModfileMeantForMe)
 				{
@@ -843,64 +844,65 @@ void CInifile::EvaluateSection(
 	CurrentSect->Name = SectionName.c_str();
 
 	static auto IsStringDLTXDelete = [](shared_str str, shared_str DLTX_DELETE)
-		{
-			const char* RawString = str.c_str();
-			return RawString && xr_strcmp(RawString, DLTX_DELETE) == 0;
-		};
+	{
+		const char* RawString = str.c_str();
+		return RawString && xr_strcmp(RawString, DLTX_DELETE) == 0;
+	};
 
 	static auto InsertItemWithDelete = [](Item CurrentItem, CInifile::InsertType Type, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
+	{
+		if (IsStringDLTXDelete(CurrentItem.first, DLTX_DELETE))
 		{
-			if (IsStringDLTXDelete(CurrentItem.first, DLTX_DELETE))
+			bDeleteSectionIfEmpty = TRUE;
+		}
+		else
+		{
+			CInifile::SectIt_ sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), *CurrentItem.first, item_pred);
+			if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(CurrentItem.first))
 			{
-				bDeleteSectionIfEmpty = TRUE;
+				static auto bShouldInsertFunc = [](CInifile::InsertType Type, CInifile::SectIt_ sect_it)
+				{
+					switch (Type)
+					{
+					case CInifile::InsertType::Override:		return true;
+					case CInifile::InsertType::Base:			return false;
+					case CInifile::InsertType::Parent:			return IsStringDLTXDelete(sect_it->second, DLTX_DELETE);
+					}
+					return false;
+				};
+
+				bool bShouldInsert = bShouldInsertFunc(Type, sect_it);
+				if (bShouldInsert)
+				{
+					sect_it->second = CurrentItem.second;
+				}
 			}
 			else
 			{
-				CInifile::SectIt_ sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), *CurrentItem.first, item_pred);
-				if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(CurrentItem.first))
-				{
-					bool bShouldInsert = [&]()
-						{
-							switch (Type)
-							{
-							case CInifile::InsertType::Override:		return true;
-							case CInifile::InsertType::Base:			return false;
-							case CInifile::InsertType::Parent:			return IsStringDLTXDelete(sect_it->second, DLTX_DELETE);
-							}
-							return false;
-						}();
-
-					if (bShouldInsert)
-					{
-						sect_it->second = CurrentItem.second;
-					}
-				}
-				else
-				{
-					CurrentSect->Data.insert(sect_it, CurrentItem);
-				}
+				CurrentSect->Data.insert(sect_it, CurrentItem);
 			}
-		};
+		}
+	};
 
 	// Insert variables of own data
 	static auto InsertData = [](xr_map<shared_str, Sect>& Data, BOOL bIsBase, shared_str SectionName, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
+	{
+		auto It = Data.find(SectionName);
+
+		if (It != Data.end())
 		{
-			auto It = Data.find(SectionName);
-
-			if (It != Data.end())
+			Sect* DataSection = &It->second;
+			for (Item CurrentItem : DataSection->Data)
 			{
-				Sect* DataSection = &It->second;
-				for (Item CurrentItem : DataSection->Data)
-				{
-					InsertItemWithDelete(CurrentItem, bIsBase ? CInifile::InsertType::Base : CInifile::InsertType::Override, bDeleteSectionIfEmpty, CurrentSect);
-				}
-
-				if (!bIsBase)
-				{
-					Data.erase(It);
-				}
+				InsertItemWithDelete(CurrentItem, bIsBase ? CInifile::InsertType::Base : CInifile::InsertType::Override, bDeleteSectionIfEmpty, CurrentSect);
 			}
-		};
+
+			if (!bIsBase)
+			{
+				Data.erase(It);
+			}
+		}
+	};
 
 	InsertData(OverrideData, false, SectionName, bDeleteSectionIfEmpty, CurrentSect);
 	InsertData(BaseData, true, SectionName, bDeleteSectionIfEmpty, CurrentSect);

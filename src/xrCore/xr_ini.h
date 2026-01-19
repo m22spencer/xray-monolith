@@ -101,8 +101,8 @@ public:
 	xr_map<shared_str, RStringVec> OverrideParentDataMap;
 	xr_map<shared_str, Sect> OverrideData;
 	xr_map<shared_str, Sect> FinalData;
-	xr_set<shared_str> FinalizedSections;
-	xr_map<shared_str, xr_vector<CInifile::Item>> OverrideModifyListData;
+	RStringSet FinalizedSections;
+	xr_map<shared_str, Items> OverrideModifyListData;
 	enum InsertType
 	{
 		Override,
