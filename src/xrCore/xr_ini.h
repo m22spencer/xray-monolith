@@ -88,9 +88,60 @@ public:
 
 	virtual ~CInifile();
 	bool save_as(LPCSTR new_fname = 0);
+
+	// DLTX
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
+	xr_map<shared_str, RStringSet> OverrideToFilename;
+	xr_map<shared_str, shared_str> SectionToFilename;
+	RStringSet SectionsToDelete;
+	xr_map<shared_str, RStringVec> BaseParentDataMap;
+	xr_map<shared_str, Sect> BaseData;
+	xr_map<shared_str, RStringVec> OverrideParentDataMap;
+	xr_map<shared_str, Sect> OverrideData;
+	xr_map<shared_str, Sect> FinalData;
+	xr_set<shared_str> FinalizedSections;
+	xr_map<shared_str, xr_vector<CInifile::Item>> OverrideModifyListData;
+	enum InsertType
+	{
+		Override,
+		Base,
+		Parent
+	};
+	void LTXLoad(
+		IReader* F,
+		LPCSTR path,
+		BOOL bIsRootFile,
+		string_path currentFileName
+#ifndef _EDITOR
+		, allow_include_func_t allow_include_func = NULL
+#endif
+	);
+private:
+	void loadFile(
+		const string_path _fn,
+		const string_path inc_path,
+		const string_path name,
+		string_path currentFileName
+#ifndef _EDITOR
+		, allow_include_func_t allow_include_func
+#endif
+	);
+	void StashCurrentSection(
+		Sect*& CurrentBase,
+		Sect*& CurrentOverride,
+		string_path currentFileName,
+		BOOL bIsCurrentSectionOverride
+	);
+	void EvaluateSection(
+		shared_str SectionName,
+		RStringVec* PreviousEvaluations,
+		string_path currentFileName
+	);
+	void insert_item(CInifile::Sect* tgt, const CInifile::Item& I);
+
+public:
 	void save_as(IWriter& writer, bool bcheck = false) const;
 	void set_override_names(BOOL b) { m_flags.set(eOverrideNames, b); }
 	void save_at_end(BOOL b) { m_flags.set(eSaveAtEnd, b); }
