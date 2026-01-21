@@ -7,29 +7,66 @@
 class CInifile;
 struct xr_token;
 
-
 class XRCORE_API CInifile
 {
 public:
 	struct XRCORE_API Item
 	{
 		shared_str first;
-		shared_str second;
+		mutable shared_str second;
 
 		//demonized: add DLTX info
-		shared_str filename;
-		//#ifdef DEBUG
-		// shared_str comment;
-		//#endif
-		Item() : first(0), second(0), filename(0)
-		//#ifdef DEBUG
-		// , comment(0)
-		//#endif
+		mutable shared_str filename;
+
+		//demonized: Replace xr_vector<Item> with xr_set<Item> with comparators
+		bool operator<(const Item& other) const
 		{
-		};
+			return xr_strcmp(*first, *other.first) < 0;
+		}
+
+		template <typename T>
+		bool operator() (const T& other) const
+		{
+			if constexpr (std::is_same_v<T, shared_str>)
+				return xr_strcmp(*first, *other) < 0;
+			else
+				return xr_strcmp(*first, other) < 0;
+		}
+
+		Item() : first(0), second(0), filename(0) {};
 	};
 
-	typedef xr_vector<Item> Items;
+	struct item_comparator
+	{
+		// Allows for searching by string-likes (string, char*,...) in set
+		using is_transparent = void;
+
+		bool operator() (const Item& x, const Item& y) const
+		{
+			return xr_strcmp(*x.first, *y.first) < 0;
+		}
+
+		template <typename T>
+		bool operator() (const Item& x, const T& y) const
+		{
+			if constexpr (std::is_same_v<T, shared_str>)
+				return xr_strcmp(*x.first, *y) < 0;
+			else
+				return xr_strcmp(*x.first, y) < 0;
+		}
+
+		template <typename T>
+		bool operator() (const T& x, const Item& y) const
+		{
+			if constexpr (std::is_same_v<T, shared_str>)
+				return xr_strcmp(*x, *y.first) < 0;
+			else
+				return xr_strcmp(x, *y.first) < 0;
+		}
+	};
+
+	typedef xr_set<Item, item_comparator> Items;
+	typedef xr_vector<Item> ItemsVec;
 	typedef Items::const_iterator SectCIt;
 	typedef Items::iterator SectIt_;
 
@@ -88,9 +125,60 @@ public:
 
 	virtual ~CInifile();
 	bool save_as(LPCSTR new_fname = 0);
+
+	// DLTX
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
+	xr_map<shared_str, RStringSet> OverrideToFilename;
+	xr_map<shared_str, shared_str> SectionToFilename;
+	RStringSet SectionsToDelete;
+	xr_map<shared_str, RStringVec> BaseParentDataMap;
+	xr_map<shared_str, Sect> BaseData;
+	xr_map<shared_str, RStringVec> OverrideParentDataMap;
+	xr_map<shared_str, Sect> OverrideData;
+	xr_map<shared_str, Sect> FinalData;
+	RStringSet FinalizedSections;
+	xr_map<shared_str, ItemsVec> OverrideModifyListData;
+	enum InsertType
+	{
+		Override,
+		Base,
+		Parent
+	};
+	void LTXLoad(
+		IReader* F,
+		LPCSTR path,
+		BOOL bIsRootFile,
+		string_path currentFileName
+#ifndef _EDITOR
+		, allow_include_func_t allow_include_func = NULL
+#endif
+	);
+private:
+	void loadFile(
+		const string_path _fn,
+		const string_path inc_path,
+		const string_path name,
+		string_path currentFileName
+#ifndef _EDITOR
+		, allow_include_func_t allow_include_func
+#endif
+	);
+	void StashCurrentSection(
+		Sect*& CurrentBase,
+		Sect*& CurrentOverride,
+		string_path currentFileName,
+		BOOL bIsCurrentSectionOverride
+	);
+	void EvaluateSection(
+		shared_str SectionName,
+		RStringVec* PreviousEvaluations,
+		string_path currentFileName
+	);
+	void insert_item(CInifile::Sect* tgt, const CInifile::Item& I);
+
+public:
 	void save_as(IWriter& writer, bool bcheck = false) const;
 	void set_override_names(BOOL b) { m_flags.set(eOverrideNames, b); }
 	void save_at_end(BOOL b) { m_flags.set(eSaveAtEnd, b); }
