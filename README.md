@@ -223,6 +223,7 @@ How to compile exes:
   * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
 
 * Additional changes to exes (included in MT version as well)
+  * Expanded grass shadow settings in Modded Exes settings
   * Refactored DLTX code to be more performant and readable for engine modders.
   * Significantly reduced loading times on DLTX heavy modpacks by changing key-value storage from `xr_vector` to `xr_set`
   * Removed obsolete code calls in `FPU` module

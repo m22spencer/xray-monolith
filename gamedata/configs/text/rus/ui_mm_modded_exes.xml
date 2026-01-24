@@ -33,6 +33,26 @@
 		<text>Визуал</text>
 	</string>
 
+	<!-- Graphics -->
+	<string id="ui_mm_menu_graphics">
+		<text>Графика</text>
+	</string>
+	<string id="ui_mm_graphics_modded_exes">
+		<text>Графика</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_x">
+		<text>Тени травы кол-во каскадов</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_y">
+		<text>Тени травы расстояние убавления</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_z">
+		<text>Тени травы расстояние рендера</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_w">
+		<text>Не используется</text>
+	</string>
+
 	<!-- UI/HUD -->
 
 	<string id="ui_mm_menu_ui_hud">

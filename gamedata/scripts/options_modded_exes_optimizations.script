@@ -25,8 +25,8 @@ PAGE = filter_false(page {
 	get_item_if_exists(check { id = "r2_mt", def = true }),
 	get_item_if_exists(check { id = "mt_bullets", def = true }),
 	get_item_if_exists(check { id = "mt_particles", def = true }),
-	get_item_if_exists(list_bool { id = "mt_scheduler", def = true }),
-	get_item_if_exists(list_bool { id = "mt_update_weapon_sounds" }),
+	get_item_if_exists(list_bool { id = "mt_scheduler" }),
+	list_bool { id = "mt_update_weapon_sounds" },
 
 	line{},
 

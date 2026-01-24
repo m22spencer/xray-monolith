@@ -33,6 +33,26 @@
 		<text>Visual</text>
 	</string>
 
+	<!-- Graphics -->
+	<string id="ui_mm_menu_graphics">
+		<text>Graphics</text>
+	</string>
+	<string id="ui_mm_graphics_modded_exes">
+		<text>Graphics</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_x">
+		<text>Grass shadows Cascades</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_y">
+		<text>Grass shadows Fade Distance</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_z">
+		<text>Grass shadows Rendering Distance</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_w">
+		<text>Unused</text>
+	</string>
+
 	<!-- UI/HUD -->
 
 	<string id="ui_mm_menu_ui_hud">
