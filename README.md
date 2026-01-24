@@ -38,6 +38,7 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
 * Known issues with MT version
   * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
   * Increased possibility to have a crash on loading the whole game or a savefile
+  * Longer pause on escaping to main menu or saving the game
   * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
   * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
   * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
@@ -216,6 +217,7 @@ How to compile exes:
 * Known issues with MT version
   * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
   * Increased possibility to have a crash on loading the whole game or a savefile
+  * Longer pause on escaping to main menu or saving the game
   * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
   * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
   * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
