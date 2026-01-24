@@ -520,6 +520,7 @@ void CInifile::LTXLoad (
 
 			continue;
 		}
+		xr_string currentLine = str;
 
 		// Parse comment - single pass instead of multiple strchr calls
 		LPSTR comm = strchr(str, ';');
@@ -761,6 +762,11 @@ void CInifile::LTXLoad (
 
 			Item I;
 			I.first = (name[0] ? name : NULL);
+			if (!I.first)
+			{
+				Msg("~[DLTX] WARNING: Malformed line %s in file %s, can't get key name, skipping, section data might be altered unexpectedly", currentLine.c_str(), currentFileName);
+				continue;
+			}
 			I.second = bIsDelete ? DLTX_DELETE.c_str() : (str2[0] ? str2.GetBuffer() : NULL);
 
 			auto fname = toLowerCaseCopy(trimCopy(getFilename(std::string(currentFileName))));
