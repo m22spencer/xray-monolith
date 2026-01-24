@@ -203,6 +203,7 @@ How to compile exes:
 
 * Current features:
   * Reworked render graph, sector and portal traversals
+  * Support for wallmarks on stalkers, mutants and other dynamic objects
   * Multithreaded loading resources (textures, models, CFORM (collisions)) HOM (Visibility tests), Grass rendering, Particles, Bones calculations for models, Engine scheduler, Feel and Vision for AI, Logger. Toggleable options available in Modded Exes options
   * Updated Luabind to latest version from (https://github.com/ForserX/luabind-latest)
   * Functor cache for Lua calls, disabled by default, didn't show any performance difference
