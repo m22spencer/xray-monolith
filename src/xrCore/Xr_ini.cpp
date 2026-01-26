@@ -1096,7 +1096,17 @@ void CInifile::Load(IReader* F, LPCSTR path
 
 	static shared_str DLTX_DELETE = "DLTX_DELETE";
 	string_path currentFileName;
-	strcpy(currentFileName, m_file_name);
+
+	// Assemble paths and filename
+	MezzStringBuffer split_drive;
+	MezzStringBuffer split_dir;
+	MezzStringBuffer split_name;
+	MezzStringBuffer split_ext;
+
+	_splitpath_s(m_file_name, split_drive, split_drive.GetSize(), split_dir, split_dir.GetSize(), split_name, split_name.GetSize(), split_ext, split_ext.GetSize());
+
+	xr_string FileName = xr_string(split_name) + xr_string(split_ext);
+	strcpy(currentFileName, FileName.c_str());
 
 	// CRITICAL OPTIMIZATION: Single-pass load instead of double read
 	// Parse both base and override data in one pass
