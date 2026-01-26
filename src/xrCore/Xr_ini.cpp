@@ -97,8 +97,8 @@ XRCORE_API void _decorate(LPSTR dest, LPCSTR src)
 
 BOOL CInifile::Sect::line_exist(LPCSTR L, LPCSTR* val)
 {
-	auto A = Data.find(L);
-	if (A != Data.end())
+	auto A = std::lower_bound(Data.begin(), Data.end(), L, item_comparator());
+	if (A != Data.end() && A->first.equal(L))
 	{
 		if (val) *val = *A->second;
 		return TRUE;
@@ -193,7 +193,7 @@ void CInifile::insert_item(Sect* tgt, const Item& I)
 		return;
 	}
 
-	auto sect_it = tgt->Data.lower_bound(I.first);
+	auto sect_it = std::lower_bound(tgt->Data.begin(), tgt->Data.end(), I.first, item_comparator());
 	if (sect_it != tgt->Data.end() && sect_it->first.equal(I.first))
 	{
 		sect_it->second = I.second;
@@ -288,7 +288,9 @@ void CInifile::loadFile(
 	#endif
 	)
 {
+#ifndef _EDITOR
 	if (!allow_include_func || allow_include_func(_fn))
+#endif
 	{
 		IReader* I = FS.r_open(_fn);
 		R_ASSERT3(I, "Can't find include file:", name);
@@ -299,8 +301,10 @@ void CInifile::loadFile(
 			I,
 			inc_path,
 			false,
-			currentFileName,
-			allow_include_func
+			currentFileName
+#ifndef _EDITOR
+			, allow_include_func
+#endif
 		);
 
 		FS.r_close(I);
@@ -854,7 +858,7 @@ void CInifile::EvaluateSection(
 		}
 		else
 		{
-			auto sect_it = CurrentSect->Data.lower_bound(CurrentItem.first);
+			auto sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), CurrentItem.first, item_comparator());
 			if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(CurrentItem.first))
 			{
 				static auto bShouldInsertFunc = [](CInifile::InsertType Type, CInifile::SectIt_ sect_it)
@@ -962,7 +966,7 @@ void CInifile::EvaluateSection(
 			char dltx_listmode = I.first[0];
 			I.first = I.first.c_str() + 1;
 
-			auto sect_it = CurrentSect->Data.lower_bound(I.first);
+			auto sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), I.first, item_comparator());
 
 			if (I.second != NULL &&
 				dltx_listmode == '>' &&
@@ -1220,9 +1224,13 @@ void CInifile::DLTX_print(LPCSTR sec, LPCSTR line)
 		return;
 	}
 
-	auto A = I.Data.find(line);
-	Msg("[%s]", I.Name.c_str());
-	printIniItemLine(*A);
+	auto A = std::lower_bound(I.Data.begin(), I.Data.end(), line, item_comparator());
+	if (A != I.Data.end() && A->first.equal(line))
+	{
+		Msg("[%s]", I.Name.c_str());
+		printIniItemLine(*A);
+	}
+	
 }
 LPCSTR CInifile::DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line)
 {
@@ -1247,9 +1255,13 @@ LPCSTR CInifile::DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line)
 	}
 
 	Sect& I = r_section(sec);
-	auto A = I.Data.find(line);
-	auto fname = A->filename.c_str();
-	return fname;
+	auto A = std::lower_bound(I.Data.begin(), I.Data.end(), line, item_comparator());
+	if (A != I.Data.end() && A->first.equal(line))
+	{
+		auto fname = A->filename.c_str();
+		return fname;
+	}
+	return nullptr;
 }
 bool CInifile::DLTX_isOverride(LPCSTR sec, LPCSTR line)
 {
@@ -1330,8 +1342,8 @@ BOOL CInifile::line_exist(LPCSTR S, LPCSTR L) const
 	if (!section_exist(S)) return FALSE;
 
 	Sect& I = r_section(S);
-	auto A = I.Data.find(L);
-	return A != I.Data.end();
+	auto A = std::lower_bound(I.Data.begin(), I.Data.end(), L, item_comparator());
+	return A != I.Data.end() && A->first.equal(L);
 }
 
 u32 CInifile::line_count(LPCSTR Sname) const
@@ -1383,8 +1395,9 @@ LPCSTR CInifile::r_string(LPCSTR S, LPCSTR L) const
 	}
 
 	Sect const& I = r_section(S);
-	auto A = I.Data.find(L);
-	if (A != I.Data.end()) {
+	auto A = std::lower_bound(I.Data.begin(), I.Data.end(), L, item_comparator());
+	if (A != I.Data.end() && A->first.equal(L))
+	{
 		shared_str V = A->second;
 		LPCSTR res = *V;
 		return res;
@@ -1620,7 +1633,7 @@ void CInifile::w_string(LPCSTR S, LPCSTR L, LPCSTR V, LPCSTR comment)
 	//#ifdef DEBUG
 	// I.comment = (comment?comment:0);
 	//#endif
-	auto it = data.Data.lower_bound(I.first);
+	auto it = std::lower_bound(data.Data.begin(), data.Data.end(), I.first, item_comparator());
 
 	if (it != data.Data.end() && it->first.equal(I.first))
 	{
@@ -1782,8 +1795,8 @@ void CInifile::remove_line(LPCSTR S, LPCSTR L)
 	if (line_exist(S, L))
 	{
 		Sect& data = r_section(S);
-		auto A = data.Data.find(L);
-		R_ASSERT(A != data.Data.end());
-		data.Data.erase(A);
+		auto A = std::lower_bound(data.Data.begin(), data.Data.end(), L, item_comparator());
+		if (A != data.Data.end() && A->first.equal(L))
+			data.Data.erase(A);
 	}
 }

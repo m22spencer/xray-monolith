@@ -55,7 +55,7 @@ public:
 		}
 	};
 
-	typedef xr_set<Item, item_comparator> Items;
+	typedef xr_vector<Item> Items;
 	typedef xr_vector<Item> ItemsVec;
 	typedef Items::const_iterator SectCIt;
 	typedef Items::iterator SectIt_;
