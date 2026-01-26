@@ -23,15 +23,6 @@ public:
 			return xr_strcmp(*first, *other.first) < 0;
 		}
 
-		template <typename T>
-		bool operator() (const T& other) const
-		{
-			if constexpr (std::is_same_v<T, shared_str>)
-				return xr_strcmp(*first, *other) < 0;
-			else
-				return xr_strcmp(*first, other) < 0;
-		}
-
 		Item() : first(0), second(0), filename(0) {};
 	};
 
