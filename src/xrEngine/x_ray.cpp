@@ -73,6 +73,7 @@ float discord_update_rate = .5f;
 bool use_reshade = false;
 extern bool init_reshade();
 extern void unregister_reshade();
+extern void GetMonitorResolution(u32& horizontal, u32& vertical);
 
 //ImGui
 #pragma comment(lib, "imgui.lib")
@@ -973,6 +974,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
 	RECT logoRect;
 	GetWindowRect(logoPicture, &logoRect);
+	int splashW = logoRect.right - logoRect.left;
+	int splashH = logoRect.bottom - logoRect.top;
+
+	u32 screenW, screenH;
+	GetMonitorResolution(screenW, screenH);
+	int x = (screenW - splashW) / 2;
+	int y = (screenH - splashH) / 2;
 
 	SetWindowPos(
 		logoWindow,
@@ -981,11 +989,11 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #else
         HWND_NOTOPMOST,
 #endif // NDEBUG
-		0,
-		0,
-		logoRect.right - logoRect.left,
-		logoRect.bottom - logoRect.top,
-		SWP_NOMOVE | SWP_SHOWWINDOW // | SWP_NOSIZE
+		x,
+		y,
+		splashW,
+		splashH,
+		SWP_SHOWWINDOW
 	);
 
 	UpdateWindow(logoWindow);
