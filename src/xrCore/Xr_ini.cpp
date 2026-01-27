@@ -403,6 +403,92 @@ void CInifile::SortAndFilterSection(Sect& Data)
 	Data.Data.erase(write_it, Data.Data.end());
 }
 
+void CInifile::SortAndFilterSectionAfterEvaluate(Sect& Data, std::set<shared_str>& deletedItems)
+{
+	if (Data.Data.size() < 2) return;
+
+	static shared_str DLTX_DELETE = "DLTX_DELETE";
+
+	// 1. Sort by Key, then by Depth (Ascending), then by insertionOrder (Descending).
+	std::sort(Data.Data.begin(), Data.Data.end(), [](const Item& a, const Item& b)
+	{
+		// Compare keys alpphabetically
+		int res = xr_strcmp(a.first, b.first);
+		if (res != 0) return res < 0;
+
+		// Compare depths, lower depth wins
+		if (a.depth != b.depth) return a.depth < b.depth;
+
+		// Compare insertionIndex, higher wins
+		return a.insertionIndex > b.insertionIndex;
+	});
+
+	// 2. Linear pass to keep the first (lowest depth) of each key group, but the item inserted last at that depth wins
+	// If the override or base is DLTX_DELETE, use Parent value
+	auto write_it = Data.Data.begin();
+	for (auto read_it = Data.Data.begin(); read_it != Data.Data.end(); )
+	{
+		shared_str current_key = read_it->first;
+
+		// Pointers to track our candidates within this key group
+		Item* override_ptr = nullptr;
+		Item* base_ptr = nullptr;
+		Item* parent_ptr = nullptr;
+
+		// Scan the group to identify what layers we actually have
+		auto group_it = read_it;
+		while (group_it != Data.Data.end() && group_it->first == current_key)
+		{
+			if (group_it->depth == -1 && !override_ptr)
+				override_ptr = &*group_it;
+			else if (group_it->depth == 0 && !base_ptr)
+				base_ptr = &*group_it;
+			else if (group_it->depth == 1 && !parent_ptr)
+				parent_ptr = &*group_it;
+
+			group_it++;
+		}
+
+		// Evaluation Logic
+		Item* winner = nullptr;
+
+		// If Override exists, it is the primary candidate for the current layer.
+		// If Base exists (and no override), it is the primary candidate.
+		Item* current_layer_item = override_ptr ? override_ptr : base_ptr;
+
+		if (current_layer_item)
+		{
+			// If the current layer (Override or Base) explicitly deletes the key...
+			if (current_layer_item->second == DLTX_DELETE)
+				// ...we revert to the Parent.
+				winner = parent_ptr;
+			else
+				// ...otherwise, the current layer wins.
+				winner = current_layer_item;
+		}
+		else
+			// No Override or Base exists, so Parent is the only choice.
+			winner = parent_ptr;
+
+		// Write the winner to the front if it is not DLTX_DELETE, otherwise delete the key
+		if (winner)
+		{
+			if (winner->second != DLTX_DELETE)
+			{
+				if (&*write_it != winner)
+					*write_it = std::move(*winner);
+				++write_it;
+			}
+			else
+				deletedItems.insert(winner->first);
+		}
+
+		// Jump read_it to the start of the next key group
+		read_it = group_it;
+	}
+	Data.Data.erase(write_it, Data.Data.end());
+}
+
 // Single-pass LTXLoad that distinguishes override vs base data during parsing
 void CInifile::LTXLoad (
 		IReader* F,
@@ -906,7 +992,7 @@ void CInifile::EvaluateSection(
 		return str == DLTX_DELETE;
 	};
 
-	static auto InsertItemWithDelete = [](Item CurrentItem, CInifile::InsertType Type, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
+	static auto InsertItemWithDelete = [](Item& CurrentItem, CInifile::InsertType Type, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
 	{
 		if (IsStringDLTXDelete(CurrentItem.first, DLTX_DELETE))
 		{
@@ -914,30 +1000,8 @@ void CInifile::EvaluateSection(
 		}
 		else
 		{
-			auto sect_it = std::lower_bound(CurrentSect->Data.begin(), CurrentSect->Data.end(), CurrentItem.first, item_comparator());
-			if (sect_it != CurrentSect->Data.end() && sect_it->first.equal(CurrentItem.first))
-			{
-				static auto bShouldInsertFunc = [](CInifile::InsertType Type, CInifile::SectIt_ sect_it)
-				{
-					switch (Type)
-					{
-					case CInifile::InsertType::Override:		return true;
-					case CInifile::InsertType::Base:			return false;
-					case CInifile::InsertType::Parent:			return IsStringDLTXDelete(sect_it->second, DLTX_DELETE);
-					}
-					return false;
-				};
-
-				bool bShouldInsert = bShouldInsertFunc(Type, sect_it);
-				if (bShouldInsert)
-				{
-					sect_it->second = CurrentItem.second;
-				}
-			}
-			else
-			{
-				CurrentSect->Data.insert(sect_it, CurrentItem);
-			}
+			CurrentItem.insertionIndex = CurrentSect->Data.size();
+			CurrentSect->Data.push_back(CurrentItem);
 		}
 	};
 
@@ -949,8 +1013,9 @@ void CInifile::EvaluateSection(
 		if (It != Data.end())
 		{
 			Sect* DataSection = &It->second;
-			for (const Item& CurrentItem : DataSection->Data)
+			for (Item& CurrentItem : DataSection->Data)
 			{
+				CurrentItem.depth = bIsBase ? 0 : -1;
 				InsertItemWithDelete(CurrentItem, bIsBase ? CInifile::InsertType::Base : CInifile::InsertType::Override, bDeleteSectionIfEmpty, CurrentSect);
 			}
 
@@ -967,9 +1032,9 @@ void CInifile::EvaluateSection(
 	// Insert variables from parents
 	if (BaseParents)
 	{
-		for (auto It = BaseParents->rbegin(); It != BaseParents->rend(); ++It)
+		for (auto It = BaseParents->begin(); It != BaseParents->end(); ++It)
 		{
-			shared_str ParentSectionName = *(It.base() - 1);
+			shared_str ParentSectionName = *It;
 
 			for (auto It2 = PreviousEvaluations->begin(); It2 != PreviousEvaluations->end(); ++It2)
 			{
@@ -990,27 +1055,17 @@ void CInifile::EvaluateSection(
 
 			Sect* ParentSec = &ParentIt->second;
 
-			for (const Item& CurrentItem : ParentSec->Data)
+			for (Item& CurrentItem : ParentSec->Data)
 			{
+				CurrentItem.depth = 1;
 				InsertItemWithDelete(CurrentItem, CInifile::InsertType::Parent, bDeleteSectionIfEmpty, CurrentSect);
 			}
 		}
 	}
 
-	// Delete entries marked DLTX_DELETE
+	// Process section, Delete entries marked DLTX_DELETE
 	std::set<shared_str> deletedItems;
-	for (auto It = CurrentSect->Data.begin(); It != CurrentSect->Data.end(); )
-	{
-		if (IsStringDLTXDelete(It->second, DLTX_DELETE))
-		{
-			It = CurrentSect->Data.erase(It);
-			deletedItems.insert(It->first);
-		}
-		else
-		{
-			It++;
-		}
-	}
+	SortAndFilterSectionAfterEvaluate(*CurrentSect, deletedItems);
 
 	// Add or remove from list
 	static auto find_and_store_index = [](const std::vector<std::string>& items_vec, const std::string& item, int& vec_index)

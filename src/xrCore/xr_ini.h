@@ -176,6 +176,7 @@ private:
 	);
 	void insert_item(CInifile::Sect* tgt, CInifile::Item& I);
 	void SortAndFilterSection(Sect& Data);
+	void SortAndFilterSectionAfterEvaluate(Sect& Data, std::set<shared_str>& deletedItems);
 
 public:
 	void save_as(IWriter& writer, bool bcheck = false) const;
