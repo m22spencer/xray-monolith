@@ -1013,6 +1013,77 @@ void CInifile::EvaluateSection(
 		}
 	}
 
+	// Add or remove from list
+	static auto find_and_store_index = [](const std::vector<std::string>& items_vec, const std::string& item, int& vec_index)
+		{
+			auto it = std::find(items_vec.begin(), items_vec.end(), item);
+			if (it != items_vec.end()) {
+				vec_index = it - items_vec.begin();
+				return true;
+			}
+			else
+			{
+				vec_index = -1;
+				return false;
+			}
+		};
+
+	// Optimized list splitting and joining with reduced allocations
+	static auto split_list = [](shared_str items, const std::string& delimiter = ",")
+		{
+			std::vector<std::string> vec;
+			vec.reserve(16);  // Pre-allocate for typical list sizes
+
+			const char* start = items.c_str();
+			const char* end = start + xr_strlen(start);
+
+			for (const char* pos = start; pos < end; ++pos)
+			{
+				if (*pos == delimiter[0])
+				{
+					std::string token(start, pos - start);
+					trim(token);
+					vec.push_back(token);
+					start = pos + 1;
+				}
+			}
+
+			// Add remaining token
+			if (start < end)
+			{
+				std::string token(start, end - start);
+				trim(token);
+				vec.push_back(token);
+			}
+
+			return vec;
+		};
+
+	// Store result back - optimized join with pre-calculated capacity
+	static auto join_list = [](const std::vector<std::string>& items_vec, const std::string& delimiter = ",")
+		{
+			if (items_vec.empty())
+				return std::string();
+
+			// Calculate total size needed
+			size_t total_size = 0;
+			for (const auto& i : items_vec)
+			{
+				total_size += i.length() + delimiter.length();
+			}
+
+			std::string ret;
+			ret.reserve(total_size);
+
+			for (size_t idx = 0; idx < items_vec.size(); ++idx)
+			{
+				if (idx > 0)
+					ret += delimiter;
+				ret += items_vec[idx];
+			}
+			return ret;
+		};
+
 	// Process list modifications
 	if (OverrideModifyListData.find(CurrentSect->Name) != OverrideModifyListData.end())
 	{
@@ -1037,54 +1108,8 @@ void CInifile::EvaluateSection(
 			{
 				if (dltx_listmode && sect_it->second != NULL)
 				{
-					// Optimized list splitting and joining with reduced allocations
-					static auto split_list = [](shared_str items, const std::string& delimiter = ",")
-					{
-						std::vector<std::string> vec;
-						vec.reserve(16);  // Pre-allocate for typical list sizes
-
-						const char* start = items.c_str();
-						const char* end = start + xr_strlen(start);
-
-						for (const char* pos = start; pos < end; ++pos)
-						{
-							if (*pos == delimiter[0])
-							{
-								std::string token(start, pos - start);
-								trim(token);
-								vec.push_back(token);
-								start = pos + 1;
-							}
-						}
-
-						// Add remaining token
-						if (start < end)
-						{
-							std::string token(start, end - start);
-							trim(token);
-							vec.push_back(token);
-						}
-
-						return vec;
-					};
-
 					auto sect_it_items_vec = split_list(sect_it->second);
 					auto I_items_vec = split_list(I.second);
-
-					// Add or remove from list
-					static auto find_and_store_index = [](const std::vector<std::string>& items_vec, const std::string& item, int& vec_index)
-					{
-						auto it = std::find(items_vec.begin(), items_vec.end(), item);
-						if (it != items_vec.end()) {
-							vec_index = it - items_vec.begin();
-							return true;
-						}
-						else
-						{
-							vec_index = -1;
-							return false;
-						}
-					};
 
 					int vec_index = -1;
 					for (const auto& item : I_items_vec)
@@ -1101,31 +1126,6 @@ void CInifile::EvaluateSection(
 							}
 						}
 					}
-
-					// Store result back - optimized join with pre-calculated capacity
-					static auto join_list = [](const std::vector<std::string>& items_vec, const std::string& delimiter = ",")
-					{
-						if (items_vec.empty())
-							return std::string();
-
-						// Calculate total size needed
-						size_t total_size = 0;
-						for (const auto& i : items_vec)
-						{
-							total_size += i.length() + delimiter.length();
-						}
-
-						std::string ret;
-						ret.reserve(total_size);
-
-						for (size_t idx = 0; idx < items_vec.size(); ++idx)
-						{
-							if (idx > 0)
-								ret += delimiter;
-							ret += items_vec[idx];
-						}
-						return ret;
-					};
 
 					sect_it->second = join_list(sect_it_items_vec, ",").c_str();
 				}
