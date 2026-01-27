@@ -526,6 +526,7 @@ public:
 };
 
 extern void GetMonitorResolution(u32& horizontal, u32& vertical);
+extern void GetMonitorPosition(int& x, int& y);
 
 class CCC_Screenmode : public CCC_Token
 {
@@ -575,7 +576,9 @@ public:
 			if (!reset_required)
 			{
 				u32 monW, monH;
+				int monX, monY;
 				GetMonitorResolution(monW, monH);
+				GetMonitorPosition(monX, monY);
 				DWORD style = g_screenmode == 0 ? WS_OVERLAPPEDWINDOW : WS_POPUP;
 				SetWindowLongPtr(Device.m_hWnd, GWL_STYLE, WS_VISIBLE | style);
 
@@ -583,13 +586,13 @@ public:
 				{
 					LONG w = psCurrentVidMode[0];
 					LONG h = psCurrentVidMode[1];
-					int x = (LONG(monW) - w) / 2;
-					int y = (LONG(monH) - h) / 2;
+					int x = monX + (LONG(monW) - w) / 2;
+					int y = monY + (LONG(monH) - h) / 2;
 					SetWindowPos(Device.m_hWnd, HWND_TOP, x, y, w, h, SWP_FRAMECHANGED);
 				}
 				else
 				{
-					SetWindowPos(Device.m_hWnd, HWND_TOP, 0, 0, monW, monH, SWP_FRAMECHANGED);
+					SetWindowPos(Device.m_hWnd, HWND_TOP, monX, monY, monW, monH, SWP_FRAMECHANGED);
 				}
 			}
 		}

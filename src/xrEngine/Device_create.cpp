@@ -163,6 +163,7 @@ void CRenderDevice::ConnectToRender()
 
 extern u32 g_screenmode;
 extern void GetMonitorResolution(u32& horizontal, u32& vertical);
+extern void GetMonitorPosition(int& x, int& y);
 
 PROTECT_API void CRenderDevice::Create()
 {
@@ -172,6 +173,8 @@ PROTECT_API void CRenderDevice::Create()
 
 	u32 w, h;
 	GetMonitorResolution(w, h);
+	int monX, monY;
+	GetMonitorPosition(monX, monY);
 	if (psCurrentVidMode[0] == 0 || psCurrentVidMode[1] == 0)
 	{
 		psCurrentVidMode[0] = w;
@@ -191,7 +194,7 @@ PROTECT_API void CRenderDevice::Create()
 	}
 
 	SetWindowLongPtr(m_hWnd, GWL_STYLE, style);
-	SetWindowPos(m_hWnd, HWND_TOP, 0, 0, w, h, SWP_FRAMECHANGED);
+	SetWindowPos(m_hWnd, HWND_TOP, monX, monY, w, h, SWP_FRAMECHANGED);
 
 	Statistic = xr_new<CStats>();
 #ifdef DEBUG

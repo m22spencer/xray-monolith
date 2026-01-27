@@ -246,14 +246,24 @@ ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
 extern bool IsMainMenuActive(); //ECO_RENDER add
 
+static HMONITOR g_StartupMonitor = NULL;
+void InitMonitor()
+{
+	if (!g_StartupMonitor)
+	{
+		POINT cursorPos;
+		GetCursorPos(&cursorPos);
+		g_StartupMonitor = MonitorFromPoint(cursorPos, MONITOR_DEFAULTTOPRIMARY);
+	}
+}
+
 void GetMonitorResolution(u32& horizontal, u32& vertical)
 {
-	HMONITOR hMonitor = MonitorFromWindow(
-		Device.m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+	InitMonitor();
 
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
-	if (GetMonitorInfoA(hMonitor, &mi))
+	if (GetMonitorInfoA(g_StartupMonitor, &mi))
 	{
 		horizontal = mi.rcMonitor.right - mi.rcMonitor.left;
 		vertical = mi.rcMonitor.bottom - mi.rcMonitor.top;
@@ -265,6 +275,24 @@ void GetMonitorResolution(u32& horizontal, u32& vertical)
 		GetWindowRect(hDesktop, &desktop);
 		horizontal = desktop.right - desktop.left;
 		vertical = desktop.bottom - desktop.top;
+	}
+}
+
+void GetMonitorPosition(int& x, int& y)
+{
+	InitMonitor();
+
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	if (GetMonitorInfoA(g_StartupMonitor, &mi))
+	{
+		x = mi.rcMonitor.left;
+		y = mi.rcMonitor.top;
+	}
+	else
+	{
+		x = 0;
+		y = 0;
 	}
 }
 

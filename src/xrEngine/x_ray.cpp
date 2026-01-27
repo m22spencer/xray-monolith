@@ -74,6 +74,7 @@ bool use_reshade = false;
 extern bool init_reshade();
 extern void unregister_reshade();
 extern void GetMonitorResolution(u32& horizontal, u32& vertical);
+extern void GetMonitorPosition(int& x, int& y);
 
 //ImGui
 #pragma comment(lib, "imgui.lib")
@@ -978,9 +979,11 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	int splashH = logoRect.bottom - logoRect.top;
 
 	u32 screenW, screenH;
+	int monX, monY;
 	GetMonitorResolution(screenW, screenH);
-	int x = (screenW - splashW) / 2;
-	int y = (screenH - splashH) / 2;
+	GetMonitorPosition(monX, monY);
+	int x = monX + (screenW - splashW) / 2;
+	int y = monY + (screenH - splashH) / 2;
 
 	SetWindowPos(
 		logoWindow,
@@ -1179,6 +1182,35 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      char* lpCmdLine,
                      int nCmdShow)
 {
+	// Enable per-monitor DPI awareness so GetMonitorInfo returns real pixel sizes.
+	// Without this, monitors with different DPI scaling report wrong resolutions
+	// (e.g. a 1920x1080 secondary monitor reports 2400x1290 when primary is at 125%).
+	// Uses dynamic loading since _WIN32_WINNT is too old for these APIs.
+	// Try Win10 1703+ API first, fall back to Win 8.1+ API, silently skip on Win 7 or older.
+	{
+		bool dpi_set = false;
+		HMODULE user32 = GetModuleHandleA("user32.dll");
+		if (user32)
+		{
+			typedef BOOL(WINAPI* pfnSetProcessDpiAwarenessContext)(HANDLE);
+			auto fn = (pfnSetProcessDpiAwarenessContext)GetProcAddress(user32, "SetProcessDpiAwarenessContext");
+			if (fn)
+				dpi_set = fn(/*DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2*/ (HANDLE)-4) != FALSE;
+		}
+		if (!dpi_set)
+		{
+			HMODULE shcore = LoadLibraryA("Shcore.dll");
+			if (shcore)
+			{
+				typedef HRESULT(WINAPI* pfnSetProcessDpiAwareness)(int);
+				auto fn = (pfnSetProcessDpiAwareness)GetProcAddress(shcore, "SetProcessDpiAwareness");
+				if (fn)
+					fn(/*PROCESS_PER_MONITOR_DPI_AWARE*/ 2);
+				FreeLibrary(shcore);
+			}
+		}
+	}
+
 	//DllMainOpenAL32(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrCore(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrPhysics(NULL, DLL_PROCESS_ATTACH, NULL);

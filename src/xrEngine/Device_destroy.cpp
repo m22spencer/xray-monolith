@@ -61,6 +61,7 @@ extern bool init_reshade();
 extern void unregister_reshade();
 extern u32 g_screenmode;
 extern void GetMonitorResolution(u32& horizontal, u32& vertical);
+extern void GetMonitorPosition(int& x, int& y);
 
 void CRenderDevice::Reset(bool precache)
 {
@@ -101,9 +102,11 @@ void CRenderDevice::Reset(bool precache)
 	if (g_screenmode == 1)
 	{
 		u32 w, h;
+		int monX, monY;
 		GetMonitorResolution(w, h);
+		GetMonitorPosition(monX, monY);
 		SetWindowLongPtr(Device.m_hWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);
-		SetWindowPos(Device.m_hWnd, HWND_TOP, 0, 0, w, h, SWP_FRAMECHANGED);
+		SetWindowPos(Device.m_hWnd, HWND_TOP, monX, monY, w, h, SWP_FRAMECHANGED);
 	}
 
 #ifndef DEDICATED_SERVER

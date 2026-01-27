@@ -847,6 +847,7 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
 }
 
 extern void GetMonitorResolution(u32& horizontal, u32& vertical);
+extern void GetMonitorPosition(int& x, int& y);
 
 void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
 {
@@ -1124,6 +1125,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
 		    u32 monW, monH;
 		    GetMonitorResolution(monW, monH);
+		    int monX, monY;
+		    GetMonitorPosition(monX, monY);
 
 		    if (psCurrentVidMode[0] == 0 || psCurrentVidMode[1] == 0)
 		        GetMonitorResolution(psCurrentVidMode[0], psCurrentVidMode[1]);
@@ -1136,15 +1139,15 @@ void CHW::updateWindowProps(HWND m_hWnd)
 			GetClientRect(GetDesktopWindow(), &DesktopRect);
 
 			SetRect(&m_rcWindowBounds,
-                (DesktopRect.right - res_width) / 2,
-                (DesktopRect.bottom - res_height) / 2,
-                (DesktopRect.right + res_width) / 2,
-                (DesktopRect.bottom + res_height) / 2);
+                (LONG(monW) - res_width) / 2,
+                (LONG(monH) - res_height) / 2,
+                (monW + res_width) / 2,
+                (monH + res_height) / 2);
 
 			SetWindowPos(m_hWnd,
                 HWND_NOTOPMOST,
-                m_rcWindowBounds.left,
-                m_rcWindowBounds.top,
+                monX + m_rcWindowBounds.left,
+                monY + m_rcWindowBounds.top,
                 (m_rcWindowBounds.right - m_rcWindowBounds.left),
                 (m_rcWindowBounds.bottom - m_rcWindowBounds.top),
                 SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
