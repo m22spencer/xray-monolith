@@ -17,7 +17,6 @@ public:
 		//demonized: add DLTX info
 		mutable shared_str filename;
 
-		//demonized: Replace xr_vector<Item> with xr_set<Item> with comparators
 		bool operator<(const Item& other) const
 		{
 			return xr_strcmp(*first, *other.first) < 0;

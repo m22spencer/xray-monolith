@@ -1160,10 +1160,12 @@ void CInifile::Load(IReader* F, LPCSTR path
 	{
 		Sect* NewSect = xr_new<Sect>();
 		*NewSect = SectPair.second;
-
-		RootIt I = std::lower_bound(DATA.begin(), DATA.end(), SectPair.first.c_str(), sect_pred);
-		DATA.insert(I, NewSect);
+		DATA.push_back(NewSect);
 	}
+	std::sort(DATA.begin(), DATA.end(), [](const Sect* a, const Sect* b)
+	{
+		return xr_strcmp(a->Name, b->Name) < 0;
+	});
 
 	// Handle override warnings
 	if (OverrideData.size())
