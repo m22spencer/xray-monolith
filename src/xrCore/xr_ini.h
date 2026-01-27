@@ -120,16 +120,16 @@ public:
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
-	xr_map<shared_str, RStringSet> OverrideToFilename;
-	xr_map<shared_str, shared_str> SectionToFilename;
-	RStringSet SectionsToDelete;
-	xr_map<shared_str, RStringVec> BaseParentDataMap;
-	xr_map<shared_str, Sect> BaseData;
-	xr_map<shared_str, RStringVec> OverrideParentDataMap;
-	xr_map<shared_str, Sect> OverrideData;
-	xr_map<shared_str, Sect> FinalData;
-	RStringSet FinalizedSections;
-	xr_map<shared_str, ItemsVec> OverrideModifyListData;
+	std::map<shared_str, std::set<shared_str>> OverrideToFilename;
+	std::map<shared_str, shared_str> SectionToFilename;
+	std::set<shared_str> SectionsToDelete;
+	std::map<shared_str, std::vector<shared_str>> BaseParentDataMap;
+	std::map<shared_str, Sect> BaseData;
+	std::map<shared_str, std::vector<shared_str>> OverrideParentDataMap;
+	std::map<shared_str, Sect> OverrideData;
+	std::map<shared_str, Sect> FinalData;
+	std::set<shared_str> FinalizedSections;
+	std::map<shared_str, std::vector<Item>> OverrideModifyListData;
 	enum InsertType
 	{
 		Override,
@@ -163,7 +163,7 @@ private:
 	);
 	void EvaluateSection(
 		shared_str SectionName,
-		RStringVec* PreviousEvaluations,
+		std::vector<shared_str>* PreviousEvaluations,
 		string_path currentFileName
 	);
 	void insert_item(CInifile::Sect* tgt, const CInifile::Item& I);

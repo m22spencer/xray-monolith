@@ -216,10 +216,9 @@ IC BOOL is_empty_line_now(IReader* F)
 };
 
 // Regex pattern cache (added before Load function)
-static xr_map<shared_str, std::regex> g_RegexCache;
-
-static const std::regex& GetCachedRegex(const shared_str& pattern)
+static const std::regex& GetCachedRegex(const std::string& pattern)
 {
+	static std::map<std::string, std::regex> g_RegexCache;
 	auto it = g_RegexCache.find(pattern);
 	if (it == g_RegexCache.end())
 	{
@@ -248,7 +247,7 @@ static inline void TrimStringInPlace(xr_string& str)
 	}
 }
 
-static void MergeParentSet(RStringVec* ParentsBase, RStringVec* ParentsOverride, bool bIncludeRemovers)
+static void MergeParentSet(std::vector<shared_str>* ParentsBase, std::vector<shared_str>* ParentsOverride, bool bIncludeRemovers)
 {
 	// Optimized parent set merging using std::remove_if for O(n) complexity
 	for (const auto& CurrentParentStr : *ParentsOverride)
@@ -258,7 +257,7 @@ static void MergeParentSet(RStringVec* ParentsBase, RStringVec* ParentsOverride,
 		bool bIsParentRemoval = (first_char == '!');
 
 		// Build the opposite marker string more efficiently
-		xr_string StaleParentString;
+		std::string StaleParentString;
 		StaleParentString.reserve(xr_strlen(CurrentParent) + 1);
 		StaleParentString += (bIsParentRemoval ? "" : "!");
 		StaleParentString += (CurrentParent + (bIsParentRemoval ? 1 : 0));
@@ -387,13 +386,13 @@ void CInifile::LTXLoad (
 	BOOL bIsCurrentSectionOverride = FALSE;
 	BOOL bHasLoadedModFiles = FALSE;
 
-	static auto InsertParentStringsInMap = [](shared_str SectionName, xr_map<shared_str, RStringVec>& ParentMap)
+	static auto InsertParentStringsInMap = [](shared_str SectionName, std::map<shared_str, std::vector<shared_str>>& ParentMap)
 	{
 		auto It = ParentMap.find(SectionName);
 
 		if (It == ParentMap.end())
 		{
-			auto result = ParentMap.emplace(SectionName, RStringVec());
+			auto result = ParentMap.emplace(SectionName, std::vector<shared_str>());
 			return &result.first->second;
 		}
 
@@ -402,7 +401,7 @@ void CInifile::LTXLoad (
 
 	static auto GetParentsSetFromString = [](const char* ParentString, MezzStringBuffer& str2)
 	{
-		auto ParentSet = RStringVec();
+		auto ParentSet = std::vector<shared_str>();
 
 		u32 ItemCount = _GetItemCount(ParentString);
 
@@ -416,31 +415,31 @@ void CInifile::LTXLoad (
 	};
 
 	// Optimized regex match with caching
-	static auto GetRegexMatch = [](const shared_str& InputString, const shared_str& PatternString)
+	static auto GetRegexMatch = [](const std::string& InputString, const std::string& PatternString)
 	{
 		const std::regex& Pattern = GetCachedRegex(PatternString);
 		std::smatch MatchResult;
-		xr_string input = InputString.c_str();
+		std::string input = InputString.c_str();
 
 		std::regex_search(input, MatchResult, Pattern);
 
 		if (MatchResult.begin() == MatchResult.end())
 		{
-			return xr_string();
+			return std::string();
 		}
 
-		xr_string result = MatchResult.begin()->str().c_str();
+		std::string result = MatchResult.begin()->str().c_str();
 		return result;
 	};
 
 	// Optimized regex full match with caching
-	static auto IsFullRegexMatch = [](const shared_str& InputString, const shared_str& PatternString)
+	static auto IsFullRegexMatch = [](const std::string& InputString, const std::string& PatternString)
 	{
 		const std::regex& Pattern = GetCachedRegex(PatternString);
 		return std::regex_match(InputString.c_str(), Pattern);
 	};
 
-	xr_set<shared_str> sectionsMarkedForCreate;
+	std::set<shared_str> sectionsMarkedForCreate;
 
 	while (!F->eof() || (bIsRootFile && !bHasLoadedModFiles))
 	{
@@ -471,8 +470,8 @@ void CInifile::LTXLoad (
 
 			_splitpath_s(m_file_name, split_drive, split_drive.GetSize(), split_dir, split_dir.GetSize(), split_name, split_name.GetSize(), NULL, 0);
 
-			xr_string FilePath = xr_string(split_drive) + xr_string(split_dir);
-			xr_string FileName = split_name;
+			std::string FilePath = std::string(split_drive) + std::string(split_dir);
+			std::string FileName = split_name;
 
 			// Collect all files that could potentially be confused as a root file by our mod files
 			FS_FileSet AmbiguousFiles;
@@ -484,16 +483,16 @@ void CInifile::LTXLoad (
 
 			for (auto It = ModFiles.begin(); It != ModFiles.end(); ++It)
 			{
-				shared_str ModFileName = It->name.c_str();
+				std::string ModFileName = It->name.c_str();
 
 				// Determine if we should load this mod file, or if it's meant for a different root file
-				static auto bIsModfileMeantForMeFunc = [](FS_FileSet AmbiguousFiles, shared_str ModFileName)
+				static auto bIsModfileMeantForMeFunc = [](FS_FileSet AmbiguousFiles, std::string ModFileName)
 				{
 					for (auto It2 = AmbiguousFiles.begin(); It2 != AmbiguousFiles.end(); ++It2)
 					{
-						shared_str name = It2->name.c_str();
-						xr_string AmbiguousFileName = xr_string(GetRegexMatch(name, "^.+(?=.ltx$)").c_str());
-						xr_string AmbiguousFileMatchPattern = xr_string("mod_") + AmbiguousFileName + xr_string("_.+.ltx");
+						std::string name = It2->name.c_str();
+						std::string AmbiguousFileName = std::string(GetRegexMatch(name, "^.+(?=.ltx$)").c_str());
+						std::string AmbiguousFileMatchPattern = std::string("mod_") + AmbiguousFileName + std::string("_.+.ltx");
 
 						if (IsFullRegexMatch(ModFileName, AmbiguousFileMatchPattern.c_str()))
 						{
@@ -510,7 +509,7 @@ void CInifile::LTXLoad (
 					continue;
 				}
 
-				xr_string ModFileNameStr = xr_string(ModFileName.c_str());
+				std::string ModFileNameStr = ModFileName.c_str();
 				loadFile(
 					(FilePath + ModFileNameStr).c_str(),
 					FilePath.c_str(),
@@ -524,7 +523,7 @@ void CInifile::LTXLoad (
 
 			continue;
 		}
-		xr_string currentLine = str;
+		std::string currentLine = str;
 
 		// Parse comment - single pass instead of multiple strchr calls
 		LPSTR comm = strchr(str, ';');
@@ -635,7 +634,7 @@ void CInifile::LTXLoad (
 			);
 
 			u32 SectionNameStartPos = 3;
-			xr_string SecName = xr_string(str).substr(SectionNameStartPos, strchr(str, ']') - str - SectionNameStartPos).c_str();
+			std::string SecName = std::string(str).substr(SectionNameStartPos, strchr(str, ']') - str - SectionNameStartPos).c_str();
 			for (auto i = SecName.begin(); i != SecName.end(); ++i)
 			{
 				*i = tolower(*i);
@@ -656,7 +655,7 @@ void CInifile::LTXLoad (
 			);
 
 			u32 SectionNameStartPos = (isModSection(str) ? 2 : 1);
-			xr_string SecName = xr_string(str).substr(SectionNameStartPos, strchr(str, ']') - str - SectionNameStartPos).c_str();
+			std::string SecName = std::string(str).substr(SectionNameStartPos, strchr(str, ']') - str - SectionNameStartPos).c_str();
 			for (auto i = SecName.begin(); i != SecName.end(); ++i)
 			{
 				*i = tolower(*i);
@@ -814,7 +813,7 @@ void CInifile::LTXLoad (
 
 void CInifile::EvaluateSection(
 	shared_str SectionName,
-	RStringVec* PreviousEvaluations,
+	std::vector<shared_str>* PreviousEvaluations,
 	string_path currentFileName
 )
 {
@@ -838,7 +837,7 @@ void CInifile::EvaluateSection(
 	// Create base parents map if override parents exist
 	if (OverrideParents && !BaseParents)
 	{
-		auto result = BaseParentDataMap.emplace(SectionName, RStringVec());
+		auto result = BaseParentDataMap.emplace(SectionName, std::vector<shared_str>());
 		BaseParentsIt = BaseParentDataMap.find(SectionName);
 		BaseParents = (BaseParentsIt != BaseParentDataMap.end()) ? &BaseParentsIt->second : nullptr;
 	}
@@ -848,7 +847,7 @@ void CInifile::EvaluateSection(
 		MergeParentSet(BaseParents, OverrideParents, false);
 	}
 
-	auto CurrentSecPair = xr_pair<shared_str, Sect>(SectionName, Sect());
+	auto CurrentSecPair = std::pair<shared_str, Sect>(SectionName, Sect());
 	Sect* CurrentSect = &CurrentSecPair.second;
 	CurrentSect->Name = SectionName.c_str();
 
@@ -894,7 +893,7 @@ void CInifile::EvaluateSection(
 	};
 
 	// Insert variables of own data
-	static auto InsertData = [](xr_map<shared_str, Sect>& Data, BOOL bIsBase, shared_str SectionName, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
+	static auto InsertData = [](std::map<shared_str, Sect>& Data, BOOL bIsBase, shared_str SectionName, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
 	{
 		auto It = Data.find(SectionName);
 
@@ -950,7 +949,7 @@ void CInifile::EvaluateSection(
 	}
 
 	// Delete entries marked DLTX_DELETE
-	xr_set<shared_str> deletedItems;
+	std::set<shared_str> deletedItems;
 	for (auto It = CurrentSect->Data.begin(); It != CurrentSect->Data.end(); )
 	{
 		if (IsStringDLTXDelete(It->second, DLTX_DELETE))
@@ -989,9 +988,9 @@ void CInifile::EvaluateSection(
 				if (dltx_listmode && sect_it->second != NULL)
 				{
 					// Optimized list splitting and joining with reduced allocations
-					static auto split_list = [](shared_str items, const xr_string& delimiter = ",")
+					static auto split_list = [](shared_str items, const std::string& delimiter = ",")
 					{
-						xr_vector<xr_string> vec;
+						std::vector<std::string> vec;
 						vec.reserve(16);  // Pre-allocate for typical list sizes
 
 						const char* start = items.c_str();
@@ -1001,7 +1000,7 @@ void CInifile::EvaluateSection(
 						{
 							if (*pos == delimiter[0])
 							{
-								xr_string token(start, pos - start);
+								std::string token(start, pos - start);
 								trim(token);
 								vec.push_back(token);
 								start = pos + 1;
@@ -1011,7 +1010,7 @@ void CInifile::EvaluateSection(
 						// Add remaining token
 						if (start < end)
 						{
-							xr_string token(start, end - start);
+							std::string token(start, end - start);
 							trim(token);
 							vec.push_back(token);
 						}
@@ -1023,7 +1022,7 @@ void CInifile::EvaluateSection(
 					auto I_items_vec = split_list(I.second);
 
 					// Add or remove from list
-					static auto find_and_store_index = [](const xr_vector<xr_string>& items_vec, const xr_string& item, int& vec_index)
+					static auto find_and_store_index = [](const std::vector<std::string>& items_vec, const std::string& item, int& vec_index)
 					{
 						auto it = std::find(items_vec.begin(), items_vec.end(), item);
 						if (it != items_vec.end()) {
@@ -1054,10 +1053,10 @@ void CInifile::EvaluateSection(
 					}
 
 					// Store result back - optimized join with pre-calculated capacity
-					static auto join_list = [](const xr_vector<xr_string>& items_vec, const xr_string& delimiter = ",")
+					static auto join_list = [](const std::vector<std::string>& items_vec, const std::string& delimiter = ",")
 					{
 						if (items_vec.empty())
-							return xr_string();
+							return std::string();
 
 						// Calculate total size needed
 						size_t total_size = 0;
@@ -1066,7 +1065,7 @@ void CInifile::EvaluateSection(
 							total_size += i.length() + delimiter.length();
 						}
 
-						xr_string ret;
+						std::string ret;
 						ret.reserve(total_size);
 
 						for (size_t idx = 0; idx < items_vec.size(); ++idx)
@@ -1117,7 +1116,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 
 	_splitpath_s(m_file_name, split_drive, split_drive.GetSize(), split_dir, split_dir.GetSize(), split_name, split_name.GetSize(), split_ext, split_ext.GetSize());
 
-	xr_string FileName = xr_string(split_name) + xr_string(split_ext);
+	std::string FileName = std::string(split_name) + std::string(split_ext);
 	strcpy(currentFileName, FileName.c_str());
 
 	// CRITICAL OPTIMIZATION: Single-pass load instead of double read
@@ -1133,7 +1132,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 	);
 
 	// Merge base and override data together
-	RStringVec PreviousEvaluations;
+	std::vector<shared_str> PreviousEvaluations;
 
 	for (const auto& SectPair : BaseData)
 	{
