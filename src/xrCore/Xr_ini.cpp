@@ -193,16 +193,8 @@ void CInifile::insert_item(Sect* tgt, const Item& I)
 		return;
 	}
 
-	auto sect_it = std::lower_bound(tgt->Data.begin(), tgt->Data.end(), I.first, item_comparator());
-	if (sect_it != tgt->Data.end() && sect_it->first.equal(I.first))
-	{
-		sect_it->second = I.second;
-		sect_it->filename = I.filename;
-	}
-	else
-	{
-		tgt->Data.insert(sect_it, I);
-	}
+	// Just push back items, will be filtered later
+	tgt->Data.push_back(I);
 }
 
 IC BOOL is_empty_line_now(IReader* F)
@@ -281,7 +273,8 @@ void CInifile::loadFile(
 		const string_path _fn,
 		const string_path inc_path,
 		const string_path name,
-		string_path currentFileName
+		string_path currentFileName,
+		int depth
 	#ifndef _EDITOR
 		, allow_include_func_t allow_include_func
 	#endif
@@ -300,7 +293,8 @@ void CInifile::loadFile(
 			I,
 			inc_path,
 			false,
-			currentFileName
+			currentFileName,
+			depth
 #ifndef _EDITOR
 			, allow_include_func
 #endif
@@ -365,12 +359,57 @@ void CInifile::StashCurrentSection(
 	}
 };
 
+void CInifile::SortAndFilterSection(Sect& Data)
+{
+	if (Data.Data.size() < 2) return;
+	
+	static shared_str DLTX_DELETE = "DLTX_DELETE";
+
+	// 1. Sort by Key, then by Depth (Ascending). Stable is important to keep relative order of items when equal by criteria
+	std::stable_sort(Data.Data.begin(), Data.Data.end(), [](const Item& a, const Item& b)
+	{
+		// First, compare keys
+		int res = xr_strcmp(a.first, b.first);
+		if (res != 0) return res < 0;
+
+		// Keys are identical, so the one with the smaller depth wins
+		return a.depth < b.depth;
+	});
+
+	// 2. Linear pass to keep the first (lowest depth) of each key group, but the last item at that depth wins
+	auto write_it = Data.Data.begin();
+	for (auto read_it = Data.Data.begin(); read_it != Data.Data.end(); )
+	{
+		shared_str key = read_it->first;
+		int min_depth = read_it->depth;
+
+		// Find the boundary of this key group
+		auto winner_it = read_it;
+		while (read_it != Data.Data.end() && read_it->first == key)
+		{
+			if (read_it->depth == min_depth) {
+				winner_it = read_it; // Keep updating to find the last one at this depth
+			}
+			read_it++;
+		}
+
+		// winner_it points to the last occurrence at the lowest depth
+		if (write_it != winner_it)
+		{
+			*write_it = std::move(*winner_it);
+		}
+		++write_it;
+	}
+	Data.Data.erase(write_it, Data.Data.end());
+}
+
 // Single-pass LTXLoad that distinguishes override vs base data during parsing
 void CInifile::LTXLoad (
 		IReader* F,
 		LPCSTR path,
 		BOOL bIsRootFile,
-		string_path currentFileName
+		string_path currentFileName,
+		int depth
 #ifndef _EDITOR
 		, allow_include_func_t allow_include_func
 #endif
@@ -481,6 +520,9 @@ void CInifile::LTXLoad (
 			FS_FileSet ModFiles;
 			FS.file_list(ModFiles, FilePath.c_str(), FS_ListFiles, ("mod_" + FileName + "_*.ltx").c_str());
 
+			// Found mod files, set depth lower than base
+			int d = -200;
+			int dt = -200;
 			for (auto It = ModFiles.begin(); It != ModFiles.end(); ++It)
 			{
 				std::string ModFileName = It->name.c_str();
@@ -514,11 +556,13 @@ void CInifile::LTXLoad (
 					(FilePath + ModFileNameStr).c_str(),
 					FilePath.c_str(),
 					ModFileName.c_str(),
-					currentFileName
+					currentFileName,
+					d
 #ifndef _EDITOR
 					, allow_include_func
 #endif
 				);
+				d += dt;
 			}
 
 			continue;
@@ -598,23 +642,28 @@ void CInifile::LTXLoad (
 						LPCSTR _name = it->name.c_str();
 						string_path _fn;
 						strconcat(sizeof(_fn), _fn, inc_path, _name);
+
+						// Include file, increase depth by 1 from either mod file or base file
 						loadFile(
 							_fn,
 							inc_path,
 							_name,
-							currentFileName
+							currentFileName,
+							depth + 1
 #ifndef _EDITOR
 							, allow_include_func
 #endif
 						);
 					}
 				}
+				// Include file, increase depth by 1 from either mod file or base file
 				else
 					loadFile(
 						fn,
 						inc_path,
 						inc_name,
-						currentFileName
+						currentFileName,
+						depth + 1
 #ifndef _EDITOR
 						, allow_include_func
 #endif
@@ -774,6 +823,7 @@ void CInifile::LTXLoad (
 
 			auto fname = toLowerCaseCopy(trimCopy(getFilename(std::string(currentFileName))));
 			I.filename = fname.c_str();
+			I.depth = depth;
 
 			if (*I.first || *I.second)
 			{
@@ -1121,15 +1171,23 @@ void CInifile::Load(IReader* F, LPCSTR path
 
 	// CRITICAL OPTIMIZATION: Single-pass load instead of double read
 	// Parse both base and override data in one pass
+	// Start with depth 0
 	LTXLoad(
 		F,
 		path,
 		true,
-		currentFileName
+		currentFileName,
+		0
 #ifndef _EDITOR
 		, allow_include_func
 #endif
 	);
+
+	// Sort items by depth and name
+	for (auto& [k, v] : BaseData)
+		SortAndFilterSection(v);
+	for (auto& [k, v] : OverrideData)
+		SortAndFilterSection(v);
 
 	// Merge base and override data together
 	std::vector<shared_str> PreviousEvaluations;

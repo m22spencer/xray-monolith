@@ -17,12 +17,16 @@ public:
 		//demonized: add DLTX info
 		mutable shared_str filename;
 
+		// depth determines load order of DLTX overrides, lower depth is more important
+		// depth order: DLTX mod_file -> its includes -> Base file -> its includes
+		int depth;
+
 		bool operator<(const Item& other) const
 		{
 			return xr_strcmp(*first, *other.first) < 0;
 		}
 
-		Item() : first(0), second(0), filename(0) {};
+		Item() : first(0), second(0), filename(0), depth(0) {};
 	};
 
 	struct item_comparator
@@ -139,7 +143,8 @@ public:
 		IReader* F,
 		LPCSTR path,
 		BOOL bIsRootFile,
-		string_path currentFileName
+		string_path currentFileName,
+		int depth
 #ifndef _EDITOR
 		, allow_include_func_t allow_include_func = NULL
 #endif
@@ -149,7 +154,8 @@ private:
 		const string_path _fn,
 		const string_path inc_path,
 		const string_path name,
-		string_path currentFileName
+		string_path currentFileName,
+		int depth
 #ifndef _EDITOR
 		, allow_include_func_t allow_include_func
 #endif
@@ -166,6 +172,7 @@ private:
 		string_path currentFileName
 	);
 	void insert_item(CInifile::Sect* tgt, const CInifile::Item& I);
+	void SortAndFilterSection(Sect& Data);
 
 public:
 	void save_as(IWriter& writer, bool bcheck = false) const;
