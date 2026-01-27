@@ -387,7 +387,7 @@ void CInifile::LTXLoad (
 	BOOL bIsCurrentSectionOverride = FALSE;
 	BOOL bHasLoadedModFiles = FALSE;
 
-	static auto GetParentStrings = [](shared_str SectionName, xr_map<shared_str, RStringVec>& ParentMap)
+	static auto InsertParentStringsInMap = [](shared_str SectionName, xr_map<shared_str, RStringVec>& ParentMap)
 	{
 		auto It = ParentMap.find(SectionName);
 
@@ -705,12 +705,12 @@ void CInifile::LTXLoad (
 
 				if (bIsCurrentSectionOverride)
 				{
-					auto* SectionParents = GetParentStrings(SecName.c_str(), OverrideParentDataMap);
+					auto* SectionParents = InsertParentStringsInMap(SecName.c_str(), OverrideParentDataMap);
 					MergeParentSet(SectionParents, &CurrentParents, true);
 				}
 				else
 				{
-					auto* SectionParents = GetParentStrings(SecName.c_str(), BaseParentDataMap);
+					auto* SectionParents = InsertParentStringsInMap(SecName.c_str(), BaseParentDataMap);
 					MergeParentSet(SectionParents, &CurrentParents, true);
 				}
 			}
@@ -830,10 +830,18 @@ void CInifile::EvaluateSection(
 	auto BaseParentsIt = BaseParentDataMap.find(SectionName);
 	auto OverrideParentsIt = OverrideParentDataMap.find(SectionName);
 
-	RStringVec* BaseParents = (BaseParentsIt != BaseParentDataMap.end()) ? &BaseParentsIt->second : nullptr;
-	RStringVec* OverrideParents = (OverrideParentsIt != OverrideParentDataMap.end()) ? &OverrideParentsIt->second : nullptr;
+	auto* BaseParents = (BaseParentsIt != BaseParentDataMap.end()) ? &BaseParentsIt->second : nullptr;
+	auto* OverrideParents = (OverrideParentsIt != OverrideParentDataMap.end()) ? &OverrideParentsIt->second : nullptr;
 
 	BOOL bDeleteSectionIfEmpty = FALSE;
+
+	// Create base parents map if override parents exist
+	if (OverrideParents && !BaseParents)
+	{
+		auto result = BaseParentDataMap.emplace(SectionName, RStringVec());
+		BaseParentsIt = BaseParentDataMap.find(SectionName);
+		BaseParents = (BaseParentsIt != BaseParentDataMap.end()) ? &BaseParentsIt->second : nullptr;
+	}
 
 	if (BaseParents && OverrideParents)
 	{
