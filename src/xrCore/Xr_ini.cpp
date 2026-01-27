@@ -903,8 +903,7 @@ void CInifile::EvaluateSection(
 
 	static auto IsStringDLTXDelete = [](shared_str str, shared_str DLTX_DELETE)
 	{
-		const char* RawString = str.c_str();
-		return RawString && xr_strcmp(RawString, DLTX_DELETE) == 0;
+		return str == DLTX_DELETE;
 	};
 
 	static auto InsertItemWithDelete = [](Item CurrentItem, CInifile::InsertType Type, BOOL& bDeleteSectionIfEmpty, Sect* CurrentSect)
