@@ -182,7 +182,7 @@ CInifile::~CInifile()
 		xr_delete(*I);
 }
 
-void CInifile::insert_item(Sect* tgt, const Item& I)
+void CInifile::insert_item(Sect* tgt, Item& I)
 {
 	// demonized
 	// DLTX: add or remove item from the section parameter if it has a structure of "name = item1, item2, item3, ..."
@@ -194,6 +194,7 @@ void CInifile::insert_item(Sect* tgt, const Item& I)
 	}
 
 	// Just push back items, will be filtered later
+	I.insertionIndex = tgt->Data.size();
 	tgt->Data.push_back(I);
 }
 
@@ -318,7 +319,7 @@ void CInifile::StashCurrentSection(
 		if (SectIt != BaseData.end() && SectIt->first.equal(CurrentBase->Name))
 		{
 			// Overwrite existing base data
-			for (const Item& CurrentItem : CurrentBase->Data)
+			for (Item& CurrentItem : CurrentBase->Data)
 			{
 				insert_item(&SectIt->second, CurrentItem);
 			}
@@ -343,7 +344,7 @@ void CInifile::StashCurrentSection(
 			}
 
 			// Overwrite existing override data
-			for (const Item& CurrentItem : CurrentOverride->Data)
+			for (Item& CurrentItem : CurrentOverride->Data)
 			{
 				insert_item(&SectIt->second, CurrentItem);
 			}
@@ -365,40 +366,39 @@ void CInifile::SortAndFilterSection(Sect& Data)
 	
 	static shared_str DLTX_DELETE = "DLTX_DELETE";
 
-	// 1. Sort by Key, then by Depth (Ascending). Stable is important to keep relative order of items when equal by criteria
-	std::stable_sort(Data.Data.begin(), Data.Data.end(), [](const Item& a, const Item& b)
+	// 1. Sort by Key, then by Depth (Ascending), then by insertionOrder (Descending).
+	std::sort(Data.Data.begin(), Data.Data.end(), [](const Item& a, const Item& b)
 	{
-		// First, compare keys
+		// Compare keys alpphabetically
 		int res = xr_strcmp(a.first, b.first);
 		if (res != 0) return res < 0;
 
-		// Keys are identical, so the one with the smaller depth wins
-		return a.depth < b.depth;
+		// Compare depths, lower depth wins
+		if (a.depth != b.depth) return a.depth < b.depth;
+
+		// Compare insertionIndex, higher wins
+		return a.insertionIndex > b.insertionIndex;
 	});
 
-	// 2. Linear pass to keep the first (lowest depth) of each key group, but the last item at that depth wins
+	// 2. Linear pass to keep the first (lowest depth) of each key group, but the item inserted last at that depth wins
 	auto write_it = Data.Data.begin();
 	for (auto read_it = Data.Data.begin(); read_it != Data.Data.end(); )
 	{
-		shared_str key = read_it->first;
-		int min_depth = read_it->depth;
-
-		// Find the boundary of this key group
-		auto winner_it = read_it;
-		while (read_it != Data.Data.end() && read_it->first == key)
+		if (write_it != read_it)
 		{
-			if (read_it->depth == min_depth) {
-				winner_it = read_it; // Keep updating to find the last one at this depth
-			}
-			read_it++;
+			*write_it = std::move(*read_it);
 		}
 
-		// winner_it points to the last occurrence at the lowest depth
-		if (write_it != winner_it)
-		{
-			*write_it = std::move(*winner_it);
-		}
+		// Save the key pointer to skip duplicates
+		shared_str current_key = write_it->first;
 		++write_it;
+
+		// Skip all other kv pairs
+		++read_it;
+		while (read_it != Data.Data.end() && read_it->first == current_key)
+		{
+			++read_it;
+		}
 	}
 	Data.Data.erase(write_it, Data.Data.end());
 }

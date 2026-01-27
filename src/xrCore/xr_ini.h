@@ -20,13 +20,16 @@ public:
 		// depth determines load order of DLTX overrides, lower depth is more important
 		// depth order: DLTX mod_file -> its includes -> Base file -> its includes
 		int depth;
+		
+		// Insertion index will determine what kv pair in overrides will win even if the depth is the same
+		u32 insertionIndex;
 
 		bool operator<(const Item& other) const
 		{
 			return xr_strcmp(*first, *other.first) < 0;
 		}
 
-		Item() : first(0), second(0), filename(0), depth(0) {};
+		Item() : first(0), second(0), filename(0), depth(0), insertionIndex(0) {};
 	};
 
 	struct item_comparator
@@ -171,7 +174,7 @@ private:
 		std::vector<shared_str>* PreviousEvaluations,
 		string_path currentFileName
 	);
-	void insert_item(CInifile::Sect* tgt, const CInifile::Item& I);
+	void insert_item(CInifile::Sect* tgt, CInifile::Item& I);
 	void SortAndFilterSection(Sect& Data);
 
 public:
