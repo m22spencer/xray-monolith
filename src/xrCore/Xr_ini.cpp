@@ -1215,11 +1215,8 @@ void CInifile::Load(IReader* F, LPCSTR path
 
 	// Insert all finalized sections into final container
 	for (const auto& SectPair : FinalData)
-	{
-		Sect* NewSect = xr_new<Sect>();
-		*NewSect = SectPair.second;
-		DATA.push_back(NewSect);
-	}
+		DATA.push_back(xr_new<Sect>(SectPair.second));
+
 	std::sort(DATA.begin(), DATA.end(), [](const Sect* a, const Sect* b)
 	{
 		return xr_strcmp(a->Name, b->Name) < 0;
