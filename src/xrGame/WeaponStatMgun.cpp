@@ -901,7 +901,8 @@ void CWeaponStatMgun::SetParam(int id, Fvector val)
 	switch (id)
 	{
 	case eWpnDesiredPos:
-		m_destEnemyDir.sub(val, Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_y_bone)).c).normalize_safe();
+		Fvector vec = Fmatrix().mul_43(XFORM(), Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_y_bone)).c;
+		m_destEnemyDir.sub(val, vec).normalize_safe();
 		m_desire_angle_enable = false;
 		break;
 	case eWpnDesiredDir:

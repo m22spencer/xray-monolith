@@ -5163,6 +5163,18 @@
     <ClInclude Include="script_callback_ex.h">
       <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
+    <ClInclude Include="script_callback_ex_generators.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+    </ClInclude>
+    <ClInclude Include="script_callback_ex_inline.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+    </ClInclude>
+    <ClInclude Include="script_callback_ex_nonvoid.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+    </ClInclude>
+    <ClInclude Include="script_callback_ex_void.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+    </ClInclude>
     <ClInclude Include="script_lanim.h">
       <Filter>AI\AScript\ScriptClasses\ScriptLAnim</Filter>
     </ClInclude>
@@ -9581,6 +9593,12 @@
     <ClCompile Include="searchlight.cpp">
       <Filter>Core\Client\Objects\searchlight</Filter>
     </ClCompile>
+    <ClCompile Include="searchlight_script.cpp">
+      <Filter>Core\Client\Objects\searchlight_script</Filter>
+    </ClCompile>
+    <ClCompile Include="searchlight_struct.cpp">
+      <Filter>Core\Client\Objects\searchlight_struct</Filter>
+    </ClCompile>
     <ClCompile Include="trade.cpp">
       <Filter>Core\Client\Objects\searchlight\Trade</Filter>
     </ClCompile>
@@ -11075,8 +11093,6 @@
     <ClCompile Include="script_imgui_script.cpp">
       <Filter>UI\Common\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="searchlight_script.cpp" />
-    <ClCompile Include="searchlight_struct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Explosive.h">

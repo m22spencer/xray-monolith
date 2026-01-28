@@ -312,7 +312,8 @@ void SProjectorControl::SetParam(int id, Fvector val)
 	switch (id)
 	{
 	case CProjector::eDesiredPos:
-		m_desire_dir.sub(val, Fmatrix().mul_43(O->XFORM(), O->Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_y_bone)).c).normalize_safe();
+		Fvector vec = Fmatrix().mul_43(O->XFORM(), O->Visual()->dcast_PKinematics()->LL_GetTransform(m_rotate_y_bone)).c;
+		m_desire_dir.sub(val, vec).normalize_safe();
 		m_enable_ang = false;
 		break;
 	case CProjector::eDesiredDir:
