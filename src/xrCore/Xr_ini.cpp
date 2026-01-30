@@ -1241,6 +1241,7 @@ void CInifile::EvaluateSection(
 							}
 
 							working_item.second = join_list(sect_it_items_vec).c_str();
+							working_item.filename = mod_it->filename;
 						}
 						mod_it++;
 					}
