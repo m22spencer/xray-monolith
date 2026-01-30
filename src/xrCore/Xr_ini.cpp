@@ -322,7 +322,7 @@ void CInifile::StashCurrentSection(
 	// Store base section if exists
 	if (CurrentBase)
 	{
-		auto SectIt = BaseData.lower_bound(CurrentBase->Name);
+		auto SectIt = BaseData.find(CurrentBase->Name);
 		if (SectIt != BaseData.end() && SectIt->first.equal(CurrentBase->Name))
 		{
 			// Overwrite existing base data
@@ -333,7 +333,7 @@ void CInifile::StashCurrentSection(
 		}
 		else
 		{
-			BaseData.emplace_hint(SectIt, CurrentBase->Name, *CurrentBase);
+			BaseData.emplace(CurrentBase->Name, *CurrentBase);
 			SectionToFilename[CurrentBase->Name] = currentFileName;
 		}
 		xr_delete(CurrentBase);
@@ -342,7 +342,7 @@ void CInifile::StashCurrentSection(
 	// Store override section if exists
 	if (CurrentOverride)
 	{
-		auto SectIt = OverrideData.lower_bound(CurrentOverride->Name);
+		auto SectIt = OverrideData.find(CurrentOverride->Name);
 		if (SectIt != OverrideData.end() && SectIt->first.equal(CurrentOverride->Name))
 		{
 			if (!bIsCurrentSectionOverride)
@@ -360,7 +360,7 @@ void CInifile::StashCurrentSection(
 		}
 		else
 		{
-			OverrideData.emplace_hint(SectIt, CurrentOverride->Name, *CurrentOverride);
+			OverrideData.emplace(CurrentOverride->Name, *CurrentOverride);
 			OverrideToFilename[CurrentOverride->Name].insert(currentFileName);
 		}
 		xr_delete(CurrentOverride);
@@ -432,7 +432,7 @@ void CInifile::LTXLoad (
 	BOOL bIsCurrentSectionOverride = FALSE;
 	BOOL bHasLoadedModFiles = FALSE;
 
-	static auto InsertParentStringsInMap = [](shared_str SectionName, xr_map<shared_str, RStringVec>& ParentMap)
+	static auto InsertParentStringsInMap = [](shared_str SectionName, xr_unordered_flat_map<shared_str, RStringVec>& ParentMap)
 	{
 		auto It = ParentMap.find(SectionName);
 
@@ -485,7 +485,7 @@ void CInifile::LTXLoad (
 		return std::regex_match(InputString.c_str(), Pattern);
 	};
 
-	RStringSet sectionsMarkedForCreate;
+	xr_unordered_flat_set<shared_str> sectionsMarkedForCreate;
 
 	while (!F->eof() || (bIsRootFile && !bHasLoadedModFiles))
 	{
@@ -871,7 +871,7 @@ void CInifile::LTXLoad (
 CInifile::Items CInifile::MergeSections(
 		const CInifile::Items& BaseItems,
 		const CInifile::Items& OverrideItems,
-		RStringSet& DeletedItems,
+		xr_unordered_flat_set<shared_str>& DeletedItems,
 		bool IsMergingBaseAndMod
 	)
 {
@@ -1010,7 +1010,7 @@ CInifile::Items CInifile::EvaluateSection(
 	}
 
 	Items ResolvedParents;
-	RStringSet DeletedItems;
+	xr_unordered_flat_set<shared_str> DeletedItems;
 	if (BaseParents)
 	{
 		for (const auto& parent : *BaseParents)
@@ -1294,6 +1294,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 
 	// Merge base and override data together
 	EvaluationsContext Evaluations;
+	Evaluations.ResolvedCache.reserve(BaseData.size() + OverrideData.size());
 	RStringVec BaseDataSectionNames;
 	BaseDataSectionNames.reserve(BaseData.size());
 	for (const auto& SectPair : BaseData)
@@ -1325,13 +1326,14 @@ void CInifile::Load(IReader* F, LPCSTR path
 	}
 
 	// Insert all finalized sections into final container
+	DATA.reserve(FinalData.size());
 	for (const auto& SectPair : FinalData)
 	{
-		DATA.push_back(xr_new<Sect>());
-		DATA.back()->Name = SectPair.first;
-		DATA.back()->Data = SectPair.second;
+		auto s = xr_new<Sect>();
+		s->Name = SectPair.first;
+		s->Data = SectPair.second;
+		DATA.push_back(std::move(s));
 	}
-
 	std::sort(DATA.begin(), DATA.end(), [](const Sect* a, const Sect* b)
 	{
 		return xr_strcmp(a->Name, b->Name) < 0;
@@ -1365,6 +1367,15 @@ void CInifile::Load(IReader* F, LPCSTR path
 	OverrideParentDataMap.clear();
 	OverrideData.clear();
 	OverrideModifyListData.clear();
+
+	OverrideToFilename.rehash(0);
+	SectionToFilename.rehash(0);
+	SectionsToDelete.rehash(0);
+	BaseParentDataMap.rehash(0);
+	BaseData.rehash(0);
+	OverrideParentDataMap.rehash(0);
+	OverrideData.rehash(0);
+	OverrideModifyListData.rehash(0);
 }
 
 // demonized: print DLTX override info

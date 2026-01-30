@@ -126,17 +126,17 @@ public:
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
-	xr_map<shared_str, RStringSet> OverrideToFilename;
-	xr_map<shared_str, shared_str> SectionToFilename;
-	RStringSet SectionsToDelete;
-	xr_map<shared_str, RStringVec> BaseParentDataMap;
-	xr_map<shared_str, Sect> BaseData;
-	xr_map<shared_str, RStringVec> OverrideParentDataMap;
-	xr_map<shared_str, Sect> OverrideData;
-	xr_map<shared_str, Items> OverrideModifyListData;
+	xr_unordered_flat_map<shared_str, xr_unordered_flat_set<shared_str>> OverrideToFilename;
+	xr_unordered_flat_map<shared_str, shared_str> SectionToFilename;
+	xr_unordered_flat_set<shared_str> SectionsToDelete;
+	xr_unordered_flat_map<shared_str, RStringVec> BaseParentDataMap;
+	xr_unordered_flat_map<shared_str, Sect> BaseData;
+	xr_unordered_flat_map<shared_str, RStringVec> OverrideParentDataMap;
+	xr_unordered_flat_map<shared_str, Sect> OverrideData;
+	xr_unordered_flat_map<shared_str, Items> OverrideModifyListData;
 	struct EvaluationsContext
 	{
-		xr_map<shared_str, Items> ResolvedCache; // "Black" Set
+		xr_unordered_flat_map<shared_str, Items> ResolvedCache; // "Black" Set
 		RStringVec RecursionStack;              // "Gray" Set
 
 		// Helper to check if we are currently visiting a section
@@ -203,7 +203,7 @@ private:
 	Items MergeSections(
 		const Items& BaseItems,
 		const Items& OverrideItems,
-		RStringSet& DeletedItems,
+		xr_unordered_flat_set<shared_str>& DeletedItems,
 		bool IsMergingBaseAndMod
 	);
 	void insert_item(CInifile::Sect* tgt, CInifile::Item& I);
