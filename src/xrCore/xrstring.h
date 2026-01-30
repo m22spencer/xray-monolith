@@ -166,7 +166,7 @@ namespace std
 	public:
 		size_t operator()(const shared_str& s) const
 		{
-			return xr_hash<std::string_view>()(s._get()->value);
+			return xr_hash<str_value*>()(const_cast<str_value*>(s._get()));
 		}
 	};
 }
