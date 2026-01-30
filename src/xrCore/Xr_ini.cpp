@@ -1027,7 +1027,7 @@ CInifile::Items CInifile::EvaluateSection(
 						m_file_name,
 						currentFileName
 					);
-					BaseData.emplace(parent, OverrideDataIt->second);
+					BaseData[parent].Name = parent;
 				}
 				else
 				{
