@@ -4,7 +4,6 @@
 #include "../xrEngine/xr_ioc_cmd.h"
 #include "ai_space.h"
 #include "script_engine.h"
-#include "../xrSound/Sound.h"
 
 using namespace luabind;
 
@@ -65,23 +64,6 @@ void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
 	return table;
 }
 
-::luabind::object get_console_token_list(CConsole* c, LPCSTR cmd)
-{
-	::luabind::object table = ::luabind::newtable(ai().script_engine().lua());
-	xr_token* tok = c->GetXRToken(cmd);
-	if (tok)
-	{
-		int idx = 1;
-		while (tok->name)
-		{
-			table[idx] = tok->name;
-			++tok;
-			++idx;
-		}
-	}
-	return table;
-}
-
 #pragma optimize("s",on)
 void console_registrator::script_register(lua_State* L)
 {
@@ -101,7 +83,6 @@ void console_registrator::script_register(lua_State* L)
 		.def("get_bool", &get_console_bool)
 		.def("get_float", &get_console_float)
 		.def("get_token", &CConsole::GetToken)
-		.def("get_token_list", &get_console_token_list)
 		.def("execute_deferred", &execute_console_command_deferred)
 	];
 }

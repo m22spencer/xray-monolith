@@ -2,6 +2,9 @@
 #include "NotificationClient.h"
 
 #include "SoundRender_CoreA.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_TargetA.h"
+#include <AL/al.h>
 
 CNotificationClient::CNotificationClient()
     : m_bComInitialized(false)
@@ -72,24 +75,60 @@ inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDefaultDeviceChan
     if (flow != eRender || role != eConsole)
         return S_OK;
 
-    SoundRenderA->bPendingDefaultDeviceSwitch = TRUE;
+    // Default audio device has been changed.
+    ALDeviceDesc deviceDesc = SoundRenderA->pDeviceList->GetDeviceDesc(snd_device_id);
+
+    xr_string DeviceName = deviceDesc.name;
+    if (DeviceName == "Default Device")
+    {
+        SoundRenderA->bReady = false;
+        SoundRenderA->pause_emitters(true);
+
+        ALCdevice* OldDevice = SoundRenderA->pDevice;
+        ALCcontext* OldContect = SoundRenderA->pContext;
+
+        for (u32 it = 0; it < SoundRenderA->s_targets.size(); it++)
+        {
+            CSoundRender_TargetA* AlTarget = (CSoundRender_TargetA*)SoundRenderA->s_targets[it];
+            AlTarget->_destroy();
+        }
+
+        SoundRenderA->DestroyEffect();
+        SoundRenderA->pDevice = alcOpenDevice(deviceDesc.name_al);
+        SoundRenderA->pContext = alcCreateContext(SoundRenderA->pDevice, nullptr);
+
+        alcMakeContextCurrent(SoundRenderA->pContext);
+        alcDestroyContext(OldContect);
+
+        for (u32 it = 0; it < SoundRenderA->s_targets.size(); it++)
+        {
+            CSoundRender_TargetA* AlTarget = (CSoundRender_TargetA*)SoundRenderA->s_targets[it];
+            AlTarget->_initialize();
+        }
+
+        SoundRenderA->LoadEffect();
+        SoundRenderA->restart_emitters();
+        SoundRenderA->pause_emitters(false);
+        SoundRenderA->bReady = true;
+    }
+
     return S_OK;
 }
 
 inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDeviceRemoved(LPCWSTR pwstrDeviceId)
 {
-    SoundRenderA->bPendingDeviceListRefresh = TRUE;
+    // An audio device has been removed.
     return S_OK;
 }
 
-inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState)
+inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) 
 {
-    SoundRenderA->bPendingDeviceListRefresh = TRUE;
+    // The state of an audio device has changed.
     return S_OK;
 }
 
-inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key)
+inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) 
 {
-    SoundRenderA->bPendingDeviceListRefresh = TRUE;
+    // A property value of an audio device has changed.
     return S_OK;
 }
