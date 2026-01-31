@@ -54,7 +54,6 @@ void CSoundRender_TargetA::_destroy()
 	if (alIsSource(pSource))
 		alDeleteSources(1, &pSource);
 	A_CHK(alDeleteBuffers (sdef_target_count, pBuffers));
-	inherited::_destroy();
 }
 
 void CSoundRender_TargetA::_restart()
