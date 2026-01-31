@@ -19,43 +19,44 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #ifdef _M_AMD64
+// x64 doesn't use the legacy Status Word in the same way, usually safely ignored or return 0.
 u16 getFPUsw() { return 0; }
 
 namespace FPU
 {
+	// On x64, we can ONLY control Rounding, not Precision.
+
+	// "m24", "m53", "m64" are all physically 64-bit (double) or 32-bit (float)
+	// depending on variable types
+	// so only rounding (chop or nearest) is changed
+
 	XRCORE_API void m24(void)
 	{
-		_control87(_PC_24, MCW_PC);
 		_control87(_RC_CHOP, MCW_RC);
 	}
 
 	XRCORE_API void m24r(void)
 	{
-		_control87(_PC_24, MCW_PC);
 		_control87(_RC_NEAR, MCW_RC);
 	}
 
 	XRCORE_API void m53(void)
 	{
-		_control87(_PC_53, MCW_PC);
 		_control87(_RC_CHOP, MCW_RC);
 	}
 
 	XRCORE_API void m53r(void)
 	{
-		_control87(_PC_53, MCW_PC);
 		_control87(_RC_NEAR, MCW_RC);
 	}
 
 	XRCORE_API void m64(void)
 	{
-		_control87(_PC_64, MCW_PC);
 		_control87(_RC_CHOP, MCW_RC);
 	}
 
 	XRCORE_API void m64r(void)
 	{
-		_control87(_PC_64, MCW_PC);
 		_control87(_RC_NEAR, MCW_RC);
 	}
 
@@ -115,7 +116,7 @@ void initialize()
 {
     _clear87();
 
-    _control87(_PC_24, MCW_PC);
+    _control87(_PC_64, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
     _24 = getFPUsw(); // 24, chop
     _control87(_RC_NEAR, MCW_RC);
@@ -312,7 +313,7 @@ void _initialize_cpu_thread()
 	debug_on_thread_spawn();
 #ifndef XRCORE_STATIC
 	// fpu & sse
-	FPU::m24r();
+	FPU::m64r(); // set 64 bit mode
 #endif // XRCORE_STATIC
 	if (CPU::ID.feature & _CPU_FEATURE_SSE)
 	{

@@ -6,8 +6,7 @@
 #include "SoundRender_TargetA.h"
 #include <AL/al.h>
 
-CNotificationClient::CNotificationClient()
-    : m_bComInitialized(false)
+CNotificationClient::CNotificationClient() 
 {
     Start();
 }
@@ -22,10 +21,7 @@ inline bool CNotificationClient::Start()
     // Initialize the COM library for the current thread
     HRESULT ihr = CoInitialize(NULL);
 
-    // RPC_E_CHANGED_MODE means COM already initialized in different mode - this is OK
-    if (SUCCEEDED(ihr) || ihr == RPC_E_CHANGED_MODE) {
-        m_bComInitialized = SUCCEEDED(ihr);
-
+    if (SUCCEEDED(ihr)) {
         // Create the device enumerator
         IMMDeviceEnumerator* pEnumerator;
         HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
@@ -37,10 +33,7 @@ inline bool CNotificationClient::Start()
             return true;
         }
 
-        if (m_bComInitialized) {
-            CoUninitialize();
-            m_bComInitialized = false;
-        }
+        CoUninitialize();
     }
 
     return false;
@@ -54,10 +47,8 @@ inline void CNotificationClient::Close()
         m_pEnumerator->Release();
     }
 
-    if (m_bComInitialized) {
-        CoUninitialize();
-        m_bComInitialized = false;
-    }
+    // Uninitialize the COM library for the current thread
+    CoUninitialize();
 }
 
 inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDeviceAdded(LPCWSTR pwstrDeviceId) 
@@ -71,10 +62,6 @@ inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDeviceAdded(LPCWS
 
 inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId)
 {
-	// Only handle render (output) devices with console (default) role
-    if (flow != eRender || role != eConsole)
-        return S_OK;
-
     // Default audio device has been changed.
     ALDeviceDesc deviceDesc = SoundRenderA->pDeviceList->GetDeviceDesc(snd_device_id);
 
@@ -100,14 +87,15 @@ inline STDMETHODIMP_(HRESULT __stdcall) CNotificationClient::OnDefaultDeviceChan
         alcMakeContextCurrent(SoundRenderA->pContext);
         alcDestroyContext(OldContect);
 
+        //alcCloseDevice(OldDevice);
+
         for (u32 it = 0; it < SoundRenderA->s_targets.size(); it++)
         {
-            CSoundRender_TargetA* AlTarget = (CSoundRender_TargetA*)SoundRenderA->s_targets[it];
+            CSoundRender_TargetA* AlTarget = (CSoundRender_TargetA*)((CSoundRender_Emitter*)SoundRenderA->s_targets[it]);
             AlTarget->_initialize();
         }
 
         SoundRenderA->LoadEffect();
-        SoundRenderA->restart_emitters();
         SoundRenderA->pause_emitters(false);
         SoundRenderA->bReady = true;
     }

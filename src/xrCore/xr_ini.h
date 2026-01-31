@@ -126,21 +126,47 @@ public:
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
-	std::map<shared_str, std::set<shared_str>> OverrideToFilename;
-	std::map<shared_str, shared_str> SectionToFilename;
-	std::set<shared_str> SectionsToDelete;
-	std::map<shared_str, std::vector<shared_str>> BaseParentDataMap;
-	std::map<shared_str, Sect> BaseData;
-	std::map<shared_str, std::vector<shared_str>> OverrideParentDataMap;
-	std::map<shared_str, Sect> OverrideData;
-	std::map<shared_str, Sect> FinalData;
-	std::set<shared_str> FinalizedSections;
-	std::map<shared_str, std::vector<Item>> OverrideModifyListData;
+	xr_unordered_flat_map<shared_str, xr_unordered_flat_set<shared_str>> OverrideToFilename;
+	xr_unordered_flat_map<shared_str, shared_str> SectionToFilename;
+	xr_unordered_flat_set<shared_str> SectionsToDelete;
+	xr_unordered_flat_map<shared_str, RStringVec> BaseParentDataMap;
+	xr_unordered_flat_map<shared_str, Sect> BaseData;
+	xr_unordered_flat_map<shared_str, RStringVec> OverrideParentDataMap;
+	xr_unordered_flat_map<shared_str, Sect> OverrideData;
+	xr_unordered_flat_map<shared_str, Items> OverrideModifyListData;
+	struct EvaluationsContext
+	{
+		xr_unordered_flat_map<shared_str, Items> ResolvedCache; // "Black" Set
+		RStringVec RecursionStack;              // "Gray" Set
+
+		// Helper to check if we are currently visiting a section
+		bool IsInStack(const shared_str& section) const
+		{
+			return std::find(RecursionStack.begin(), RecursionStack.end(), section) != RecursionStack.end();
+		}
+
+		xr_string GetRecursionStackAsString() const
+		{
+			xr_string result;
+			for (const auto& section : RecursionStack)
+			{
+				if (!result.empty())
+					result += " -> ";
+				result += section.c_str();
+			}
+			return result;
+		}
+	};
 	enum InsertType
 	{
 		Override,
 		Base,
 		Parent
+	};
+	enum ModifyListType : char
+	{
+		Insert = '>',
+		Remove = '<'
 	};
 	void LTXLoad(
 		IReader* F,
@@ -169,14 +195,19 @@ private:
 		string_path currentFileName,
 		BOOL bIsCurrentSectionOverride
 	);
-	void EvaluateSection(
+	Items EvaluateSection(
 		shared_str SectionName,
-		std::vector<shared_str>* PreviousEvaluations,
+		EvaluationsContext& Evaluations,
 		string_path currentFileName
+	);
+	Items MergeSections(
+		const Items& BaseItems,
+		const Items& OverrideItems,
+		xr_unordered_flat_set<shared_str>& DeletedItems,
+		bool IsMergingBaseAndMod
 	);
 	void insert_item(CInifile::Sect* tgt, CInifile::Item& I);
 	void SortAndFilterSection(Sect& Data);
-	void SortAndFilterSectionAfterEvaluate(Sect& Data, std::set<shared_str>& deletedItems);
 
 public:
 	void save_as(IWriter& writer, bool bcheck = false) const;
