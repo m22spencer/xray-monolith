@@ -50,7 +50,8 @@ extern bool use_discord;
 extern Fvector4 ps_ssfx_grass_interactive;
 
 #ifdef ECO_RENDER
-std::chrono::steady_clock::time_point tlastf = std::chrono::steady_clock::now(), tcurrentf = std::chrono::steady_clock::now();
+std::chrono::high_resolution_clock::time_point tlastf = std::chrono::high_resolution_clock::now(), tcurrentf = std::
+	                                               chrono::high_resolution_clock::now();
 std::chrono::duration<float> time_span;
 ENGINE_API float refresh_rate = 0;
 #endif // ECO_RENDER
@@ -420,36 +421,22 @@ void CRenderDevice::on_idle()
 		PROF_EVENT("Eco Render");
 
 		if (refresh_rate == 0)
-		{
 			refresh_rate = GetMonitorRefresh();
-		}
-			
-		float frame_time = ps_framelimiter ? frame_time = 1.f / ps_framelimiter : frame_time = refresh_rate;
 
-		const auto target = tlastf + std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-			std::chrono::duration<float>(frame_time)
-		);
-		constexpr auto kTail = std::chrono::microseconds(200);
-		while (true)
+		float rr;
+
+		if (ps_framelimiter)
+			rr = 1.f / ps_framelimiter;
+		else
+			rr = refresh_rate;
+
+		time_span = std::chrono::duration_cast<std::chrono::duration<float>>(tcurrentf - tlastf);
+		while (time_span.count() < rr)
 		{
-			const auto now = std::chrono::steady_clock::now();
-			if (now >= target)
-			{
-				break;
-			}				
-			const auto remaining = target - now;
-			if (remaining > kTail)
-			{
-				/* i don't know how precise those timers are, lets leave a small gap for the more accurate spin lock here */
-				std::this_thread::sleep_for(remaining - kTail);
-			}
-			else 
-			{
-				_mm_pause(); /* we'll spin lock instead here */
-			}
-			
+			tcurrentf = std::chrono::high_resolution_clock::now();
+			time_span = std::chrono::duration_cast<std::chrono::duration<float>>(tcurrentf - tlastf);
 		}
-		tlastf = target; /* don't put now here as it might accumulate drift */
+		tlastf = std::chrono::high_resolution_clock::now();
 	}
 #endif // ECO_RENDER END
 
