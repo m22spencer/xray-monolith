@@ -6,9 +6,13 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
 
 # Versions
 The Modded Exes come with standard and MT versions (currently in test phase designated as MT-TEST).
+
 MT is a version with numerous performance improvements to the engine adapted from [IX-Ray](https://github.com/ixray-team/ixray-1.6-stcop) and [OpenXRay](https://github.com/OpenXRay/xray-16).
+
 On average expect 30%-50% performance increase, will be higher if you were CPU bound before.
-MT version is packed into separate `STALKER-Anomaly-modded-exes-MT-TEST` archive and are designated as `MT-TEST` in main menu and log
+
+MT version is packed into separate `STALKER-Anomaly-modded-exes-MT-TEST` archive and are designated as `MT-TEST` in main menu and log.
+
 MT version includes all features of standard Modded Exes described below, plus:
   * Reworked render graph, sector and portal traversals
   * Support for wallmarks on stalkers, mutants and other dynamic objects
@@ -32,7 +36,7 @@ MT version includes all features of standard Modded Exes described below, plus:
   * Significantly reduced compilation time and PDB size
   * A lot of small fixes and improvements
 
-Future MT versions will include LuaJIT 2.1 64 bit version, it will be incompatible with existing savefiles so for now its on a hold
+Future MT versions will include LuaJIT 2.1 64 bit version, it will be incompatible with existing savefiles so for now its on a hold.
 
 Known issues with MT version
   * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
@@ -230,12 +234,14 @@ How to compile exes:
 
 ## Changelog
 **2026.01.31**
+
 Main and MT:
   * DLTX Refactor
     * Restored old `xr_vector` structure for KV pairs, increases stability of loading
     * Significantly optimized loading and merging sections' data with mods, reduced loading times esp. with DLTX heavy modpacks
     * More informative logging, print warnings when a malformed line encountered in files, warnings when section inherits from non-existent parent or a parent that was defined with `!` override
   * PrivatePirate97: fix inertia offset movement when using canted aim (https://github.com/themrdemonized/xray-monolith/pull/410)
+
 MT:
   * Fixed constant motion blur due to incorrect motion vectors calculation placement in code
   * Fixed potential crash when trying to use `demo_record` and fly through geometry or in any situation where a lot of rendering sectors and portals is occured
@@ -244,13 +250,13 @@ MT:
   * `stat_memory` prints Lua memory usage
 
 **2026.01.25 (Pre-release)**
-  * First release of test version of MT branch 
-  * Expanded grass shadow settings in Modded Exes settings
-  * Refactored DLTX code to be more performant and readable for engine modders.
-  * Significantly reduced loading times on DLTX heavy modpacks by changing key-value storage from `xr_vector` to `xr_set`
-  * Removed obsolete code calls in `FPU` module
-  * VodoXleb: fixed level.set_music_volume() (https://github.com/themrdemonized/xray-monolith/pull/403)
-  * erepb: fix sound device autoswitch (https://github.com/themrdemonized/xray-monolith/pull/405)
+* First release of test version of MT branch 
+* Expanded grass shadow settings in Modded Exes settings
+* Refactored DLTX code to be more performant and readable for engine modders.
+* Significantly reduced loading times on DLTX heavy modpacks by changing key-value storage from `xr_vector` to `xr_set`
+* Removed obsolete code calls in `FPU` module
+* VodoXleb: fixed level.set_music_volume() (https://github.com/themrdemonized/xray-monolith/pull/403)
+* erepb: fix sound device autoswitch (https://github.com/themrdemonized/xray-monolith/pull/405)
 
 **2025.12.30**
 * Enabled Hot Reload configuration for `VerifiedDX11` configuration
