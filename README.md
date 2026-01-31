@@ -235,7 +235,6 @@ Main and MT:
     * Restored old `xr_vector` structure for KV pairs, increases stability of loading
     * Significantly optimized loading and merging sections' data with mods, reduced loading times esp. with DLTX heavy modpacks
     * More informative logging, print warnings when a malformed line encountered in files, warnings when section inherits from non-existent parent or a parent that was defined with `!` override
-  * erepb: fix sound device autoswitch (https://github.com/themrdemonized/xray-monolith/pull/407)
   * PrivatePirate97: fix inertia offset movement when using canted aim (https://github.com/themrdemonized/xray-monolith/pull/410)
 MT:
   * Fixed constant motion blur due to incorrect motion vectors calculation placement in code
