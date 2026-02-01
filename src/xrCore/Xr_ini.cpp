@@ -218,7 +218,7 @@ IC BOOL is_empty_line_now(IReader* F)
 // Regex pattern cache (added before Load function)
 static const std::regex& GetCachedRegex(const xr_string& pattern)
 {
-	static xr_map<xr_string, std::regex> g_RegexCache;
+	static xr_unordered_flat_map<xr_string, std::regex> g_RegexCache;
 	auto it = g_RegexCache.find(pattern);
 	if (it == g_RegexCache.end())
 	{
@@ -1282,6 +1282,8 @@ void CInifile::Load(IReader* F, LPCSTR path
 	{
 		xr_string FileName(m_file_name);
 		toLowerCase(FileName);
+
+		xrCriticalSectionGuard g(CacheCS);
 		auto CachedDataIt = CachedData.find(FileName);
 		if (CachedDataIt != CachedData.end())
 		{
@@ -1363,6 +1365,7 @@ void CInifile::Load(IReader* F, LPCSTR path
 	{
 		xr_string FileName(m_file_name);
 		toLowerCase(FileName);
+		xrCriticalSectionGuard g(CacheCS);
 		CachedData.emplace(std::move(FileName), ResolvedData);
 	}
 

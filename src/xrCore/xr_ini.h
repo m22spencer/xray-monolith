@@ -129,16 +129,24 @@ public:
 	
 private:
 	static xr_unordered_flat_map<xr_string, xr_unordered_flat_map<shared_str, CInifile::Items>> CachedData;
+	static xrCriticalSection CacheCS;
 
 public:
 	static void InvalidateCache(LPCSTR path = nullptr) {
 		if (path)
 		{
 			if (path[0])
-				CachedData.erase(path);
+			{
+				xr_string FileName(path);
+				toLowerCase(FileName);
+				xrCriticalSectionGuard g(CacheCS);
+				CachedData.erase(FileName);
+			}
+				
 		}
 		else
 		{
+			xrCriticalSectionGuard g(CacheCS);
 			CachedData.clear();
 		}
 	};
