@@ -148,6 +148,7 @@ extern int MOUSEBUFFERSIZE;
 extern int KEYBOARDBUFFERSIZE;
 extern BOOL print_bone_warnings;
 extern BOOL print_dltx_warnings;
+extern BOOL dltx_use_cache;
 extern BOOL poltergeist_spawn_corpse_on_death;
 extern BOOL useNewZoomDeltaAlgorithm;
 extern BOOL g_aimmode_remember;
@@ -2340,6 +2341,24 @@ public:
 	}
 };
 
+class CCC_DLTXCache : public CCC_Integer
+{
+public:
+	CCC_DLTXCache(LPCSTR N) :
+		CCC_Integer(N, &dltx_use_cache, 0, 1)
+	{
+	};
+
+	virtual void Execute(LPCSTR args)
+	{
+		CCC_Integer::Execute(args);
+
+		dltx_use_cache = std::atoi(args) != 0;
+		if (!dltx_use_cache)
+			CInifile::InvalidateCache();
+	}
+};
+
 void CCC_RegisterCommands()
 {
 	//Not needed for a singleplayer-only mod
@@ -2959,8 +2978,11 @@ void CCC_RegisterCommands()
 	// Print warnings when using bone_position and bone_direction functions and encounter invalid bones
 	CMD4(CCC_Integer, "print_bone_warnings", &print_bone_warnings, 0, 1);
 
-	// Print DLTX warnings when "override section which doesn't exist"
+	// Print DLTX warnings when "override section which doesn't exist", also prints cache hit for each file
 	CMD4(CCC_Integer, "print_dltx_warnings", &print_dltx_warnings, 0, 1);
+
+	// Use DLTX Cache
+	CMD1(CCC_DLTXCache, "dltx_use_cache");
 
 	// Ignore "no renderer type set for hanging-lamp" error
 	CMD4(CCC_Integer, "hanging_lamp_ignore_match_configuration", &alifeObjectHangingLampIgnoreMatchConfiguration, 0, 1);
