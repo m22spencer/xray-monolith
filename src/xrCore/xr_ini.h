@@ -126,6 +126,29 @@ public:
 	void DLTX_print(LPCSTR sec, LPCSTR line);
 	LPCSTR DLTX_getFilenameOfLine(LPCSTR sec, LPCSTR line);
 	bool DLTX_isOverride(LPCSTR sec, LPCSTR line);
+	
+private:
+	static xr_unordered_flat_map<xr_string, xr_unordered_flat_map<shared_str, CInifile::Items>> CachedData;
+
+public:
+	static void InvalidateCache(LPCSTR path = nullptr) {
+		if (path)
+		{
+			if (path[0])
+				CachedData.erase(path);
+		}
+		else
+		{
+			CachedData.clear();
+		}
+	};
+
+private:
+	IC bool IsValidFileNameForCache() const
+	{
+		return m_file_name && m_file_name[0];
+	}
+
 	xr_unordered_flat_map<shared_str, xr_unordered_flat_set<shared_str>> OverrideToFilename;
 	xr_unordered_flat_map<shared_str, shared_str> SectionToFilename;
 	xr_unordered_flat_set<shared_str> SectionsToDelete;
@@ -157,6 +180,7 @@ public:
 			return result;
 		}
 	};
+	void InsertIntoDATA(xr_unordered_flat_map<shared_str, Items>& FinalData);
 	enum InsertType
 	{
 		Override,
