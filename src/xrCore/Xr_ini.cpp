@@ -1252,6 +1252,25 @@ CInifile::Items CInifile::EvaluateSection(
 
 // Initialize the static cache member
 xr_unordered_flat_map<xr_string, xr_unordered_flat_map<shared_str, CInifile::Items>> CInifile::CachedData;
+xrCriticalSection CInifile::CacheCS;
+void CInifile::InvalidateCache(LPCSTR path) {
+	if (path)
+	{
+		if (path[0])
+		{
+			xr_string FileName(path);
+			toLowerCase(FileName);
+			xrCriticalSectionGuard g(CacheCS);
+			CachedData.erase(FileName);
+		}
+
+	}
+	else
+	{
+		xrCriticalSectionGuard g(CacheCS);
+		CachedData.clear();
+	}
+};
 
 void CInifile::InsertIntoDATA(xr_unordered_flat_map<shared_str, Items>& FinalData)
 {

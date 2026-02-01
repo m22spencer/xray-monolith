@@ -132,24 +132,7 @@ private:
 	static xrCriticalSection CacheCS;
 
 public:
-	static void InvalidateCache(LPCSTR path = nullptr) {
-		if (path)
-		{
-			if (path[0])
-			{
-				xr_string FileName(path);
-				toLowerCase(FileName);
-				xrCriticalSectionGuard g(CacheCS);
-				CachedData.erase(FileName);
-			}
-				
-		}
-		else
-		{
-			xrCriticalSectionGuard g(CacheCS);
-			CachedData.clear();
-		}
-	};
+	static void InvalidateCache(LPCSTR path = nullptr);
 
 private:
 	IC bool IsValidFileNameForCache() const
