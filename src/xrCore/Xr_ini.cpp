@@ -106,7 +106,44 @@ BOOL CInifile::Sect::line_exist(LPCSTR L, LPCSTR* val)
 	return FALSE;
 }
 
-//------------------------------------------------------------------------------
+// Initialize the static cache member
+BOOL dltx_use_cache = TRUE;
+xr_unordered_flat_map<xr_string, xr_unordered_flat_map<shared_str, CInifile::Items>> CInifile::CachedData;
+xrCriticalSection CInifile::CacheCS;
+void CInifile::InvalidateCache(LPCSTR path) {
+	if (path)
+	{
+		if (path[0])
+		{
+			xr_string FileName(path);
+			toLowerCase(FileName);
+			xrCriticalSectionGuard g(CacheCS);
+			CachedData.erase(FileName);
+		}
+
+	}
+	else
+	{
+		xrCriticalSectionGuard g(CacheCS);
+		CachedData.clear();
+	}
+};
+
+void CInifile::InsertIntoDATA(xr_unordered_flat_map<shared_str, Items>& FinalData)
+{
+	DATA.reserve(FinalData.size());
+	for (auto& SectPair : FinalData)
+	{
+		auto s = xr_new<Sect>();
+		s->Name = SectPair.first;
+		s->Data = SectPair.second;
+		DATA.push_back(s);
+	}
+	std::sort(DATA.begin(), DATA.end(), [](const Sect* a, const Sect* b)
+		{
+			return xr_strcmp(a->Name, b->Name) < 0;
+		});
+}
 
 CInifile::CInifile(IReader* F, LPCSTR path
 #ifndef _EDITOR
@@ -150,6 +187,23 @@ CInifile::CInifile(LPCSTR szFileName,
 
 	if (bLoad)
 	{
+		// Find in cache and use it, skip initiating IReader
+		if (dltx_use_cache && IsValidFileNameForCache())
+		{
+			xr_string FileName(m_file_name);
+			toLowerCase(FileName);
+
+			xrCriticalSectionGuard g(CacheCS);
+			auto CachedDataIt = CachedData.find(FileName);
+			if (CachedDataIt != CachedData.end())
+			{
+				if (print_dltx_warnings)
+					Msg("[DLTX] [%s] Found data in cache", m_file_name);
+				InsertIntoDATA(CachedDataIt->second);
+				return;
+			}
+		}
+
 		string_path path, folder;
 		_splitpath(m_file_name, path, folder, 0, 0);
 		xr_strcat(path, sizeof(path), folder);
@@ -1251,45 +1305,6 @@ CInifile::Items CInifile::EvaluateSection(
 	return Evaluations.ResolvedCache[SectionName] = std::move(CurrentResult);
 };
 
-// Initialize the static cache member
-BOOL dltx_use_cache = TRUE;
-xr_unordered_flat_map<xr_string, xr_unordered_flat_map<shared_str, CInifile::Items>> CInifile::CachedData;
-xrCriticalSection CInifile::CacheCS;
-void CInifile::InvalidateCache(LPCSTR path) {
-	if (path)
-	{
-		if (path[0])
-		{
-			xr_string FileName(path);
-			toLowerCase(FileName);
-			xrCriticalSectionGuard g(CacheCS);
-			CachedData.erase(FileName);
-		}
-
-	}
-	else
-	{
-		xrCriticalSectionGuard g(CacheCS);
-		CachedData.clear();
-	}
-};
-
-void CInifile::InsertIntoDATA(xr_unordered_flat_map<shared_str, Items>& FinalData)
-{
-	DATA.reserve(FinalData.size());
-	for (auto& SectPair : FinalData)
-	{
-		auto s = xr_new<Sect>();
-		s->Name = SectPair.first;
-		s->Data = SectPair.second;
-		DATA.push_back(s);
-	}
-	std::sort(DATA.begin(), DATA.end(), [](const Sect* a, const Sect* b)
-	{
-		return xr_strcmp(a->Name, b->Name) < 0;
-	});
-}
-
 void CInifile::Load(IReader* F, LPCSTR path
 #ifndef _EDITOR
                     , allow_include_func_t allow_include_func
@@ -1297,22 +1312,6 @@ void CInifile::Load(IReader* F, LPCSTR path
 )
 {
 	R_ASSERT(F);
-
-	if (dltx_use_cache && IsValidFileNameForCache())
-	{
-		xr_string FileName(m_file_name);
-		toLowerCase(FileName);
-
-		xrCriticalSectionGuard g(CacheCS);
-		auto CachedDataIt = CachedData.find(FileName);
-		if (CachedDataIt != CachedData.end())
-		{
-			if (print_dltx_warnings)
-				Msg("[DLTX] [%s] Found data in cache", m_file_name);
-			InsertIntoDATA(CachedDataIt->second);
-			return;
-		}
-	}
 	
 	static shared_str DLTX_DELETE = "DLTX_DELETE";
 	string_path currentFileName;
