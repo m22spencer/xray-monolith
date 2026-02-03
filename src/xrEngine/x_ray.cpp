@@ -32,6 +32,8 @@
 
 #include "xrSash.h"
 
+extern "C" void XR_EARLY_INIT();
+
 //#include "securom_api.h"
 
 
@@ -1172,6 +1174,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      char* lpCmdLine,
                      int nCmdShow)
 {
+	// Initialize LuaJIT low-memory pool FIRST, before any DLLs load and fragment
+	// the lower 2GB address space.
+	XR_EARLY_INIT();
+
 	//DllMainOpenAL32(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrCore(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrPhysics(NULL, DLL_PROCESS_ATTACH, NULL);
