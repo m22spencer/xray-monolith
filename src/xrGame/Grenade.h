@@ -11,6 +11,7 @@ struct SGrenadeContact
 	bool explode; /* Grenade explode by contact. (not by time out) */
 	Fvector position;
 	Fvector velocity;
+	Fvector normal;
 	shared_str material;
 	SGrenadeContact()
 	{
@@ -19,6 +20,7 @@ struct SGrenadeContact
 		explode = false;
 		position.set(0.0F, 0.0F, 0.0F);
 		velocity.set(0.0F, 0.0F, 0.0F);
+		normal.set(0.0F, 1.0F, 0.0F);
 		material._set("");
 	}
 };
@@ -100,7 +102,7 @@ public:
 #ifdef EXPLOSIVE_CHANGE
 	SGrenadeContact m_contact;
 	virtual void activate_physic_shell();
-	void Contact(const Fvector &pos, const Fvector &vel, const LPCSTR mtl);
+	void Contact(const Fvector &pos, const Fvector &vel, const Fvector &nor, const LPCSTR mtl);
 	void ContactUpdateCL();
 	static void GrenadeContactCallback(bool &do_colide, bool bo1, dContact &c, SGameMtl *mtl_1, SGameMtl *mtl_2);
 

@@ -415,11 +415,12 @@ void CGrenade::activate_physic_shell()
 	}
 }
 
-void CGrenade::Contact(const Fvector &pos, const Fvector &vel, const LPCSTR mtl)
+void CGrenade::Contact(const Fvector &pos, const Fvector &vel, const Fvector &nor, const LPCSTR mtl)
 {
 	m_contact.contact = true;
 	m_contact.position.set(pos);
 	m_contact.velocity.set(vel);
+	m_contact.normal.set(nor);
 	m_contact.material._set(mtl ? mtl : "");
 }
 
@@ -448,23 +449,25 @@ void CGrenade::GrenadeContactCallback(bool &do_colide, bool bo1, dContact &c, SG
 	dxGeomUserData *gd1 = PHRetrieveGeomUserData(c.geom.g1);
 	dxGeomUserData *gd2 = PHRetrieveGeomUserData(c.geom.g2);
 
-	SGameMtl *material = nullptr;
-	Fvector normal;
+	SGameMtl *mtl = nullptr;
+	Fvector pos;
+	Fvector nor;
+	pos.set(*(Fvector *)&c.geom.pos);
 	CGrenade *gnd = gd1 ? smart_cast<CGrenade *>(gd1->ph_ref_object) : nullptr;
 	if (!gnd)
 	{
 		gnd = gd2 ? smart_cast<CGrenade *>(gd2->ph_ref_object) : nullptr;
-		normal.invert(*(Fvector *)&c.geom.normal);
-		material = material_1;
+		nor.invert(*(Fvector *)&c.geom.normal);
+		mtl = material_1;
 	}
 	else
 	{
-		normal.set(*(Fvector *)&c.geom.normal);
-		material = material_2;
+		nor.set(*(Fvector *)&c.geom.normal);
+		mtl = material_2;
 	}
-	VERIFY(material);
+	VERIFY(mtl);
 
-	if (material->Flags.is(SGameMtl::flPassable))
+	if (mtl->Flags.is(SGameMtl::flPassable))
 		return;
 
 	if (gnd == nullptr || gnd->m_contact.enabled != true || gnd->m_contact.contact == true)
@@ -478,8 +481,7 @@ void CGrenade::GrenadeContactCallback(bool &do_colide, bool bo1, dContact &c, SG
 
 	if (!who || who->ID() != gnd->CurrentParentID())
 	{
-		Fvector pos;
-		pos.set(gnd->Position());
+#if 0 /* Copy from CCustomRocket. No idea what these do. Don't seem to work. */
 		dxGeomUserData *l_pMYU = bo1 ? gd1 : gd2;
 		VERIFY(l_pMYU);
 		if (l_pMYU->last_pos[0] != -dInfinity)
@@ -508,9 +510,10 @@ void CGrenade::GrenadeContactCallback(bool &do_colide, bool bo1, dContact &c, SG
 				}
 			}
 		}
+#endif
 		Fvector vel;
 		gnd->PHGetLinearVell(vel);
-		gnd->Contact(pos, vel, material->m_Name.c_str());
+		gnd->Contact(pos, vel, nor, mtl->m_Name.c_str());
 		R_ASSERT(gnd->m_pPhysicsShell);
 		gnd->m_pPhysicsShell->DisableCollision();
 		gnd->m_pPhysicsShell->set_LinearVel(zero_vel);
@@ -534,23 +537,27 @@ void CGrenade::OnBeforeExplosion()
 		{
 			Fvector pos;
 			Fvector vel;
+			Fvector nor;
 			LPCSTR mtl = "";
 			if (m_contact.explode)
 			{
 				pos.set(m_contact.position);
 				vel.set(m_contact.velocity);
+				nor.set(m_contact.normal);
 				mtl = m_contact.material.c_str();
 			}
 			else
 			{
 				pos.set(Position());
 				PHGetLinearVell(vel);
+				nor.set(0.0F, 1.0F, 0.0F);
 				mtl = "";
 			}
 			::luabind::object lua_table = ::luabind::newtable(ai().script_engine().lua());
 			lua_table["flag"] = m_contact.explode;
 			lua_table["position"] = pos;
 			lua_table["velocity"] = vel;
+			lua_table["normal"] = nor;
 			lua_table["material"] = mtl;
 			lua_function(lua_game_object(), lua_table);
 		}
