@@ -254,6 +254,7 @@ public:
 	NET_Queue_Event* spawn_events = nullptr;
 	prefetch_event_queue* prefetch_events = nullptr;
 	models_set* prefetched_models = nullptr;
+	xrSRWLock prefetch_lock;
     bool PostponedSpawn(u16 id);
 	void ProcessSpawnEvents();
 	static void ProcessPrefetchEvents(void* args);

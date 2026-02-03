@@ -80,7 +80,6 @@ u32 lvInterpSteps = 0;
 #ifdef SPAWN_ANTIFREEZE
 BOOL spawn_antifreeze = TRUE;
 BOOL spawn_antifreeze_debug = FALSE;
-static xrCriticalSection prefetch_cs;
 static HANDLE prefetch_thread_signal;
 
 static void unpausePrefetchThreadSignal()
@@ -113,6 +112,7 @@ struct spawn_and_prefetch_events
 	prefetch_event_queue* prefetch_events = nullptr;
 	models_set* prefetched_models = nullptr;
 	bool* closeSignal = nullptr;
+	xrSRWLock* prefetch_lock = nullptr;
 };
 
 u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id, shared_str& section)
@@ -257,7 +257,7 @@ CLevel::CLevel() :
 	spawn_events = xr_new<NET_Queue_Event>();
 	prefetch_events = xr_new<prefetch_event_queue>();
 	prefetched_models = xr_new<models_set>();
-	auto events = new spawn_and_prefetch_events({ spawn_events, prefetch_events, prefetched_models, &closeSignal });
+	auto events = new spawn_and_prefetch_events({ spawn_events, prefetch_events, prefetched_models, &closeSignal, &prefetch_lock });
 	createPrefetchThreadSignal();
 	thread_spawn(ProcessPrefetchEvents, "Pre-Spawn Prefetcher Thread", 0, events);
 	Msg("CLevel::CLevel() Spawn Antifreeze initialized");
@@ -493,7 +493,7 @@ bool CLevel::PostponedSpawn(u16 id)
 {
 	PROF_EVENT("ProcessGameEvents PostponedSpawn");
 
-	xrCriticalSectionGuard g(prefetch_cs);
+	xrSRWLockGuard g(prefetch_lock, true);
 	auto queue = prefetch_events;
 	auto it = std::find_if(queue->begin(), queue->end(), [id, this](prefetch_event& E) { return PostponedSpawnFind(id, E.p); });
 
@@ -531,7 +531,7 @@ bool CLevel::SpawnEventCompare(const NET_Event& a, const NET_Event& b) const
 // demonized: If called manually, be aware of ProcessPrefetchEvents thread, which may modify spawn_events queue at the same time, maybe fix later
 void CLevel::SortSpawnEventsQueue()
 {
-	xrCriticalSectionGuard g(prefetch_cs);
+	xrSRWLockGuard g(prefetch_lock);
 	auto& queue = spawn_events->queue;
 	std::stable_sort(queue.begin(), queue.end(), [this](const NET_Event& a, const NET_Event& b) { return SpawnEventCompare(a, b); });
 }
@@ -543,6 +543,7 @@ void CLevel::ProcessPrefetchEvents(void* args)
 	auto prefetch_events = events->prefetch_events;
 	auto prefetched_models = events->prefetched_models;
 	auto closeSignal = events->closeSignal;	
+	auto prefetch_lock = events->prefetch_lock;
 
 	while (true)
 	{
@@ -556,22 +557,22 @@ void CLevel::ProcessPrefetchEvents(void* args)
 			return;
 		}
 
-		if (prefetch_events->empty())
 		{
-			if (spawn_antifreeze_debug) Msg("[ProcessPrefetchEvents] called, but prefetch_events queue is empty");
-			pausePrefetchThreadSignal();
-			continue;
+			xrSRWLockGuard g(prefetch_lock, true);
+			if (prefetch_events->empty())
+			{
+				if (spawn_antifreeze_debug) Msg("[ProcessPrefetchEvents] called, but prefetch_events queue is empty");
+				pausePrefetchThreadSignal();
+				continue;
+			}
 		}
 
-		PROF_EVENT("ProcessPrefetchEvents");
-
-		if (spawn_antifreeze_debug) Msg("[ProcessPrefetchEvents] started, queue size %d", prefetch_events->size());
-
+		PROF_EVENT("ProcessPrefetchEvents")
 		prefetch_event_queue saved_prefetch_events;
-
 		{
-			xrCriticalSectionGuard g(prefetch_cs);
-			saved_prefetch_events = std::move(*prefetch_events); // move the events to temp queue, so we can continue processing prefetch_events in the main thread
+			xrSRWLockGuard g(prefetch_lock);
+			if (spawn_antifreeze_debug) Msg("[ProcessPrefetchEvents] started, queue size %d", prefetch_events->size());
+			saved_prefetch_events.swap(*prefetch_events); // move the events to temp queue, so we can continue processing prefetch_events in the main thread
 			pausePrefetchThreadSignal();
 		}
 
@@ -579,17 +580,28 @@ void CLevel::ProcessPrefetchEvents(void* args)
 		{
 			for (const auto& model : E.models)
 			{
-				if (prefetched_models->find(model) == prefetched_models->end())
+				bool not_prefetched = false;
+
+				{
+					xrSRWLockGuard g(prefetch_lock, true);
+					not_prefetched = prefetched_models->find(model) == prefetched_models->end();
+				}
+
+				if (not_prefetched)
 				{
 					if (spawn_antifreeze_debug) Msg("[ProcessPrefetchEvents] Prefetching model '%s' for spawn event", model.c_str());
 					::Render->models_PrefetchOne(model.c_str(), false);
-					prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
+
+					{
+						xrSRWLockGuard g(prefetch_lock);
+						prefetched_models->insert(model); // add model to prefetched models set to avoid double prefetching
+					}
 				}
 			}
 		}
 
 		{
-			xrCriticalSectionGuard g(prefetch_cs);
+			xrSRWLockGuard g(prefetch_lock);
 			for (auto& E : saved_prefetch_events)
 			{
 				spawn_events->insert(E.p); // reinsert the event to spawn_events queue for further processing
@@ -604,10 +616,18 @@ void CLevel::ProcessPrefetchEvents(void* args)
 void CLevel::ProcessSpawnEvents()
 {
 	PROF_EVENT("ProcessSpawnEvents");
-	xrCriticalSectionGuard g(prefetch_cs);
-	for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end();)
+
+	xr_vector<NET_Event> events_to_process;
 	{
-		const NET_Event& E = *it;
+		xrSRWLockGuard g(prefetch_lock);
+		if (!spawn_events->queue.empty())
+		{
+			events_to_process.swap(spawn_events->queue);
+		}
+	}
+
+	for (const auto& E : events_to_process)
+	{
 		u16 ID, dest, type;
 		NET_Packet P;
 		ID = E.ID;
@@ -635,7 +655,6 @@ void CLevel::ProcessSpawnEvents()
 			if (!parent_obj || !parent_obj->m_bOnline)
 			{
 				if (spawn_antifreeze_debug) Msg("![ProcessSpawnEvents] parent object is not in alife, do not spawn, section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
-				it = spawn_events->queue.erase(it); // remove current event
 				continue;
 			}
 		}
@@ -644,7 +663,6 @@ void CLevel::ProcessSpawnEvents()
 		u16 dummy16;
 		P.r_begin(dummy16);
 		cl_Process_Spawn(P);
-		it = spawn_events->queue.erase(it);
 	}
 }
 #endif
@@ -653,9 +671,19 @@ void CLevel::ProcessGameEvents()
 {
 	PROF_EVENT("ProcessGameEvents");
 
+	xr_vector<NET_Event> events_to_process;
+	xr_vector<prefetch_event> events_to_prefetch;
+	{
+		xrSRWLockGuard g(prefetch_lock);
+		if (!game_events->queue.empty())
+		{
+			events_to_process.swap(game_events->queue);
+		}
+	}
+
 	// Game events
 	{
-		for (auto it = game_events->queue.begin(); it != game_events->queue.end(); )
+		for (auto it = events_to_process.begin(); it != events_to_process.end(); )
 		{
 			PROF_EVENT("ProcessGameEvents game_events queue");
 			u16 ID = it->ID;
@@ -758,11 +786,10 @@ void CLevel::ProcessGameEvents()
 							E.p = std::move(P);
 							E.models = std::move(models);
 
-							xrCriticalSectionGuard g(prefetch_cs);
-							prefetch_events->push_back(E);
+							events_to_prefetch.push_back(std::move(E));
 
 							if (spawn_antifreeze_debug) Msg("[ProcessGameEvents] added M_SPAWN to prefetch_events: section %s, obj_id %d, parent_id %d, event_id %d", section.c_str(), obj_id, parent_id, dest);
-							it = game_events->queue.erase(it); // remove current event
+							it++; // Move to next event
 							continue;
 						}
 					}					
@@ -770,7 +797,7 @@ void CLevel::ProcessGameEvents()
 			}
 #endif
 //-AVO
-			it = game_events->queue.erase(it); // remove current event
+			it++; // Move to next event
 			switch (ID)
 			{
 			case M_SPAWN:
@@ -848,9 +875,11 @@ void CLevel::ProcessGameEvents()
 	}
 
 #ifdef SPAWN_ANTIFREEZE
-	if (!prefetch_events->empty())
+	if (!events_to_prefetch.empty())
 	{
-		unpausePrefetchThreadSignal(); // signal ProcessPrefetchEvents thread to process prefetch_events queue
+		xrSRWLockGuard g(prefetch_lock);
+		prefetch_events->insert(prefetch_events->end(), events_to_prefetch.begin(), events_to_prefetch.end());
+		unpausePrefetchThreadSignal();
 	}
 #endif
 
@@ -944,7 +973,7 @@ void CLevel::OnFrame()
 	{
 		bool queueEmpty = false;
 		{
-			xrCriticalSectionGuard g(prefetch_cs);
+			xrSRWLockGuard g(prefetch_lock);
 			queueEmpty = spawn_events->queue.empty();
 		}
 		if (!queueEmpty)
