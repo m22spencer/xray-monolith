@@ -946,20 +946,26 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	// Check for another instance
 #ifdef NO_MULTI_INSTANCES
 #define STALKER_PRESENCE_MUTEX "Local\\STALKER-COP"
+	char exePath[MAX_PATH] = {};
+	GetModuleFileName(NULL, exePath, MAX_PATH);
 
-	HANDLE hCheckPresenceMutex = INVALID_HANDLE_VALUE;
-	hCheckPresenceMutex = OpenMutex(READ_CONTROL, FALSE, STALKER_PRESENCE_MUTEX);
-	if (hCheckPresenceMutex == NULL)
+	// Normalize
+	xr_strlwr(exePath);
+
+	// Create hash
+	u32 pathHash = path_crc32(exePath, xr_strlen(exePath));
+
+	// Create unique mutex name  
+	string256 mutexName = {};
+	xr_sprintf(mutexName, sizeof(mutexName), STALKER_PRESENCE_MUTEX"_%08x", pathHash);
+	mutexName[sizeof(mutexName) - 1] = '\0';
+
+	HANDLE hCheckPresenceMutex = CreateMutex(NULL, TRUE, mutexName);
+	if (!hCheckPresenceMutex)
+		return 2;
+
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
-		// New mutex
-		hCheckPresenceMutex = CreateMutex(NULL, FALSE, STALKER_PRESENCE_MUTEX);
-		if (hCheckPresenceMutex == NULL)
-			// Shit happens
-			return 2;
-	}
-	else
-	{
-		// Already running
 		CloseHandle(hCheckPresenceMutex);
 		return 1;
 	}
