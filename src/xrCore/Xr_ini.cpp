@@ -374,8 +374,7 @@ void CInifile::loadFile(
 void CInifile::StashCurrentSection(
 		Sect*& CurrentBase,
 		Sect*& CurrentOverride,
-		string_path currentFileName,
-		BOOL bIsCurrentSectionOverride
+		string_path currentFileName
 	)
 {
 	// Store base section if exists
@@ -384,11 +383,7 @@ void CInifile::StashCurrentSection(
 		auto SectIt = BaseData.find(CurrentBase->Name);
 		if (SectIt != BaseData.end() && SectIt->first.equal(CurrentBase->Name))
 		{
-			// Overwrite existing base data
-			for (Item& CurrentItem : CurrentBase->Data)
-			{
-				insert_item(&SectIt->second, CurrentItem);
-			}
+			Debug.fatal(DEBUG_INFO, "[DLTX] Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *CurrentBase->Name, *CurrentBase->Name, m_file_name, SectionToFilename[CurrentBase->Name].c_str(), currentFileName);
 		}
 		else
 		{
@@ -404,11 +399,6 @@ void CInifile::StashCurrentSection(
 		auto SectIt = OverrideData.find(CurrentOverride->Name);
 		if (SectIt != OverrideData.end() && SectIt->first.equal(CurrentOverride->Name))
 		{
-			if (!bIsCurrentSectionOverride)
-			{
-				Debug.fatal(DEBUG_INFO, "[DLTX] Duplicate section '%s' wasn't marked as an override.\n\nOverride section by prefixing it with '!' (![%s]) or give it a unique name.\n\nCheck this file and its DLTX mods:\n\"%s\",\nfile with section \"%s\",\nfile with duplicate \"%s\"", *CurrentOverride->Name, *CurrentOverride->Name, m_file_name, SectionToFilename[CurrentOverride->Name].c_str(), currentFileName);
-			}
-
 			// Overwrite existing override data
 			for (Item& CurrentItem : CurrentOverride->Data)
 			{
@@ -558,8 +548,7 @@ void CInifile::LTXLoad (
 			StashCurrentSection(
 				CurrentBase,
 				CurrentOverride,
-				currentFileName,
-				bIsCurrentSectionOverride
+				currentFileName
 			);
 			bHasLoadedModFiles = TRUE;
 
@@ -744,8 +733,7 @@ void CInifile::LTXLoad (
 			StashCurrentSection(
 				CurrentBase,
 				CurrentOverride,
-				currentFileName,
-				bIsCurrentSectionOverride
+				currentFileName
 			);
 
 			u32 SectionNameStartPos = 3;
@@ -765,8 +753,7 @@ void CInifile::LTXLoad (
 			StashCurrentSection(
 				CurrentBase,
 				CurrentOverride,
-				currentFileName,
-				bIsCurrentSectionOverride
+				currentFileName
 			);
 
 			u32 SectionNameStartPos = (isModSection(str) ? 2 : 1);
@@ -907,8 +894,7 @@ void CInifile::LTXLoad (
 	StashCurrentSection(
 		CurrentBase,
 		CurrentOverride,
-		currentFileName,
-		bIsCurrentSectionOverride
+		currentFileName
 	);
 
 	// Create empty sections that were marked with @[ and weren't defined normally

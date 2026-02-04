@@ -231,8 +231,7 @@ private:
 	void StashCurrentSection(
 		Sect*& CurrentBase,
 		Sect*& CurrentOverride,
-		string_path currentFileName,
-		BOOL bIsCurrentSectionOverride
+		string_path currentFileName
 	);
 	Items EvaluateSection(
 		shared_str SectionName,
