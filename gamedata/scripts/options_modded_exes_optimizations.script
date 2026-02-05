@@ -13,6 +13,7 @@ PAGE = filter_false(page {
 	get_item_if_exists(check { id = "mt_bullets", def = true }),
 	get_item_if_exists(check { id = "mt_particles", def = true }),
 	get_item_if_exists(list_bool { id = "mt_scheduler" }),
+	get_item_if_exists(list_bool { id = "mt_calc_bones"}),
 	list_bool { id = "mt_update_weapon_sounds" },
 
 	line{},
@@ -27,6 +28,7 @@ PAGE = filter_false(page {
 
 	line{},
 
+	list_bool { id = "dltx_use_cache" },
 	track {
 		id = "mouse_buffer_size",
 		def = 1024,

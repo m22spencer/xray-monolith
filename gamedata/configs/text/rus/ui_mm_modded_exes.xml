@@ -53,6 +53,16 @@
 		<text>Не используется</text>
 	</string>
 
+	<string id="ui_mm_modded_exes_visual_graphics_g_wallmark_range_static">
+		<text>Расстояние рендера статических следов от пуль (g_wallmark_range_static)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_g_wallmark_range_skeleton">
+		<text>Расстояние рендера следов от скелетных пуль (g_wallmark_range_skeleton)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r__blood_decals_on_objects">
+		<text>Декали крови на существах (r__blood_decals_on_objects)</text>
+	</string>
+
 	<!-- UI/HUD -->
 
 	<string id="ui_mm_menu_ui_hud">
@@ -224,20 +234,6 @@
 	</string>
 	<string id="ui_mm_modded_exes_visual_particles_allow_silencer_hide_tracer">
 		<text>Позволить глушителям скрывать трассирующие элементы (allow_silencer_hide_tracer)</text>
-	</string>
-
-	<!-- Wallmarks -->
-	<string id="ui_mm_wallmarks_modded_exes">
-		<text>Следы от пуль</text>
-	</string>
-	<string id="ui_mm_menu_wallmarks">
-		<text>Следы от пуль</text>
-	</string>
-	<string id="ui_mm_modded_exes_visual_wallmarks_g_wallmark_range_static">
-		<text>Диапазон статических следов от пуль (g_wallmark_range_static)</text>
-	</string>
-	<string id="ui_mm_modded_exes_visual_wallmarks_g_wallmark_range_skeleton">
-		<text>Диапазон следов от скелетных пуль (g_wallmark_range_skeleton)</text>
 	</string>
 
 	<!-- HDR10 -->
@@ -879,6 +875,9 @@
 	<string id="ui_mm_modded_exes_optimizations_mt_scheduler">
 		<text>Многопоточный планировщик (mt_scheduler)</text>
 	</string>
+	<string id="ui_mm_modded_exes_optimizations_mt_calc_bones">
+		<text>Многопоточные вычисления костей (mt_calc_bones)</text>
+	</string>
 	<string id="ui_mm_modded_exes_optimizations_mt_update_weapon_sounds">
 		<text>Многопоточное обновление звуков оружия (mt_update_weapon_sounds)</text>
 	</string>
@@ -920,6 +919,14 @@
 	<string id="ui_mm_modded_exes_optimizations_lua_gcstep">
 		<text>Lua шаг сборщика мусора (lua_gcstep)</text>
 	</string>
+
+	<string id="ui_mm_modded_exes_optimizations_dltx_use_cache">
+		<text>DLTX Кэш (dltx_use_cache)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_dltx_use_cache_desc">
+		<text>Кэширует файлы и секции чтобы быстро грузить их, минуя чтение с диска и DLTX парсинг. Занимает около 50MB на Anomaly и 150MB на Gamma</text>
+	</string>
+
 	<string id="ui_mm_modded_exes_optimizations_mouse_buffer_size">
 		<text>Буфер ввода для мыши (mouse_buffer_size)</text>
 	</string>
