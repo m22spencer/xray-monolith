@@ -19,6 +19,10 @@ PAGE = filter_false(page {
 
 	line {},
 
+	list_bool { id = "g_use_non_linear_inertia"},
+
+	line {},
+
 	vector {
 		id = "ssfx_grass_shadows",
 		x_min = 0,

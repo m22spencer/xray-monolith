@@ -55,7 +55,7 @@ float hud_fov_aim_multiplier = 1.0f;
 
 extern int g_nearwall;
 
-BOOL g_use_non_linear_inertia = FALSE;
+BOOL g_use_non_linear_inertia = TRUE;
 
 float CWeapon::SDS_Radius(bool alt) {
 	// hack for GL to always return 0, fix later

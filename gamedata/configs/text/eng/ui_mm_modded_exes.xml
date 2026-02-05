@@ -63,6 +63,10 @@
 		<text>Blood decals on living objects (r__blood_decals_on_objects)</text>
 	</string>
 
+	<string id="ui_mm_modded_exes_visual_graphics_g_use_non_linear_inertia">
+		<text>Non linear animation inertia on movement (g_use_non_linear_inertia)</text>
+	</string>
+
 	<!-- UI/HUD -->
 
 	<string id="ui_mm_menu_ui_hud">
@@ -721,6 +725,9 @@
 
 	<string id="ui_mm_modded_exes_gameplay_weapons_g_auto_reload">
 		<text>Automatically reload weapon when ammo is depleted (g_auto_reload)</text>
+	</string>
+	<string id="ui_mm_modded_exes_gameplay_weapons_g_decouple_horz_recoil">
+		<text>Horizontal recoil is independent of vertical (g_decouple_horz_recoil)</text>
 	</string>
 	
 	<string id="ui_mm_modded_exes_gameplay_weapons_g_fire_reloads_ubgl">
