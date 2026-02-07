@@ -933,6 +933,31 @@
 		<text>Lua Garbage Collection Step (lua_gcstep)</text>
 	</string>
 
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gc">
+		<text>Lua Parallel GC (lua_parallel_gc)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gc_desc">
+		<text>Calls Lua GC repeatedly on separate thread with parameters below to collect garbage while engine is rendering frame</text>
+	</string>
+
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gcstep">
+		<text>Lua Parallel GC Step (lua_parallel_gcstep)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gcstep_desc">
+		<text>How much data to collect in a single call. RECOMMENDATION: in order to hit the sweet spot when frame time is flat and Parallel GC doesn't thrash CPU, type "lua_parallel_gc_debug 1" in the console and check memory usage. It should stay flat at a given value, usually about 45-50MB. To INCREASE efficiency of Parallel GC, FIRST increase GC Step, THEN increase amount of calls. If you think you can afford less aggressive GC, to DECREASE it, FIRST decrease amount, THEN GC Step. Prioritize higher GC Step than Call Amount to reduce overhead on accessing Lua. Default values are very good for vanilla (might run even lower values) and good for Gamma</text>
+	</string>
+
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gc_call_amount">
+		<text>Lua Parallel GC Call Amount (lua_parallel_gc_call_amount)</text>
+	</string>
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gc_call_amount_desc">
+		<text>How much calls to perform to collect garbage. This amount is NOT guaranteed if frames are rendered too fast. RECOMMENDATION: in order to hit the sweet spot when frame time is flat and Parallel GC doesn't thrash CPU, type "lua_parallel_gc_debug 1" in the console and check memory usage. It should stay flat at a given value, usually about 45-50MB. To INCREASE efficiency of Parallel GC, FIRST increase GC Step, THEN increase amount of calls. If you think you can afford less aggressive GC, to DECREASE it, FIRST decrease amount, THEN GC Step. Prioritize higher GC Step than Call Amount to reduce overhead on accessing Lua. Default values are very good for vanilla (might run even lower values) and good for Gamma</text>
+	</string>
+
+	<string id="ui_mm_modded_exes_optimizations_lua_parallel_gc_debug">
+		<text>Lua Parallel GC Debug (lua_parallel_gc_debug)</text>
+	</string>
+
 	<string id="ui_mm_modded_exes_optimizations_dltx_use_cache">
 		<text>DLTX Cache (dltx_use_cache)</text>
 	</string>

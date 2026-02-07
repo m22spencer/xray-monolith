@@ -30,6 +30,18 @@ PAGE = filter_false(page {
 		def = 400,
 		step = 10,
 	},
+	get_item_if_exists(list_bool { id = "lua_parallel_gc"}),
+	get_item_if_exists(track {
+		id = "lua_parallel_gcstep",
+		def = 75,
+		step = 5,
+	}),
+	get_item_if_exists(track {
+		id = "lua_parallel_gc_call_amount",
+		def = 25,
+		step = 1,
+	}),
+	get_item_if_exists(list_bool { id = "lua_parallel_gc_debug" }),
 
 	line{},
 
