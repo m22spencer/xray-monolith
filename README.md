@@ -15,7 +15,7 @@ MT version is packed into separate `STALKER-Anomaly-modded-exes-MT-TEST` archive
 
 MT version includes all features of standard Modded Exes described below, plus:
   * Reworked render graph, sector and portal traversals
-  * Support for wallmarks on stalkers, mutants and other dynamic objects
+  * Optional support for wallmarks on stalkers, mutants and other dynamic objects
   * Multithreaded: 
     * Loading resources (textures, models, CFORM (collisions))
     * HOM (Visibility tests)
@@ -23,12 +23,15 @@ MT version includes all features of standard Modded Exes described below, plus:
     * Rain
     * Particles
     * Bones calculations for models
-    * Engine scheduler,
+    * Engine scheduler, split between real-time updated objects on main thread and others on separate thread with configurable batch amount to do per frame
     * Feel and Vision for AI
     * Task Manager
     * Parallel execution of `CreateTimeEvent` and `AddUniqueCall` commands (disabled by default)
     * Logger
   * Toggleable options available in Modded Exes options
+  * Proactive Parallel Lua GC
+    * When frame is prepared in Renderer, repeatedly call Lua GC with small step to keep it busy and reduce cleanup work later
+    * After frame is rendered, check if Lua memory usage is good, perform big GC with usual GC step if its not
   * Updated Luabind to latest version from (https://github.com/ForserX/luabind-latest)
   * Functor cache for Lua calls, disabled by default, didn't show any performance difference
   * Enhanced `smart_cast` with specializations
@@ -233,6 +236,49 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.02.08**
+
+Main and MT:
+  * Preemptive trader update check are run on own timer, fixes stutters in Gamma from this side 
+  * DLTX Refactor:
+    * DLTX Cache: evaluated files and sections are stored permanently in RAM. Next file access by `CInifile` construction will quickly return data without ever accessing disk and DLTX parsing
+    * `dltx_use_cache` variable to toggle the cache
+    * Vanilla usage of cache is about 50MB, on GAMMA it is up to 150MB
+  * Better Debug Inputs script (when calling F7). Spawner of items, objects and executor are affected
+    * When you spawn an object from a list or by typing in input field, the input will be saved
+    * You can cycle between saved inputs by pressing up and down arrows, much like through console commands. The input shouldnt be focused (no caret visible)
+    * Maximum of 20 inputs can be saved
+    * Execution of functions in executor is automatically wrapped into protected call, so you wont crash the game on some error. If error occured, you will see the message on the bottom or in the console
+  * Spawn Antifreeze: fixed occasional crash when spawning, reorganized data to minimize multithreading lock time
+  * erepb: super early luajit init (https://github.com/themrdemonized/xray-monolith/pull/419)
+  * erepb: actually fix sound device selection and autoswitch (https://github.com/themrdemonized/xray-monolith/pull/416)
+  * PrivatePirate97: decoupled horz recoil, non-linear inertia movement, additions to lua_help_ex.script (https://github.com/themrdemonized/xray-monolith/pull/417)
+  * GhenTuong: Development work for level_graph, CExplosive, CGrenade, CWeaponStatMgun, CWeapon, script mutant movement. Export CGrenade functions (https://github.com/themrdemonized/xray-monolith/pull/420)
+
+MT:
+  * Fixed crash when using Glowsticks mod
+  * Fixed occasional crash when using SWM Visible Legs mod
+  * Fixed occasional crash on exiting the game due to Renderer being destroyed before shader data
+  * 3DSS, fixed rendering grass on top of stalkers when looking through the scope
+  * Reduced memory footprint of `shared_str` and `str_container`
+  * Prevent duplicates when calling `Instance_Register` in `ModelPool` 
+  * Safer destruction of objects if `feel_vision_update` is running
+  * Add self-model ignoring in feel vision (https://github.com/ixray-team/ixray-1.6-stcop/commit/c0a2540937708d029e4f7247e6cbcb929204eb5b)
+  * Disabled blood decals on objects when shooting by default, can be enabled via `r__blood_decals_on_objects`
+  * `mt_calc_bones` option to disable multithreaded bones calculation
+  * Multithreaded bones calculation is slightly safer
+  * Scheduler:
+    * Split real-time objects on main thread, non RT on task group when MT Scheduler is enabled. Fixes Interaction Dot Marks mod
+    * `scheduler_batch_size` to control max objects to `shedule_update` per frame
+    * `scheduler_log` to log info
+  * Proactive Parallel Lua GC
+    * When frame is prepared in Renderer, repeatedly call Lua GC with small step to keep it busy and reduce cleanup work later
+    * After frame is rendered, check if Lua memory usage is good, perform big GC with usual GC step if its not
+    * `lua_parallel_gc` to enable feature
+    * `lua_parallel_gcstep` controls GC step, default 75
+    * `lua_parallel_gc_call_amount` sets the amount of times GC will be called, default 25
+    * `lua_parallel_gc_debug` to print memory information
+
 **2026.01.31**
 
 Main and MT:
