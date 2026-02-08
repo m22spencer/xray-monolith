@@ -1029,7 +1029,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 	InitSettings();
 	Msg(XRAY_MONOLITH_VERSION);
-	Msg("Executable path: %s", exePath);
 
 	{
 		FS_FileSet fset;
