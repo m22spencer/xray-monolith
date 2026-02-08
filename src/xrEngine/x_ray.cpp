@@ -949,7 +949,15 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #ifdef NO_MULTI_INSTANCES
 #define STALKER_PRESENCE_MUTEX "Local\\STALKER-COP"
 	char exePath[MAX_PATH] = {};
-	GetModuleFileName(NULL, exePath, MAX_PATH);
+	DWORD bytes = GetModuleFileNameA(NULL, exePath, MAX_PATH);
+	exePath[MAX_PATH - 1] = '\0';
+	if (bytes == 0)
+		return 2;
+
+	// Strip filename and focus on installation directory
+	char* cut = strrchr(exePath, '\\');
+	if (cut)
+		*cut = '\0';
 
 	// Normalize
 	xr_strlwr(exePath);
@@ -960,7 +968,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	// Create unique mutex name  
 	string256 mutexName = {};
 	xr_sprintf(mutexName, sizeof(mutexName), STALKER_PRESENCE_MUTEX"_%08x", pathHash);
-	mutexName[sizeof(mutexName) - 1] = '\0';
 
 	HANDLE hCheckPresenceMutex = CreateMutex(NULL, TRUE, mutexName);
 	if (!hCheckPresenceMutex)
@@ -1022,6 +1029,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 	InitSettings();
 	Msg(XRAY_MONOLITH_VERSION);
+	Msg("Executable path: %s", exePath);
 
 	{
 		FS_FileSet fset;
