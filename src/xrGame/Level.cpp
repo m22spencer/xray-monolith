@@ -476,11 +476,24 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 	}
 }
 
+// Define a helper struct to hold the heavy data
+struct ProcessNetPacket : public intrusive_base_nonatomic
+{
+	NET_Packet P;
+};
+
+struct ProcessGameEventsData : ProcessNetPacket
+{
+	prefetch_event E;
+	NET_Packet PRespond;
+};
+
 //AVO: used by SPAWN_ANTIFREEZE (by alpet, edited by demonized)
 #ifdef SPAWN_ANTIFREEZE
 bool CLevel::PostponedSpawnFind(u16 id, const NET_Event& E) const
 {
-	NET_Packet P;
+	auto data = make_intrusive<ProcessNetPacket>();
+	NET_Packet& P = data->P;
 	E.implication(P);
 	return PostponedSpawnFind(id, P);
 }
@@ -505,22 +518,13 @@ bool CLevel::PostponedSpawn(u16 id)
 	return it != queue->end() || it2 != queue2.end();
 }
 
-
-// Define a helper struct to hold the heavy data
-struct ProcessGameEventsData : public intrusive_base_nonatomic
-{
-	NET_Packet P;
-	prefetch_event E;
-	NET_Packet PRespond;
-};
-
 int CLevel::GetSpawnEventPriority(const NET_Event& e) const
 {
 	if (e.ID == M_EVENT)
 		return 0;
 
 	if (e.ID == M_SPAWN) {
-		auto data = make_intrusive<ProcessGameEventsData>();
+		auto data = make_intrusive<ProcessNetPacket>();
 		NET_Packet& P = data->P;
 		e.implication(P);
 
@@ -641,7 +645,7 @@ void CLevel::ProcessSpawnEvents()
 
 	for (const auto& E : events_to_process)
 	{
-		auto data = make_intrusive<ProcessGameEventsData>();
+		auto data = make_intrusive<ProcessNetPacket>();
 		u16 ID, dest, type;
 		NET_Packet& P = data->P;
 		ID = E.ID;
