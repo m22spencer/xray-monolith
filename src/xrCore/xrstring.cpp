@@ -56,7 +56,7 @@ struct str_container_impl
 			while (*current != NULL)
 			{
 				str_value* value = *current;
-				if (!value->dwReference)
+				if (!value->dwReference.load(std::memory_order_relaxed))
 				{
 					*current = value->next;
 					xr_free(value);
@@ -96,7 +96,7 @@ struct str_container_impl
 			str_value* value = buffer[i];
 			while (value)
 			{
-				fprintf(f, "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC,
+				fprintf(f, "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference.load(std::memory_order_relaxed), value->dwLength, value->dwCRC,
 				        value->value);
 				value = value->next;
 			}
@@ -111,7 +111,7 @@ struct str_container_impl
 			string4096 temp;
 			while (value)
 			{
-				xr_sprintf(temp, sizeof(temp), "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength,
+				xr_sprintf(temp, sizeof(temp), "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference.load(std::memory_order_relaxed), value->dwLength,
 				           value->dwCRC, value->value);
 				f->w_string(temp);
 				value = value->next;
@@ -129,7 +129,7 @@ struct str_container_impl
 			{
 				count += 1;
 				counter -= sizeof(str_value);
-				counter += (value->dwReference - 1) * (value->dwLength + 1);
+				counter += (value->dwReference.load(std::memory_order_relaxed) - 1) * (value->dwLength + 1);
 				value = value->next;
 			}
 		}
@@ -163,7 +163,7 @@ str_value* str_container::dock(str_c value)
 	// setup find structure
 	char header[sizeof(str_value)];
 	str_value* sv = (str_value*)header;
-	sv->dwReference = 0;
+	sv->dwReference.store(0, std::memory_order_relaxed);
 	sv->dwLength = s_len;
 	sv->dwCRC = crc32(value, s_len);
 
@@ -196,7 +196,7 @@ str_value* str_container::dock(str_c value)
         }
 #endif // DEBUG
 
-		result->dwReference = 0;
+		result->dwReference.store(0, std::memory_order_relaxed);
 		result->dwLength = sv->dwLength;
 		result->dwCRC = sv->dwCRC;
 		CopyMemory(result->value, value, s_len_with_zero);
@@ -303,7 +303,7 @@ str_value* str_container::dock(str_c value)
     // setup find structure
     char header[sizeof(str_value)];
     str_value* sv = (str_value*)header;
-    sv->dwReference = 0;
+    sv->dwReference.store(0, std::memory_order_relaxed);
     sv->dwLength = s_len;
     sv->dwCRC = crc32(value, s_len);
     sv->next = NULL;
@@ -348,7 +348,7 @@ str_value* str_container::dock(str_c value)
 
         // DUMP_PHASE;
 
-        result->dwReference = 0;
+        result->dwReference.store(0, std::memory_order_relaxed);
         result->dwLength = sv->dwLength;
         result->dwCRC = sv->dwCRC;
         result->next = NULL;
@@ -371,7 +371,7 @@ void str_container::clean()
     for (; it != end;)
     {
         str_value* sv = *it;
-        if (0 == sv->dwReference)
+        if (0 == sv->dwReference.load(std::memory_order_relaxed))
         {
             str_container_impl::cdb::iterator i_current = it;
             str_container_impl::cdb::iterator i_next = ++it;
@@ -411,7 +411,7 @@ void str_container::dump()
     str_container_impl::cdb::iterator end = impl->container.end();
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
     for (; it != end; it++)
-        fprintf(F, "ref[%4d]-len[%3d]-crc[%8X] : %s\n", (*it)->dwReference, (*it)->dwLength, (*it)->dwCRC, (*it)->value);
+        fprintf(F, "ref[%4d]-len[%3d]-crc[%8X] : %s\n", (*it)->dwReference.load(std::memory_order_relaxed), (*it)->dwLength, (*it)->dwCRC, (*it)->value);
     fclose(F);
     cs.Leave();
 }
@@ -429,7 +429,7 @@ u32 str_container::stat_economy()
     {
         counter -= HEADER;
         counter -= node_size;
-        counter += int((int((*it)->dwReference) - 1)*int((*it)->dwLength + 1));
+        counter += int((int((*it)->dwReference.load(std::memory_order_relaxed)) - 1)*int((*it)->dwLength + 1));
     }
     cs.Leave();
 
