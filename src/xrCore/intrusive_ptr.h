@@ -91,10 +91,11 @@ struct destructor_virtual { virtual ~destructor_virtual() = default; };
 struct destructor_non_virtual { ~destructor_non_virtual() = default; };
 
 template <DeletionPolicy Policy = DeletionPolicy::Immediate, CounterPolicy Counter = CounterPolicy::Atomic, bool Virtual = true>
-struct intrusive_base_impl : public intrusive_base_marker, ref_count_storage<Counter>, std::conditional_t<Virtual, destructor_virtual, destructor_non_virtual>
+struct __declspec(novtable) intrusive_base_impl : public intrusive_base_marker, ref_count_storage<Counter>, std::conditional_t<Virtual, destructor_virtual, destructor_non_virtual>
 {
     // This makes the policy visible to the smart pointer
     static constexpr DeletionPolicy deletion_policy = Policy;
+    static constexpr bool virtual_destructor = Virtual;
 
     template <typename T>
     IC bool intrusive_release(T* object)
@@ -127,10 +128,11 @@ template <bool _is_pm, typename T> struct xr_special_free;
 
 // Strict policy - forbid calling xr_delete<ptr.get()>, must have protected destructor
 template<CounterPolicy Counter>
-struct intrusive_base_impl<DeletionPolicy::Strict, Counter> : public intrusive_base_marker, ref_count_storage<Counter>
+struct __declspec(novtable) intrusive_base_impl<DeletionPolicy::Strict, Counter> : public intrusive_base_marker, ref_count_storage<Counter>
 {
     // This makes the policy visible to the smart pointer
     static constexpr DeletionPolicy deletion_policy = DeletionPolicy::Strict;
+    static constexpr bool virtual_destructor = true;
 
     template <typename T>
     IC bool intrusive_release(T* object)
@@ -185,7 +187,8 @@ public:
     typedef _intrusive_ptr self_type;
 
 private:
-    static constexpr DeletionPolicy policy = object_type::deletion_policy;
+    static constexpr DeletionPolicy deletion_policy = object_type::deletion_policy;
+    static constexpr bool virtual_destructor = object_type::virtual_destructor;
 
     // Static check instead of the old enum hack
     static_assert(std::is_base_of_v<intrusive_base_marker, object_type>,
@@ -195,8 +198,13 @@ private:
     // This asserts that 'object_type' does NOT have a public destructor if policy is Strict (intrusive_base_strict).
     // If this triggers, it means you forgot to make your destructor protected.
     // Note: std::is_destructible_v is false if the destructor is protected/private.
-    static_assert(!(policy == DeletionPolicy::Strict && std::is_destructible_v<object_type>),
+    static_assert(!(deletion_policy == DeletionPolicy::Strict && std::is_destructible_v<object_type>),
         "intrusive_ptr<T>: T must have a protected destructor, Strict Policy");
+
+
+    // Static check to see if class have virtual destructor if base is virtual
+    static_assert(!virtual_destructor || std::is_polymorphic_v<object_type>,
+        "intrusive_ptr<T>: T must be polymorphic because the base class is virtual");
 
     object_type* m_object;
 
