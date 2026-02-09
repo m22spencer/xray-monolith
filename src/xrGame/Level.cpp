@@ -144,6 +144,18 @@ u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id, shared_str& section)
 #endif
 //-AVO
 
+// Define a helper struct to hold the heavy data
+struct ProcessNetPacket : public intrusive_base_nonatomic
+{
+	NET_Packet P;
+};
+
+struct ProcessGameEventsData : ProcessNetPacket
+{
+	prefetch_event E;
+	NET_Packet PRespond;
+};
+
 namespace crash_saving {
 	extern void(*save_impl)();
 	static bool g_isSaving = false;
@@ -156,7 +168,8 @@ namespace crash_saving {
 
 		int saveCount = -1;
 		g_isSaving = true;
-		NET_Packet net_packet;
+		auto data = make_intrusive<ProcessNetPacket>();
+		NET_Packet& net_packet = data->P;
 		net_packet.w_begin(M_SAVE_GAME);
 
 		std::string path = "fatal_ctd_save_";
@@ -475,18 +488,6 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 		}
 	}
 }
-
-// Define a helper struct to hold the heavy data
-struct ProcessNetPacket : public intrusive_base_nonatomic
-{
-	NET_Packet P;
-};
-
-struct ProcessGameEventsData : ProcessNetPacket
-{
-	prefetch_event E;
-	NET_Packet PRespond;
-};
 
 //AVO: used by SPAWN_ANTIFREEZE (by alpet, edited by demonized)
 #ifdef SPAWN_ANTIFREEZE
