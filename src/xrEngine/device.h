@@ -51,6 +51,8 @@ class ENGINE_API CRenderDeviceData
 public:
 	u32 dwWidth;
 	u32 dwHeight;
+	u32 clientWidth;
+	u32 clientHeight;
 
 	u32 dwPrecacheFrame;
 	BOOL b_is_Ready;
