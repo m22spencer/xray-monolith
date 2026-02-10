@@ -4,6 +4,54 @@
 
 Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by community required for some advanced mods to work.
 
+# Versions
+The Modded Exes come with standard and MT versions (currently in test phase designated as MT-TEST).
+
+MT is a version with numerous performance improvements to the engine adapted from [IX-Ray](https://github.com/ixray-team/ixray-1.6-stcop) and [OpenXRay](https://github.com/OpenXRay/xray-16).
+
+On average expect 30%-50% performance increase, will be higher if you were CPU bound before.
+
+MT version is packed into separate `STALKER-Anomaly-modded-exes-MT-TEST` archive and are designated as `MT-TEST` in main menu and log.
+
+MT version includes all features of standard Modded Exes described below, plus:
+  * Reworked render graph, sector and portal traversals
+  * Optional support for wallmarks on stalkers, mutants and other dynamic objects
+  * Particle interpolation between frames for smoother appearance
+  * Multithreaded: 
+    * Loading resources (textures, models, CFORM (collisions))
+    * HOM (Visibility tests)
+    * Grass rendering
+    * Rain
+    * Particles
+    * Bones calculations for models
+    * Engine scheduler, split between real-time updated objects on main thread and others on separate thread with configurable batch amount to do per frame
+    * Feel and Vision for AI
+    * Task Manager
+    * Parallel execution of `CreateTimeEvent` and `AddUniqueCall` commands (disabled by default)
+    * Logger
+  * Toggleable options available in Modded Exes options
+  * Idle Time Parallel Lua GC
+    * When frame is prepared in Renderer, repeatedly call Lua GC with small step to keep it busy and reduce cleanup work later, reduces stutters
+    * After frame is rendered, check if Lua memory usage is good, perform big GC with usual GC step if its not
+  * Updated Luabind to latest version from (https://github.com/ForserX/luabind-latest)
+  * Functor cache for Lua calls, disabled by default, didn't show any performance difference
+  * Enhanced `smart_cast` with specializations
+  * Simplified `shared_str` container with string pooling in blocks, Robin Hood hashing, increased lookup buffer
+  * Significantly reduced compilation time and PDB size
+  * A lot of small fixes and improvements
+
+Future MT versions will include LuaJIT 2.1 64 bit version, it will be incompatible with existing savefiles so for now its on a hold.
+
+Known issues with MT version
+  * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
+  * Increased possibility to have a crash on loading the whole game or a savefile
+  * Longer pause on escaping to main menu or saving the game
+  * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
+  * Occassional visual bugs like seldom flickering lights, model animations
+  * Inconsistencies with some Lua mods like Interaction Dot Marks that might result in buggy behaviour
+  * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
+  * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
+
 # Read the instructions PLEASE!!!
 ![изображение](https://github.com/user-attachments/assets/1b792ffc-127f-400f-8a2d-1f701803837d)
 
@@ -34,14 +82,6 @@ Here is list of exe files for Anomaly 1.5.3 that contains all engine patches by 
 
 * Q: I have conflicts, crashes and bugs with shaders when i use Beef NVG, SSS, or Enhanced Shaders
 * A: If you are using those mods, install this package via MO2, and put it higher priority than those mods: https://github.com/deggua/xray-hdr10-shaders/releases/latest
-
-* Known issues with MT version (Pre-release)
-  * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
-  * Increased possibility to have a crash on loading the whole game or a savefile
-  * Longer pause on escaping to main menu or saving the game
-  * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
-  * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
-  * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
 
 ## X-Ray Monolith Edition for S.T.A.L.K.E.R. Anomaly
 ----
@@ -197,39 +237,75 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
-## 2026.01.25 (Pre-release)
-* ### First release of test version of MT branch with numerous performance improvements to the engine adapted from [IX-Ray](https://github.com/ixray-team/ixray-1.6-stcop) and [OpenXRay](https://github.com/OpenXRay/xray-16)
-* Test exes are packed into separate `STALKER-Anomaly-modded-exes-MT-TEST` archive and are designated as `MT-TEST` in main menu and log
-* On average expect 30%-50% performance increase, will be higher if you were CPU bound before
+**2026.02.08**
 
-* Current features:
-  * Reworked render graph, sector and portal traversals
-  * Support for wallmarks on stalkers, mutants and other dynamic objects
-  * Multithreaded loading resources (textures, models, CFORM (collisions)) HOM (Visibility tests), Grass rendering, Particles, Bones calculations for models, Engine scheduler, Feel and Vision for AI, Logger. Toggleable options available in Modded Exes options
-  * Updated Luabind to latest version from (https://github.com/ForserX/luabind-latest)
-  * Functor cache for Lua calls, disabled by default, didn't show any performance difference
-  * Enhanced `smart_cast` with specializations
-  * Simplified `shared_str` container 
-  * Significantly reduced compilation time and PDB size
-  * A lot of small fixes and improvements
+Main and MT:
+  * Preemptive trader update check are run on own timer, fixes stutters in Gamma from this side 
+  * DLTX Refactor:
+    * Duplicate section check now actually works
+    * DLTX Cache: evaluated files and sections are stored permanently in RAM. Next file access by `CInifile` construction will quickly return data without ever accessing disk and DLTX parsing
+    * `dltx_use_cache` variable to toggle the cache
+    * Vanilla usage of cache is about 50MB, on GAMMA it is up to 150MB
+  * Better Debug Inputs script (when calling F7). Spawner of items, objects and executor are affected
+    * When you spawn an object from a list or by typing in input field, the input will be saved
+    * You can cycle between saved inputs by pressing up and down arrows, much like through console commands. The input shouldnt be focused (no caret visible)
+    * Maximum of 20 inputs can be saved
+    * Execution of functions in executor is automatically wrapped into protected call, so you wont crash the game on some error. If error occured, you will see the message on the bottom or in the console
+  * Spawn Antifreeze: fixed occasional crash when spawning, reorganized data to minimize multithreading lock time
+  * erepb: super early luajit init (https://github.com/themrdemonized/xray-monolith/pull/419)
+  * erepb: actually fix sound device selection and autoswitch (https://github.com/themrdemonized/xray-monolith/pull/416)
+  * PrivatePirate97: decoupled horz recoil, non-linear inertia movement, additions to lua_help_ex.script (https://github.com/themrdemonized/xray-monolith/pull/417)
+  * GhenTuong: Development work for level_graph, CExplosive, CGrenade, CWeaponStatMgun, CWeapon, script mutant movement. Export CGrenade functions (https://github.com/themrdemonized/xray-monolith/pull/420)
+  * Tosox: Keyboard layout-aware text input & Caps Lock handling (https://github.com/themrdemonized/xray-monolith/pull/421)
 
-* Future MT versions will include LuaJIT 2.1 64 bit version, it will be incompatible with existing savefiles so for now its on a hold
-* Known issues with MT version
-  * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
-  * Increased possibility to have a crash on loading the whole game or a savefile
-  * Longer pause on escaping to main menu or saving the game
-  * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
-  * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
-  * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
+MT:
+  * Fixed crash when using Glowsticks mod
+  * Fixed occasional crash when using SWM Visible Legs mod
+  * Fixed occasional crash on exiting the game due to Renderer being destroyed before shader data
+  * 3DSS, fixed rendering grass on top of stalkers when looking through the scope
+  * Reduced memory footprint of `shared_str` and `str_container`
+  * Prevent duplicates when calling `Instance_Register` in `ModelPool` 
+  * Safer destruction of objects if `feel_vision_update` is running
+  * Add self-model ignoring in feel vision (https://github.com/ixray-team/ixray-1.6-stcop/commit/c0a2540937708d029e4f7247e6cbcb929204eb5b)
+  * Disabled blood decals on objects when shooting by default, can be enabled via `r__blood_decals_on_objects`
+  * `mt_calc_bones` option to disable multithreaded bones calculation
+  * Multithreaded bones calculation is slightly safer
+  * Scheduler:
+    * Split real-time objects on main thread, non RT on task group when MT Scheduler is enabled. Fixes Interaction Dot Marks mod
+    * `scheduler_batch_size` to control max objects to `shedule_update` per frame
+    * `scheduler_log` to log info
+  * Idle Time Parallel Lua GC
+    * When frame is prepared in Renderer, repeatedly call Lua GC with small step to keep it busy and reduce cleanup work later, reduces stutters
+    * After frame is rendered, check if Lua memory usage is good, perform big GC with usual GC step if its not
+    * `lua_parallel_gc` to enable feature
+    * `lua_parallel_gcstep` controls GC step, default 75
+    * `lua_parallel_gc_call_amount` sets the amount of times GC will be called, default 25
+    * `lua_parallel_gc_debug` to print memory information
 
-* Additional changes to exes (included in MT version as well)
-  * Expanded grass shadow settings in Modded Exes settings
-  * Refactored DLTX code to be more performant and readable for engine modders.
-  * Significantly reduced loading times on DLTX heavy modpacks by changing key-value storage from `xr_vector` to `xr_set`
-  * Removed obsolete code calls in `FPU` module
-  * VodoXleb: fixed level.set_music_volume() (https://github.com/themrdemonized/xray-monolith/pull/403)
-  * erepb: fix sound device autoswitch (https://github.com/themrdemonized/xray-monolith/pull/405)
+**2026.01.31**
 
+Main and MT:
+  * DLTX Refactor
+    * Restored old `xr_vector` structure for KV pairs, increases stability of loading
+    * Significantly optimized loading and merging sections' data with mods, reduced loading times esp. with DLTX heavy modpacks
+    * More informative logging, print warnings when a malformed line encountered in files, warnings when section inherits from non-existent parent or a parent that was defined with `!` override
+  * PrivatePirate97: fix inertia offset movement when using canted aim (https://github.com/themrdemonized/xray-monolith/pull/410)
+
+MT:
+  * Fixed constant motion blur due to incorrect motion vectors calculation placement in code
+  * Fixed potential crash when trying to use `demo_record` and fly through geometry or in any situation where a lot of rendering sectors and portals is occured
+  * Parallel execution of `CreateTimeEvent` and `AddUniqueCall` commands via `mt_level_call` command (disabled by default). Disabling partially fixes Interaction Dot Marks mod
+  * `stat_memory` prints more info on `shared_str` container - current pool blocks used, load factor, max hash collisions
+  * `stat_memory` prints Lua memory usage
+
+**2026.01.25 (Pre-release)**
+* First release of test version of MT branch 
+* Expanded grass shadow settings in Modded Exes settings
+* Refactored DLTX code to be more performant and readable for engine modders.
+* Significantly reduced loading times on DLTX heavy modpacks by changing key-value storage from `xr_vector` to `xr_set`
+* Removed obsolete code calls in `FPU` module
+* VodoXleb: fixed level.set_music_volume() (https://github.com/themrdemonized/xray-monolith/pull/403)
+* erepb: fix sound device autoswitch (https://github.com/themrdemonized/xray-monolith/pull/405)
 
 **2025.12.30**
 * Enabled Hot Reload configuration for `VerifiedDX11` configuration

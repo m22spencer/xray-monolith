@@ -74,7 +74,7 @@ function track(args)
 	end
 
 	-- Ensure provided range is valid
-	if args.min > args.max then
+	if args.min and args.max and args.min > args.max then
 		args.min, args.max = args.max, args.min
 	end
 
@@ -338,6 +338,20 @@ function group(args)
 	assert(is_table(head), "Group header is not a table")
 	head.gr = args
 	return head
+end
+
+-- Helpers
+function get_item_if_exists(item)
+	return get_console_cmd(0, item.id) and item or false
+end
+
+function filter_false(page)
+	for i = #page.gr, 1, -1 do
+		if page.gr[i] == false then
+			table.remove(page.gr, i)
+		end
+	end
+	return page
 end
 
 -- Import this script into another

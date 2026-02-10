@@ -32,6 +32,8 @@
 
 #include "xrSash.h"
 
+extern "C" void XR_EARLY_INIT();
+
 //#include "securom_api.h"
 
 
@@ -1182,6 +1184,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      char* lpCmdLine,
                      int nCmdShow)
 {
+  // Initialize LuaJIT low-memory pool FIRST, before any DLLs load and fragment
+	// the lower 2GB address space.
+	XR_EARLY_INIT();
+  
 	// Enable per-monitor DPI awareness so GetMonitorInfo returns real pixel sizes.
 	// Without this, monitors with different DPI scaling report wrong resolutions
 	// (e.g. a 1920x1080 secondary monitor reports 2400x1290 when primary is at 125%).
@@ -1210,7 +1216,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 			}
 		}
 	}
-
+  
 	//DllMainOpenAL32(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrCore(NULL, DLL_PROCESS_ATTACH, NULL);
 	DllMainXrPhysics(NULL, DLL_PROCESS_ATTACH, NULL);

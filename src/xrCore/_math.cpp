@@ -25,13 +25,13 @@ namespace FPU
 {
 	XRCORE_API void m24(void)
 	{
-		_control87(_PC_24, MCW_PC);
+		_control87(_PC_64, MCW_PC);
 		_control87(_RC_CHOP, MCW_RC);
 	}
 
 	XRCORE_API void m24r(void)
 	{
-		_control87(_PC_24, MCW_PC);
+		_control87(_PC_64, MCW_PC);
 		_control87(_RC_NEAR, MCW_RC);
 	}
 
@@ -115,7 +115,7 @@ void initialize()
 {
     _clear87();
 
-    _control87(_PC_24, MCW_PC);
+    _control87(_PC_64, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
     _24 = getFPUsw(); // 24, chop
     _control87(_RC_NEAR, MCW_RC);
@@ -175,69 +175,73 @@ u64 __fastcall GetCLK(void)
 }
 #endif
 
-	void Detect()
+void Detect()
+{
+	// 1. General CPU identification
+	if (!_cpuid(&ID))
 	{
-		// General CPU identification
-		if (!_cpuid(&ID))
-		{
-			// Core.Fatal ("Fatal error: can't detect CPU/FPU.");
-			abort();
-		}
-
-		// Timers & frequency
-		u64 start, end;
-		u32 dwStart, dwTest;
-
-		SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-
-		// Detect Freq
-		dwTest = timeGetTime();
-		do { dwStart = timeGetTime(); }
-		while (dwTest == dwStart);
-		start = GetCLK();
-		while (timeGetTime() - dwStart < 1000);
-		end = GetCLK();
-		clk_per_second = end - start;
-
-		// Detect RDTSC Overhead
-		clk_overhead = 0;
-		u64 dummy = 0;
-		for (int i = 0; i < 256; i++)
-		{
-			start = GetCLK();
-			clk_overhead += GetCLK() - start - dummy;
-		}
-		clk_overhead /= 256;
-
-		// Detect QPC Overhead
-		QueryPerformanceFrequency((PLARGE_INTEGER)&qpc_freq);
-		qpc_overhead = 0;
-		for (int i = 0; i < 256; i++)
-		{
-			start = QPC();
-			qpc_overhead += QPC() - start - dummy;
-		}
-		qpc_overhead /= 256;
-
-		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-
-		clk_per_second -= clk_overhead;
-		clk_per_milisec = clk_per_second / 1000;
-		clk_per_microsec = clk_per_milisec / 1000;
-
-		_control87(_PC_64, MCW_PC);
-		// _control87 ( _RC_CHOP, MCW_RC );
-		double a, b;
-		a = 1;
-		b = double(clk_per_second);
-		clk_to_seconds = float(double(a / b));
-		a = 1000;
-		b = double(clk_per_second);
-		clk_to_milisec = float(double(a / b));
-		a = 1000000;
-		b = double(clk_per_second);
-		clk_to_microsec = float(double(a / b));
+		abort();
 	}
+
+	// 2. Use QueryPerformanceFrequency as the stable frequency reference
+	// QPC is constant even if the CPU frequency boosts or throttles.
+	QueryPerformanceFrequency((PLARGE_INTEGER)&qpc_freq);
+
+	// 3. Detect clk_per_second (RDTSC Frequency)
+	// We time this for 100ms instead of 1000ms to avoid long startup hangs
+	// while still getting a very accurate calibration.
+	u64 start_qpc = QPC();
+	u64 start_clk = GetCLK();
+
+	// Busy-wait for 100ms using QPC
+	u64 wait_ticks = qpc_freq / 10;
+	while (QPC() - start_qpc < wait_ticks);
+
+	u64 end_qpc = QPC();
+	u64 end_clk = GetCLK();
+
+	// Calculate cycles per second based on the stable QPC reference
+	double time_elapsed = double(end_qpc - start_qpc) / double(qpc_freq);
+	clk_per_second = u64(double(end_clk - start_clk) / time_elapsed);
+
+	// 4. Detect RDTSC Overhead (Keep for compatibility)
+	// We do this without changing priority; modern CPUs have very stable RDTSC latencies.
+	clk_overhead = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		u64 start = GetCLK();
+		clk_overhead += (GetCLK() - start);
+	}
+	clk_overhead /= 256;
+
+	// 5. Detect QPC Overhead (Keep for compatibility)
+	qpc_overhead = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		u64 start = QPC();
+		qpc_overhead += (QPC() - start);
+	}
+	qpc_overhead /= 256;
+
+	// 6. Calculate derived timings
+	clk_per_second -= clk_overhead;
+	clk_per_milisec = clk_per_second / 1000;
+	clk_per_microsec = clk_per_milisec / 1000;
+
+	// Setup conversion factors for high-precision doubles
+	double a = 1.0;
+	double b = double(clk_per_second);
+	clk_to_seconds = float(a / b);
+
+	a = 1000.0;
+	clk_to_milisec = float(a / b);
+
+	a = 1000000.0;
+	clk_to_microsec = float(a / b);
+
+	// Ensure the OS timer resolution is set to 1ms globally for the engine
+	timeBeginPeriod(1);
+}
 };
 
 bool g_initialize_cpu_called = false;
@@ -312,7 +316,7 @@ void _initialize_cpu_thread()
 	debug_on_thread_spawn();
 #ifndef XRCORE_STATIC
 	// fpu & sse
-	FPU::m24r();
+	FPU::m64r(); // set 64 bit mode
 #endif // XRCORE_STATIC
 	if (CPU::ID.feature & _CPU_FEATURE_SSE)
 	{
