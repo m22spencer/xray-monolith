@@ -18,40 +18,6 @@
 #include <string>
 
 XRCORE_API xrCore Core;
-XRCORE_API refcount_stats g_refcount_stats;
-
-#include <algorithm>
-void refcount_stats::dump_top_callers()
-{
-	// Collect non-zero entries
-	struct entry { uintptr_t addr; u64 count; };
-	xr_vector<entry> entries;
-	entries.reserve(256);
-	for (u32 i = 0; i < ADDR_SLOTS; ++i)
-	{
-		u64 c = addr_table[i].count.load(std::memory_order_relaxed);
-		uintptr_t a = addr_table[i].addr.load(std::memory_order_relaxed);
-		if (c > 0 && a != 0)
-			entries.push_back({a, c});
-	}
-	// Sort by count descending
-	std::sort(entries.begin(), entries.end(), [](const entry& a, const entry& b) { return a.count > b.count; });
-	// Print top 20
-	u32 n = std::min((u32)entries.size(), 20u);
-	Msg("~ REFCOUNT TOP %u callers of _inc():", n);
-	for (u32 i = 0; i < n; ++i)
-		Msg("~   #%2u: %12llu calls  ret_addr=0x%p", i + 1, entries[i].count, (void*)entries[i].addr);
-}
-
-void refcount_stats::reset_addrs()
-{
-	for (u32 i = 0; i < ADDR_SLOTS; ++i)
-	{
-		addr_table[i].addr.store(0, std::memory_order_relaxed);
-		addr_table[i].count.store(0, std::memory_order_relaxed);
-	}
-}
-
 extern XRCORE_API u32 build_id;
 extern XRCORE_API LPCSTR build_date;
 
