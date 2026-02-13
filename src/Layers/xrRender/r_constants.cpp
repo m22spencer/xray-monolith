@@ -31,33 +31,25 @@ void R_constant_table::fatal(LPCSTR S)
 }
 
 // predicates
-IC bool p_search(ref_constant C, LPCSTR S)
+IC bool p_sort(const ref_constant& C1, const ref_constant& C2) noexcept
 {
-	return xr_strcmp(*C->name, S) < 0;
-}
-
-IC bool p_sort(ref_constant C1, ref_constant C2)
-{
-	return xr_strcmp(C1->name, C2->name) < 0;
+	return C1->name < C2->name;
 }
 
 R_constant* R_constant_table::get(LPCSTR S)
 {
-	// assumption - sorted by name
-	c_table::iterator I = std::lower_bound(table.begin(), table.end(), S, p_search);
-	if (I == table.end() || (0 != xr_strcmp(*(*I)->name, S))) return nullptr;
-	else return &**I;
+    // demonized: make shared_str and use override, str most likely already exists, faster
+    shared_str s(S);
+    return get(s);
 }
 
 R_constant* R_constant_table::get(shared_str& S)
 {
-	// linear search, but only ptr-compare
-	c_table::iterator I = table.begin();
-	c_table::iterator E = table.end();
-	for (; I != E; ++I)
-	{
-		if ((*I)->name.equal(S)) return &**I;
-	}
+	// demonized: use lower_bound for shared_str search, sorted by pointer
+    static auto sortFunc = [](const ref_constant& C, const shared_str& S) noexcept { return C->name < S; };
+    auto it = std::lower_bound(table.begin(), table.end(), S, sortFunc);
+    if (it != table.end() && (*it)->name.equal(S))
+        return &**it;
 	return nullptr;
 }
 
