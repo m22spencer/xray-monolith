@@ -436,6 +436,7 @@ CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, L
 		clone->ammo_type = wpnmag->ammo_type;
 		clone->m_upgrades = wpnmag->m_upgrades;
 		clone->set_ammo_elapsed(wpnmag->get_ammo_elapsed());
+        clone->m_u8CurFireMode = wpnmag->m_u8CurFireMode;
 
 		return bRegister ? reprocess_spawn(self, absClone) : absClone;
 		// (self->server().Process_spawn(packet, clientID));
