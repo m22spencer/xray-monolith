@@ -150,12 +150,14 @@ struct script_layer
 	bool active;
 	Fmatrix blend;
 	u8 m_part;
+    shared_str m_pivot_bone;
 
-	script_layer(LPCSTR name, u8 part, float speed = 1.f, float power = 1.f, bool looped = true)
+	script_layer(LPCSTR name, u8 part, float speed = 1.f, float power = 1.f, bool looped = true, LPCSTR pivot_bone = nullptr)
 	{
 		m_name = name;
 		m_part = part;
 		m_power = power;
+		m_pivot_bone = pivot_bone;
 		blend.identity();
 		anm = xr_new<CObjectAnimator>();
 		anm->Load(name);
@@ -359,7 +361,7 @@ public:
 	void update(const Fmatrix& trans);
 	void updateMovementLayerState();
 	void StopScriptAnim();
-	void PlayBlendAnm(LPCSTR name, u8 part = 0, float speed = 1.f, float power = 1.f, bool bLooped = true, bool no_restart = false);
+	void PlayBlendAnm(LPCSTR name, u8 part = 0, float speed = 1.f, float power = 1.f, bool bLooped = true, bool no_restart = false, LPCSTR pivot_bone = nullptr);
 	void StopBlendAnm(LPCSTR name, bool bForce = false);
 	void StopAllBlendAnms(bool bForce);
 	float SetBlendAnmTime(LPCSTR name, float time);
