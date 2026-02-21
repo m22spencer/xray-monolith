@@ -633,9 +633,9 @@ void CALifeSimulator::script_register(lua_State* L)
 		.def("object_ids", &alife_object_ids)
 		.def("objects", &alife_objects)
 		.def("iterate_objects", &CALifeSimulator__iterate_objects)
-		/*.def("iterate_objects_without_actor", &CALifeSimulator__iterate_objects_without_actor)
+		.def("iterate_objects_without_actor", &CALifeSimulator__iterate_objects_without_actor)
 		.def("objects_iter", &alife_object_iter)
-		.def("objects_without_actor_iter", &alife_object_without_actor_iter)*/
+		.def("objects_without_actor_iter", &alife_object_without_actor_iter)
 		.def("max_id", &alife_max_id)
 
 		, def("alife", &alife)
