@@ -831,22 +831,31 @@ void CSE_ALifeItemWeaponMagazinedWGL::UPDATE_Read(NET_Packet& P)
 {
 	m_bGrenadeMode = !!P.r_u8();
 	inherited::UPDATE_Read(P);
+
+	a_elapsed_grenades.unpack_from_byte(P.r_u8());
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::UPDATE_Write(NET_Packet& P)
 {
 	P.w_u8(m_bGrenadeMode ? 1 : 0);
 	inherited::UPDATE_Write(P);
+
+	P.w_u8(a_elapsed_grenades.pack_to_byte());
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::STATE_Read(NET_Packet& P, u16 size)
 {
 	inherited::STATE_Read(P, size);
+
+	if (m_wVersion > 128)
+		m_bGrenadeMode = !!P.r_u8();
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::STATE_Write(NET_Packet& P)
 {
 	inherited::STATE_Write(P);
+
+	P.w_u8(m_bGrenadeMode ? 1 : 0);
 }
 
 #ifndef XRGAME_EXPORTS
