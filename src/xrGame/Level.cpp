@@ -1175,31 +1175,29 @@ bool CLevel::Load(u32 dwNum)
 // demonized: called from Device, via Device.LuaGC pointer
 int CLevel::LuaGC(const bool cleanup)
 {
-	if (cleanup)
-	{
-		// Call cleanup only if memory is at the limit, check every 30 frames
-		static int mem_kb = 0;
+    if (!cleanup)
+        return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLua_ParallelGCStep);
 
-		if (psLua_ParallelGC_debug)
-		{
-			mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
-			Msg("[Lua] CLevel::LuaGC mem_kb %llu, times performed %d", mem_kb, Device.LuaGCCount);
-		}
-		else if (Device.dwFrame % 30 == 0)
-			mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
+    // Call cleanup only if memory is at the limit, check every 120 frames
+    static int mem_kb = 0;
 
-		if (mem_kb > 90000)
-		{
-			if (psLua_ParallelGC_debug)
-				Msg("![Lua] CLevel::LuaGC cleanup");
+    if (psLua_ParallelGC_debug)
+    {
+        mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
+        Msg("[Lua] CLevel::LuaGC mem_kb %llu, times performed %d", mem_kb, Device.LuaGCCount);
+    }
+    else if (Device.dwFrame % 120 == 0)
+        mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
 
-			return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLUA_GCSTEP);
-		}
+    if (mem_kb > 90000)
+    {
+        if (psLua_ParallelGC_debug)
+            Msg("![Lua] CLevel::LuaGC cleanup");
 
-		return 0;
-	}
-	else
-		return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLua_ParallelGCStep);
+        return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLUA_GCSTEP);
+    }
+
+    return 0;
 }
 
 #ifdef DEBUG_PRECISE_PATH
