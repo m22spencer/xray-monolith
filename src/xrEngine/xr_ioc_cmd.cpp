@@ -1044,6 +1044,7 @@ void CCC_Register()
 	CMD1(CCC_SND_Restart, "snd_restart");
 	CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
 	CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EFX);
+	CMD4(CCC_Float, "snd_efx_overwrite", &snd_efx_overwrite, 0.f, 1.f);
 	CMD4(CCC_Float, "snd_efx_environment_change_time", &snd_efx_environment_change_time, 0.f, 3.f);
 	CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 32, 1024);
 	CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 8, 256);
