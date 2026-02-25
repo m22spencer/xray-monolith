@@ -131,9 +131,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 		float alpha = 1.0f - std::exp(std::log(1.0f - percent) * dt_sec / snd_efx_environment_change_time);
 		clamp(alpha, 0.f, 1.f);
 		//Msg("interpolating from e_current to e_target %.2f", std::min(e_current.Reverb, e_target_ptr->Reverb) / std::max(e_current.Reverb, e_target_ptr->Reverb));
-		e_current.lerp(EFX_REVERB_PRESET_OUTDOORS_VALLEY, EFX_REVERB_PRESET_GENERIC, snd_efx_overwrite);
+		e_current.lerp(e_current, e_target_ptr*, alpha);
 
 		set_listener(e_current);
+		load_reverb(effect,EFX_REVERB_PRESET_ROOM)
 		commit();
 	}
 
