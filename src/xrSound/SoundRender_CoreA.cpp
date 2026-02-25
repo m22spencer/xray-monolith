@@ -8,6 +8,8 @@
 #include "../xrEngine/pure.h"
 #include "../xrEngine/XR_IOConsole.h"
 
+int snd_efx_overwrite = 0;
+
 namespace soundSmoothingParams {
 	float distanceBasedDelayPower = 1.f;
 	float distanceBasedDelayMinDistance = 50.f;
@@ -172,6 +174,7 @@ void CSoundRender_CoreA::set_listener(const CSoundRender_Environment& env)
 			A_CHK(alEffectf(effect, AL_EAXREVERB_LFREFERENCE, env.LFReference));
 			A_CHK(alEffectf(effect, AL_EAXREVERB_DENSITY, env.Density));
 	}
+	load_reverb(effect, &reverbs[snd_efx_overwrite]);
 }
 
 void CSoundRender_CoreA::get_listener(CSoundRender_Environment& env)
