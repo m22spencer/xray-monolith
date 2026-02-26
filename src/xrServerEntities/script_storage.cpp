@@ -411,7 +411,7 @@ void CScriptStorage::reinit()
 	if (strstr(Core.Params, "-nojit"))
 		luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
 #else // USE_LUAJIT_ONE
-    // initialize lua standard library functions
+    // initialize lua standard library functions    
 
     luajit::open_lib(lua(), "", luaopen_base);
     luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
@@ -620,7 +620,7 @@ void CScriptStorage::print_stack()
 			if (!xr_strcmp(l_tDebugInfo.what, "C"))
 			{
 				script_log_no_stack(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);
-				//script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);
+				//script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);  
 			}
 			else
 			{
