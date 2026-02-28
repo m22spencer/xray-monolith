@@ -636,17 +636,41 @@ function pda.calculate_rankings()
 		end
 	end
 	
-	pda.coc_ranking_list = iempty_table(pda.coc_ranking_list)
 	local size_t = 0
+	local coc_ranking_list = pda.coc_ranking_list
+	local coc_ranking_array_size = pda.coc_ranking_array_size
+
 	-- sort by highest rank first
-	for id,rank in spairs(t, function(t,a,b) return t[a] > t[b] end) do
+	for id, rank in spairs(t, sort_func_values_descend) do
 		size_t = size_t + 1
-		pda.coc_ranking_list[size_t] = id
+		coc_ranking_list[size_t] = id
 		if (id == AC_ID) then
 			pda.actor_rank_place = size_t
 		end
 	end
+	-- Trim excessive data
+	for i = coc_ranking_array_size, size_t + 1, -1 do
+		coc_ranking_list[i] = nil
+	end
 	
 	-- force actor into last visible slot + 1 on ranking list
-	pda.coc_ranking_list[pda.coc_ranking_array_size+1] = 0
+	coc_ranking_list[coc_ranking_array_size+1] = 0
+end
+
+-- Saloeater: Fix/trade manager resupply sync
+local old_trade_manager_trade_init = trade_manager.trade_init
+function trade_manager.trade_init(npc, cfg)
+	if not (db.actor) then 
+		return 
+	end 
+
+    local id = npc:id()
+    local reup_time = trade_manager.get_trade_profile(id, "resupply_time")
+    old_trade_manager_trade_init(npc, cfg)
+    if not reup_time then return end
+
+    local trade_profile = trade_manager.get_trade_profile(id)
+    if not trade_profile then return end
+    
+    trade_profile.resupply_time = reup_time
 end
