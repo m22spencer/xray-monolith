@@ -84,17 +84,73 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
 	UpdateGrenadeVisibility(!!iAmmoElapsed);
 	SetPending(FALSE);
 
-	iAmmoElapsed2 = weapon->a_elapsed_grenades.grenades_count;
-	m_ammoType2 = weapon->a_elapsed_grenades.grenades_type;
+	auto* se_wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(DC);
+	bool server_grenade_mode = se_wgl && se_wgl->m_bGrenadeMode;
 
-	m_DefaultCartridge2.Load(m_ammoTypes2[m_ammoType2].c_str(), m_ammoType2);
+	// Migration compat: client_data (via load()) is preferred over a_elapsed_grenades because
+	// a_elapsed_grenades may be stale in saves made before its UPDATE sync was introduced.
+	// iAmmoElapsed2 == 0 signals load() did not run (clone), so the fallback to a_elapsed_grenades
+	// — kept current by the UPDATE cycle — is used instead.
+	//
+	// To remove: delete this lambda and replace each call site with a direct read:
+	//   count = weapon->a_elapsed_grenades.grenades_count;
+	//   type  = weapon->a_elapsed_grenades.grenades_type;
+	const auto resolve_ammo2 = [&](u8& count, u8& type) {
+		if (iAmmoElapsed2 > 0) {
+			count = iAmmoElapsed2;
+			type  = m_ammoType2;
+		} else {
+			count = weapon->a_elapsed_grenades.grenades_count;
+			type  = weapon->a_elapsed_grenades.grenades_type;
+		}
+	};
+
+	if (server_grenade_mode && IsGrenadeLauncherAttached())
+	{
+		// Server was in grenade mode: a_elapsed/ammo_type hold grenade data (swapped orientation),
+		// which inherited::net_Spawn loaded into the primary magazine assuming gun-mode orientation.
+		// Rebuild primary magazine from a_elapsed_grenades (bullet data) and set up grenade magazine
+		// from a_elapsed/ammo_type, then switch into grenade mode via PerformSwitchGL.
+
+		u8 bullet_count, bullet_type;
+		resolve_ammo2(bullet_count, bullet_type);
+		if (bullet_type >= m_ammoTypes.size()) bullet_type = 0;
+
+		m_ammoType = bullet_type;
+		m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), m_ammoType, m_APk);
+		m_magazine.clear();
+		iAmmoElapsed = bullet_count;
+		for (int i = 0; i < iAmmoElapsed; i++)
+			m_magazine.push_back(m_DefaultCartridge);
+
+		iAmmoElapsed2 = (u8)weapon->a_elapsed;
+		m_ammoType2 = (weapon->ammo_type < m_ammoTypes2.size()) ? weapon->ammo_type : 0;
+		m_DefaultCartridge2.Load(m_ammoTypes2[m_ammoType2].c_str(), m_ammoType2);
+		m_magazine2.clear();
+		for (int i = 0; i < iAmmoElapsed2; i++)
+			m_magazine2.push_back(m_DefaultCartridge2);
+
+		PerformSwitchGL();
+	}
+	else
+	{
+		// Gun mode (or GL not attached): inherited::net_Spawn already loaded bullet data
+		// from a_elapsed/ammo_type into the primary magazine. Set up grenade magazine.
+		resolve_ammo2(iAmmoElapsed2, m_ammoType2);
+		if (m_ammoType2 >= m_ammoTypes2.size())
+			m_ammoType2 = 0;
+
+		m_DefaultCartridge2.Load(m_ammoTypes2[m_ammoType2].c_str(), m_ammoType2);
+
+		m_magazine2.clear();
+		for (int i = 0; i < iAmmoElapsed2; i++)
+			m_magazine2.push_back(m_DefaultCartridge2);
+	}
 
 	if (!IsGameTypeSingle())
 	{
 		if (!m_bGrenadeMode && IsGrenadeLauncherAttached() && !getRocketCount() && iAmmoElapsed2)
 		{
-			m_magazine2.push_back(m_DefaultCartridge2);
-
 			shared_str grenade_name = m_DefaultCartridge2.m_ammoSect;
 			shared_str fake_grenade_name = pSettings->r_string(grenade_name, "fake_grenade_name");
 
@@ -239,6 +295,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
 
 	m_magazine.swap(m_magazine2);
 	iAmmoElapsed = (int)m_magazine.size();
+	iAmmoElapsed2 = (u8)m_magazine2.size();
 
 	if (m_bGrenadeMode && !getRocketCount())
 	{
@@ -1011,30 +1068,23 @@ void CWeaponMagazinedWGrenade::save(NET_Packet& output_packet)
 {
 	inherited::save(output_packet);
 	save_data(m_bGrenadeMode, output_packet);
-	save_data(m_magazine2.size(), output_packet);
+	save_data(u8(m_magazine2.size()), output_packet);
+	save_data(m_ammoType2, output_packet);
 }
 
 void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 {
 	inherited::load(input_packet);
-	bool b;
-	load_data(b, input_packet);
-	if (b != m_bGrenadeMode)
-		SwitchMode(true);
 
-	if (b && !m_bGrenadeMode) {
-		Msg("[%s] ERROR: CWeaponMagazinedWGrenade::load: m_bGrenadeMode = %d, failed to switch to grenade mode", Name(), m_bGrenadeMode);
-		return;
-	}
+	// Restore secondary magazine count and type from the save stream.
+	// These feed the migration compat lambda in net_Spawn (see resolve_ammo2).
+	bool saved_mode = false;
+	load_data(saved_mode, input_packet);
 
-	u32 sz;
-	load_data(sz, input_packet);
-
-	CCartridge l_cartridge;
-	l_cartridge.Load(m_ammoTypes2[m_ammoType2].c_str(), m_ammoType2);
-
-	while (sz > m_magazine2.size())
-		m_magazine2.push_back(l_cartridge);
+	load_data(iAmmoElapsed2, input_packet);
+	u8 saved_ammo_type2 = 0;
+	load_data(saved_ammo_type2, input_packet);
+	m_ammoType2 = (saved_ammo_type2 < m_ammoTypes2.size()) ? saved_ammo_type2 : 0;
 }
 
 void CWeaponMagazinedWGrenade::net_Export(NET_Packet& P)
@@ -1042,6 +1092,9 @@ void CWeaponMagazinedWGrenade::net_Export(NET_Packet& P)
 	P.w_u8(m_bGrenadeMode ? 1 : 0);
 
 	inherited::net_Export(P);
+
+	iAmmoElapsed2 = (u8)m_magazine2.size();
+	P.w_u8(((u8(m_ammoType2) & 0x3) << 6) | (u8(iAmmoElapsed2) & 0x3f));
 }
 
 void CWeaponMagazinedWGrenade::net_Import(NET_Packet& P)
@@ -1052,6 +1105,13 @@ void CWeaponMagazinedWGrenade::net_Import(NET_Packet& P)
 		SwitchMode();
 
 	inherited::net_Import(P);
+
+	u8 packed = P.r_u8();
+	iAmmoElapsed2 = packed & 0x3f;
+	m_ammoType2 = packed >> 6;
+	if (m_ammoType2 >= m_ammoTypes2.size())
+		m_ammoType2 = 0;
+	SetAmmoElapsed2(iAmmoElapsed2);
 }
 
 float CWeaponMagazinedWGrenade::Weight() const

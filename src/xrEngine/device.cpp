@@ -44,6 +44,10 @@ ENGINE_API BOOL g_bRendering = FALSE;
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
 
+BOOL psLua_ParallelGC = TRUE;
+BOOL psLua_ParallelGC_debug = FALSE;
+int psLua_ParallelGC_CallAmount = 25;
+
 extern discord::Core* discord_core;
 extern bool use_discord;
 
@@ -55,10 +59,6 @@ std::chrono::high_resolution_clock::time_point tlastf = std::chrono::high_resolu
 std::chrono::duration<float> time_span;
 ENGINE_API float refresh_rate = 0;
 #endif // ECO_RENDER
-
-BOOL psLua_ParallelGC = TRUE;
-int psLua_ParallelGC_CallAmount = 25;
-
 
 BOOL CRenderDevice::Begin()
 {
@@ -214,7 +214,7 @@ void mt_Thread(void* ptr)
 				do
 				{
 					Device.LuaGCCount++;
-					if (Device.LuaGC(false) == 1) // 1 informs that GC cycle is complete
+					if (Device.LuaGC() == 1) // 1 informs that GC cycle is complete
 					{
 						Device.LuaGCDone = true;
 						break;
@@ -537,10 +537,9 @@ void CRenderDevice::on_idle()
 		seqFrameMT.Process(rp_Frame);
 	}
 
-	if (psLua_ParallelGC && Device.LuaGC && !Device.LuaGCDone)
+	if (psLua_ParallelGC_debug && psLua_ParallelGC && Device.LuaGCDebug)
 	{
-		PROF_EVENT("LuaGC Cleanup");
-		Device.LuaGC(true);
+		Device.LuaGCDebug();
 	}
 
 #ifdef DEDICATED_SERVER

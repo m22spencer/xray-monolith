@@ -1,4 +1,4 @@
-﻿#include "pch_script.h"
+#include "pch_script.h"
 
 #include "WeaponMagazined.h"
 #include "actor.h"
@@ -72,6 +72,16 @@ CWeaponMagazined::~CWeaponMagazined()
 
 	// sounds
 	Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CWeaponMagazined::UpdateSoundsPositions));
+}
+
+BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
+{
+    BOOL l_res = inherited::net_Spawn(DC);
+
+    if (auto* se = smart_cast<CSE_ALifeItemWeaponMagazined*>(DC))
+        SetFireMode(se->m_u8CurFireMode);
+
+    return l_res;
 }
 
 void CWeaponMagazined::net_Destroy()

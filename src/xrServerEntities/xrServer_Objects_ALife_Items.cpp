@@ -764,6 +764,14 @@ void CSE_ALifeItemWeaponAutoShotGun::FillProps		(LPCSTR pref, PropItemVec& items
 CSE_ALifeItemWeaponMagazined::CSE_ALifeItemWeaponMagazined(LPCSTR caSection) : CSE_ALifeItemWeapon(caSection)
 {
 	m_u8CurFireMode = 0;
+
+    if (pSettings->line_exist(caSection, "fire_modes"))
+    {
+        shared_str fireModesList = pSettings->r_string(caSection, "fire_modes");
+        int modesCount = _GetItemCount(fireModesList.c_str());
+        if (modesCount > 0)
+            m_u8CurFireMode = u8(modesCount - 1);
+    }
 }
 
 CSE_ALifeItemWeaponMagazined::~CSE_ALifeItemWeaponMagazined()
@@ -787,11 +795,16 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
 void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size)
 {
 	inherited::STATE_Read(P, size);
+
+    if (m_wVersion > 128)
+        m_u8CurFireMode = P.r_u8();
 }
 
 void CSE_ALifeItemWeaponMagazined::STATE_Write(NET_Packet& P)
 {
 	inherited::STATE_Write(P);
+
+    P.w_u8(m_u8CurFireMode);
 }
 
 #ifndef XRGAME_EXPORTS
@@ -818,22 +831,31 @@ void CSE_ALifeItemWeaponMagazinedWGL::UPDATE_Read(NET_Packet& P)
 {
 	m_bGrenadeMode = !!P.r_u8();
 	inherited::UPDATE_Read(P);
+
+	a_elapsed_grenades.unpack_from_byte(P.r_u8());
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::UPDATE_Write(NET_Packet& P)
 {
 	P.w_u8(m_bGrenadeMode ? 1 : 0);
 	inherited::UPDATE_Write(P);
+
+	P.w_u8(a_elapsed_grenades.pack_to_byte());
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::STATE_Read(NET_Packet& P, u16 size)
 {
 	inherited::STATE_Read(P, size);
+
+	if (m_wVersion > 128)
+		m_bGrenadeMode = !!P.r_u8();
 }
 
 void CSE_ALifeItemWeaponMagazinedWGL::STATE_Write(NET_Packet& P)
 {
 	inherited::STATE_Write(P);
+
+	P.w_u8(m_bGrenadeMode ? 1 : 0);
 }
 
 #ifndef XRGAME_EXPORTS

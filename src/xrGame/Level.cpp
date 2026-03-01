@@ -277,9 +277,6 @@ CLevel::CLevel() :
 #endif
 
 	Msg("%s", Core.Params);
-
-	// demonized: bind LuaGC call to be available in device.cpp
-	Device.LuaGC = fastdelegate::FastDelegate1<const bool, int>(&CLevel::LuaGC);
 	//crash_saving::save_impl = crash_saving::_save_impl; // CLevel ready, we can save now
 }
 
@@ -1156,7 +1153,7 @@ void CLevel::OnFrame()
 int psLUA_GCSTEP = 300;
 int psLua_ParallelGCStep = 75;
 extern BOOL psLua_ParallelGC;
-BOOL psLua_ParallelGC_debug = FALSE;
+extern BOOL psLua_ParallelGC_debug;
 
 void CLevel::script_gc()
 {
@@ -1167,34 +1164,26 @@ void CLevel::script_gc()
 	}
 }
 
-// demonized: called from Device, via Device.LuaGC pointer
-int CLevel::LuaGC(const bool cleanup)
+// demonized: bind LuaGC call to be available in device.cpp
+bool CLevel::Load(u32 dwNum)
 {
-	if (cleanup)
-	{
-		// Call cleanup only if memory is at the limit, check every 30 frames
-		static int mem_kb = 0;
+    inherited::Load(dwNum);
+    Msg("Device.LuaGC bind");
+    Device.LuaGC = fastdelegate::FastDelegate0<int>(&CLevel::LuaGC);
+    Device.LuaGCDebug = fastdelegate::FastDelegate0<void>(&CLevel::LuaGCDebug);
+    return true;
+}
 
-		if (psLua_ParallelGC_debug)
-		{
-			mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
-			Msg("[Lua] CLevel::LuaGC mem_kb %llu, times performed %d", mem_kb, Device.LuaGCCount);
-		}
-		else if (Device.dwFrame % 30 == 0)
-			mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
-
-		if (mem_kb > 90000)
-		{
-			if (psLua_ParallelGC_debug)
-				Msg("![Lua] CLevel::LuaGC cleanup");
-
-			return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLUA_GCSTEP);
-		}
-
-		return 0;
-	}
-	else
-		return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLua_ParallelGCStep);
+// demonized: called from Device, via Device.LuaGC pointer
+int CLevel::LuaGC()
+{
+    return lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLua_ParallelGCStep);
+}
+void CLevel::LuaGCDebug()
+{
+    static int mem_kb = 0;
+    mem_kb = lua_gc(ai().script_engine().lua(), LUA_GCCOUNT, 0);
+    Msg("[Lua] CLevel::LuaGCDebug mem_kb %llu, times performed %d", mem_kb, Device.LuaGCCount);
 }
 
 #ifdef DEBUG_PRECISE_PATH

@@ -237,6 +237,27 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.03.01**
+
+Main and MT:
+  * DLTX: hide Malformed Line and Invalid Section Parent warnings behind `print_dltx_warnings`
+  * Fixed stuttering when prompt to ignite or extinguish campfire appears, or any other prompt that uses `game.start_tutotial` function
+  * Parallel GC will work only when level is fully loaded to prevent some bugs on loading
+  * Added `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` macro to `openal` and `optick`, fixes crashes with certain PC configurations
+  * Tosox: Persist weapon fire mode & grenade launcher data (https://github.com/themrdemonized/xray-monolith/pull/440)
+  * damoldavskiy: HUD state switch callback (https://github.com/themrdemonized/xray-monolith/pull/448)
+  * LVutner: Faster CBuffer updates (https://github.com/themrdemonized/xray-monolith/pull/449)
+  * SaloEater:
+    * Fix trade manager resupply sync (https://github.com/themrdemonized/xray-monolith/pull/442)
+    * Imgui luadebug button (https://github.com/themrdemonized/xray-monolith/pull/443)
+
+MT:
+  * Fixes from IXRay repo, fixes possible stack overflow in Pripyat Outskirts (https://github.com/ixray-team/ixray-1.6-stcop/commit/d9f32e486a27f61ec3cc88a7a0cb87863def2284)
+  * Fixed absent explosion particles with Molotov mod when `mt_level_call` is 0
+  * Fixed absent spot light cone when light doesn't allow shadow casting
+  * Thread safety for `combat_members()` access
+  * Fixed possible freezes in Zaton due to NaN coordinates in spatial components 
+
 **2026.02.22**
 
 Main and MT:

@@ -215,6 +215,7 @@ public:
 	virtual void net_Stop();
 	virtual bool net_Start_client(const char* name);
 	virtual void net_Update();
+    virtual bool Load(u32 dwNum);
 	virtual bool Load_GameSpecific_Before();
 	virtual bool Load_GameSpecific_After();
 	virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count);
@@ -303,7 +304,8 @@ public:
 	IC CAutosaveManager& autosave_manager();
     IC CDebugRenderer& debug_renderer();
 	void __stdcall script_gc(); // GC-cycle
-	static int __stdcall LuaGC(const bool cleanup); // GC that will called from Device via Device.LuaGC
+    static int LuaGC(); // GC that will called from Device via Device.LuaGC
+    static void LuaGCDebug(); // GC that will called from Device via Device.LuaGCDebug
 	IC CPHCommander& ph_commander();
 	IC CPHCommander& ph_commander_scripts();
 	IC CPHCommander& ph_commander_physics_worldstep();
