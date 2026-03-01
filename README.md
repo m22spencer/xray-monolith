@@ -244,7 +244,6 @@ Main and MT:
   * Fixed stuttering when prompt to ignite or extinguish campfire appears, or any other prompt that uses `game.start_tutotial` function
   * Parallel GC will work only when level is fully loaded to prevent some bugs on loading
   * Added `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` macro to `openal` and `optick`, fixes crashes with certain PC configurations
-  * Tosox: Persist weapon fire mode & grenade launcher data (https://github.com/themrdemonized/xray-monolith/pull/440)
   * damoldavskiy: HUD state switch callback (https://github.com/themrdemonized/xray-monolith/pull/448)
   * LVutner: Faster CBuffer updates (https://github.com/themrdemonized/xray-monolith/pull/449)
   * SaloEater:
