@@ -237,6 +237,21 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.03.07**
+
+Main and MT:
+  * Spawn Antifreeze: If the object has server counterpart, check if server object is still in alife after prefetching
+  * Fixed issue with Interaction Dot Marks mod due to `game_tutorials` cache
+  * Always return a copy of `VEC_ZERO`, `VEC_X`, `VEC_Y`, `VEC_Z` in scripts to prevent unwanted changes to original objects, potentially fixes a plethora of vanilla bugs related to these variables. Thanks to PrivatePirate97 for addressing the issue
+  * Possible fix to `aaaa_script_fixes_mp.script:652: 'for' initial value must be a number`
+  * `server_object_on_(un)register` callbacks for all server objects
+  * Removal of stale data in `bind_item` and `item_parts` when brand new server object is created, fixes bugs with having weapon or outfit parts on unrelated objects or having wrong item uses and condition on freshly crafted items
+  * Moved callback based script fixes from `callbacks_gameobject` to `aaaa_script_fixes_mp`
+
+MT:
+  * `g_sv_Spawn` safety features
+  * `CUIWindow` postponed deletion of `AutoDelete` items
+
 **2026.03.01**
 
 Main and MT:
