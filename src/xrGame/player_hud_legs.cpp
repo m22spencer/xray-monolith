@@ -34,10 +34,22 @@ bool player_legs_controller::resolve_config(CActor* actor, shared_str& out_secti
         m_last_outfit_sect = current_outfit;
     }
 
+    bool result = false;
+    if (pSettings->line_exist("actor", "visual"))
+    {
+        out_section = "actor";
+        result = true;
+    }
+
     if (outfit)
-        return resolve_outfit_config(current_outfit, out_section);
-    else
-        return resolve_default_config(out_section);
+    {
+        if (pSettings->line_exist(current_outfit, "actor_visual"))
+        {
+            out_section = current_outfit;
+            result = true;
+        }
+    }
+    return result;       
 }
 
 bool player_legs_controller::resolve_outfit_config(const shared_str& outfit_sect,
@@ -106,14 +118,14 @@ bool player_legs_controller::ensure_model(const shared_str& legs_section)
 {
     LPCSTR key = nullptr;
 
-    if (pSettings->line_exist(legs_section, "legs_visual"))
-        key = "legs_visual";
+    if (pSettings->line_exist(legs_section, "actor_visual"))
+        key = "actor_visual";
     else if (pSettings->line_exist(legs_section, "visual"))
         key = "visual";
 
     if (!key)
     {
-        warn_once("section [%s] has no 'legs_visual' or 'visual' field", legs_section.c_str());
+        warn_once("section [%s] has no 'actor_visual' or 'visual' field", legs_section.c_str());
         destroy();
         return false;
     }
@@ -205,6 +217,25 @@ void player_legs_controller::copy_bones_from_actor(CActor* actor)
                 m_model->LL_GetData(i).m2b_transform);
         }
     }
+
+    u16 bone_id = m_model->LL_BoneID("bip01_head");
+    if (bone_id != BI_NONE)
+    {
+        m_model->LL_SetBoneVisible(bone_id, false, true);
+    }
+
+    bone_id = m_model->LL_BoneID("bip01_l_hand");
+    if (bone_id != BI_NONE)
+    {
+        m_model->LL_SetBoneVisible(bone_id, false, true);
+    }
+
+    bone_id = m_model->LL_BoneID("bip01_r_hand");
+    if (bone_id != BI_NONE)
+    {
+        m_model->LL_SetBoneVisible(bone_id, false, true);
+    }
+    
 }
 
 void player_legs_controller::update(CActor* actor)
