@@ -182,6 +182,8 @@ extern float IK_CALC_SSA;
 extern float IK_ALWAYS_CALC_DIST;
 extern BOOL r_optimize_calculate_bones;
 
+extern float legs_fwd_offset;
+
 extern CrosshairSettings g_crosshair_camera_near;
 extern CrosshairSettings g_crosshair_camera_far;
 extern CrosshairSettings g_crosshair_weapon_near;
@@ -2441,6 +2443,8 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Float, "hud_fov", &psHUD_FOV_def, 0.1f, 1.0f);
 	CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
 	CMD4(CCC_Float, "viewport_near", &Device.ViewportNear, 0.0f, 1.0f);
+
+    CMD4(CCC_Float, "g_legs_fwd_offset", &legs_fwd_offset, -2.0f, 2.0f);
 	//#endif // DEBUG
 
 	// Demo

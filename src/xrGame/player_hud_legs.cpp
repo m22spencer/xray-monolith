@@ -155,7 +155,8 @@ bool player_legs_controller::ensure_model(const shared_str& legs_section)
     m_model = K;
     m_visual_name = new_visual;
 
-    m_fwd_offset = READ_IF_EXISTS(pSettings, r_float, legs_section, "legs_fwd_offset", -0.55f);
+    if (pSettings->line_exist(legs_section, "legs_fwd_offset"))
+        m_fwd_offset = pSettings->r_float(legs_section, "legs_fwd_offset");
 
     return true;
 }
@@ -265,6 +266,7 @@ void player_legs_controller::update(CActor* actor)
     copy_bones_from_actor(actor);
 }
 
+float legs_fwd_offset = -0.64f;
 void player_legs_controller::render()
 {
     if (!g_legs_enabled || !m_model)
@@ -288,7 +290,9 @@ void player_legs_controller::render()
     fwd.set(m_legs_transform.k);
     fwd.y = 0.f;
     fwd.normalize_safe();
-    m_legs_transform.c.mad(fwd, m_fwd_offset);
+
+    float offset = m_fwd_offset.has_value() ? m_fwd_offset.value() : legs_fwd_offset;
+    m_legs_transform.c.mad(fwd, offset);
 
     ::Render->set_Transform(&m_legs_transform);
     ::Render->add_Visual(visual);
