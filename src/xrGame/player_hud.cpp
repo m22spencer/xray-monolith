@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "player_hud.h"
 #include "HudItem.h"
 #include "ui_base.h"
@@ -14,7 +14,7 @@
 
 extern int g_nearwall;
 
-BOOL g_legs_enabled = TRUE;
+BOOL g_legs_enabled = FALSE;
 
 player_hud* g_player_hud = NULL;
 Fvector _ancor_pos;

@@ -233,6 +233,9 @@ enum EBoneCallbackParam
 	r_finger0 = 0,
 	r_finger01,
 	r_finger02,
+	//bip01_r_finger1,
+	//bip01_r_finger11,
+	//bip01_r_finger12,
 };
 
 struct hud_item_measures
@@ -241,9 +244,9 @@ struct hud_item_measures
 
 	Flags8 m_prop_flags;
 
-	Fvector m_item_attach[2];
-	Fvector m_hands_offset[2][8];
-	Fvector m_strafe_offset[4][2];
+	Fvector m_item_attach[2]; // pos,rot
+	Fvector m_hands_offset[2][8]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount --#SM+#--
+	Fvector m_strafe_offset[4][2]; // pos,rot,data1,data2/ normal,aim-GL	 --#SM+#--
 
 	u16 m_fire_bone;
 	Fvector m_fire_point_offset;
@@ -255,7 +258,7 @@ struct hud_item_measures
 	u16 m_shell_bone;
 	Fvector m_shell_point_offset;
 
-	Fvector m_hands_attach[2];
+	Fvector m_hands_attach[2]; //pos,rot
 
 	void load(const shared_str& sect_name, IKinematics* K);
 
@@ -302,6 +305,7 @@ struct attachable_hud_item
 	u16 m_attach_place_idx;
 	hud_item_measures m_measures;
 
+	//runtime positioning
 	Fmatrix m_attach_offset;
 	Fmatrix m_item_transform;
 
@@ -321,21 +325,27 @@ struct attachable_hud_item
 	void set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent = FALSE);
 	void debug_draw_firedeps();
 	player_hud_motion* find_motion(const shared_str& anm_name);
-
+	//hands bind position
 	Fvector& hands_attach_pos();
 	Fvector& hands_attach_rot();
+
+	//hands runtime offset
 	Fvector& hands_offset_pos();
 	Fvector& hands_offset_rot();
+
 	Fvector& aim_offset_pos();
 	Fvector& aim_offset_rot();
+
 	Fvector& alt_aim_offset_pos();
 	Fvector& alt_aim_offset_rot();
+
 	Fvector& attach_base_offset_pos();
 	Fvector& attach_base_offset_rot();
 	Fvector& attach_mount_offset_pos();
 	Fvector& attach_mount_offset_rot();
 	float attach_scale();
 
+	//props
 	u32 m_upd_firedeps_frame;
 	void tune(Ivector values);
 	u32 anim_play(const shared_str& anim_name, BOOL bMixIn, const CMotionDef*& md, u8& rnd, float speed = 0, bool bMixIn2 = true);
@@ -380,6 +390,7 @@ public:
 	Fmatrix m_item_pos;
 	u8 m_attach_idx;
 
+	//Movement animation layers: 0 = aim_walk, 1 = aim_crouch, 2 = crouch, 3 = walk, 4 = run, 5 = sprint
 	xr_vector<movement_layer*> m_movement_layers;
 	xr_vector<script_layer*> m_script_layers;
 
@@ -431,17 +442,17 @@ private:
 public:
 	IKinematicsAnimated* m_model;
 	IKinematicsAnimated* m_model_2;
+	Fvector m_adjust_offset[2][10]; // pos,rot/ normal,aim,GL,aim_alt,safemode, normal2, attach_base, attach_mount, aim for attach, alt aim for attach
+	Fvector m_adjust_obj[2]; // pos,rot; used for the item/weapon itself
+	Fvector m_adjust_ui_offset[2]; // pos,rot; used for custom device ui
 
 	player_legs_controller m_legs_controller;
 
 	void update_legs(const Fmatrix& cam_trans);
 	void delete_legs_model();
 
-	Fvector m_adjust_offset[2][10];
-	Fvector m_adjust_obj[2];
-	Fvector m_adjust_ui_offset[2];
 	Fvector m_adjust_firepoint_shell[2][2];
-	xr_map<EBoneCallbackParam, BoneCallbackParams*> m_bone_callback_params;
+	xr_map<EBoneCallbackParam, BoneCallbackParams*> m_bone_callback_params; // bonename,params
 	int m_edit_attachment;
 	float m_adjust_zoom_factor[3];
 	float m_adjust_scale;
@@ -456,11 +467,25 @@ public:
 			m_bone_callback_params[r_finger01]->m_current.set(0.f, 0.f, 0.f);
 			m_bone_callback_params[r_finger02]->m_current.set(0.f, 0.f, 0.f);
 		}
-
+		
 		m_bone_callback_params[r_finger0]->m_target.set(0.f, 0.f, 0.f);
 		m_bone_callback_params[r_finger01]->m_target.set(0.f, 0.f, 0.f);
 		m_bone_callback_params[r_finger02]->m_target.set(0.f, 0.f, 0.f);
 	}
+
+	/*void reset_triggerfinger(bool bForce)
+	{
+		if (bForce)
+		{
+			m_bone_callback_params[bip01_r_finger1]->m_current.set(0.f, 0.f, 0.f);
+			m_bone_callback_params[bip01_r_finger11]->m_current.set(0.f, 0.f, 0.f);
+			m_bone_callback_params[bip01_r_finger12]->m_current.set(0.f, 0.f, 0.f);
+		}
+
+		m_bone_callback_params[bip01_r_finger1]->m_target.set(0.f, 0.f, 0.f);
+		m_bone_callback_params[bip01_r_finger11]->m_target.set(0.f, 0.f, 0.f);
+		m_bone_callback_params[bip01_r_finger12]->m_target.set(0.f, 0.f, 0.f);
+	}*/
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
