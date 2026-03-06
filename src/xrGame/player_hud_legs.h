@@ -19,7 +19,6 @@ private:
     IKinematics* m_model = nullptr;
     shared_str              m_visual_name;
     shared_str              m_last_outfit_sect;
-    bool                    m_config_warned = false;
     float                   m_fwd_offset = -0.55f;
     float                   m_y_offset = 0.f;
     Fmatrix                 m_legs_transform;

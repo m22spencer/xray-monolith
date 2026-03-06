@@ -31,7 +31,6 @@ bool player_legs_controller::resolve_config(CActor* actor, shared_str& out_secti
 
     if (m_last_outfit_sect != current_outfit)
     {
-        m_config_warned = false;
         m_last_outfit_sect = current_outfit;
     }
 
@@ -88,16 +87,19 @@ bool player_legs_controller::resolve_default_config(shared_str& out_section)
 
 void player_legs_controller::warn_once(const char* fmt, ...)
 {
-    if (m_config_warned) return;
-    m_config_warned = true;
-
     string512 buf;
     va_list args;
     va_start(args, fmt);
     vsprintf_s(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    Msg("! [player_legs] %s", buf);
+    xr_string s = make_string("! [player_legs] %s", buf).c_str();
+    static xr_unordered_flat_set<xr_string> warnings;
+    if (warnings.find(s) == warnings.end())
+    {
+        warnings.insert(s);
+        Msg(s.c_str());
+    }
 }
 
 bool player_legs_controller::ensure_model(const shared_str& legs_section)
