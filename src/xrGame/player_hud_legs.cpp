@@ -224,13 +224,13 @@ void player_legs_controller::copy_bones_from_actor(CActor* actor)
         m_model->LL_SetBoneVisible(bone_id, false, true);
     }
 
-    bone_id = m_model->LL_BoneID("bip01_l_hand");
+    bone_id = m_model->LL_BoneID("bip01_l_upperarm");
     if (bone_id != BI_NONE)
     {
         m_model->LL_SetBoneVisible(bone_id, false, true);
     }
 
-    bone_id = m_model->LL_BoneID("bip01_r_hand");
+    bone_id = m_model->LL_BoneID("bip01_r_upperarm");
     if (bone_id != BI_NONE)
     {
         m_model->LL_SetBoneVisible(bone_id, false, true);
