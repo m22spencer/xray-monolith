@@ -263,7 +263,6 @@ Main and MT:
 MT:
   * `g_sv_Spawn` safety features
   * `CUIWindow` postponed deletion of `AutoDelete` items
-  * Alife registry uses `sparse_map` data structure for faster insertion, removal and iteration
   * `CWeapon::GetFireDispersion` added `pOwner` check for safety
   * `CObject::net_Destroy()` will wait until the object is finished being processed in feel vision routine
 
