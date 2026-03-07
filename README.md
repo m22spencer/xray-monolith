@@ -242,15 +242,30 @@ How to compile exes:
 Main and MT:
   * Spawn Antifreeze: If the object has server counterpart, check if server object is still in alife after prefetching
   * Fixed issue with Interaction Dot Marks mod due to `game_tutorials` cache
+  * Fixed potential crash in `CMovementManager::process_game_path` if dest_level_vertex_id is invalid
   * Always return a copy of `VEC_ZERO`, `VEC_X`, `VEC_Y`, `VEC_Z` in scripts to prevent unwanted changes to original objects, potentially fixes a plethora of vanilla bugs related to these variables. Thanks to PrivatePirate97 for addressing the issue
   * Possible fix to `aaaa_script_fixes_mp.script:652: 'for' initial value must be a number`
   * `server_object_on_(un)register` callbacks for all server objects
   * Removal of stale data in `bind_item` and `item_parts` when brand new server object is created, fixes bugs with having weapon or outfit parts on unrelated objects or having wrong item uses and condition on freshly crafted items
   * Moved callback based script fixes from `callbacks_gameobject` to `aaaa_script_fixes_mp`
-
+  * Kutez: Spatial Audio Rework - The ability to overwrite EFX's reverb, allowing for controllable reverb (https://github.com/themrdemonized/xray-monolith/pull/451)
+  * leer-h: Added "show_actor_body" (https://github.com/themrdemonized/xray-monolith/pull/454)
+  * tabudz: Potential Vulnerability in Cloned Code (https://github.com/themrdemonized/xray-monolith/pull/453)
+  * knallpsi: Engine-side First Person Body implementation (https://github.com/themrdemonized/xray-monolith/pull/437)
+    * Type `g_legs 1` in console to enable legs
+    * `g_legs_fwd_offset` to adjust position for legs if it isn't specified in the config, see below
+    * `g_legs_in_demo_record` to enable rendering legs while `demo_record` is active
+    * By default, the existing player model based on current outfit will be used with hiding head and arm bones
+    * Possibility to specify custom model for legs. In an outfit section where `actor_visual` is defined, or `[actor]` section for the default legs, either use DLTX or adjust LTX directly:
+      1. Add `legs_visual` field with the path to the model to use (`legs_visual = sm\actor_legs\jacket_loner.ogf`)
+      2. Optionally add `legs_fwd_offset` field to adjust position of the legs (`legs_fwd_offset = -0.55`)
+      
 MT:
   * `g_sv_Spawn` safety features
   * `CUIWindow` postponed deletion of `AutoDelete` items
+  * Alife registry uses `sparse_map` data structure for faster insertion, removal and iteration
+  * `CWeapon::GetFireDispersion` added `pOwner` check for safety
+  * `CObject::net_Destroy()` will wait until the object is finished being processed in feel vision routine
 
 **2026.03.01**
 
@@ -1798,4 +1813,3 @@ override = true
 
 * Exported distance_to_xz_sqr() function of Fvector
 * Redesigned duplicate section error, it will additionally print what file adds the section in the first place in addition to the file that has the duplicate
-
