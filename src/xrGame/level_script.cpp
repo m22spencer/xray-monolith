@@ -60,6 +60,7 @@
 #include "alife_registry_wrappers.h"
 #include "cover_manager.h"
 #include "cover_point.h"
+#include "ActorCondition.h"
 
 using namespace luabind;
 
@@ -2241,6 +2242,16 @@ void update_pda_news_from_uiwindow(CUIWindow* CUIWindowPItem) {
 	}
 }
 
+float GetActorAlcohol()
+{
+    if (Actor())
+    {
+        return Actor()->conditions().GetAlcohol();
+    }
+
+    return 0.0f;
+}
+
 script_attachment* AddAttachment(LPCSTR name, LPCSTR model_name)
 {
 	script_attachment* att = xr_new<script_attachment>(name, model_name);
@@ -2712,6 +2723,8 @@ void CLevel::script_register(lua_State* L)
 		
 		// demonized: adjust game news time
 		def("change_game_news_show_time", &change_game_news_show_time),
-		def("update_pda_news_from_uiwindow", &update_pda_news_from_uiwindow)
+		def("update_pda_news_from_uiwindow", &update_pda_news_from_uiwindow),
+
+        def("get_actor_alcohol", &GetActorAlcohol)
 	];
 }
