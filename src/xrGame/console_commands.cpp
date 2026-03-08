@@ -132,7 +132,7 @@ extern BOOL g_apply_pdm_to_ads;
 extern BOOL g_smooth_ads_transition;
 extern BOOL g_allow_silencer_hide_tracer;
 
-extern BOOL showActorBody; //leer
+extern int showActorBody; //leer
 extern BOOL disableActorBodyRotationDelay; //leer
 
 //demonized: new console vars
@@ -3060,6 +3060,6 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Float, "g_wallmark_range_static", &wallmark_range_static, 0.f, 1000.f);
 	CMD4(CCC_Float, "g_wallmark_range_skeleton", &wallmark_range_skeleton, 0.f, 1000.f);
 
-    CMD4(CCC_Integer, "show_actor_body", &showActorBody, 0, 1);
+    CMD4(CCC_Integer, "show_actor_body", &showActorBody, 0, 2);
     CMD4(CCC_Integer, "disable_actor_body_rotation_delay", &disableActorBodyRotationDelay, 0, 1);
 }
