@@ -354,8 +354,10 @@ public:
 		const LPCSTR m_hand_atm = "stm_hand_atm";
 		u16 m_hand_bid;
 		Fvector m_hand_pos;
+		shared_str m_hand_vis;
 		shared_str m_hand_anims[eStmAnimWeapon_size];
 
+		bool HandGetVisualName();
 		void HandCreate();
 		void HandRemove();
 		void HandPlay(u8 anim);

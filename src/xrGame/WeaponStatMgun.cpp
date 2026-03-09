@@ -934,7 +934,18 @@ bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 
 	if (OwnerActor())
 	{
-		OnCameraChange(eCamFirst);
+		switch (OwnerActor()->active_cam())
+		{
+		case eacFirstEye:
+			OnCameraChange(eCamFirst);
+			break;
+		case eacLookAt:
+			OnCameraChange(eCamChase);
+			break;
+		default:
+			OnCameraChange(eCamFirst);
+			break;
+		}
 		Camera()->yaw = m_cur_y_rot;
 		Camera()->pitch = m_cur_x_rot;
 	}
@@ -1090,18 +1101,6 @@ bool CWeaponStatMgun::Use(const Fvector &pos, const Fvector &dir, const Fvector 
 
 void CWeaponStatMgun::OnCameraChange(u16 type)
 {
-	if (OwnerActor())
-	{
-		if (type == eCamFirst)
-		{
-			Owner()->setVisible(FALSE);
-		}
-		else
-		{
-			Owner()->setVisible(TRUE);
-		}
-	}
-
 	if (active_camera == nullptr)
 	{
 		active_camera = camera[type];
@@ -1128,13 +1127,18 @@ void CWeaponStatMgun::OnCameraChange(u16 type)
 		active_camera = camera[type];
 	}
 
-	if (Camera()->tag == eCamFirst)
+	if (OwnerActor())
 	{
-		m_anim_weapon.HandCreate();
-	}
-	else
-	{
-		m_anim_weapon.HandRemove();
+		if (Camera()->tag == eCamFirst)
+		{
+			OwnerActor()->setVisible(FALSE);
+			m_anim_weapon.HandCreate();
+		}
+		else
+		{
+			OwnerActor()->setVisible(TRUE);
+			m_anim_weapon.HandRemove();
+		}
 	}
 }
 
