@@ -57,6 +57,9 @@ CWeaponStatMgun::SStmAnimWeapon::SStmAnimWeapon()
 	m_current_idx = 0;
 	m_current_mid.invalidate();
 
+	m_hand_bid = BI_NONE;
+	m_hand_pos.set(0, 0, 0);
+
 	m_magazine_hide_bid = BI_NONE;
 	m_magazine_hide_anm.clear();
 #if 0
@@ -135,6 +138,13 @@ BOOL CWeaponStatMgun::SStmAnimWeapon::net_Spawn(CSE_Abstract *DC)
 			Play(eStmAnimWeapon_idle);
 		}
 	}
+
+	if (ini->section_exist("animation_hand"))
+	{
+		m_hand_bid = ini->line_exist("animation_hand", "hand_bid") ? K->LL_BoneID(ini->r_string("animation_hand", "hand_bid")) : BI_NONE;
+		m_hand_pos = READ_IF_EXISTS(ini, r_fvector3, "animation_hand", "hand_pos", Fvector().set(0, 0, 0));
+		m_hand_anims[eStmAnimWeapon_idle]._set(READ_IF_EXISTS(ini, r_string, "animation_hand", "hand_idle", ""));
+	}
 	return TRUE;
 }
 
@@ -184,6 +194,44 @@ void CWeaponStatMgun::SStmAnimWeapon::AnimationCallback(CBlend *B)
 {
 	CWeaponStatMgun *stm = (CWeaponStatMgun *)B->CallbackParam;
 	stm->m_anim_weapon.OnAnimationEnd();
+}
+
+void CWeaponStatMgun::SStmAnimWeapon::HandCreate()
+{
+	if (g_player_hud == nullptr || g_player_hud->section_name().size() == 0)
+		return;
+	if (m_hand_bid == BI_NONE)
+		return;
+	if (m_stm->get_attachment(m_hand_atm) == nullptr)
+	{
+		LPCSTR str = READ_IF_EXISTS(pSettings, r_string, g_player_hud->section_name().c_str(), "visual", nullptr);
+		if (str && strlen(str))
+		{
+			string128 vis;
+			snprintf(vis, sizeof(vis), "%s.ogf", str);
+			script_attachment *att = xr_new<script_attachment>(m_hand_atm, vis);
+			R_ASSERT(att);
+			m_stm->remove_attachment(m_hand_atm);
+			att->SetParent(m_stm->cast_game_object());
+			att->SetParentBone(m_hand_bid);
+			att->SetPosition(m_hand_pos);
+			HandPlay(eStmAnimWeapon_idle);
+		}
+	}
+}
+
+void CWeaponStatMgun::SStmAnimWeapon::HandRemove()
+{
+	m_stm->remove_attachment(m_hand_atm);
+}
+
+void CWeaponStatMgun::SStmAnimWeapon::HandPlay(u8 anim)
+{
+	script_attachment *att = m_stm->get_attachment(m_hand_atm);
+	if (att && m_hand_anims[anim].size())
+	{
+		att->PlayMotion(m_hand_anims[anim].c_str(), false, 1.0);
+	}
 }
 
 void CWeaponStatMgun::SStmAnimWeapon::UpdateMagazineVisibility()

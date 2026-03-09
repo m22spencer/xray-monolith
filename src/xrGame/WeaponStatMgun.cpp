@@ -89,6 +89,7 @@ CWeaponStatMgun::CWeaponStatMgun()
 	m_single_shot_wpn = FALSE;
 	m_unlimited_ammo = true;
 	m_reload_consume_callback = nullptr;
+	m_shot_effector._set("");
 
 	m_next_ammoType_on_reload.reset();
 	m_ammoType = 0;
@@ -220,6 +221,7 @@ void CWeaponStatMgun::Load(LPCSTR section)
 	m_single_shot_wpn = !!READ_IF_EXISTS(pSettings, r_bool, section, "is_single_shot_wpn", FALSE);
 	m_unlimited_ammo = !!READ_IF_EXISTS(pSettings, r_bool, section, "unlimited_ammo", false);
 	m_reload_consume_callback = READ_IF_EXISTS(pSettings, r_string, section, "reload_consume", nullptr);
+	m_shot_effector._set(READ_IF_EXISTS(pSettings, r_string, section, "shot_effector", ""));
 
 	m_ammoTypes.clear();
 	LPCSTR ammo_class = pSettings->r_string(section, "ammo_class");
@@ -964,6 +966,7 @@ void CWeaponStatMgun::detach_Actor()
 	Action(eWpnActivate, 0);
 	SetFeelVisionIgnore(false);
 	m_anim_weapon.Play(SStmAnimWeapon::eStmAnimWeapon_idle);
+	m_anim_weapon.HandRemove();
 #else
 	Owner()->setVisible(1);
 	inheritedHolder::detach_Actor();
@@ -1123,6 +1126,15 @@ void CWeaponStatMgun::OnCameraChange(u16 type)
 			cam->yaw = active_camera->yaw + ang.x;
 		}
 		active_camera = camera[type];
+	}
+
+	if (Camera()->tag == eCamFirst)
+	{
+		m_anim_weapon.HandCreate();
+	}
+	else
+	{
+		m_anim_weapon.HandRemove();
 	}
 }
 
