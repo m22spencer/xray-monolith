@@ -240,7 +240,6 @@ How to compile exes:
 **2026.03.10**
 
 MT:
-  * Alife registry uses `sparse_map` data structure for faster insertion, removal and iteration
   * Additional safety checks in visual memory manager
   * `CPHSimpleCharacter::UpdateDynamicDamage`, nullptr check should reduce crashes when interacting with dead bodies
   * `cNameVisual_set`, updating visuals will wait until the object is finished being processed in feel vision routine
