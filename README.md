@@ -237,6 +237,14 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.03.10**
+
+MT:
+  * Additional safety checks in visual memory manager
+  * `CPHSimpleCharacter::UpdateDynamicDamage`, nullptr check should reduce crashes when interacting with dead bodies
+  * `cNameVisual_set`, updating visuals will wait until the object is finished being processed in feel vision routine
+  * `CHudItem::renderable_Render`, nullptr check for owner
+
 **2026.03.07**
 
 Main and MT:
