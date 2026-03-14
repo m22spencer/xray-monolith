@@ -111,7 +111,7 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-BOOL showActorBody = FALSE;
+int showActorBody = 0;
 
 Flags32 psActorFlags = {AF_GODMODE_RT | AF_AUTOPICKUP | AF_RUN_BACKWARD | AF_IMPORTANT_SAVE | AF_USE_TRACERS};
 int psActorSleepTime = 1;
@@ -2139,15 +2139,19 @@ void CActor::renderable_Render()
 	{
 		if (::Render->active_phase() == 0) // can render first person body here
 		{
-			if (g_player_hud && !m_holder && (legs_in_demo_record || pDemoRecords.empty()) && !showActorBody)
+			if (g_player_hud && !m_holder && (legs_in_demo_record || pDemoRecords.empty()) && showActorBody == 0)
 			{
 				g_player_hud->render_legs();
 			}
 
-            if (showActorBody)
+            if (showActorBody == 1 || showActorBody == 2)
             {
                 inherited::renderable_Render();
-                CInventoryOwner::renderable_Render();
+
+                if (showActorBody == 2)
+                {
+                    CInventoryOwner::renderable_Render();
+                }
             }
 
 			//if (fpBody) 
