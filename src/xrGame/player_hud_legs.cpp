@@ -187,9 +187,12 @@ void player_legs_controller::copy_bones_from_actor(CActor* actor)
 }
 
 float legs_fwd_offset = -0.6f;
+extern int showActorBody;
 void player_legs_controller::update(CActor* actor)
 {
-    if (!g_legs_enabled || !actor)
+    actor->XFORMPrev.set(actor->XFORM());
+
+    if (!g_legs_enabled || showActorBody != 0 || !actor)
     {
         destroy();
         return;
@@ -225,14 +228,13 @@ void player_legs_controller::update(CActor* actor)
     m_legs_transform.c.mad(fwd, offset);
 
     // Move actor's XFORM for correct shadow placement
-    actor->XFORMPrev.set(actor->XFORM());
     actor->XFORM().set(m_legs_transform);
 }
 
 
 void player_legs_controller::render()
 {
-    if (!g_legs_enabled || !m_model)
+    if (!g_legs_enabled || showActorBody != 0 || !m_model)
         return;
 
     CActor* actor = Actor();
