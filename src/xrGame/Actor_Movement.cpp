@@ -20,7 +20,7 @@
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
-BOOL disableActorBodyRotationDelay = FALSE;
+BOOL disableActorBodyRotationDelay = TRUE;
 static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
 static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
 static const float s_fJumpTime = 0.3f;
