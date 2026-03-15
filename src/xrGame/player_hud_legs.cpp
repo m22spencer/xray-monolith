@@ -190,7 +190,7 @@ float legs_fwd_offset = -0.6f;
 extern int showActorBody;
 void player_legs_controller::update(CActor* actor)
 {
-    actor->XFORMPrev.set(actor->XFORM());
+    actor->XFORMShadow.set(actor->XFORM());
 
     if (!g_legs_enabled || showActorBody != 0 || !actor)
     {
@@ -228,7 +228,7 @@ void player_legs_controller::update(CActor* actor)
     m_legs_transform.c.mad(fwd, offset);
 
     // Move actor's XFORM for correct shadow placement
-    actor->XFORM().set(m_legs_transform);
+    actor->XFORMShadow.translate_over(m_legs_transform.c);
 }
 
 
