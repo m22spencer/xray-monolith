@@ -13,6 +13,9 @@ local table_insert 	= table.insert
 local table_remove 	= table.remove
 
 local math_huge		= math.huge
+local math_floor	= math.floor
+local math_max		= math.max
+local math_min		= math.min
 
 local tostring 		= tostring
 local tonumber 		= tonumber
@@ -209,7 +212,7 @@ end
 
 -- Postpone on next n tick
 _G.nextTick = function(f, n)
-	n = math.floor(math.max(n or 1, 1))
+	n = math_floor(math_max(n or 1, 1))
 	AddUniqueCall(function()
 		if n == 1 then
 			return f()
@@ -762,7 +765,7 @@ _G.hspairs = function(t, order)
             end
         end
     else
-        -- Default alphanumeric sort fallback
+        -- Default ascending order
         sift_down = function(idx, end_idx)
             local root = idx
             while root * 2 <= end_idx do
@@ -784,7 +787,7 @@ _G.hspairs = function(t, order)
     end
 
     -- Build the Heap: O(N)
-    for i = math.floor(n / 2), 1, -1 do
+    for i = math_floor(n / 2), 1, -1 do
         sift_down(i, n)
     end
 
@@ -810,59 +813,64 @@ _G.heapsort = function(t, order)
     local n = #t
     if n <= 1 then return end
 
-    -- Max-Heap Sift Down
     local sift_down
+    -- Use order if its provided
     if order then
-    	sift_down = function(root, end_idx)
-	        while root * 2 <= end_idx do
-	            local child = root * 2
-	            local swap = root
-	            
-	            -- If order exists, we use it. 
-	            -- To build a Max-Heap for ascending order, we swap if child > swap
-	            if order(t[child], t[swap]) == false then 
-                    swap = child 
+        sift_down = function(root, end_idx)
+            local root_val = t[root] -- Cache the root value to prevent nil/index shifting
+            
+            while root * 2 <= end_idx do
+                local child = root * 2
+                
+                -- 1. Find the "greater" child 
+                -- (If left child comes before right child, the right child is "greater")
+                if child < end_idx and order(t[child], t[child + 1]) then
+                    child = child + 1
                 end
-                if child + 1 <= end_idx and order(t[child + 1], t[swap]) == false then 
-                    swap = child + 1 
+                
+                -- 2. Compare cached root against the greater child
+                -- If root comes before child, root is "smaller" and child must move up
+                if order(root_val, t[child]) then
+                    t[root] = t[child]
+                    root = child
+                else
+                    -- Root is in the correct position
+                    break
                 end
-
-	            if swap == root then break end
-	            t[root], t[swap] = t[swap], t[root]
-	            root = swap
-	        end
-	    end
+            end
+            t[root] = root_val
+        end
     else
-    	sift_down = function(root, end_idx)
-	        while root * 2 <= end_idx do
-	            local child = root * 2
-	            local swap = root
-	            
-	            -- Default ascending (parents > children)
-                if t[child] > t[swap] then 
-                    swap = child 
+        -- Default ascending sort
+        sift_down = function(root, end_idx)
+            local root_val = t[root]
+            
+            while root * 2 <= end_idx do
+                local child = root * 2
+                
+                if child < end_idx and t[child] < t[child + 1] then
+                    child = child + 1
                 end
-                if child + 1 <= end_idx and t[child + 1] > t[swap] then 
-                    swap = child + 1 
+                
+                if root_val < t[child] then
+                    t[root] = t[child]
+                    root = child
+                else
+                    break
                 end
-
-	            if swap == root then break end
-	            t[root], t[swap] = t[swap], t[root]
-	            root = swap
-	        end
-	    end
-	end
+            end
+            t[root] = root_val
+        end
+    end
 
     -- Build the Heap: O(N)
-    for i = math.floor(n / 2), 1, -1 do
+    for i = math_floor(n / 2), 1, -1 do
         sift_down(i, n)
     end
 
     -- Sort (Extract max and move to end)
     for i = n, 2, -1 do
-        -- Move current max (root) to the end of the unsorted portion
         t[1], t[i] = t[i], t[1]
-        -- Sift down the new root in the reduced heap
         sift_down(1, i - 1)
     end
 end
