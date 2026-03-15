@@ -251,7 +251,8 @@ Main and MT:
   * Min-Heap based `spairs` iterator
     * Supports early break without sorting whole table
     * Faster retrieval of the first item
-  * disable `alife():object(id)` invalid id spam on `pda.calculate_rankings`
+  * Disable `alife():object(id)` invalid id spam on `pda.calculate_rankings`
+  * When `on_loading_screen_key_prompt` happens, perform Lua GC and call `jit.flush`
   * leer-h: Command to disable actor body/legs model rotation delay. Functionality to load new animations for Actor\NPC without editing the existing stalker_animation.omf or including new omf's in the model's motion refs (https://github.com/themrdemonized/xray-monolith/pull/457)
   * knallpsi: UI optimization, crc32 replacement (https://github.com/themrdemonized/xray-monolith/pull/463)
   * GhenTuong:
