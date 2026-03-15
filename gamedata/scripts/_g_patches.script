@@ -715,14 +715,61 @@ _G.log = function(str)
     end
 end
 
+_G.nil_func = function() return nil end
+
+-- Custom order via order parameter (t, a, b) as default spairs
+local sift_down_order = function(t, keys, idx, end_idx, order)
+    local hole_idx = idx
+    local sifting_key = keys[hole_idx]
+    local half_idx = math_floor(end_idx / 2)
+    
+    while hole_idx <= half_idx do
+        local child = hole_idx * 2
+        
+        if child < end_idx and order(t, keys[child + 1], keys[child]) then
+            child = child + 1
+        end
+        
+        if order(t, keys[child], sifting_key) then
+            keys[hole_idx] = keys[child]
+            hole_idx = child
+        else
+            break
+        end
+    end
+    keys[hole_idx] = sifting_key
+end
+
+-- Default ascending order
+local sift_down_default = function(t, keys, idx, end_idx)
+    local hole_idx = idx
+    local sifting_key = keys[hole_idx]
+    local half_idx = math_floor(end_idx / 2)
+    
+    while hole_idx <= half_idx do
+        local child = hole_idx * 2
+        
+        if child < end_idx and keys[child + 1] < keys[child] then
+            child = child + 1
+        end
+        
+        if keys[child] < sifting_key then
+            keys[hole_idx] = keys[child]
+            hole_idx = child
+        else
+            break
+        end
+    end
+    keys[hole_idx] = sifting_key
+end
+
 -- Min-Heap based spairs
 -- Supports early break without sorting whole table
 -- Faster retrieval of the first item
-_G.nil_func = function() return nil end
 _G.hspairs = function(t, order)
     -- collect the keys
-    local keys = {}
     local n = 0
+    local keys = {}
     for k in pairs(t) do
     	n = n + 1
         keys[n] = k
@@ -743,52 +790,12 @@ _G.hspairs = function(t, order)
         end
     end
 
-    local sift_down
     -- Use order if its provided
-    if order then
-        sift_down = function(idx, end_idx)
-            local root = idx
-            while root * 2 <= end_idx do
-                local child = root * 2
-                local swap = root
-                
-                if order(t, keys[child], keys[swap]) then 
-                    swap = child 
-                end
-                if child + 1 <= end_idx and order(t, keys[child + 1], keys[swap]) then 
-                    swap = child + 1 
-                end
-                
-                if swap == root then break end
-                keys[root], keys[swap] = keys[swap], keys[root]
-                root = swap
-            end
-        end
-    else
-        -- Default ascending order
-        sift_down = function(idx, end_idx)
-            local root = idx
-            while root * 2 <= end_idx do
-                local child = root * 2
-                local swap = root
-                
-                if keys[child] < keys[swap] then 
-                    swap = child 
-                end
-                if child + 1 <= end_idx and keys[child + 1] < keys[swap] then 
-                    swap = child + 1 
-                end
-                
-                if swap == root then break end
-                keys[root], keys[swap] = keys[swap], keys[root]
-                root = swap
-            end
-        end
-    end
+    local sift_down = order and sift_down_order or sift_down_default
 
     -- Build the Heap: O(N)
     for i = math_floor(n / 2), 1, -1 do
-        sift_down(i, n)
+        sift_down(t, keys, i, n, order)
     end
 
     -- return the iterator function
@@ -801,93 +808,15 @@ _G.hspairs = function(t, order)
         n = n - 1
         
         if n > 0 then
-            sift_down(1, n)
+            sift_down(t, keys, 1, n, order)
         end
         
         return best_key, t[best_key]
     end
 end
 
--- Max-Heap sort, behaves identical to table.sort
-_G.heapsort = function(t, order)
-    local n = #t
-    if n <= 1 then return end
-
-    local sift_down
-    -- Use order if its provided
-    if order then
-        sift_down = function(root, end_idx)
-            local root_val = t[root] -- Cache the root value to prevent nil/index shifting
-            
-            while root * 2 <= end_idx do
-                local child = root * 2
-                
-                -- 1. Find the "greater" child 
-                -- (If left child comes before right child, the right child is "greater")
-                if child < end_idx and order(t[child], t[child + 1]) then
-                    child = child + 1
-                end
-                
-                -- 2. Compare cached root against the greater child
-                -- If root comes before child, root is "smaller" and child must move up
-                if order(root_val, t[child]) then
-                    t[root] = t[child]
-                    root = child
-                else
-                    -- Root is in the correct position
-                    break
-                end
-            end
-            t[root] = root_val
-        end
-    else
-        -- Default ascending sort
-        sift_down = function(root, end_idx)
-            local root_val = t[root]
-            
-            while root * 2 <= end_idx do
-                local child = root * 2
-                
-                if child < end_idx and t[child] < t[child + 1] then
-                    child = child + 1
-                end
-                
-                if root_val < t[child] then
-                    t[root] = t[child]
-                    root = child
-                else
-                    break
-                end
-            end
-            t[root] = root_val
-        end
-    end
-
-    -- Build the Heap: O(N)
-    for i = math_floor(n / 2), 1, -1 do
-        sift_down(i, n)
-    end
-
-    -- Sort (Extract max and move to end)
-    for i = n, 2, -1 do
-        t[1], t[i] = t[i], t[1]
-        sift_down(1, i - 1)
-    end
-end
-
 -- Replace spairs with hspairs
--- table.sort with heapsort
--- Can you guess why in Anomaly's LuaJIT they are faster? (100000 items run in us)
--- spairs comparator 94795.9765625
--- hspairs comparator 43937.91796875
--- spairs 22768.982421875
--- hspairs 13501.509765625 
--- table.sort comparator 55890.84765625
--- heapsort comparator 20329.314453125
--- table.sort 23911.232421875
--- heapsort 18591.03515625
 _G.spairs = hspairs
-table.sort = heapsort
 
 -- Always return a copy of these global variables to prevent modification in scripts
 local constTable = {
