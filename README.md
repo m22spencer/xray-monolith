@@ -237,13 +237,14 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
-**2026.03.18**
+**2026.03.19**
 
 Main and MT:
   * Legs improvements:
     * In shadowmap phase render full body model without hiding bones instead of moving the player's, fixes some bugs like reappearing level transition dialog
     * Adjust player's torch and bolt offsets so they won't float in the space
   * Faster algorithm for `spairs` if order function is not provided
+  * Minor optimizations in `_g.script`
 
 **2026.03.16**
 

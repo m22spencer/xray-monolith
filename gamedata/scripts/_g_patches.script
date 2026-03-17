@@ -16,10 +16,12 @@ local math_huge		= math.huge
 local math_floor	= math.floor
 local math_max		= math.max
 local math_min		= math.min
+local math_random 	= math.random
 
 local tostring 		= tostring
 local tonumber 		= tonumber
 local unpack 		= unpack
+local select 		= select
 
 _G.printf_me = function(s, ...)
 	printf("[Modded Exes] " .. s, ...)
@@ -1030,6 +1032,55 @@ _G.spairs = function(t, order)
 	else
 		return mspairs_default(t)
 	end
+end
+
+-- Simpler is_empty
+_G.is_empty = function(t)
+	if not t then return true end
+	return next(t) == nil
+end
+
+-- Shuffle table, Fisher-Yates shuffle
+_G.shuffle_table = function(t)
+   for i = #t, 2, -1 do
+        local j = math_random(i)
+        t[i], t[j] = t[j], t[i]
+    end
+end
+
+-- Simpler size_table
+_G.size_table = function(t)
+	local n = 0
+	for _ in pairs(t) do
+		n = n + 1
+	end
+	return n
+end
+
+-- Reservoir sampling random key table
+_G.random_key_table = function(t)
+	local result_key = nil
+    local counter = 0
+    
+    for k in pairs(t) do
+        counter = counter + 1
+        -- On the 1st item, math_random(1) is always 1 (100% chance)
+        -- On the 2nd item, math_random(2) == 1 is 50% chance, etc.
+        if math_random(counter) == 1 then
+            result_key = k
+        end
+    end
+    
+    return result_key
+end
+
+-- Random choice without allocating tables
+_G.random_choice = function(...)
+	local n = select("#", ...) -- Get the count of arguments
+    if n > 0 then
+        local r = math_random(n)
+        return (select(r, ...)) -- Return the r-th argument directly
+    end
 end
 
 -- Always return a copy of these global variables to prevent modification in scripts
