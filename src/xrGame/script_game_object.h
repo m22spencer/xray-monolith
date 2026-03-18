@@ -191,10 +191,6 @@ public:
         // Check lua game object pointer back-reference. If it doesn't point to this, then the object was likely deleted and the pointer is now dangling.
         if (m_game_object->lua_game_object() != this) return false;
 
-        // Ask the engine's object registry if this ID is still linked to this exact pointer.
-        // This catches objects that were deleted by the engine (e.g., NPC death/cleanup).
-        if (Level().Objects.net_Find(m_game_object->ID()) != m_game_object) return false;
-
         return true;
     }
 
