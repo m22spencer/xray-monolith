@@ -1185,6 +1185,30 @@ DECLARE_SCRIPT_REGISTER_FUNCTION
 
 extern BOOL lua_busy_hands_debug;
 
+struct SafeWrapBase
+{
+    template <typename Ret>
+    static Ret handle_invalid()
+    {
+        // This part is never reached because we crash the game,
+        // but we need to satisfy the compiler.
+        if constexpr (std::is_reference_v<Ret>)
+        {
+            return *static_cast<std::remove_reference_t<Ret>*>(nullptr);
+        }
+        else
+        {
+            return Ret();
+        }
+    }
+
+    static void log_and_error(LPCSTR error)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: %s", error);
+        ai().script_engine().lua_error(ai().script_engine().lua());
+    }
+};
+
 // Wrap every getter/setter with a validity check
 // If the object is not valid, instead of "busy hands" issue, crash the game with error log
 template <typename FuncSignature, FuncSignature MemFunc>
@@ -1192,7 +1216,7 @@ struct SafeWrap;
 
 // Specialization for NON-CONST methods
 template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...)>
-struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc>
+struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
 {
     using type = Ret(*)(CScriptGameObject*, Args...);
 
@@ -1200,58 +1224,34 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc>
     // keep & as & and const& as const&.
     static Ret call(CScriptGameObject* instance, Args... args)
     {
-        if (!lua_busy_hands_debug)
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-
-        if (!instance || !instance->is_valid())
+        if (lua_busy_hands_debug)
         {
-            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: Accessing destroyed object.");
-            ai().script_engine().lua_error(ai().script_engine().lua());
-
-            // This part is never reached because we crash the game,
-            // but we need to satisfy the compiler.
-            if constexpr (std::is_reference_v<Ret>)
+            if (!instance || !instance->is_valid())
             {
-                return *static_cast<std::remove_reference_t<Ret>*>(nullptr);
-            }
-            else
-            {
-                return Ret();
+                log_and_error("Accessing destroyed object");
+                return handle_invalid<Ret>();
             }
         }
-
         return (instance->*MemFunc)(std::forward<Args>(args)...);
     }
 };
 
 // Specialization for CONST methods
 template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...) const>
-struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc>
+struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc> : SafeWrapBase
 {
     using type = Ret(*)(const CScriptGameObject*, Args...);
 
     static Ret call(const CScriptGameObject* instance, Args... args)
     {
-        if (!lua_busy_hands_debug)
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-
-        if (!instance || !instance->is_valid())
+        if (lua_busy_hands_debug)
         {
-            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: Accessing destroyed object.");
-            ai().script_engine().lua_error(ai().script_engine().lua());
-
-            // This part is never reached because we crash the game,
-            // but we need to satisfy the compiler.
-            if constexpr (std::is_reference_v<Ret>)
+            if (!instance || !instance->is_valid())
             {
-                return *static_cast<std::remove_reference_t<Ret>*>(nullptr);
-            }
-            else
-            {
-                return Ret();
+                log_and_error("Accessing destroyed object");
+                return handle_invalid<Ret>();
             }
         }
-
         return (instance->*MemFunc)(std::forward<Args>(args)...);
     }
 };
