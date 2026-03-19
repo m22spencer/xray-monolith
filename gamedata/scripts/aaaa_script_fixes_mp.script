@@ -724,6 +724,10 @@ function npc_on_update_force_trader_update(npc)
 		-- Copy checks from trade_manager with fixed restock time, fixes GAMMA
 		local id = npc:id()
 		local tm = trade_manager.get_trade_profile(id)
+		if not tm then
+			return
+		end
+		
 		if not tm.cfg_ltx then 
 			return
 		end 
@@ -783,6 +787,51 @@ end
 
 function actor_on_first_update_register_callbacks()
 	RegisterScriptCallback("server_object_on_register", server_object_on_register_remove_stale_data)
+end
+
+-- Fix state_mgr_animation.delayed_attach to not spam events
+-- Auto-attach newly created item for special animation
+-- requires axr_main function CreateTimeEvent
+state_mgr_animation.delayed_attach = function(id)
+	if not id then
+		return true
+	end
+	if not alife_object(id) then
+		return true
+	end
+
+	local itm = level.object_by_id(id)
+	if itm then
+		itm:enable_attachable_item(true)
+		return true
+	end
+	return false
+end
+
+-- Same for ui_debug_main
+ui_debug_main.delayed_attach = function(id)
+	if not id then
+		return true
+	end
+	if not alife_object(id) then
+		return true
+	end
+
+	local itm = level.object_by_id(id)
+	if itm then
+		itm:enable_attachable_item(true)
+		ui_debug_main._attached = itm:id()
+		return true
+	end
+	return false
+end
+
+-- Fix ui_enemy_health.cs_remove spamming in time events because the wrapper function for time event doesn't return true
+ui_enemy_health_cs_remove = ui_enemy_health.cs_remove
+ui_enemy_health.cs_remove = function()
+	ui_enemy_health_cs_remove()
+	RemoveTimeEvent(0, "enemy_health_remove")
+	return true
 end
 
 -- Perform luagc cleanup
