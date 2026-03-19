@@ -87,7 +87,7 @@ extern int psLua_ParallelGC_CallAmount;
 extern BOOL psLua_ParallelGC_debug;
 extern BOOL psLua_ParallelGC;
 extern BOOL lua_debug;
-BOOL lua_busy_hands_debug = FALSE;
+BOOL lua_busy_hands_debug = TRUE;
 
 float g_end_modif = 0.f;
 
