@@ -1204,8 +1204,13 @@ struct SafeWrapBase
 
     static void log_and_error(LPCSTR error)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: %s", error);
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[BusyHandsDebug] Fatal Error: %s", error);
         ai().script_engine().lua_error(ai().script_engine().lua());
+    }
+
+    static void log(LPCSTR error)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[BusyHandsDebug] Error: %s", error);
     }
 };
 
@@ -1224,15 +1229,29 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
     // keep & as & and const& as const&.
     static Ret call(CScriptGameObject* instance, Args... args)
     {
-        if (lua_busy_hands_debug)
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        if (!instance || !instance->is_valid())
         {
-            if (!instance || !instance->is_valid())
-            {
-                log_and_error("Accessing destroyed object");
-                return handle_invalid<Ret>();
-            }
+            log_and_error("Accessing destroyed object");
+            return handle_invalid<Ret>();
         }
-        return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        try
+        {
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+        }
+        catch (std::exception& e)
+        {
+            // Catches standard C++ exceptions
+            auto s = make_string("C++ Error: %s", e.what());
+            log(s.c_str());
+        }
+        catch (...)
+        {
+            log("Unknown Error");
+        }
     }
 };
 
@@ -1244,15 +1263,29 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc> : SafeWrapBas
 
     static Ret call(const CScriptGameObject* instance, Args... args)
     {
-        if (lua_busy_hands_debug)
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        if (!instance || !instance->is_valid())
         {
-            if (!instance || !instance->is_valid())
-            {
-                log_and_error("Accessing destroyed object");
-                return handle_invalid<Ret>();
-            }
+            log_and_error("Accessing destroyed object");
+            return handle_invalid<Ret>();
         }
-        return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        try
+        {
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+        }
+        catch (std::exception& e)
+        {
+            // Catches standard C++ exceptions
+            auto s = make_string("C++ Error: %s", e.what());
+            log(s.c_str());
+        }
+        catch (...)
+        {
+            log("Unknown Error");
+        }
     }
 };
 
