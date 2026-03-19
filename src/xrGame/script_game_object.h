@@ -1183,6 +1183,8 @@ public:
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
+extern BOOL lua_busy_hands_debug;
+
 // Wrap every getter/setter with a validity check
 // If the object is not valid, instead of "busy hands" issue, crash the game with error log
 template <typename FuncSignature, FuncSignature MemFunc>
@@ -1198,9 +1200,12 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc>
     // keep & as & and const& as const&.
     static Ret call(CScriptGameObject* instance, Args... args)
     {
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
         if (!instance || !instance->is_valid())
         {
-            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "ERROR: Accessing destroyed object.");
+            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: Accessing destroyed object.");
             ai().script_engine().lua_error(ai().script_engine().lua());
 
             // This part is never reached because we crash the game,
@@ -1214,6 +1219,7 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc>
                 return Ret();
             }
         }
+
         return (instance->*MemFunc)(std::forward<Args>(args)...);
     }
 };
@@ -1226,8 +1232,12 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc>
 
     static Ret call(const CScriptGameObject* instance, Args... args)
     {
-        if (!instance || !instance->is_valid()) {
-            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "ERROR: Accessing destroyed object.");
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        if (!instance || !instance->is_valid())
+        {
+            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Lua ERROR: Accessing destroyed object.");
             ai().script_engine().lua_error(ai().script_engine().lua());
 
             // This part is never reached because we crash the game,
@@ -1241,6 +1251,7 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc>
                 return Ret();
             }
         }
+
         return (instance->*MemFunc)(std::forward<Args>(args)...);
     }
 };
