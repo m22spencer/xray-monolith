@@ -183,6 +183,17 @@ public:
 	virtual ~CScriptGameObject();
 	operator CObject*();
 
+    IC bool is_valid() const
+    {
+        // If the pointer was never set, it's obviously invalid.
+        if (!m_game_object) return false;
+
+        // Check lua game object pointer back-reference. If it doesn't point to this, then the object was likely deleted and the pointer is now dangling.
+        if (m_game_object->lua_game_object() != this) return false;
+
+        return true;
+    }
+
 	CGameObject& object() const;
 	CScriptGameObject* Parent() const;
 	void Hit(CScriptHit* tLuaHit);
@@ -1171,6 +1182,115 @@ public:
 
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };
+
+extern BOOL lua_busy_hands_debug;
+
+struct SafeWrapBase
+{
+    template <typename Ret>
+    static Ret handle_invalid()
+    {
+        // This part is never reached because we crash the game,
+        // but we need to satisfy the compiler.
+        if constexpr (std::is_reference_v<Ret>)
+        {
+            return *static_cast<std::remove_reference_t<Ret>*>(nullptr);
+        }
+        else
+        {
+            return Ret();
+        }
+    }
+
+    static void log_and_error(LPCSTR error)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[BusyHandsDebug] Fatal Error: %s", error);
+        ai().script_engine().lua_error(ai().script_engine().lua());
+    }
+
+    static void log(LPCSTR error)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[BusyHandsDebug] Error: %s", error);
+    }
+};
+
+// Wrap every getter/setter with a validity check
+// If the object is not valid, instead of "busy hands" issue, crash the game with error log
+template <typename FuncSignature, FuncSignature MemFunc>
+struct SafeWrap;
+
+// Specialization for NON-CONST methods
+template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...)>
+struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
+{
+    using type = Ret(*)(CScriptGameObject*, Args...);
+
+    // We use Args... directly. C++ reference-collapsing rules will 
+    // keep & as & and const& as const&.
+    static Ret call(CScriptGameObject* instance, Args... args)
+    {
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        if (!instance || !instance->is_valid())
+        {
+            log_and_error("Accessing destroyed object");
+            return handle_invalid<Ret>();
+        }
+
+        try
+        {
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+        }
+        catch (std::exception& e)
+        {
+            // Catches standard C++ exceptions
+            auto s = make_string("C++ Error: %s", e.what());
+            log(s.c_str());
+        }
+        catch (...)
+        {
+            log("Unknown Error");
+        }
+    }
+};
+
+// Specialization for CONST methods
+template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...) const>
+struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc> : SafeWrapBase
+{
+    using type = Ret(*)(const CScriptGameObject*, Args...);
+
+    static Ret call(const CScriptGameObject* instance, Args... args)
+    {
+        if (!lua_busy_hands_debug)
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+
+        if (!instance || !instance->is_valid())
+        {
+            log_and_error("Accessing destroyed object");
+            return handle_invalid<Ret>();
+        }
+
+        try
+        {
+            return (instance->*MemFunc)(std::forward<Args>(args)...);
+        }
+        catch (std::exception& e)
+        {
+            // Catches standard C++ exceptions
+            auto s = make_string("C++ Error: %s", e.what());
+            log(s.c_str());
+        }
+        catch (...)
+        {
+            log("Unknown Error");
+        }
+    }
+};
+
+#define SAFE_WRAP(func) static_cast<SafeWrap<decltype(func), func>::type>(SafeWrap<decltype(func), func>::call)
+#define SAFE_WRAP_CAST(sig, func) static_cast<SafeWrap<sig, (sig)func>::type>(SafeWrap<sig, (sig)func>::call)
 
 extern void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
 extern void sell_condition(float friend_factor, float enemy_factor);
