@@ -1242,21 +1242,7 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
             return (instance->*MemFunc)(std::forward<Args>(args)...);
         }
 
-        // Try to catch runtime errors in methods and print them
-        try
-        {
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-        }
-        catch (std::exception& e)
-        {
-            // Catches standard C++ exceptions
-            auto s = make_string("C++ Error: %s", e.what());
-            log(s.c_str());
-        }
-        catch (...)
-        {
-            log("Unknown Error");
-        }
+        return (instance->*MemFunc)(std::forward<Args>(args)...);
     }
 };
 

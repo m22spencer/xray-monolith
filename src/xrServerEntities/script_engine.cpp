@@ -240,7 +240,7 @@ void CScriptEngine::lua_error_not_crash(lua_State* L)
     if (!lua_busy_hands_debug)
         return;
 
-    ai().script_engine().print_stack();
+    ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[BusyHandsDebug] Runtime Error");
     auto stack = get_lua_stack(ai().script_engine().lua());
 
     xr_string lua_error_line = "";
