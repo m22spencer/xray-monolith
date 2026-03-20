@@ -505,7 +505,7 @@ _G.COnLuaBindFatalError = function(offender)
 	end
 	on_luabind_fatal_error_triggered = true
 
-	SendScriptCallback("on_luabind_fatal_error")
+	SendScriptCallback("on_luabind_fatal_error", offender)
 	exec_console_cmd("save " .. (user_name() or "") .. " - tempsave")
 
 	LuaFatalErrorUIInstance = LuaFatalErrorUI(offender)
