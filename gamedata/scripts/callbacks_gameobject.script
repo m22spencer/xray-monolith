@@ -524,7 +524,14 @@ function LuaFatalErrorUI:__init(offender) super()
 	self:InitCallBacks()
 	self:InitControls()
 	self:AllowWorkInPause(true)
-	exec_console_cmd("freeze_time 1")
+	self:AllowMovement(true)
+	self:AllowCursor(true)
+
+	self.message_box:AllowWorkInPause(true)
+	self.message_box:AllowMovement(true)
+	self.message_box:AllowCursor(true)
+
+	device():pause(true)
 end
 
 function LuaFatalErrorUI:__finalize()
@@ -550,17 +557,17 @@ function LuaFatalErrorUI:Show()
 end
 
 function LuaFatalErrorUI:OnMsgCopy()
-	exec_console_cmd("freeze_time 0")
+	device():pause(false)
 	exec_console_cmd("disconnect")
 end
 
 function LuaFatalErrorUI:OnMsgYes()
-	exec_console_cmd("freeze_time 0")
+	device():pause(false)
     exec_console_cmd("load " .. (user_name() or "") .. " - tempsave")
 end
 
 function LuaFatalErrorUI:OnMsgNo()
-	exec_console_cmd("freeze_time 0")
+	device():pause(false)
 end
 
 function on_game_start()
