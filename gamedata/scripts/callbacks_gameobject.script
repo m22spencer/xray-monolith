@@ -32,22 +32,6 @@ function game_object_on_net_spawn(obj)
 end
 function game_object_on_net_destroy(obj)
 	gameobjects_registry[obj:id()] = nil
-
-	-- Fix dynamic_news_manager loot table
-	local instance = dynamic_news_manager and dynamic_news_manager.get_dynamic_news and dynamic_news_manager.get_dynamic_news()
-	if instance and instance.loot then
-		for i = #instance.loot, 1, -1 do
-			local item = instance.loot[i]
-			if type(item) == "userdata" and item:id() == obj:id() then
-				table.remove(instance.loot, i)
-			end
-		end
-	end
-
-	-- Fix self.response containing deleted object
-	if instance and instance.response and instance.response["who"] and type(instance.response["who"]) == "userdata" and instance.response["who"]:id() == obj:id() then
-		instance.response["who"] = nil
-	end
 end
 
 -- Game objects iterator
@@ -505,7 +489,7 @@ _G.COnLuaBindFatalError = function(offender)
 	end
 	on_luabind_fatal_error_triggered = true
 
-	SendScriptCallback("on_luabind_fatal_error")
+	SendScriptCallback("on_luabind_fatal_error", offender)
 	exec_console_cmd("save " .. (user_name() or "") .. " - tempsave")
 
 	LuaFatalErrorUIInstance = LuaFatalErrorUI(offender)

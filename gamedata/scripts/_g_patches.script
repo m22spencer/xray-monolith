@@ -1091,25 +1091,27 @@ end
 -- Supports only unique numbers, table and userdata pointers
 _G.MinHeap = function(order, copyFrom)
 	local self = {
-		data = copyFrom and copyFrom.data and dup_table(copyFrom.data) or {}
+		__order = order or (copyFrom and copyFrom.__order or less_func),
+		__data = copyFrom and dup_table(copyFrom.__data) or {},
+		__indices = {},
 	}
-	local order = order or less_func
-
-	-- Weak table to not hold references to deleted objects for whatever reason
-	local indices = setmetatable({}, { __mode = "k" })
 
 	-- Internal: Swap two elements and update their stored indices
-	self._swap = function(self, i, j)
-	    local heap = self.data
+	self.__swap = function(self, i, j)
+	    local heap = self.__data
+	    local indices = self.__indices
+
 	    local a, b = heap[i], heap[j]
-	    heap[i], heap[j] = b, a
-	    
 	    indices[a] = j
 	    indices[b] = i
+	    heap[i], heap[j] = b, a
 	end
 
 	self.sift_up_index = function(self, idx)
-	    local heap = self.data
+	    local heap = self.__data
+	    local indices = self.__indices
+	    local order = self.__order
+
 	    local hole_idx = idx
 	    local sifting_node = heap[hole_idx]
 
@@ -1131,6 +1133,7 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.sift_up = function(self, node)
+		local indices = self.__indices
 		if not indices[node] then
 			callstack()
 			printf("~[MinHeap] trying to sift up not indexed node, push instead")
@@ -1140,13 +1143,15 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.sift_down_index = function(self, idx)
-	    local heap = self.data
-	    local end_idx = #heap
+	    local heap = self.__data
+	    local indices = self.__indices
+	    local order = self.__order
 
+	    local end_idx = #heap
 	    local hole_idx = idx
 	    local sifting_node = heap[hole_idx]
 	    local half_idx = math_floor(end_idx / 2)
-	    
+
 	    while hole_idx <= half_idx do
 	        local child_idx = hole_idx * 2
 	        local right_idx = child_idx + 1
@@ -1170,6 +1175,7 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.sift_down = function(self, node)
+		local indices = self.__indices
 		if not indices[node] then
 			callstack()
 			printf("~[MinHeap] trying to sift down not indexed node, push instead")
@@ -1179,7 +1185,8 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.update_index = function(self, idx)
-        local heap = self.data
+        local heap = self.__data
+	    local order = self.__order
 
         local parent = math_floor(idx / 2)
         -- If the new value is smaller than its parent, move it up
@@ -1192,6 +1199,7 @@ _G.MinHeap = function(order, copyFrom)
     end
 
     self.update = function(self, node)
+    	local indices = self.__indices
     	if not indices[node] then
     		callstack()
 			printf("~[MinHeap] trying update not indexed node, push instead")
@@ -1201,12 +1209,15 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.push = function(self, node)
+		local heap = self.__data
+	    local indices = self.__indices
+
 		if indices[node] then
 			callstack()
 			printf("~[MinHeap] trying to push existing node, update instead")
 			return self:update(node)
 		end
-	    local heap = self.data
+
 	    local n = #heap + 1
 	    heap[n] = node
 	    indices[node] = n
@@ -1214,7 +1225,10 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.remove_index = function(self, idx)
-	    local heap = self.data
+	    local heap = self.__data
+	    local indices = self.__indices
+	    local order = self.__order
+
 	    local node_to_remove = heap[idx]
 	    if not node_to_remove then return end
 
@@ -1224,23 +1238,22 @@ _G.MinHeap = function(order, copyFrom)
 	        heap[n] = nil
 	        indices[node_to_remove] = nil
 	    else
-	        self:_swap(idx, n)
+	        self:__swap(idx, n)
 	        heap[n] = nil
 	        indices[node_to_remove] = nil
 
 	        -- The element swapped into 'idx' might need to move up or down
-	        if heap[idx] then
-		        local parent = math_floor(idx / 2)
-		        if idx > 1 and order(heap[idx], heap[parent]) then
-		            self:sift_up_index(idx)
-		        else
-		            self:sift_down_index(idx)
-		        end
-		    end
+	        local parent = math_floor(idx / 2)
+	        if idx > 1 and order(heap[idx], heap[parent]) then
+	            self:sift_up_index(idx)
+	        else
+	            self:sift_down_index(idx)
+	        end
 	    end
 	end
 
 	self.remove = function(self, node)
+		local indices = self.__indices
 		if not indices[node] then
 			return
 		end
@@ -1248,21 +1261,24 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.peek = function(self)
-	    return self.data[1]
+	    return self.__data[1]
 	end
 
 	self.pop = function(self)
-		local d = self.data[1]
+		local d = self.__data[1]
 		self:remove_index(1)
 		return d
 	end
 
+	-- For validation purposes, returned value must be equal (==) to node
 	self.get = function(self, node)
-		return self.data[indices[node]]
+		return self.__data[self.__indices[node]]
 	end
 
 	self.rebuild = function(self)
-	    local heap = self.data
+	    local heap = self.__data
+	    local indices = self.__indices
+
 	    local n = #heap
 
 	    for k in pairs(indices) do indices[k] = nil end
@@ -1275,21 +1291,24 @@ _G.MinHeap = function(order, copyFrom)
 	end
 
 	self.size = function(self)
-	    return #self.data
+	    return #self.__data
 	end
 
 	self.copy = function(self)
-		return MinHeap(order, self)
+		return MinHeap(nil, self)
 	end
 
 	self.to_table = function(self)
-		local t = dup_table(self.data)
-		table.sort(t, order)
+		local t = dup_table(self.__data)
+		table.sort(t, self.__order)
 		return t
 	end
 
 	self.validate = function(self)
-		local heap = self.data
+		local heap = self.__data
+	    local indices = self.__indices
+	    local order = self.__order
+
 	    local size = #heap
 	    local valid = true
 
@@ -1316,7 +1335,7 @@ _G.MinHeap = function(order, copyFrom)
 	    return valid
 	end
 
-	if #self.data > 0 then
+	if #self.__data > 0 then
 		self:rebuild()
 	end
 

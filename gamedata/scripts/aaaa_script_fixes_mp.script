@@ -834,6 +834,67 @@ ui_enemy_health.cs_remove = function()
 	return true
 end
 
+-- Attempt for safer DynamicNewsManager
+DynamicNewsManagerInit = dynamic_news_manager.DynamicNewsManager.__init
+dynamic_news_manager.DynamicNewsManager.__init = function(self)
+	DynamicNewsManagerInit(self)
+	RegisterScriptCallback("game_object_on_net_destroy", self)
+
+	if self.response and type(self.response) == "table" then
+		local who = self.response["who"]
+		self.response["who"] = nil
+		setmetatable(self.response, {
+			__newindex = function(t, key, value)
+				if key == "who" then
+					if type(value) == "userdata" and type(value.id) == "function" then
+						rawset(t, "__responseId", value:id())
+						rawset(t, "__responseValue", nil)
+					else
+						rawset(t, "__responseId", nil)
+						rawset(t, "__responseValue", value)
+					end
+				else
+					rawset(t, key, value)
+				end
+			end,
+			__index = function(t, key)
+				if key == "who" then
+					local responseId = rawget(t, "__responseId")
+					local responseValue = rawget(t, "__responseValue")
+
+					if responseId then
+						return level.object_by_id(responseId)
+					end
+
+					return responseValue
+				else
+					return rawget(t, key)
+				end
+			end
+		})
+		self.response["who"] = who
+	end
+end
+
+dynamic_news_manager.DynamicNewsManager.CleanObjects = function(self, id)
+	if self.loot then
+		for i = #self.loot, 1, -1 do
+			local item = self.loot[i]
+			if type(item) == "userdata" and item:id() == id then
+				table.remove(self.loot, i)
+			end
+		end
+	end
+
+	if self.response and self.response["who"] and type(self.response["who"]) == "userdata" and self.response["who"]:id() == id then
+		self.response["who"] = nil
+	end
+end
+
+dynamic_news_manager.DynamicNewsManager.game_object_on_net_destroy = function(self, obj)
+	self:CleanObjects(obj:id())
+end
+
 -- Perform luagc cleanup
 function luagc_cleanup()
 	printf("~[luagc_cleanup] collectgarbage before=%sKb",collectgarbage("count")*1024)
