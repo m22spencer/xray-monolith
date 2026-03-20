@@ -234,6 +234,30 @@ void CScriptEngine::lua_error(lua_State* L)
 #endif
 }
 
+extern BOOL lua_busy_hands_debug;
+void CScriptEngine::lua_error_not_crash(lua_State* L)
+{
+    if (!lua_busy_hands_debug)
+        return;
+
+    ai().script_engine().print_stack();
+    auto stack = get_lua_stack(ai().script_engine().lua());
+
+    xr_string lua_error_line = "";
+    for (auto const& s : stack)
+    {
+        if (s.find("[Lua]") != xr_string::npos)
+        {
+            lua_error_line = s;
+            break;
+        }
+    }
+
+    ::luabind::functor<void> funct;
+    if (ai().script_engine().functor("_G.COnLuaBindFatalError", funct))
+        funct(lua_error_line.c_str());
+}
+
 void printLuaStack()
 {
 	ai().script_engine().print_stack();
@@ -290,6 +314,7 @@ void CScriptEngine::setup_callbacks()
 	{
 #if !XRAY_EXCEPTIONS
 		::luabind::set_error_callback(CScriptEngine::lua_error);
+        ::luabind::set_error_callback_not_crash(CScriptEngine::lua_error_not_crash);
 #endif
 
 		::luabind::set_pcall_callback(CScriptEngine::lua_pcall_failed);
