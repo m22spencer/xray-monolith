@@ -1226,11 +1226,11 @@ _G.MinHeap = function(order, copyFrom)
 
 	self.remove_index = function(self, idx)
 	    local heap = self.__data
-	    local indices = self.__indices
-	    local order = self.__order
-
 	    local node_to_remove = heap[idx]
 	    if not node_to_remove then return end
+
+	    local indices = self.__indices
+	    local order = self.__order	    
 
 	    local n = #heap
 
@@ -1347,6 +1347,13 @@ end
 local ev_queue = {}
 local ev_order_func = function(a, b) return a.timer < b.timer end
 local ev_heap = MinHeap(ev_order_func)
+local ev_heap_validate = function()
+	local valid = ev_heap:validate()
+	if not valid then
+		print_tip("ev_heap is not valid!")
+	end
+end
+
 _G.CreateTimeEvent = function(ev_id,act_id,timer,f,...)
 	if not f then
 		callstack()
@@ -1360,12 +1367,12 @@ _G.CreateTimeEvent = function(ev_id,act_id,timer,f,...)
 
 	if not ev_queue[ev_id][act_id] then
 		local node = {
-			ev_id = ev_id,
-			act_id = act_id,
-			timer = time_global() + timer * 1000,
-			f = f,
-			p = select("#", ...) > 0 and {...} or nil -- Force nil
-		}
+	        ev_id = ev_id,
+	        act_id = act_id,
+	        timer = time_global() + timer * 1000,
+	        f = f,
+	        p = select("#", ...) > 0 and {...} or nil -- Force nil
+	    }
 		ev_queue[ev_id][act_id] = node
 		ev_heap:push(node)
 	end
@@ -1398,6 +1405,8 @@ _G.ProcessEventQueue = function(force)
 
 	local tg = time_global()
 
+	-- ev_heap_validate()
+
     while ev_heap:size() > 0 do
         local node = ev_heap:peek()
 
@@ -1423,26 +1432,37 @@ _G.ProcessEventQueue = function(force)
 			* returns true, if calls RemoveTimeEvent with the different id, works, PASS
 			* returns false, if calls RemoveTimeEvent with the different id, works, PASS
         ]]
-        -- local timer = node.timer
+        local timer = node.timer
         local result
-        if node.p then
+		if node.p then
         	result = node.f(unpack(node.p))
         else
         	result = node.f()
         end
-        ev_heap:remove(node)
+        
         if result == true then
+        	-- Remove current node and remove potential node created if Remove->Create by the same id in the same event happened. If they both point to the same node, :remove will handle that
         	-- print_tip("executing %s:%s:%s, result true", node.ev_id, node.act_id, timer)
+        	ev_heap:remove(node)
+        	ev_heap:remove(ev_queue[node.ev_id][node.act_id])
         	ev_queue[node.ev_id][node.act_id] = nil
         else
-        	-- print_tip("executing %s:%s:%s, result false, to reinsert", node.ev_id, node.act_id, timer)
-        	table_insert(ev_reinsert, node)
+        	-- If called reset on itself, and still in ev_queue by the same node, do nothing, it handled reinsertion by itself
+        	if ev_queue[node.ev_id][node.act_id] == node and node.timer > timer then
+        		-- print_tip("executing %s:%s:%s, result false, event reset itself, skipping, timers %s->%s", node.ev_id, node.act_id, timer, timer, node.timer)
+        	else
+	        	-- print_tip("executing %s:%s:%s, result false, to reinsert", node.ev_id, node.act_id, timer)
+	        	ev_heap:remove(node)
+	        	table_insert(ev_reinsert, node)
+	        end
         end
+        -- ev_heap_validate()
     end
 
     for i = #ev_reinsert, 1, -1 do
     	local node = ev_reinsert[i]
-    	if ev_queue[node.ev_id][node.act_id] then
+    	-- Push only same node that in ev_queue, to prevent Remove->Create case
+    	if ev_queue[node.ev_id][node.act_id] == node then
     		-- print_tip("try reinserting %s:%s:%s, success", node.ev_id, node.act_id, node.timer)
     		ev_heap:push(node)
     	else
@@ -1450,6 +1470,8 @@ _G.ProcessEventQueue = function(force)
     	end
         ev_reinsert[i] = nil
     end
+
+    -- ev_heap_validate()
 
     return false
 end
