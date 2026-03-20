@@ -7,7 +7,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "../Include/xrRender/KinematicsAnimated.h"
 
-extern BOOL g_legs_enabled;
+BOOL g_legs_enabled = FALSE;
 
 void player_legs_controller::destroy()
 {
@@ -246,7 +246,7 @@ void player_legs_controller::update(CActor* actor, bool isShadowPass)
 
 void player_legs_controller::render()
 {
-    if (!g_legs_enabled || showActorBody != 0 || !m_model)
+    if (!m_model)
         return;
 
     CActor* actor = Actor();

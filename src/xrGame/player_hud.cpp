@@ -14,8 +14,6 @@
 
 extern int g_nearwall;
 
-BOOL g_legs_enabled = FALSE;
-
 player_hud* g_player_hud = NULL;
 Fvector _ancor_pos;
 Fvector _wpn_root_pos;

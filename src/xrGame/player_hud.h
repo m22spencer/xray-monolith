@@ -485,4 +485,3 @@ public:
 };
 
 extern player_hud* g_player_hud;
-extern BOOL g_legs_enabled;
