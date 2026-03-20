@@ -187,6 +187,7 @@ extern BOOL r_optimize_calculate_bones;
 extern float legs_fwd_offset;
 extern float legs_spine_offset_y;
 extern BOOL legs_in_demo_record;
+extern BOOL legs_in_low_crouch;
 
 extern CrosshairSettings g_crosshair_camera_near;
 extern CrosshairSettings g_crosshair_camera_far;
@@ -2628,6 +2629,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "g_legs_fwd_offset", &legs_fwd_offset, -2.0f, 2.0f);
     CMD4(CCC_Float, "g_legs_spine_offset_y", &legs_spine_offset_y, -1.0f, 1.0f);
     CMD4(CCC_Integer, "g_legs_in_demo_record", &legs_in_demo_record, 0, 1);
+    CMD4(CCC_Integer, "g_legs_in_low_crouch", &legs_in_low_crouch, 0, 1);
 
 	CMD3(CCC_Mask, "g_firepos", &psActorFlags, AF_FIREPOS);
 	CMD3(CCC_Mask, "g_firepos_zoom", &psActorFlags, AF_FIREPOS_ZOOM);
