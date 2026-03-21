@@ -411,17 +411,17 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
 		.def("set_smart_cover_target_idle", SAFE_WRAP(&CScriptGameObject::set_smart_cover_target_idle))
 		.def("set_smart_cover_target_default", SAFE_WRAP(&CScriptGameObject::set_smart_cover_target_default))
 
-		.def("idle_min_time", SAFE_WRAP_CAST(void (CScriptGameObject::*)(float), &CScriptGameObject::idle_min_time))
-		.def("idle_min_time", SAFE_WRAP_CAST(float (CScriptGameObject::*)() const, &CScriptGameObject::idle_min_time))
+		.def("idle_min_time", SAFE_WRAP((void (CScriptGameObject::*)(float))(&CScriptGameObject::idle_min_time)))
+		.def("idle_min_time", SAFE_WRAP((float (CScriptGameObject::*)() const)(&CScriptGameObject::idle_min_time)))
 
-		.def("idle_max_time", SAFE_WRAP_CAST(void (CScriptGameObject::*)(float), &CScriptGameObject::idle_max_time))
-		.def("idle_max_time", SAFE_WRAP_CAST(float (CScriptGameObject::*)() const, &CScriptGameObject::idle_max_time))
+		.def("idle_max_time", SAFE_WRAP((void (CScriptGameObject::*)(float))(&CScriptGameObject::idle_max_time)))
+		.def("idle_max_time", SAFE_WRAP((float (CScriptGameObject::*)() const)(&CScriptGameObject::idle_max_time)))
 
-		.def("lookout_min_time", SAFE_WRAP_CAST(void (CScriptGameObject::*)(float), &CScriptGameObject::lookout_min_time))
-		.def("lookout_min_time", SAFE_WRAP_CAST(float (CScriptGameObject::*)() const, &CScriptGameObject::lookout_min_time))
+		.def("lookout_min_time", SAFE_WRAP((void (CScriptGameObject::*)(float))(&CScriptGameObject::lookout_min_time)))
+		.def("lookout_min_time", SAFE_WRAP((float (CScriptGameObject::*)() const)(&CScriptGameObject::lookout_min_time)))
 
-		.def("lookout_max_time", SAFE_WRAP_CAST(void (CScriptGameObject::*)(float), &CScriptGameObject::lookout_max_time))
-		.def("lookout_max_time", SAFE_WRAP_CAST(float (CScriptGameObject::*)() const, &CScriptGameObject::lookout_max_time))
+		.def("lookout_max_time", SAFE_WRAP((void (CScriptGameObject::*)(float))(&CScriptGameObject::lookout_max_time)))
+		.def("lookout_max_time", SAFE_WRAP((float (CScriptGameObject::*)() const)(&CScriptGameObject::lookout_max_time)))
 
 		.def("in_loophole_fov", SAFE_WRAP(&CScriptGameObject::in_loophole_fov))
 		.def("in_current_loophole_fov", SAFE_WRAP(&CScriptGameObject::in_current_loophole_fov))
