@@ -1417,14 +1417,14 @@ _G.ProcessEventQueue = function(force)
 
         -- Event can create new event or reset events that will change the position of node in the heap
         -- So remove current node explicitly instead of popping
-        -- Possible outcomes for f(unpack(p)) that needs to be addressed
+        -- Possible outcomes for f(unpack(p)) that needs to be addressed. ev_queue and ev_heap MUST contain same nodes, so not only check ids, but identity (==) check as well
         --[[
 			* returns true, if calls createTimeEvent with the same id, create is ignored, event removed - PASS
 			* returns false, if calls createTimeEvent with the same id, create is ignored, event stays for next frame - PASS
 			* returns true, if calls createTimeEvent with the different id, works, PASS
 			* returns false, if calls createTimeEvent with the different id, works, PASS
 			* returns true, if calls ResetTimeEvent with the same id, node is updated in heap, then removed, removed from ev_queue as well, PASS 
-			* returns false, if calls ResetTimeEvent with the same id, node is updated in heap, then removed, then added to reinsert, then reinserted. Originally, only timer is updated. On paper should be PASS but needs more testing and optimization
+			* returns false, if calls ResetTimeEvent with the same id, node is updated in heap. If node.timer is greater than before, don't reinsert, it handled itself. Otherwise, removed, then added to reinsert, then reinserted. Originally, only timer is updated. On paper should be PASS but needs more testing
 			* returns true, if calls ResetTimeEvent with the different id, works, PASS
 			* returns false, if calls ResetTimeEvent with the different id, works, PASS
 			* returns true, if calls RemoveTimeEvent with the same id, node tries to be removed twice but gets caught in :remove method, then removed from ev_queue, PASS
