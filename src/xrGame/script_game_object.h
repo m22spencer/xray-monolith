@@ -1186,6 +1186,14 @@ DECLARE_SCRIPT_REGISTER_FUNCTION
 extern BOOL lua_busy_hands_debug;
 extern xr_vector<xr_string> get_lua_stack(lua_State* L);
 
+// Default: Assume the class DOES NOT have is_valid()
+template <typename T, typename = void>
+struct has_is_valid : std::false_type {};
+
+// Specialization: If T->is_valid() compiles, this becomes true
+template <typename T>
+struct has_is_valid<T, std::void_t<decltype(std::declval<T>()->is_valid())>> : std::true_type {};
+
 struct SafeWrapBase
 {
     template <typename Ret>
@@ -1220,10 +1228,23 @@ struct SafeWrapBase
     static auto execute(InstanceT instance, FuncT memFunc, Args&&... args)
         -> decltype((instance->*memFunc)(std::forward<Args>(args)...))
     {
-        if (lua_busy_hands_debug && (!instance || !instance->is_valid()))
+        if (lua_busy_hands_debug)
         {
+            bool is_valid = false;
+
+            if (instance != nullptr)
+            {
+                if constexpr (has_is_valid<InstanceT>::value)
+                    // The class has is_valid(), so we use it
+                    is_valid = instance->is_valid();
+                else
+                    // The class does NOT have is_valid(), so being non-null is good enough
+                    is_valid = true;
+            }
+
             // Send one last call to Lua to warn users that Lua is about to die
-            log_and_callback("Accessing destroyed object");
+            if (!is_valid)
+                log_and_callback("Accessing destroyed object");
         }
 
         // Sayonara
@@ -1231,39 +1252,37 @@ struct SafeWrapBase
     }
 };
 
-// Wrap every getter/setter with a validity check
-// If the object is not valid, instead of "busy hands" issue, crash the game with error log
+// The primary template (just a declaration)
 template <typename FuncSignature, FuncSignature MemFunc>
 struct SafeWrap;
 
-// Specialization for NON-CONST methods
-template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...)>
-struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
+// 1. Generalized specialization for NON-CONST methods
+template <typename T, typename Ret, typename... Args, Ret(T::* MemFunc)(Args...)>
+struct SafeWrap<Ret(T::*)(Args...), MemFunc> : SafeWrapBase
 {
-    using type = Ret(*)(CScriptGameObject*, Args...);
+    // T is deduced as the class (e.g., CScriptGameObject)
+    using type = Ret(*)(T*, Args...);
 
-    static Ret call(CScriptGameObject* instance, Args... args)
+    static Ret call(T* instance, Args... args)
     {
-        // Just forward everything to the base class
         return execute(instance, MemFunc, std::forward<Args>(args)...);
     }
 };
 
-// Specialization for CONST methods
-template <typename Ret, typename... Args, Ret(CScriptGameObject::* MemFunc)(Args...) const>
-struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc> : SafeWrapBase
+// 2. Generalized specialization for CONST methods
+template <typename T, typename Ret, typename... Args, Ret(T::* MemFunc)(Args...) const>
+struct SafeWrap<Ret(T::*)(Args...) const, MemFunc> : SafeWrapBase
 {
-    using type = Ret(*)(const CScriptGameObject*, Args...);
+    // T is deduced as the class, but we use const T* for the instance
+    using type = Ret(*)(const T*, Args...);
 
-    static Ret call(const CScriptGameObject* instance, Args... args)
+    static Ret call(const T* instance, Args... args)
     {
-        // Just forward everything to the base class
         return execute(instance, MemFunc, std::forward<Args>(args)...);
     }
 };
 
-#define SAFE_WRAP(func) static_cast<SafeWrap<decltype(func), func>::type>(SafeWrap<decltype(func), func>::call)
-#define SAFE_WRAP_CAST(sig, func) static_cast<SafeWrap<sig, (sig)func>::type>(SafeWrap<sig, (sig)func>::call)
+#define SAFE_WRAP(func) static_cast<typename SafeWrap<decltype(func), func>::type>(SafeWrap<decltype(func), func>::call)
 
 extern void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
 extern void sell_condition(float friend_factor, float enemy_factor);
