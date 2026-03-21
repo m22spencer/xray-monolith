@@ -1213,6 +1213,22 @@ struct SafeWrapBase
         log(error);
         ai().script_engine().lua_error_not_crash(ai().script_engine().lua());
     }
+
+    // This generic function accepts ANY instance type (const or non-const) 
+    // and ANY member function pointer type.
+    template <typename InstanceT, typename FuncT, typename... Args>
+    static auto execute(InstanceT instance, FuncT memFunc, Args&&... args)
+        -> decltype((instance->*memFunc)(std::forward<Args>(args)...))
+    {
+        if (lua_busy_hands_debug && (!instance || !instance->is_valid()))
+        {
+            // Send one last call to Lua to warn users that Lua is about to die
+            log_and_callback("Accessing destroyed object");
+        }
+
+        // Sayonara
+        return (instance->*memFunc)(std::forward<Args>(args)...);
+    }
 };
 
 // Wrap every getter/setter with a validity check
@@ -1226,23 +1242,10 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...), MemFunc> : SafeWrapBase
 {
     using type = Ret(*)(CScriptGameObject*, Args...);
 
-    // We use Args... directly. C++ reference-collapsing rules will 
-    // keep & as & and const& as const&.
     static Ret call(CScriptGameObject* instance, Args... args)
     {
-        if (!lua_busy_hands_debug)
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-
-        if (!instance || !instance->is_valid())
-        {
-            // Send one last call to Lua to warn users that Lua is about to die
-            log_and_callback("Accessing destroyed object");
-
-            // Sayonara
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-        }
-
-        return (instance->*MemFunc)(std::forward<Args>(args)...);
+        // Just forward everything to the base class
+        return execute(instance, MemFunc, std::forward<Args>(args)...);
     }
 };
 
@@ -1254,33 +1257,8 @@ struct SafeWrap<Ret(CScriptGameObject::*)(Args...) const, MemFunc> : SafeWrapBas
 
     static Ret call(const CScriptGameObject* instance, Args... args)
     {
-        if (!lua_busy_hands_debug)
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-
-        if (!instance || !instance->is_valid())
-        {
-            // Send one last call to Lua to warn users that Lua is about to die
-            log_and_callback("Accessing destroyed object");
-
-            // Sayonara
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-        }
-
-        // Try to catch runtime errors in methods and print them
-        try
-        {
-            return (instance->*MemFunc)(std::forward<Args>(args)...);
-        }
-        catch (std::exception& e)
-        {
-            // Catches standard C++ exceptions
-            auto s = make_string("C++ Error: %s", e.what());
-            log(s.c_str());
-        }
-        catch (...)
-        {
-            log("Unknown Error");
-        }
+        // Just forward everything to the base class
+        return execute(instance, MemFunc, std::forward<Args>(args)...);
     }
 };
 
