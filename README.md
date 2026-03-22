@@ -279,7 +279,6 @@ Main and MT:
     * fix infinite loop when no sound devices in system (https://github.com/themrdemonized/xray-monolith/pull/479)
 
 MT:
-  * Alife registry uses `sparse_map` data structure for faster insertion, removal and iteration
   * .peak lights has slightly higher intensity to be more visually noticeable compared to SSS
 
 **2026.03.16**
@@ -1911,4 +1910,3 @@ override = true
 
 * Exported distance_to_xz_sqr() function of Fvector
 * Redesigned duplicate section error, it will additionally print what file adds the section in the first place in addition to the file that has the duplicate
-
