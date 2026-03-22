@@ -237,18 +237,23 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
-**2026.03.19 (Pre-release)**
+**2026.03.22**
 
 Main and MT:
   * `play_cycle CA->PlayCycle` return value check on nullptr
   * Legs improvements:
     * In shadowmap phase render full body model without hiding bones instead of moving the player's, fixes some bugs like reappearing level transition dialog
     * Adjust player's torch and bolt offsets so they won't float in the space
-  * `lua_busy_hands_debug 1` console option to debug common "Busy Hands" errors
-    * Every method of `CScriptGameObject` is wrapped into functions that, when `lua_busy_hands_debug 1` is enabled, will:
-      * First check if game object exists and not unloaded
-      * If it doesn't, instead of executing Lua code that will potentially lead to "Busy Hands", the game will **crash** with proper error log
-      * If check above has passed, the underlying method is wrapped into `try-catch` block that will monitor if executing the method lead to engine errors and sends information to the log
+    * Model is attached to the camera, fixing bugs with body displacement when colliding with objects or stalkers
+    * `g_legs_in_low_crounch` command to disable legs rendering when low crouching, default enabled
+  * `lua_busy_hands_debug` command to debug common "Busy Hands" errors, default enabled:
+    * Currently, it debugs two groups of possible errors, the most common ones:
+      * Calling methods on already destroyed `CScriptGameObject` objects
+      * Mismatched parameters when calling methods
+    * When critical error occurs that will lead to "Busy Hands":
+      * Lua callback will make a temporary save and popup "Lua Critical Error" window
+      * In the window you can choose to immediately return to Main Menu, reload the temporary save, or ignore and continue
+      ![image](http://puu.sh/KKpnk/2353c0f344.jpg)
   * Replacing time event system with Indexed Min-Heap based time events
     * Peek only closest event
     * Fast insert and removal
@@ -261,11 +266,21 @@ Main and MT:
     * Simpler `size_table`
     * Reservoir sampling based `random_key_table`
     * `random_choice` without allocating tables
+  * Revised the fix for `DynamicNewsManager` to be more robust
   * Fixed script_fixes_mp:727 `attempt to index local tm (nil value)`
   * Fixed `state_mgr_animation.delayed_attach` to not spam time events
   * Fixed `ui_debug_main.delayed_attach` to not spam time events
   * Fixed `ui_enemy_health.cs_remove` spamming in time events because the wrapper function for time event doesn't return true
   * Faster algorithm for `spairs` if order function is not provided  
+  * leer-h: Update poltergeist.cpp (https://github.com/themrdemonized/xray-monolith/pull/475)
+  * erepb:
+    * fix moving target pathing (https://github.com/themrdemonized/xray-monolith/pull/474)
+    * use m_location_level to sort map spots (https://github.com/themrdemonized/xray-monolith/pull/476)
+    * fix infinite loop when no sound devices in system (https://github.com/themrdemonized/xray-monolith/pull/479)
+
+MT:
+  * Alife registry uses `sparse_map` data structure for faster insertion, removal and iteration
+  * .peak lights has slightly higher intensity to be more visually noticeable compared to SSS
 
 **2026.03.16**
 
