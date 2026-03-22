@@ -2136,6 +2136,7 @@ bool CActor::AllowActorShadow()
 extern xr_unordered_set<CDemoRecord*> pDemoRecords;
 BOOL legs_in_demo_record = FALSE;
 BOOL legs_in_low_crouch = FALSE;
+BOOL legs_render_attachments_shadow = TRUE;
 extern BOOL g_legs_enabled;
 void CActor::renderable_Render()
 {
@@ -2193,14 +2194,16 @@ void CActor::renderable_Render()
                 }
 
                 // Move torch
-                auto I = attachedItem(CLSID_DEVICE_TORCH);
-                if (I)
+                if (legs_render_attachments_shadow)
                 {
-                    auto& v = I->object();
-                    v.XFORM().c.mad(diff, m);
-                    v.renderable_Render();
+                    for (const auto& I : m_attached_objects)
+                    {
+                        auto& v = I->object();
+                        v.XFORM().c.mad(diff, m);
+                        v.renderable_Render();
+                    }
                 }
-
+                
                 // Move bolt
                 if (inventory().GetActiveSlot() == BOLT_SLOT)
                 {
