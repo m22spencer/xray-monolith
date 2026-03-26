@@ -1033,6 +1033,12 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 	CCartridge l_cartridge;
 	l_cartridge.Load(m_ammoTypes2[m_ammoType2].c_str(), m_ammoType2);
 
+    if (sz > 0xffff)
+    {
+        Msg("[%s] ERROR: CWeaponMagazinedWGrenade::load: current magazine size %zu for underbarrel is too big, truncate to 1", Name(), sz);
+        sz = 1;
+    }
+
 	while (sz > m_magazine2.size())
 		m_magazine2.push_back(l_cartridge);
 }
