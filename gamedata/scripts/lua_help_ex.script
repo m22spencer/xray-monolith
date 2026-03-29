@@ -113,6 +113,7 @@
     alife() {
         number object_count()
         void iterate_objects(function(se_obj))
+        void force_update() -- forces an immediate alife scheduled update cycle
     }
 
     game {

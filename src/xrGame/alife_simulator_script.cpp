@@ -452,6 +452,11 @@ void set_process_time(CALifeSimulator* self, int micro)
 	self->set_process_time(micro);
 }
 
+void force_update(CALifeSimulator* self)
+{
+	self->update_scheduled(true);
+}
+
 // demonized: iterate alife objects, functor style
 void CALifeSimulator__iterate_objects(const CALifeSimulator* self, const luabind::functor<bool>& functor)
 {
@@ -629,6 +634,7 @@ void CALifeSimulator::script_register(lua_State* L)
 		.def("register", &reprocess_spawn)
 		.def("set_objects_per_update", &set_objects_per_update)
 		.def("set_process_time", &set_process_time)
+		.def("force_update", &force_update)
 		.def("get_children", &get_children, return_stl_iterator)
 		//Alundaio: END
 
