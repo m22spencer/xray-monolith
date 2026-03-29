@@ -715,6 +715,9 @@
         // Get and set the zoom_rotate_time (time in seconds to fully ADS) field for a given weapon
         function GetZoomRotateTime()
         function SetZoomRotateTime(float)
+
+		// Forcibly set the zoom type for the weapon
+		function ForceSetZoomType(float)
     }
 
     class CWeaponKnife : CWeapon {
