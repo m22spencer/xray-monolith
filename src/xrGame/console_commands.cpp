@@ -174,6 +174,7 @@ extern BOOL interruptFireOnAimToggle;
 extern BOOL mt_UpdateWeaponSounds;
 
 extern BOOL alifeObjectHangingLampIgnoreMatchConfiguration;
+extern BOOL duplicate_story_id_crash;
 
 extern BOOL spawn_antifreeze;
 extern BOOL spawn_antifreeze_debug;
@@ -3034,6 +3035,9 @@ void CCC_RegisterCommands()
 
 	// Ignore "no renderer type set for hanging-lamp" error
 	CMD4(CCC_Integer, "hanging_lamp_ignore_match_configuration", &alifeObjectHangingLampIgnoreMatchConfiguration, 0, 1);
+
+    // Ignore "Specified story object is already in the Story registry!: error
+    CMD4(CCC_Integer, "duplicate_story_id_crash", &duplicate_story_id_crash, 0, 1);
 
 	// Poltergeists spawn corpses on death
 	CMD4(CCC_Integer, "poltergeist_spawn_corpse_on_death", &poltergeist_spawn_corpse_on_death, 0, 1);
