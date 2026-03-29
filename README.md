@@ -246,7 +246,7 @@ How to compile exes:
     * Big performance gain in firefights vs NPCs, up to 100% in GAMMA
     * `g_enemy_manager_useful_cache_time` to control the cache expiration time. Default is 250ms. -1 will disable caching
     
-    ![image]http://puu.sh/KKJxE/a4770b7660.jpg
+    ![image](http://puu.sh/KKJxE/a4770b7660.jpg)
 
   * Legs: 
     * Fixed rendering attached items shadows such as headlight
