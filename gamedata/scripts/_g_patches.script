@@ -1127,7 +1127,7 @@ end
 
 -- get_object_by_id that uses gameobjects_registry, more reliable than db.storage
 _G.get_object_by_id = function(id)
-	if not (id and type(id) == "number") then
+	if (id == nil or id > 65535) then
 		callstack()
 		printe("!ERROR get_object_by_id | id (%s) is invalid", id)
 		return
