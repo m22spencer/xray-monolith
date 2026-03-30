@@ -642,7 +642,6 @@ void CCustomMonster::update_range_fov(float& new_range, float& new_fov, float st
         CWeaponStatMgun* stm = smart_cast<CWeaponStatMgun*>(cast_stalker()->Holder());
         if (stm)
         {
-            float min_distance = 0.0F;
             stm->OverrideRangeFOV(cast_game_object(), start_range);
         }
 #endif
