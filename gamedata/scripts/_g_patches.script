@@ -1737,6 +1737,9 @@ _G.OrderedTable = function(t)
 	return t
 end
 
+-- Save original user_name function
+_G.user_name_og = _G.user_name
+
 -- Always return a copy of these global variables to prevent modification in scripts
 local constTable = {
 	VEC_ZERO = function() return vector():set(0,0,0) end,

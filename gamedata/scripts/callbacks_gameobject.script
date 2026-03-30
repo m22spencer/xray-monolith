@@ -492,13 +492,18 @@ AddScriptCallback("on_luabind_fatal_error")
 local LuaFatalErrorUIInstance = nil
 local on_luabind_fatal_error_triggered = false
 _G.COnLuaBindFatalError = function(offender)
+	-- Don't engage when actor is gone, it doesn't matter at this point
+	if not db.actor then
+		return
+	end
+
 	if on_luabind_fatal_error_triggered then
 		return
 	end
 	on_luabind_fatal_error_triggered = true
 
 	SendScriptCallback("on_luabind_fatal_error", offender)
-	exec_console_cmd("save " .. (user_name() or "") .. " - tempsave")
+	exec_console_cmd("save " .. (user_name_og() or "") .. " - tempsave")
 
 	LuaFatalErrorUIInstance = LuaFatalErrorUI(offender)
 	LuaFatalErrorUIInstance:Show()
@@ -555,7 +560,7 @@ end
 
 function LuaFatalErrorUI:OnMsgYes()
 	device():pause(false)
-    exec_console_cmd("load " .. (user_name() or "") .. " - tempsave")
+    exec_console_cmd("load " .. (user_name_og() or "") .. " - tempsave")
 end
 
 function LuaFatalErrorUI:OnMsgNo()
