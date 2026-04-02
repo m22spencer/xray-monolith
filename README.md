@@ -237,6 +237,23 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.04.02 (Prerelease)**
+
+* Main and MT:
+  * Legs: Fix rendering attachment shadows with multiple light sources
+  * BusyHandsDebug: Do not engage if `db.actor` is nil, doesn't matter at this point
+  * DXML: Safer Lua callback, fixes possible crashes such as when throwing grenades with right mouse button
+
+* MT:
+  * Revert "Wallmarks: Increase MAX_TRIS from 16384 to 32768"
+  * Revert changes to visual memory manager and remove unnecessary critical section guards
+  * Split `CObjectList::destroy_queue` processing:
+    * When `mt_scheduler 1`, delegate will be pushed into `seqParallelBeforRender` to the next frame
+    * `net_RelCase` for bullet manager
+    * `empty()` checks for restrictions
+    * Possibly fixes random crashes when an object is destroyed while mt scheduler is processing objects
+  * Wallmarks: static pool uses `xr_deque`, possibly fixes issues with Blood Pools mod
+
 **2026.03.29**
 
 * Main and MT:
