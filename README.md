@@ -262,6 +262,7 @@ How to compile exes:
     * `r_wallmarks_ssa_k` console command to limit rendering distance of wallmarks, default 30. More value means LESS rendering distance
   * Fixed excessive smearing when using SSS with motion vectors
   * Update global Feel::Vision data when an object changes it visuals, possibly fixes crashes related to `get_new_local_point_on_mesh`
+  * Possible fix of complete lockup of engine due to calculating bones in separate thread
 
 **2026.03.29**
 
