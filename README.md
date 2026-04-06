@@ -239,6 +239,15 @@ How to compile exes:
 ## Changelog
 **2026.04.06**
 
+* MT:
+  * Wallmarks
+    * Restore `! Failed to render dynamic wallmark` try-catch block, fixes crashes with certain script mods
+    * Disable `g_wallmark_range_static` and `g_wallmark_range_skeleton` commands, they are unused
+  * Alternative solution to fix of complete lockup of engine due to calculating bones in separate thread, fixes `HudItem.cpp (551): CHudItem::UpdateCL` crash
+  * `CVisualMemoryManager::visible_object` nullptr check in `m_objects`
+
+**2026.04.05 (Prerelease)**
+
 * Main and MT:
   * Legs: Fix rendering attachment shadows with multiple light sources
   * BusyHandsDebug: Do not engage if `db.actor` is nil, doesn't matter at this point
