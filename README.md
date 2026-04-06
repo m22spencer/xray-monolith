@@ -237,7 +237,7 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
-**2026.04.05**
+**2026.04.06**
 
 * Main and MT:
   * Legs: Fix rendering attachment shadows with multiple light sources
@@ -259,7 +259,7 @@ How to compile exes:
     * Update wallmarks lifetime before rendering, simplify rendering loop
     * Removal of skeleton wallmarks on object's `net_destroy`, fixes floating wallmarks in the air or stretched wallmarks artifacts
     * Remove distance check when adding wallmarks to render queue, fixes absent wallmarks on objects that were killed more than 50 meters away
-    * `r_wallmarks_ssa_k` console command to limit rendering distance of wallmarks, default 30. More value means LESS rendering distance
+    * `r_wallmarks_ssa_k` console command to limit rendering distance of wallmarks, default 40. More value means LESS rendering distance
   * Fixed excessive smearing when using SSS with motion vectors
   * Update global Feel::Vision data when an object changes it visuals, possibly fixes crashes related to `get_new_local_point_on_mesh`
   * Possible fix of complete lockup of engine due to calculating bones in separate thread
