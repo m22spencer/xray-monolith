@@ -1023,7 +1023,7 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 		SwitchMode(true);
 
 	if (b && !m_bGrenadeMode) {
-		Msg("[%s] ERROR: CWeaponMagazinedWGrenade::load: m_bGrenadeMode = %d, failed to switch to grenade mode", Name(), m_bGrenadeMode);
+		Msg("![%s] ERROR: CWeaponMagazinedWGrenade::load: m_bGrenadeMode = %d, failed to switch to grenade mode", Name(), m_bGrenadeMode);
 		return;
 	}
 
@@ -1035,7 +1035,7 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 
     if (sz > 0xffff)
     {
-        Msg("[%s] ERROR: CWeaponMagazinedWGrenade::load: current magazine size %zu for underbarrel is too big, truncate to 1", Name(), sz);
+        Msg("![%s] ERROR: CWeaponMagazinedWGrenade::load: current magazine size %zu for underbarrel is too big, truncate to 1", Name(), sz);
         sz = 1;
     }
 
