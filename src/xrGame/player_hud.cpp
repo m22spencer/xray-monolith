@@ -1503,7 +1503,13 @@ void player_hud::StopScriptAnim()
 
 	updateMovementLayerState();
 
-	if (part != 2 && !m_attached_items[part])
+    if (part > 2)
+    {
+        Msg("![player_hud::StopScriptAnim()] invalid script_anim_part %d, must be < 3", part);
+        ai().script_engine().print_stack();
+    }
+        
+	if (part < 2 && !m_attached_items[part])
 		re_sync_anim(part + 1);
 	else
 		OnMovementChanged((ACTOR_DEFS::EMoveCommand)0);
