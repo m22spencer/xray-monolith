@@ -152,7 +152,7 @@ public:
 				// Each section name
 				// Plus the overhead of the xr_vector structure
                 strings.insert(sect_pair.Name);
-				total_bytes += sizeof(sect_pair.Data);
+				total_bytes += sizeof(sect_pair.Name) + sizeof(sect_pair.Data);
 
                 // Items
                 for (const auto& d : sect_pair.Data)
@@ -160,12 +160,12 @@ public:
                     strings.insert(d.first);
                     strings.insert(d.second);
                     strings.insert(d.filename);
-                    total_bytes += sizeof(d.depth) + sizeof(d.insertionIndex);
+                    total_bytes += sizeof(d.depth) + sizeof(d.insertionIndex) + sizeof(d.first) + sizeof(d.second) + sizeof(d.filename);
                 }
 			}
 		}
         for (const auto& s : strings)
-            total_bytes += sizeof(s) + s.size();
+            total_bytes += s.size();
 	}
 
 private:
