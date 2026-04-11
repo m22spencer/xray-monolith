@@ -1,4 +1,4 @@
-﻿#include "pch_script.h"
+#include "pch_script.h"
 
 #include "WeaponMagazined.h"
 #include "actor.h"
@@ -960,12 +960,21 @@ void CWeaponMagazined::OnEmptyClick()
 		PlayBlendAnm(empty_click_layer, empty_click_speed, empty_click_power);
 }
 
+#include "../xrEngine/xr_input.h"
 void CWeaponMagazined::OnAnimationEnd(u32 state)
 {
 	switch (state)
 	{
-	case eReload: if (m_needReload) ReloadMagazine();
-		SwitchState(eIdle);
+	case eReload:
+        {
+            if (m_needReload)
+                ReloadMagazine();
+
+            // demonized: If wpn fire button is held, initiate auto firing when reload is done
+            if (Actor() && H_Parent() == Actor() && pInput->iGetAsyncKeyState(get_action_dik(kWPN_FIRE)))
+                m_pendingShot = true;
+            SwitchState(eIdle);
+        }
 		break; // End of reload animation
 	case eHiding: SwitchState(eHidden);
 		break; // End of Hide
@@ -1000,6 +1009,13 @@ void CWeaponMagazined::switch2_Idle()
 
 	SetPending(FALSE);
 	PlayAnimIdle();
+
+    if (m_pendingShot)
+    {
+        m_pendingShot = false;
+        if (Actor() && H_Parent() == Actor() && Actor()->cast_input_receiver())
+            Actor()->cast_input_receiver()->IR_OnKeyboardPress(kWPN_FIRE);
+    }
 }
 
 #ifdef DEBUG
