@@ -237,6 +237,22 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.04.11 (Prerelease)**
+
+* Main and MT:
+  * Print warning and set m_ammoType to 0 if `m_ammoTypes[m_ammoType]` is invalid
+  * Fix potential "heavy busy hands" on game load due to `m_attached_items` invalid indexing
+  * DLTX:
+    * `xr_vector<Sect>` for data storage instead of `xr_vector<Sect*>`,
+    * Cache actually stores prepared data, faster cache retrieval and reduced size of cache slightly
+  * QoL: on the end of a reload animation, if weapon fire button is held, the weapon will start shooting automatically
+
+* MT:
+  * Disable costly `stat_memory` calls on accessing main menu and saving, fixes big freezes
+  * Wallmark creation optimization (https://github.com/ixray-team/ixray-1.6-stcop/commit/c731e386173f284502e71c3201a9c1f68b22c1c5)
+  * Revert changes to task manager that can cause crashes
+  * Try to fix potential crash in `CEntityAlive::get_new_local_point_on_mesh`
+
 **2026.04.06**
 
 * MT:
