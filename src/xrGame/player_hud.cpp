@@ -1494,6 +1494,7 @@ void play_blend(player_hud* hud, u8 pid, const MotionID& M, BOOL bMixIn, float s
 	}
 }
 
+extern BOOL print_bone_warnings;
 void player_hud::StopScriptAnim()
 {
 	u8 part = script_anim_part;
@@ -1505,8 +1506,11 @@ void player_hud::StopScriptAnim()
 
     if (part > 2)
     {
-        Msg("![player_hud::StopScriptAnim()] invalid script_anim_part %d, must be < 3", part);
-        ai().script_engine().print_stack();
+        if (print_bone_warnings)
+        {
+            Msg("![player_hud::StopScriptAnim()] invalid script_anim_part %d, must be < 3", part);
+            ai().script_engine().print_stack();
+        }
     }
         
 	if (part < 2 && !m_attached_items[part])
