@@ -534,6 +534,23 @@ utils_item.has_scope = function(section)
 	end
 end
 
+-- Fix broken location_types table in sim_squad_scripted
+-- The original builds: location_types[mask_string] = mask_string  (e.g. ["255,255,255,000"] = "255,255,255,000")
+-- But set_location_types_section() looks up by section name  (e.g. location_types["stalker_terrain"])
+-- Unlocalized via unlocalizer_modded_exes_sim_squad_scripted.ltx, repopulated here
+do
+	local lt = sim_squad_scripted.location_types
+	if lt then
+	    empty_table(lt)
+		local locations_ini = ini_file("misc\\smart_terrain_masks.ltx")
+		locations_ini:section_for_each(function(section)
+			local a, key, val = locations_ini:r_line_ex(section, 0, "", "")
+			lt[section] = key
+			return false
+		end)
+	end
+end
+
 -- Fix for returning wrong scope section on detaching
 function item_weapon.detach_scope(weapon)
 	-- Return if the weapon is not valid.
