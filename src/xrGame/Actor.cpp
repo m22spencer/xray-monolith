@@ -2138,19 +2138,23 @@ BOOL legs_in_demo_record = FALSE;
 BOOL legs_in_low_crouch = FALSE;
 BOOL legs_render_attachments_shadow = TRUE;
 extern BOOL g_legs_enabled;
+
+bool canRenderLegs(CActor* actor, CHolderCustom* m_holder) noexcept
+{
+    return g_legs_enabled
+        && (legs_in_low_crouch || !(actor->MovingState() & mcCrouch && actor->MovingState() & mcAccel))
+        && g_player_hud
+        && !m_holder
+        && (legs_in_demo_record || pDemoRecords.empty())
+        && showActorBody == 0;
+};
+
 void CActor::renderable_Render()
 {
 	VERIFY(_valid(XFORM()));
 
-    static auto canRenderLegs = [](CActor* actor, CHolderCustom* m_holder) noexcept
-    {
-        return g_legs_enabled
-            && (legs_in_low_crouch || !(actor->mstate_real & mcCrouch && actor->mstate_real & mcAccel))
-            && g_player_hud
-            && !m_holder
-            && (legs_in_demo_record || pDemoRecords.empty())
-            && showActorBody == 0;
-    };
+    // leg shadows are disabled for DX8 and DX9
+    bool validRendererForShadow = (::Render->get_generation() == ::Render->GENERATION_R2) && (::Render->get_dx_level() != 0x00090000);
 
 	if (cam_active == eacFirstEye)
 	{
@@ -2176,59 +2180,67 @@ void CActor::renderable_Render()
 		}
 		else if (AllowActorShadow()) // render actor shadow
 		{
-            static u32 renderFrame = 0;
-            bool needAdjust = false;
-            if (Device.dwFrame != renderFrame)
+            if (validRendererForShadow)
             {
-                renderFrame = Device.dwFrame;
-                needAdjust = true;
-            }
-
-            if (canRenderLegs(this, m_holder))
-            {
-                Fvector diff(XFORMShadow.c);
-                diff.sub(XFORM().c);
-                float m = diff.magnitude();
-                diff.normalize_safe();
-
-                // Render full body from legs controller without hiding bones for shadow correctness
-                // Solves potential issues with manipulating actor's XFORM
-                m_legs_controller.update(this, true);
-                m_legs_controller.render();
-
-                // Ideally the active item also should be duplicated but leave this for now
-                // Move active item
-                PIItem pItem = inventory().ActiveItem();
-                if (pItem)
+                static u32 renderFrame = 0;
+                bool needAdjust = false;
+                if (Device.dwFrame != renderFrame)
                 {
-                    auto& v = pItem->object();
-                    if (needAdjust)
-                        v.XFORM().c.mad(diff, m);
-                    v.renderable_Render();
+                    renderFrame = Device.dwFrame;
+                    needAdjust = true;
                 }
-
-                // Move torch
-                if (legs_render_attachments_shadow)
+                
+                if (canRenderLegs(this, m_holder))
                 {
-                    for (const auto& I : m_attached_objects)
+                    Fvector diff(XFORMShadow.c);
+                    diff.sub(XFORM().c);
+                    float m = diff.magnitude();
+                    diff.normalize_safe();
+
+                    // Render full body from legs controller without hiding bones for shadow correctness
+                    // Solves potential issues with manipulating actor's XFORM
+                        m_legs_controller.update(this, true);
+                        m_legs_controller.render();
+
+                        // Ideally the active item also should be duplicated but leave this for now
+                        // Move active item
+                        PIItem pItem = inventory().ActiveItem();
+                    if (pItem)
                     {
-                        auto& v = I->object();
+                        auto& v = pItem->object();
                         if (needAdjust)
                             v.XFORM().c.mad(diff, m);
                         v.renderable_Render();
                     }
-                }
-                
-                // Move bolt
-                if (inventory().GetActiveSlot() == BOLT_SLOT)
-                {
-                    auto bI = inventory().ItemFromSlot(BOLT_SLOT);
-                    if (bI)
+
+                    // Move torch
+                    if (legs_render_attachments_shadow)
                     {
-                        auto& v = bI->object();
-                        if (needAdjust)
-                            v.XFORM().c.mad(diff, m);
+                        for (const auto& I : m_attached_objects)
+                        {
+                            auto& v = I->object();
+                            if (needAdjust)
+                                v.XFORM().c.mad(diff, m);
+                            v.renderable_Render();
+                        }
                     }
+
+                    // Move bolt
+                    if (inventory().GetActiveSlot() == BOLT_SLOT)
+                    {
+                        auto bI = inventory().ItemFromSlot(BOLT_SLOT);
+                        if (bI)
+                        {
+                            auto& v = bI->object();
+                            if (needAdjust)
+                                v.XFORM().c.mad(diff, m);
+                        }
+                    }
+                }
+                else
+                {
+                    inherited::renderable_Render();
+                    CInventoryOwner::renderable_Render();
                 }
             }
             else
@@ -2251,6 +2263,9 @@ BOOL CActor::renderable_ShadowGenerate()
 {
 	if (m_holder)
 		return FALSE;
+
+    if (::Render->get_generation() == ::Render->GENERATION_R1 && cam_active == eacFirstEye && canRenderLegs(this, m_holder))
+        return FALSE;
 
 	return inherited::renderable_ShadowGenerate();
 }
