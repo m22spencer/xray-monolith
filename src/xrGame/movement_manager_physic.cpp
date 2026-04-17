@@ -210,8 +210,8 @@ Fvector CMovementManager::path_position(const float& time_to_check)
 	);
 }
 
-float movement_manager_move_along_path_query_pos_threshold = 0.5f;
-float movement_manager_move_along_path_query_pos_threshold_sqr = 0.5f * 0.5f;
+float movement_manager_move_along_path_query_pos_threshold = 0.25f;
+float movement_manager_move_along_path_query_pos_threshold_sqr = 0.25f * 0.25f;
 void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fvector& dest_position, float time_delta)
 {
 	START_PROFILE("Build Path/Move Along Path")
