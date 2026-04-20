@@ -1,5 +1,10 @@
 function on_game_start()
 	local modded_exes_operations_per_version = {
+		[20260421] = function()
+			exec_console_cmd("r__ssa_discard 7")
+			local dist = tonumber(get_console_cmd(0, "r__detail_radius") or "0") or 0
+			exec_console_cmd("r__detail_radius " .. tostring(math.max(dist, math.min(160, dist * 2))))
+		end,
 		[20260418] = function()
 			exec_console_cmd("r__ssa_discard 6")
 			exec_console_cmd("r__ssa_discard_exp 0.5")
