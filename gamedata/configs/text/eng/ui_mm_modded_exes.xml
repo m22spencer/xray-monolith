@@ -65,8 +65,14 @@
 	<string id="ui_mm_modded_exes_visual_graphics_r_wallmarks_ssa_k_desc">
 		<text>MORE value means LESS draw distance</text>
 	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r_wallmarks_static">
+		<text>Decals on static objects (r_wallmarks_static)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r_wallmarks_dynamic">
+		<text>Decals on dynamic objects (r_wallmarks_dynamic)</text>
+	</string>
 	<string id="ui_mm_modded_exes_visual_graphics_r__blood_decals_on_objects">
-		<text>Blood decals on living objects (r__blood_decals_on_objects)</text>
+		<text>Additional Blood decals on living objects (r__blood_decals_on_objects)</text>
 	</string>
 
 	<string id="ui_mm_modded_exes_visual_graphics_r__ssa_discard">
