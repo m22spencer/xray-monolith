@@ -45,10 +45,8 @@ Future MT versions will include LuaJIT 2.1 64 bit version, it will be incompatib
 Known issues with MT version
   * Due to aggressive culling some spots on the map might bug out and don't render properly. For example a place behind basement entrance in Rookie Village
   * Increased possibility to have a crash on loading the whole game or a savefile
-  * Longer pause on escaping to main menu or saving the game
   * Trees might have minor flickering, especially with mods that alter weather parameters via scripts
   * Occassional visual bugs like seldom flickering lights, model animations
-  * Inconsistencies with some Lua mods like Interaction Dot Marks that might result in buggy behaviour
   * DX8, 9 and 10 versions are largely untested, they do load and render correctly on the first glance
   * Some modpacks might crash on load, tested with vanilla and GAMMA only and they do work
 
@@ -237,6 +235,48 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.04.21**
+
+* Main and MT:
+  * `player_hud::StopScriptAnim()` hide warnings under `print_bone_warnings` flag
+  * Optimization of headlights updates (CTorch):
+    * Optimize by limiting `set_position` and `set_rotation` calls by custom epsilon
+    * Further objects have bigger position epsilon but same rotation epsilon
+    * `r__optimize_torch` cvar to toggle optimization
+  * Controller attack fixes:
+    * No `actor_psy_immunity` dependency, looks correct in Anomaly
+    * Camera zooms on `left_eye/right_eye/bip01_head` bone if model has it, fallback to object position
+    * Better camera behaviour when actor is too close to controller
+  * Fix possible crash in `randI` when getting random value with `min == max` in range
+  * Do not set thread description, fix https://github.com/themrdemonized/xray-monolith/issues/511
+  * Legs: Disable shadow for DX8 and DX9
+  * `r__actor_shadow_in_demo_record` cvar to disable actor shadow when `demo_record 1`
+  * `r2_sun_lumscale_color` cvar to tune sun color
+  * Disable `alife_object that uses server_objects_registry, less calls to engine unless necessary` since I have paranoia and cant check if it doesn't lead to errors
+  * erepb: 
+    * Fix online transition squad teleport (https://github.com/themrdemonized/xray-monolith/pull/512)
+    * Fix actualize fails (https://github.com/themrdemonized/xray-monolith/pull/513)
+
+* MT:
+  * Cleanup `destroy_queue` if for some reason it is not empty on `CObjectList` destruction
+  * Split `PreRenderThread` on pre and post transforms. Rain and Particles updates start sooner in the game loop
+  * Possible fix for crashes related to UI in `CDialogHolder`
+  * Restore shadows from headlamp and flashlight, fix https://github.com/themrdemonized/xray-monolith/issues/510
+  * Legs: fix flickering headlamp position on DX9
+  * `CAI_Stalker::net_Relcase` invalidate `m_best_item_to_kill` if matches
+  * `stat_memory_async` command to get memory stats on separate thread
+  * Replaced all `stat_memory` calls to `stat_memory_async` to decrease freezes and loading times
+  * Optimization of discarding objects to render logic based on SSA
+    * `CalcSSA` uses squared radius for static objects, smaller objects will be culled more aggressively
+    * Gradient culling of static objects and grass based on SSA and position hash:
+      * Smaller objects that fail the SSA test will still render depending on how much smaller they are than the discard limit.
+      * In effect it turns "rendering radius" hard cutoff into smaller density of objects the further they are, makes pop-in less noticeable
+    * `r__ssa_discard` cvar to tune SSA discard, increased default SSA discard 3.5 -> 7
+    * `r_ssa_discard_exp` cvar to finetune discard logic of statics. less < 1 will increase density of closer objects, > 1 will reduce, default is 0.5
+    * `r_ssa_discard_fade_k` cvar to finetune discard logic of statics for far objects, more value means stricter discard, default is 4
+    * HUD geometry will skip SSA check
+  * Remade `r_wallmarks_ssa_k` cvar with different range of values, default is 0.5
+
 **2026.04.13**
 
 * Main and MT:
