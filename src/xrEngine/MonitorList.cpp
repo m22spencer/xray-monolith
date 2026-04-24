@@ -20,6 +20,7 @@
 
 ENGINE_API xr_token* vid_monitor_token = nullptr;
 ENGINE_API xr_string  vid_monitor_name  = "Auto";
+ENGINE_API volatile long g_monitor_list_dirty = 0;
 
 static xr_vector<HMONITOR> s_monitor_handles;
 
@@ -414,4 +415,11 @@ HMONITOR ResolveSelectedMonitor()
 
     Msg("! vid_monitor: '%s' not found on this system, using Auto", name.c_str());
     return NULL;
+}
+
+void refresh_vid_monitor_list()
+{
+    Msg("* vid_monitor: live-refresh triggered");
+    free_vid_monitor_list();
+    fill_vid_monitor_list();
 }
