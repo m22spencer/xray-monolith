@@ -235,6 +235,18 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+**2026.04.24 (Prerelease)**
+
+* Main and MT:
+  * BusyHandsDebug: Remove where it is unnecessary
+  * GhenTuong: Add callback.net_spawn_after (https://github.com/themrdemonized/xray-monolith/pull/516)
+  * erepb: Monitor selection (https://github.com/themrdemonized/xray-monolith/pull/517)
+
+* MT:
+  * Option to disable static and dynamic wallmarks via `r_wallmarks_static` and `r_wallmarks_dynamic` cvars
+  * Fixed potential crash in `CObjectList::Unload`
+  * Safer `stat_memory_async`, reverted to `stat_memory` call in critical places
+
 **2026.04.21**
 
 * Main and MT:
