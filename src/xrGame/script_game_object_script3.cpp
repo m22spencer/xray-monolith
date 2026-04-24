@@ -303,22 +303,22 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		.def("set_sympathy", &CScriptGameObject::SetSympathy)
 
 		//////////////////////////////////////////////////////////////////////////
-		.def("profile_name", SAFE_WRAP(&CScriptGameObject::ProfileName))
-		.def("character_name", SAFE_WRAP(&CScriptGameObject::CharacterName))
-		.def("character_icon", SAFE_WRAP(&CScriptGameObject::CharacterIcon))
-		.def("character_rank", SAFE_WRAP(&CScriptGameObject::CharacterRank))
-		.def("character_dialogs", SAFE_WRAP(&CScriptGameObject::CharacterDialogs))
-		.def("set_character_rank", SAFE_WRAP(&CScriptGameObject::SetCharacterRank))
-		.def("change_character_rank", SAFE_WRAP(&CScriptGameObject::ChangeCharacterRank))
-		.def("character_reputation", SAFE_WRAP(&CScriptGameObject::CharacterReputation))
-		.def("set_character_reputation", SAFE_WRAP(&CScriptGameObject::SetCharacterReputation))
-		.def("change_character_reputation", SAFE_WRAP(&CScriptGameObject::ChangeCharacterReputation))
-		.def("character_community", SAFE_WRAP(&CScriptGameObject::CharacterCommunity))
-		.def("set_character_community", SAFE_WRAP(&CScriptGameObject::SetCharacterCommunity))
+		.def("profile_name", &CScriptGameObject::ProfileName)
+		.def("character_name", &CScriptGameObject::CharacterName)
+		.def("character_icon", &CScriptGameObject::CharacterIcon)
+		.def("character_rank", &CScriptGameObject::CharacterRank)
+		.def("character_dialogs", &CScriptGameObject::CharacterDialogs)
+		.def("set_character_rank", &CScriptGameObject::SetCharacterRank)
+		.def("change_character_rank", &CScriptGameObject::ChangeCharacterRank)
+		.def("character_reputation", &CScriptGameObject::CharacterReputation)
+		.def("set_character_reputation", &CScriptGameObject::SetCharacterReputation)
+		.def("change_character_reputation", &CScriptGameObject::ChangeCharacterReputation)
+		.def("character_community", &CScriptGameObject::CharacterCommunity)
+		.def("set_character_community", &CScriptGameObject::SetCharacterCommunity)
 
 		.def("get_actor_relation_flags", SAFE_WRAP(&CScriptGameObject::get_actor_relation_flags))
 		.def("set_actor_relation_flags", SAFE_WRAP(&CScriptGameObject::set_actor_relation_flags))
-		.def("sound_voice_prefix", SAFE_WRAP(&CScriptGameObject::sound_voice_prefix))
+		.def("sound_voice_prefix", &CScriptGameObject::sound_voice_prefix)
 
 		.enum_("ACTOR_RELATIONS")
 		[
@@ -334,8 +334,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		]
 
 		//CustomZone
-		.def("set_restrictor_type", SAFE_WRAP(&CScriptGameObject::SetRestrictionType))
-		.def("get_restrictor_type", SAFE_WRAP(&CScriptGameObject::GetRestrictionType))
+		.def("set_restrictor_type", &CScriptGameObject::SetRestrictionType)
+		.def("get_restrictor_type", &CScriptGameObject::GetRestrictionType)
 		.def("enable_anomaly", SAFE_WRAP(&CScriptGameObject::EnableAnomaly))
 		.def("disable_anomaly", SAFE_WRAP(&CScriptGameObject::DisableAnomaly))
 		.def("set_idle_particles", SAFE_WRAP(&CScriptGameObject::ChangeAnomalyIdlePart))
@@ -424,10 +424,10 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		// demonized: Toggle movement collision for stalker NPCs
 		.def("set_enable_movement_collision", &CScriptGameObject::set_enable_movement_collision)
 
-		.def("mark_item_dropped", SAFE_WRAP(&CScriptGameObject::MarkItemDropped))
-		.def("marked_dropped", SAFE_WRAP(&CScriptGameObject::MarkedDropped))
-		.def("unload_magazine", SAFE_WRAP(&CScriptGameObject::UnloadMagazine))
-		.def("force_unload_magazine", SAFE_WRAP(&CScriptGameObject::ForceUnloadMagazine))
+		.def("mark_item_dropped", &CScriptGameObject::MarkItemDropped)
+		.def("marked_dropped", &CScriptGameObject::MarkedDropped)
+		.def("unload_magazine", &CScriptGameObject::UnloadMagazine)
+		.def("force_unload_magazine", &CScriptGameObject::ForceUnloadMagazine)
 
 		.def("sight_params", SAFE_WRAP(&CScriptGameObject::sight_params))
 
@@ -435,9 +435,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		.def("movement_enabled", SAFE_WRAP(&CScriptGameObject::movement_enabled))
 
 		.def("critically_wounded", SAFE_WRAP(&CScriptGameObject::critically_wounded))
-		.def("get_campfire", SAFE_WRAP(&CScriptGameObject::get_campfire))
-		.def("get_artefact", SAFE_WRAP(&CScriptGameObject::get_artefact))
-		.def("get_physics_object", SAFE_WRAP(&CScriptGameObject::get_physics_object))
+		.def("get_campfire", &CScriptGameObject::get_campfire)
+		.def("get_artefact", &CScriptGameObject::get_artefact)
+		.def("get_physics_object", &CScriptGameObject::get_physics_object)
 		.def("aim_time", SAFE_WRAP((void (CScriptGameObject::*)(CScriptGameObject*, u32))&CScriptGameObject::aim_time))
 		.def("aim_time", SAFE_WRAP((u32 (CScriptGameObject::*)(CScriptGameObject*))&CScriptGameObject::aim_time))
 
@@ -455,12 +455,12 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
 		.def("actor_look_at_point", &CScriptGameObject::ActorLookAtPoint)
 		.def("actor_stop_look_at_point", &CScriptGameObject::ActorStopLookAtPoint)
-		.def("enable_level_changer", SAFE_WRAP(&CScriptGameObject::enable_level_changer))
-		.def("is_level_changer_enabled", SAFE_WRAP(&CScriptGameObject::is_level_changer_enabled))
+		.def("enable_level_changer", &CScriptGameObject::enable_level_changer)
+		.def("is_level_changer_enabled", &CScriptGameObject::is_level_changer_enabled)
 
-		.def("set_level_changer_invitation", SAFE_WRAP(&CScriptGameObject::set_level_changer_invitation))
-		.def("start_particles", SAFE_WRAP(&CScriptGameObject::start_particles))
-		.def("stop_particles", SAFE_WRAP(&CScriptGameObject::stop_particles))
+		.def("set_level_changer_invitation", &CScriptGameObject::set_level_changer_invitation)
+		.def("start_particles", &CScriptGameObject::start_particles)
+		.def("stop_particles", &CScriptGameObject::stop_particles)
 		//Alundaio: Extended exports
 #ifdef ENABLE_CAR
 		//For Car
@@ -593,7 +593,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 		.def("get_total_weight_force_update", SAFE_WRAP(&CScriptGameObject::GetTotalWeightForceUpdate))
 
 		// demonized: get luminosity as displayed in ui
-		.def("get_actor_ui_luminosity", SAFE_WRAP(&CScriptGameObject::GetActorUILuminosity))
+		.def("get_actor_ui_luminosity", &CScriptGameObject::GetActorUILuminosity)
 
 		.def("weight", SAFE_WRAP(&CScriptGameObject::Weight))
 
