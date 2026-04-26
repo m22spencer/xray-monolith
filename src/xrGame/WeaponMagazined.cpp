@@ -1755,12 +1755,14 @@ void CWeaponMagazined::OnMotionMark(u32 state, const motion_marks& M)
 {
 	inherited::OnMotionMark(state, M);
 
+    // Edited by Verdatim 18.4.2026
 	if (state == eReload)
 	{
 		if (bClearJamOnly)
 		{
 			bMisfire = false;
 			bClearJamOnly = false;
+            m_needReload = false; // Verdatim, fix for anm_reload_misfire with motion marks causing reloads
 			return;
 		}
 		
@@ -1782,6 +1784,21 @@ void CWeaponMagazined::OnMotionMark(u32 state, const motion_marks& M)
 		{
 			if (m_needReload)
 				ReloadMagazine();
+
+            // Verdatim, fix for lmg with non-(lmg_reload) motion marks causing belts to disappear
+
+            //Msg("reload motion mark detected! initiating reload.");
+
+            u8 ammo_type = m_ammoType;
+            int ae = CheckAmmoBeforeReload(ammo_type);
+
+            if (ammo_type == m_ammoType)
+            {
+                ae += iAmmoElapsed;
+            }
+            last_hide_bullet = ae >= bullet_cnt ? bullet_cnt : bullet_cnt - ae - 1;
+
+            HUD_VisualBulletUpdate();
 		}
 	}
 }

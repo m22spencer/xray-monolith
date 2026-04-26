@@ -1,6 +1,6 @@
 // MonitorList.cpp — monitor enumeration for the vid_monitor dropdown.
 //
-// Enumerates outputs on the default DXGI adapter (EnumAdapters1(0) only),
+// Enumerates monitors via EnumDisplayMonitors + GetMonitorInfoA,
 // looks up friendly names via QueryDisplayConfig / DisplayConfigGetDeviceInfo,
 // and builds vid_monitor_token + a parallel HMONITOR sidecar vector.
 //
@@ -12,9 +12,6 @@
 #include "stdafx.h"
 #include "MonitorList.h"
 
-#pragma comment(lib, "dxgi.lib")
-#include <dxgi1_2.h>
-
 #pragma comment(lib, "cfgmgr32.lib")
 #include <cfgmgr32.h>
 #include <initguid.h>
@@ -23,6 +20,7 @@
 
 ENGINE_API xr_token* vid_monitor_token = nullptr;
 ENGINE_API xr_string  vid_monitor_name  = "Auto";
+ENGINE_API volatile long g_monitor_list_dirty = 0;
 
 static xr_vector<HMONITOR> s_monitor_handles;
 
@@ -90,8 +88,8 @@ struct DISPLAYCONFIG_MODE_INFO_LOCAL
     UINT32     infoType;
     UINT32     id;
     LUID_LOCAL adapterId;
-    // We never read the union body; pad to the full size (64 bytes).
-    UINT8      _pad[52];
+    // Union body never read; pad to the SDK size of 64 bytes.
+    UINT8      _pad[48];
 };
 
 struct DISPLAYCONFIG_DEVICE_INFO_HEADER_LOCAL
@@ -309,6 +307,28 @@ namespace
         HMONITOR  hmon;
     };
 
+    struct EnumCtx { xr_vector<OutputEntry>* outputs; GdiToInfoMap* friendly_map; };
+
+    static BOOL CALLBACK EnumMonitorsProc(HMONITOR hMon, HDC, LPRECT, LPARAM lParam)
+    {
+        auto* ctx = reinterpret_cast<EnumCtx*>(lParam);
+        MONITORINFOEXA mi;
+        mi.cbSize = sizeof(mi);
+        if (!GetMonitorInfoA(hMon, &mi))
+            return TRUE;
+
+        OutputEntry e;
+        e.gdi_name = mi.szDevice;
+        e.hmon     = hMon;
+
+        auto it = ctx->friendly_map->find(e.gdi_name);
+        e.base_label = (it != ctx->friendly_map->end() && !it->second.friendly_name.empty())
+                           ? it->second.friendly_name
+                           : xr_string(e.gdi_name);
+        ctx->outputs->push_back(e);
+        return TRUE;
+    }
+
 }
 
 
@@ -322,51 +342,9 @@ void fill_vid_monitor_list()
 
     xr_vector<OutputEntry> outputs;
     {
-        IDXGIFactory1* pFactory = nullptr;
-        HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1),
-                                        reinterpret_cast<void**>(&pFactory));
-        if (FAILED(hr) || !pFactory)
-        {
-            Msg("! vid_monitor: DXGI factory creation failed (hr=%x), monitor list will be Auto-only", hr);
-        }
-        else
-        {
-            IDXGIAdapter1* pAdapter = nullptr;
-            hr = pFactory->EnumAdapters1(0, &pAdapter);
-            if (SUCCEEDED(hr) && pAdapter)
-            {
-                UINT oi = 0;
-                IDXGIOutput* pOutput = nullptr;
-                while (pAdapter->EnumOutputs(oi, &pOutput) != DXGI_ERROR_NOT_FOUND)
-                {
-                    DXGI_OUTPUT_DESC desc;
-                    if (SUCCEEDED(pOutput->GetDesc(&desc)))
-                    {
-                        char gdi[64] = {};
-                        WideCharToMultiByte(CP_ACP, 0, desc.DeviceName, -1,
-                                            gdi, sizeof(gdi) - 1, nullptr, nullptr);
-
-                        OutputEntry e;
-                        e.gdi_name = gdi;
-                        e.hmon     = desc.Monitor;
-
-                        auto it = friendly_map.find(gdi);
-                        e.base_label = (it != friendly_map.end() && !it->second.friendly_name.empty())
-                                           ? it->second.friendly_name
-                                           : xr_string(gdi);
-                        outputs.push_back(e);
-                    }
-                    _RELEASE(pOutput);
-                    ++oi;
-                }
-                _RELEASE(pAdapter);
-            }
-            else
-            {
-                Msg("! vid_monitor: EnumAdapters1(0) failed (hr=%x)", hr);
-            }
-            _RELEASE(pFactory);
-        }
+        EnumCtx ctx{ &outputs, &friendly_map };
+        if (!EnumDisplayMonitors(NULL, NULL, EnumMonitorsProc, reinterpret_cast<LPARAM>(&ctx)) || outputs.empty())
+            Msg("! vid_monitor: EnumDisplayMonitors returned no monitors, list will be Auto-only");
     }
 
     xr_map<xr_string, u32> label_count;
@@ -437,4 +415,11 @@ HMONITOR ResolveSelectedMonitor()
 
     Msg("! vid_monitor: '%s' not found on this system, using Auto", name.c_str());
     return NULL;
+}
+
+void refresh_vid_monitor_list()
+{
+    Msg("* vid_monitor: live-refresh triggered");
+    free_vid_monitor_list();
+    fill_vid_monitor_list();
 }
