@@ -235,12 +235,15 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
-**2026.04.24 (Prerelease)**
+**2026.04.26**
 
 * Main and MT:
   * BusyHandsDebug: Remove where it is unnecessary
+  * `CWeaponMagazined::LoadScopeKoeffs` print error message on invalid weapon config
+  * maks7231: fix double `occluder_volume` apply by removing it from `level_sounds`, resulting in very quiet environment sounds in some places
   * GhenTuong: Add callback.net_spawn_after (https://github.com/themrdemonized/xray-monolith/pull/516)
-  * erepb: Monitor selection (https://github.com/themrdemonized/xray-monolith/pull/517)
+  * erepb: Monitor selection (https://github.com/themrdemonized/xray-monolith/pull/517, https://github.com/themrdemonized/xray-monolith/pull/518)
+  * Verdatim25: Fix for motion marked LMG reloads, unjams and added capability for motion_marked tri_state_reload weapons (https://github.com/themrdemonized/xray-monolith/pull/519)
 
 * MT:
   * Option to disable static and dynamic wallmarks via `r_wallmarks_static` and `r_wallmarks_dynamic` cvars
