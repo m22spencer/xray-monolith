@@ -1013,8 +1013,8 @@ void CWeaponMagazined::switch2_Idle()
     if (m_pendingShot)
     {
         m_pendingShot = false;
-        if (Actor() && H_Parent() == Actor() && Actor()->cast_input_receiver())
-            Actor()->cast_input_receiver()->IR_OnKeyboardPress(kWPN_FIRE);
+        if (Actor() && H_Parent() == Actor())
+            Level().IR_OnKeyboardPress(get_action_dik(kWPN_FIRE));
     }
 }
 
