@@ -912,15 +912,6 @@ dynamic_news_manager.DynamicNewsManager.game_object_on_net_destroy = function(se
 	self:CleanObjects(obj:id())
 end
 
--- Perform luagc cleanup
-function luagc_cleanup()
-	printf("~[luagc_cleanup] collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	collectgarbage("collect")
-	if jit and jit.flush then jit.flush() end
-	printf("~[luagc_cleanup] collectgarbage after=%sKb",collectgarbage("count")*1024)
-end
-
 -- Fix: prevent level_vertex_id bookmark from warping squad members.
 --
 -- When a squad member goes offline, net_destroy writes
@@ -955,6 +946,20 @@ local function fix_squad_offline_teleport()
 			db.offline_objects[id].level_vertex_id = nil
 		end
 	end
+end
+
+-- Disable caching in utils_item, with extra setters exported it will have wrong data
+utils_item.check_cache = function(...)
+	return false
+end
+
+-- Perform luagc cleanup
+function luagc_cleanup()
+	printf("~[luagc_cleanup] collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	collectgarbage("collect")
+	if jit and jit.flush then jit.flush() end
+	printf("~[luagc_cleanup] collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 function on_game_start()
