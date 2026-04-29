@@ -967,6 +967,9 @@
 	<string id="ui_mm_modded_exes_optimizations_mt_task_manager">
 		<text>Multithreaded Task Manager (mt_task_manager)</text>
 	</string>
+	<string id="ui_mm_modded_exes_optimizations_mt_ui">
+		<text>Multithreaded UI Update (mt_ui)</text>
+	</string>
 	<string id="ui_mm_modded_exes_optimizations_mt_update_weapon_sounds">
 		<text>Multithreaded weapon sounds updates (mt_update_weapon_sounds)</text>
 	</string>

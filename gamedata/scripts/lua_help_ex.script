@@ -98,7 +98,6 @@
         // MT only
         string active_tutorial_name()
         class class_info(object) // Returns luabind class with information about object's class: name, methods, attributes
-        CGameTaskManager* get_game_task_manager()
         string r_file_as_string(string path)
 
         -- color getters / setters
