@@ -300,6 +300,9 @@
         float get_music_volume()
         void set_music_volume(float)
 
+        float get_weather_weight()
+        void set_weather_weight(float)
+
         // Camera, position is x,y,z vector, direction is head,pitch,roll vector in RADIANS
         void set_cam_custom_position_direction(Fvector position, Fvector direction, int smoothing, bool hudDraw, bool hudAffect)
         void set_cam_custom_position_direction(Fvector position, Fvector direction, int smoothing, bool hudDraw)
