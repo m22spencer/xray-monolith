@@ -159,6 +159,17 @@ LPCSTR get_weather()
 	return (*g_pGamePersistent->Environment().GetWeather());
 }
 
+// demonized: get current weather interpolation
+float get_weather_weight()
+{
+    return g_pGamePersistent->Environment().CurrentEnv->weight;
+}
+
+void set_weather_weight(float weight)
+{
+    g_pGamePersistent->Environment().set_lerp(weight);
+}
+
 void set_weather(LPCSTR weather_name, bool forced)
 {
 #ifdef INGAME_EDITOR
@@ -2424,6 +2435,9 @@ void CLevel::script_register(lua_State* L)
 			def("is_wfx_playing", is_wfx_playing),
 			def("get_wfx_time", get_wfx_time),
 			def("stop_weather_fx", stop_weather_fx),
+
+            def("get_weather_weight", get_weather_weight),
+            def("set_weather_weight", set_weather_weight),
 
 			def("environment", environment),
 
