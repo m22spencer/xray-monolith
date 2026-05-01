@@ -259,7 +259,6 @@ How to compile exes:
 * MT:
   * Move `process_sound_callbacks` Lua callbacks for NPCs to `shedule_update`, with `mt_scheduler 1` they will be on separate thread, slightly increasing performance when there are many NPCs
   * `mt_ui` cvar to move `pUIGame->OnFrame` on separate thread, default disabled
-  * Move particle updates to `PreRenderPostTransformsThread`, less crash prone on exiting levels or game
 
 **2026.04.26**
 
