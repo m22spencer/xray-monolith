@@ -887,10 +887,10 @@ local smoke
 local last_wpn_id
 
 local function stop_smoke(smoke, force)
-	if smoke and smoke:playing() then
+	if smoke then
 		if force then
 			smoke:stop()
-		else
+		elseif smoke:playing() then
 			smoke:stop_deffered()
 		end
 	end
