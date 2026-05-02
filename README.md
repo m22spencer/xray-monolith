@@ -236,7 +236,7 @@ How to compile exes:
 
 ## Changelog
 
-**2026.05.01 (Prerelease)**
+**2026.05.02 (Prerelease)**
 * Main and MT:
   * More meaningful error messages in `CDamageManager::load_section` and `CWeaponMagazined::LoadScopeKoeffs`
   * Auto-fire after reload, use `Level().IR_OnKeyboardPress` instead of Actor's input receiver, fix https://github.com/themrdemonized/xray-monolith/issues/521
@@ -253,12 +253,19 @@ How to compile exes:
   * Persistent weather implementation with using weather interpolation from engine
     * Storing last weather file, current weather file and interpolation between them from engine
     * On load first force apply previous weather, then apply new weather but not forced, then apply interpolation
+  * Safer `pda.calculate_rankings` patch
   * leyten: clamp actor camera collision box at high FOV to fix ultrawide doorway snag, `g_clamp_actor_camera_collision 1` to enable ultrawide fix (https://github.com/themrdemonized/xray-monolith/pull/520)
   * erepb: route assign_smart via simulation_board to fix SIMBOARD.smarts orphans (https://github.com/themrdemonized/xray-monolith/pull/522)
 
 * MT:
   * Move `process_sound_callbacks` Lua callbacks for NPCs to `shedule_update`, with `mt_scheduler 1` they will be on separate thread, slightly increasing performance when there are many NPCs
+  * `CSector::traverse` optimization to address fps drop when many portals are in frustum like in Pripyat Outskirts
   * `mt_ui` cvar to move `pUIGame->OnFrame` on separate thread, default disabled
+  * `CPHMovementControl::Calculate` safety checks
+  * `CParticlesObject::renderable_Render` nullptr check
+  * `ISpatial::OwnerSectorPoint` sligthly safer
+  * `CMapLocation::UpdateSpot` `m_owner_se_object` nullptr check
+  * `CAI_Stalker::process_enemies()` `memory().visual().objectsPtr()` nullptr check
 
 **2026.04.26**
 
