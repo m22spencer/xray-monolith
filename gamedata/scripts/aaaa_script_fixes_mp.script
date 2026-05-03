@@ -967,7 +967,9 @@ level_weathers.WeatherManager.load_state = function(self, m_data, ...)
 	self.weather_file_saved = m_data.weather_manager.weather_file
 	self.last_weather_file = m_data.weather_manager.last_weather_file
 	self.weather_weight = m_data.weather_manager.weather_weight
-	printf("WeatherManager.load_state loading fields self.weather_file %s, self.last_weather_file %s, self.weather_weight %s", self.weather_file_saved, self.last_weather_file, self.weather_weight)
+	self.last_cycle = m_data.weather_manager.last_cycle
+	self.next_weather_saved = m_data.weather_manager.next_weather
+	printf("WeatherManager.load_state loading fields self.weather_file %s, self.last_weather_file %s, self.weather_weight %s, self.cycle %s, self.last_cycle %s, self.next_weather %s", self.weather_file_saved, self.last_weather_file, self.weather_weight, self.cycle, self.last_cycle, self.next_weather_saved)
 end
 
 level_weathers_WeatherManager_save_state = level_weathers.WeatherManager.save_state
@@ -976,7 +978,9 @@ level_weathers.WeatherManager.save_state = function(self, m_data, ...)
 	m_data.weather_manager.last_weather_file = self.last_weather_file
 	m_data.weather_manager.weather_file = self.weather_file
 	m_data.weather_manager.weather_weight = level.get_weather_weight()
-	printf("WeatherManager.save_state saving fields self.weather_file %s, self.last_weather_file %s, self.weather_weight %s", self.weather_file, self.last_weather_file, level.get_weather_weight())
+	m_data.weather_manager.last_cycle = self.last_cycle
+	m_data.weather_manager.next_weather = self.next_weather
+	printf("WeatherManager.save_state saving fields self.weather_file %s, self.last_weather_file %s, self.weather_weight %s, self.cycle %s, self.last_cycle %s, self.next_weather %s", self.weather_file, self.last_weather_file, level.get_weather_weight(), self.cycle, self.last_cycle, self.next_weather)
 end
 
 level_weathers_WeatherManager_select_weather = level_weathers.WeatherManager.select_weather
@@ -987,7 +991,13 @@ level_weathers.WeatherManager.select_weather = function(self, now, ...)
 	level_weathers_WeatherManager_select_weather(self, now, ...)
 end
 
-function level_weathers.WeatherManager:select_custom_weather(now, custom_weather_file, force)
+level_weathers_WeatherManager_get_next_weather_cycle = level_weathers.WeatherManager.get_next_weather_cycle
+level_weathers.WeatherManager.get_next_weather_cycle = function(self, curr_weather, ...)
+	self.last_cycle = curr_weather
+	return level_weathers_WeatherManager_get_next_weather_cycle(self, curr_weather, ...)
+end
+
+function level_weathers.WeatherManager:select_custom_weather(now, custom_weather_file, force, custom_cycle, custom_next_weather)
 	printf("select_custom_weather (%s) | current hour: %s", tostring(now), tostring(level.get_time_hours()) )
 	
 	-- get type ("atmosfear","indoor","[default]")
@@ -1021,7 +1031,7 @@ function level_weathers.WeatherManager:select_custom_weather(now, custom_weather
 				self.cycle = "clear"
 			end
 			
-			weather_cycle = self.cycle
+			weather_cycle = custom_cycle or self.cycle
 			wthr = wthr .. "_" .. weather_cycle
 		end
 	end
@@ -1059,7 +1069,7 @@ function level_weathers.WeatherManager:select_custom_weather(now, custom_weather
 		
 		-- set up current and next weather, used for many things like distant storms/Meteorites/DOF
 		if now then
-			self.curr_weather = self.preset
+			self.curr_weather = custom_next_weather or self.preset
 			self.next_weather = self.preset
 		else
 			self.curr_weather = self.next_weather
@@ -1119,14 +1129,22 @@ level_weathers_WeatherManager_reset = level_weathers.WeatherManager.reset
 level_weathers.WeatherManager.reset = function(self, ...)
 	self.from_reset = true
 	local wfx = self.weather_fx
-	local transition_period = self.transition_period
-	local pre_blowout_period = self.pre_blowout_period
 	level_weathers_WeatherManager_reset(self, ...)
 	self.from_reset = false
 
-	if self.weather_file_saved and self.last_weather_file and self.weather_weight and self.weather_file_saved ~= self.last_weather_file and not (wfx or transition_period or pre_blowout_period) then
-		self:select_custom_weather(true, self.last_weather_file)
-	    self:select_custom_weather(true, self.weather_file_saved, false)
+	if self.weather_file_saved and self.last_weather_file and self.weather_weight and self.weather_file_saved ~= self.last_weather_file and not (wfx) then
+		self:select_custom_weather(true, self.last_weather_file, nil, self.last_cycle, self.next_weather_saved)
+
+		self.last_hour = level.get_time_hours() - 1
+		if self.last_hour < 0 then
+			self.last_hour = 23
+		end
+		self.next_hour = self.last_hour + 1
+		if (self.next_hour > 23) then
+			self.next_hour = self.next_hour - 24
+		end
+
+	    self:select_custom_weather(false, self.weather_file_saved, false)
 	    level.set_weather_weight(self.weather_weight)
 	end
 end
