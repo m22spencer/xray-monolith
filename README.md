@@ -236,7 +236,7 @@ How to compile exes:
 
 ## Changelog
 
-**2026.05.02 (Prerelease)**
+**2026.05.03 (Prerelease)**
 * Main and MT:
   * More meaningful error messages in `CDamageManager::load_section` and `CWeaponMagazined::LoadScopeKoeffs`
   * Auto-fire after reload, use `Level().IR_OnKeyboardPress` instead of Actor's input receiver, fix https://github.com/themrdemonized/xray-monolith/issues/521
@@ -266,6 +266,10 @@ How to compile exes:
   * `ISpatial::OwnerSectorPoint` sligthly safer
   * `CMapLocation::UpdateSpot` `m_owner_se_object` nullptr check
   * `CAI_Stalker::process_enemies()` `memory().visual().objectsPtr()` nullptr check
+  * Removed leftover code from `ModelPool`
+  * Safer procedure to deferred deletion of models in `ModelsToDeleteDefer`
+  * Possible fix of `Physics.cpp (245): CollideIntoGroup` crash
+  * Unregister particles from spatial database when `PSI_Destroy` is called
 
 **2026.04.26**
 
