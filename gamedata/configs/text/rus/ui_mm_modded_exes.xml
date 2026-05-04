@@ -79,6 +79,16 @@
 		<text>Дополнительные декали крови на существах (r__blood_decals_on_objects)</text>
 	</string>
 
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_exp">
+		<text>Нарастание дождя (r__rain_exp)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_exp_desc">
+		<text>Как быстро увеличивается кол-во дождя. БОЛЬШЕ значение - МЕНЬШЕ нарастание</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_k">
+		<text>Модификатор плотности дождя (r__rain_k)</text>
+	</string>
+
 	<string id="ui_mm_modded_exes_visual_graphics_r__ssa_discard">
 		<text>Ограничение отрисовки объектов по занимаемой зоне на дисплее (SSA) (r__ssa_discard)</text>
 	</string>

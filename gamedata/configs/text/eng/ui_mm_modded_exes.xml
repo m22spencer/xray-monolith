@@ -79,6 +79,16 @@
 		<text>Additional Blood decals on living objects (r__blood_decals_on_objects)</text>
 	</string>
 
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_exp">
+		<text>Rain buildup (r__rain_exp)</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_exp_desc">
+		<text>How fast droplets density will increase with weather's rain density. MORE value means LESS buildup</text>
+	</string>
+	<string id="ui_mm_modded_exes_visual_graphics_r__rain_k">
+		<text>Rain density modifier (r__rain_k)</text>
+	</string>
+
 	<string id="ui_mm_modded_exes_visual_graphics_r__ssa_discard">
 		<text>Objects screen area limit (r__ssa_discard)</text>
 	</string>

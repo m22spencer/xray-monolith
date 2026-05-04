@@ -27,6 +27,19 @@ PAGE = filter_false(page {
 	line {},
 
 	get_item_if_exists(track {
+		id = "r__rain_exp",
+		def = 2,
+		step = 0.1,
+	}),
+	get_item_if_exists(track {
+		id = "r__rain_k",
+		def = 99,
+		step = 10,
+	}),
+
+	line {},
+
+	get_item_if_exists(track {
 		id = "r__ssa_discard",
 		def = 10,
 		step = 1,
