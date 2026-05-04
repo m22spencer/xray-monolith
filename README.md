@@ -253,7 +253,8 @@ How to compile exes:
   * Persistent weather implementation with using weather interpolation from engine
     * Storing last weather file, current weather file and interpolation between them from engine
     * On load first force apply previous weather, then apply new weather but not forced, then apply interpolation
-    * New engine exports for manipualting weather
+    * Can be toggled in `Video / Weather` options
+  * New engine exports for manipulating weather
   * Safer `pda.calculate_rankings` patch
   * leyten: clamp actor camera collision box at high FOV to fix ultrawide doorway snag, `g_clamp_actor_camera_collision 1` to enable ultrawide fix (https://github.com/themrdemonized/xray-monolith/pull/520)
   * erepb: route assign_smart via simulation_board to fix SIMBOARD.smarts orphans (https://github.com/themrdemonized/xray-monolith/pull/522)
