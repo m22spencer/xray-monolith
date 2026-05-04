@@ -1575,6 +1575,18 @@ bool AllowHudMotion()
 	return g_player_hud->allow_script_anim();
 }
 
+bool MotionExists(LPCSTR model_path, LPCSTR motion_name)
+{
+	::Render->hud_loading = true;
+	IRenderVisual* vis = ::Render->model_Create(model_path);
+	::Render->hud_loading = false;
+	if (!vis) return false;
+	IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(vis);
+	bool found = ka && ka->ID_Cycle_Safe(motion_name).valid();
+	::Render->model_Delete(vis);
+	return found;
+}
+
 void PlayBlendAnm(LPCSTR name, u8 part, float speed, float power, bool bLooped, bool no_restart, LPCSTR pivot_bone)
 {
 	g_player_hud->PlayBlendAnm(name, part, speed, power, bLooped, no_restart, pivot_bone);
@@ -2733,6 +2745,7 @@ void CLevel::script_register(lua_State* L)
 		def("stop_hud_motion", StopHudMotion),
 		def("get_motion_length", MotionLength),
 		def("hud_motion_allowed", AllowHudMotion),
+		def("motion_exists", MotionExists),
 		def("play_hud_anm", PlayBlendAnm),
 		def("stop_hud_anm", StopBlendAnm),
 		def("stop_all_hud_anms", StopAllBlendAnms),
