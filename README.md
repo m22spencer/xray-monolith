@@ -240,6 +240,7 @@ How to compile exes:
 * Main and MT:
   * More meaningful error messages in `CDamageManager::load_section` and `CWeaponMagazined::LoadScopeKoeffs`
   * `level.set_cam_custom_position_direction` don't apply FPCam smoothing if custom smoothing is 0
+  * Disable legs rendering when `level.set_cam_custom_position_direction` is applied
   * Auto-fire after reload, use `Level().IR_OnKeyboardPress` instead of Actor's input receiver, fix https://github.com/themrdemonized/xray-monolith/issues/521
   * Disable caching in `utils_item.script`, fixes stale data issue
   * `luabind::detail::class_rep::function_dispatcher` has own try catch block that will reroute errors to BusyHandsDebug, potentially covering more script issues
