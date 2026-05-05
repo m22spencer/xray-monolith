@@ -41,6 +41,17 @@ void CTelekinesis::clear()
 	objects.clear();
 }
 
+
+void CTelekinesis::remove_object_callbacks()
+{
+    for (auto it : objects)
+    {
+        auto obj = it->get_object();
+        if (obj)
+            obj->set_collision_hit_callback(0);
+    }
+}
+
 void CTelekinesis::deactivate()
 {
 	active = false;
