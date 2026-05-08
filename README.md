@@ -19,14 +19,14 @@ MT version includes all features of standard Modded Exes described below, plus:
   * Particle interpolation between frames for smoother appearance
   * Multithreaded: 
     * Loading resources (textures, models, CFORM (collisions))
-    * HOM (Visibility tests)
     * Grass rendering
     * Rain
     * Particles
     * Bones calculations for models
     * Engine scheduler, split between real-time updated objects on main thread and others on separate thread with configurable batch amount to do per frame
     * Feel and Vision for AI
-    * Task Manager
+    * Task Manager (disabled by default)
+    * UI (disabled by default)
     * Parallel execution of `CreateTimeEvent` and `AddUniqueCall` commands (disabled by default)
     * Logger
   * Toggleable options available in Modded Exes options
@@ -235,6 +235,19 @@ How to compile exes:
 13. A short video demonstration of the entire process: https://youtu.be/MmZwyM2QO38
 
 ## Changelog
+
+**2026.05.08**
+
+* Main and MT:
+  * Persistent weather do not load/save state on transitions to underground levels
+  * Disable actor shadow when when `level.set_cam_custom_position_direction` is engaged and `r__actor_shadow_in_demo_record` is 1
+  * Fixed crash on `poltergeist_telekinesis.cpp (310): SCollisionHitCallback::call` with Poltergeists
+
+* MT:
+  * `r__clear_resources_on_unload` cvar to force unload textures and models from pool on level change or exit. Will decrease VRAM usage but increase loading times
+  * Fixed `r__no_ram_textures` behaviour to match vanilla
+  * `setVisible(false)` for objects about to be destroyed, possibly fixes visuals flickering for one frame like with Mags Redux mod
+  * `CSoundMemoryManager::update` `m_sounds` nullptr check
 
 **2026.05.05**
 * Main and MT:
